@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121028230305) do
+ActiveRecord::Schema.define(:version => 20121102085606) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -84,8 +84,8 @@ ActiveRecord::Schema.define(:version => 20121028230305) do
     t.string   "name"
     t.integer  "address_id"
     t.integer  "primary_contact_id"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
   end
 
   create_table "service_requests", :force => true do |t|
@@ -104,11 +104,11 @@ ActiveRecord::Schema.define(:version => 20121028230305) do
     t.integer  "req_min_age"
     t.boolean  "req_veteran"
     t.integer  "funding_source_id"
-    t.string   "rate"
     t.datetime "created_at",                                                    :null => false
     t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.text     "rate"
   end
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
@@ -122,12 +122,12 @@ ActiveRecord::Schema.define(:version => 20121028230305) do
 
   create_table "trip_claims", :force => true do |t|
     t.integer  "origin_provider_id"
-    t.integer  "claimant_service_id"
+    t.integer  "claimant_provider_id"
     t.integer  "trip_ticket_id"
-    t.integer  "fare"
     t.integer  "status"
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
+    t.text     "rate"
   end
 
   create_table "trip_results", :force => true do |t|
@@ -148,7 +148,7 @@ ActiveRecord::Schema.define(:version => 20121028230305) do
     t.float    "odometer_start"
     t.float    "odometer_end"
     t.float    "billable_mileage"
-    t.integer  "num_extra_securements"
+    t.string   "extra_securements_used"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
   end
@@ -156,6 +156,7 @@ ActiveRecord::Schema.define(:version => 20121028230305) do
   create_table "trip_tickets", :force => true do |t|
     t.integer  "origin_provider_id"
     t.integer  "origin_customer_id"
+    t.integer  "claimant_provider_id"
     t.integer  "claimant_customer_id"
     t.integer  "approved_claim_id"
     t.boolean  "customer_information_withheld"
