@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121102085606) do
+ActiveRecord::Schema.define(:version => 20121102090124) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(:version => 20121102085606) do
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
     t.text     "rate"
+    t.integer  "claimant_service_id"
   end
 
   create_table "trip_results", :force => true do |t|
