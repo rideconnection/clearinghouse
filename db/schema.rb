@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121102090124) do
+ActiveRecord::Schema.define(:version => 20121102091215) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -101,14 +101,22 @@ ActiveRecord::Schema.define(:version => 20121102090124) do
   create_table "services", :force => true do |t|
     t.string   "name"
     t.integer  "provider_id"
-    t.integer  "req_min_age"
-    t.boolean  "req_veteran"
     t.integer  "funding_source_id"
     t.datetime "created_at",                                                    :null => false
     t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
     t.text     "rate"
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.hstore   "eligibility"
+  end
+
+  create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
+    t.text "table_name",      :null => false
+    t.text "geometry_column"
+    t.text "event",           :null => false
+    t.text "timestamp",       :null => false
+    t.text "ver_sqlite",      :null => false
+    t.text "ver_splite",      :null => false
   end
 
   create_table "trip_claims", :force => true do |t|
