@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121102103209) do
+ActiveRecord::Schema.define(:version => 20121102105732) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -153,9 +153,9 @@ ActiveRecord::Schema.define(:version => 20121102103209) do
     t.float    "odometer_start"
     t.float    "odometer_end"
     t.float    "billable_mileage"
-    t.string   "extra_securements_used"
     t.datetime "created_at",             :null => false
     t.datetime "updated_at",             :null => false
+    t.integer  "extra_securement_count"
   end
 
   create_table "trip_tickets", :force => true do |t|
