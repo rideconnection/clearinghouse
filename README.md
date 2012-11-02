@@ -8,46 +8,87 @@ transportation service providers.
 Development Environment
 -----------------------
 
-The Gemfile is currently setup with the assumption that you will use SQLite in
-your development environment and PostgreSQL on the deployed server.  This
-application uses geospatial database extensions that are available for each of
-these databases (SpatiaLite and PostGIS respectively) in combination with the
-RGeo Ruby gem.
+This application depends on PostgreSQL for its useful extensions: fuzzy string
+match, spatial types and operations, and hstore (key/value store).  It uses
+the RGeo gem in combination with the PostGIS extensions for spatial support.
 
-(The use of SQLite may change in the future if it is unable to support all the
-features of this application.)
+SQLite has a geospatial extension called SpatiaLite, but it does not have the
+fuzzy match or key/value storage extensions, so we don't use it in development.
 
 Setting up the development environment:
 
-0. Install RVM if you do not already have it.
+0. Prerequsites:
+   - RVM
+   - PostgreSQL, e.g.:
+         apt-get install postgresql postgresql-contrib-9.1 \
+                         postgresql-9.1-postgis postgresql-server-dev-9.1
 
 1. Install your Ruby environment:
    - Install a JavaScript runtime, for example:
        apt-get install nodejs
-   - Install SQLite and SpatiaLite, for example:
-       apt-get install sqlite3 libsqlite3-dev libspatialite-dev
    - Trust the local .rvmrc file when you enter this repository directory.
    - rvm install ruby-1.9.3-p286
    - gem install bundler
    - bundle install
+ 
+2. Create the clearinghouse user and database template:
 
-2. Create your config/database.yml with a development and test database:
+    $ sudo -u postgres -i
+    $ psql
 
+And run the following commands:
+
+    CREATE ROLE clearinghouse WITH CREATEDB LOGIN PASSWORD 'clearinghouse';
+
+    CREATE DATABASE template_clearinghouse;
+    UPDATE pg_database SET datistemplate = TRUE WHERE datname =
+        'template_clearinghouse';
+    
+    \c template_postgis
+
+    -- May produce: ERROR:  language "plpgsql" already exists
+    -- This is ok.
+    CREATE LANGUAGE plpgsql;
+    
+    -- Install PostGIS (your file paths may vary)
+    \i /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
+    \i /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+    GRANT ALL ON geometry_columns TO PUBLIC;
+    GRANT ALL ON geography_columns TO PUBLIC;
+    GRANT ALL ON spatial_ref_sys TO PUBLIC;
+
+    CREATE EXTENSION fuzzystrmatch;
+    CREATE EXTENSION hstore;
+    
+    -- Freeze rows in the database to avoid transaction ID wraparound issues
+    VACUUM FREEZE;
+
+We now have a database template called `template_clearinghouse` that can be
+used to create new databases with these extensions already installed.
+
+3. Create your config/database.yml with a development and test database:
+
+    common: &common
+      adapter: postgis
+      host: localhost
+      username: clearinghouse
+      password: clearinghouse
+      template: template_clearinghouse
+      min_messages: warning
+      pool: 5
+      timeout: 5000
+    
     development:
-      adapter: spatialite
-      database: db/development.sqlite3
-      pool: 5
-      timeout: 5000
-   
+      <<: *common
+      database: clearinghouse_dev
+    
     test:
-      adapter: spatialite
-      database: db/test.sqlite3
-      pool: 5
-      timeout: 5000
+      <<: *common
+      database: clearinghouse_test
 
-3. Create your development database: rake db:setup
+4. Create your development and test databases: rake db:setup
 
-4. Ensure the test suite passes: rake spec
+5. Ensure the test suite passes: rake spec
 
 Generating ER diagram
 ---------------------

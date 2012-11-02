@@ -6,6 +6,10 @@ gem 'rails', '3.2.8'
 gem 'rvm-capistrano'
 gem 'pg'
 
+# PostgreSQL hstore support
+gem 'activerecord-postgres-hstore',
+    git: 'git://github.com/softa/activerecord-postgres-hstore.git'
+
 # Geospatial support
 gem 'rgeo'
 gem 'activerecord-postgis-adapter'
@@ -30,10 +34,6 @@ group :test, :development do
   gem 'rails-erd'
   gem 'rspec-rails'
   gem 'ruby-debug19'
-
-  # SQLite
-  gem 'sqlite3'
-  gem 'activerecord-spatialite-adapter'
 end
 
 # To use ActiveModel has_secure_password

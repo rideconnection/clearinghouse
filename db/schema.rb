@@ -111,15 +111,6 @@ ActiveRecord::Schema.define(:version => 20121102090124) do
     t.text     "rate"
   end
 
-  create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
-    t.text "table_name",      :null => false
-    t.text "geometry_column"
-    t.text "event",           :null => false
-    t.text "timestamp",       :null => false
-    t.text "ver_sqlite",      :null => false
-    t.text "ver_splite",      :null => false
-  end
-
   create_table "trip_claims", :force => true do |t|
     t.integer  "origin_provider_id"
     t.integer  "claimant_provider_id"
