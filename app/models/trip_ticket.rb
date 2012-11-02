@@ -6,7 +6,6 @@ class TripTicket < ActiveRecord::Base
   has_one :location, :foreign_key => :pick_up_location_id
   has_one :location, :foreign_key => :drop_off_location_id
   has_one :mobility_type
-  has_many :trip_ticket_events
   has_many :trip_claims
   has_one :trip_result
 
