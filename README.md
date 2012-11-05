@@ -44,7 +44,7 @@ And run the following commands:
     UPDATE pg_database SET datistemplate = TRUE WHERE datname =
         'template_clearinghouse';
     
-    \c template_postgis
+    \c template_clearinghouse
 
     -- May produce: ERROR:  language "plpgsql" already exists
     -- This is ok.
