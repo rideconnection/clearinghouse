@@ -10,6 +10,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def logout
+    flash[:notice] = 'Logout is not implemented yet.'
+    redirect_to :controller => :home, :action => :dashboard
+  end
+
+  # My Account (placeholder)
+  def account
+  end
+
   # GET /users/1
   # GET /users/1.json
   def show

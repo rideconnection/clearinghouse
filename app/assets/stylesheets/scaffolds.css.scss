@@ -1,9 +1,11 @@
 body {
-  background-color: #fff;
+  background-color: #f0f0f0;
   color: #333;
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 13px;
   line-height: 18px;
+  margin: 0;
+  padding: 0;
 }
 
 p, ol, ul, td {
@@ -33,6 +35,30 @@ div {
   &.field, &.actions {
     margin-bottom: 10px;
   }
+}
+
+#wrapper {
+  background-color: #ffffff;
+  margin: 0 auto;
+  padding: 0 10px;
+  width: 960px;
+}
+
+#header {
+}
+
+p.notice {
+  background-color: #70ff70;
+  border: 1px solid #20e020;
+  color: #000;
+  padding: 1em;
+}
+
+#footer {
+  color: #c0c0c0;
+  padding: 1em 0;
+  text-align: center;
+  width: 100%;
 }
 
 #notice {

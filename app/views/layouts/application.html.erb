@@ -7,8 +7,33 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<%= yield %>
-
+<div id="wrapper">
+  <div id="header">
+    <div id="main-nav">
+      <ul>
+        <li><%= link_to 'Dashboard', root_path %></li>
+        <li><%= link_to 'Trip Tickets', trip_tickets_path %></li>
+        <li><%= link_to 'Open Capacity', open_capacities_path %></li>
+        <li><%= link_to 'Reports', reports_path %></li>
+        <li><%= link_to 'My Account', account_users_path %></li><%# TODO %>
+        <li><%= link_to 'Logout', logout_users_path, {:method=>:post} %></li>
+      </ul>
+      <%= form_tag search_trip_tickets_path, :id=>'search-form' do %>
+        <%= search_field_tag :q, nil, :placeholder=>'Search' %>
+      <% end %>
+    </div>
+  </div>
+  <% if notice %>
+    <p class="notice"><%= notice %></p>
+  <% end %>
+  <% if alert %>
+    <p class="alert"><%= alert %></p>
+  <% end %>
+  <%= yield %>
+  <div id="footer">
+    Copyright &copy;<%= Time.now.year %>
+    <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %>
+  </div>
+</div>
 </body>
 </html>

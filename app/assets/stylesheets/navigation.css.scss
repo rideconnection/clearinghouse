@@ -1,0 +1,37 @@
+@import 'utilities';
+
+#main-nav {
+  @include clearfix;
+}
+
+#main-nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+#main-nav li {
+  float: left;
+  margin: 0 2em 1em 0;
+}
+
+#main-nav a {
+  display: block;
+  background-color: #e0e0e0;
+  padding: 5px;
+  color: #000050;
+  font-size: 1.1em;
+  text-decoration: none;
+}
+
+#main-nav a:visited {
+  color: #000050;
+}
+
+#main-nav a:hover {
+  background-color: #e0e0ff;
+  color: #303080;
+}
+
+#search-form {
+  float: right;
+}
