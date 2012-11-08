@@ -30,4 +30,4 @@ task :link_database_yml do
   run  "ln -nfs #{deploy_to}/shared/config/app_config.yml #{deploy_to}/current/config/app_config.yml"
 end
 
-after "deploy:create_symlink", :link_database_yml
+before "deploy:assets:precompile", :link_database_yml
