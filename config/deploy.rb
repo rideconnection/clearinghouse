@@ -25,9 +25,9 @@ end
 
 task :link_database_yml do
   puts "    Link in database.yml file"
-  run  "ln -nfs #{deploy_to}/shared/config/database.yml #{deploy_to}/current/config/database.yml"
+  run  "ln -nfs #{deploy_to}/shared/config/database.yml #{latest_release}/config/database.yml"
   puts "    Link in app_config.yml file"
-  run  "ln -nfs #{deploy_to}/shared/config/app_config.yml #{deploy_to}/current/config/app_config.yml"
+  run  "ln -nfs #{deploy_to}/shared/config/app_config.yml #{latest_release}/config/app_config.yml"
 end
 
 before "deploy:assets:precompile", :link_database_yml
