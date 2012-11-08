@@ -24,8 +24,6 @@ Setting up the development environment:
                          postgresql-9.1-postgis postgresql-server-dev-9.1
 
 1. Install your Ruby environment:
-   - Install a JavaScript runtime, for example:
-       apt-get install nodejs
    - Trust the local .rvmrc file when you enter this repository directory.
    - rvm install ruby-1.9.3-p286
    - gem install bundler
