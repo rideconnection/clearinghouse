@@ -30,6 +30,9 @@ gem 'audited'
 gem 'audited-activerecord', '~> 3.0'
 gem 'jquery-rails'
 
+# Javascript engine
+gem 'therubyracer'
+
 group :test, :development do
   gem 'rails-erd'
   gem 'rspec-rails'
