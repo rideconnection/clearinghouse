@@ -7,7 +7,7 @@ Clearinghouse::Application.routes.draw do
     post 'search', :on=>:collection
   end
   scope '/admin' do
-    root :to => "admin#index"
+    root :to => "admin#index", :as => :admin
     resources :users do
       member do
         post '/activate' => 'users#activate'
