@@ -28,6 +28,8 @@ end
 
 gem 'audited'
 gem 'audited-activerecord', '~> 3.0'
+gem 'cancan', '~> 1.6.8'
+gem 'devise', '~> 2.1'
 gem 'jquery-rails'
 
 # Javascript engine

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121102105732) do
+ActiveRecord::Schema.define(:version => 20121120081521) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -91,6 +91,15 @@ ActiveRecord::Schema.define(:version => 20121102105732) do
     t.integer  "primary_contact_id"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
+  end
+
+  create_table "roles", :force => true do |t|
+    t.string "name"
+  end
+
+  create_table "roles_users", :id => false, :force => true do |t|
+    t.integer "role_id"
+    t.integer "user_id"
   end
 
   create_table "service_requests", :force => true do |t|
@@ -199,9 +208,21 @@ ActiveRecord::Schema.define(:version => 20121102105732) do
     t.string   "title"
     t.string   "phone"
     t.integer  "provider_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                               :null => false
+    t.datetime "updated_at",                               :null => false
+    t.string   "encrypted_password",     :default => "",   :null => false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.integer  "sign_in_count",          :default => 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.boolean  "active",                 :default => true, :null => false
   end
+
+  add_index "users", ["email"], :name => "index_users_on_email", :unique => true
+  add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 
   create_table "waypoints", :force => true do |t|
     t.integer  "open_capacity_id"

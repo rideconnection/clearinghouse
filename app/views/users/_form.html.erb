@@ -15,6 +15,14 @@
     <%= f.label :email %><br />
     <%= f.text_field :email %>
   </div>
+  <div>
+    <%= f.label :password %><br />
+    <%= f.password_field :password %>
+  </div>
+  <div>
+    <%= f.label :password_confirmation %><br />
+    <%= f.password_field :password_confirmation %>
+  </div>
   <div class="field">
     <%= f.label :name %><br />
     <%= f.text_field :name %>
@@ -27,6 +35,12 @@
     <%= f.label :phone %><br />
     <%= f.text_field :phone %>
   </div>
+  <% if current_user != @user %>
+  <div class="field">
+    <%= f.label :role %><br />
+    <%= collection_select :user, :role_ids, Role.all, :id, :name %>
+  </div>
+  <% end %>
   <div class="actions">
     <%= f.submit %>
   </div>

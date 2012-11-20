@@ -1,3 +1,4 @@
+<div id="users">
 <h1>Listing users</h1>
 
 <table>
@@ -13,13 +14,15 @@
 
 <% @users.each do |user| %>
   <tr>
-    <td><%= user.email %></td>
+    <td><%= link_to user.email, edit_user_path(user) %></td>
     <td><%= user.name %></td>
     <td><%= user.title %></td>
     <td><%= user.phone %></td>
-    <td><%= link_to 'Show', user %></td>
-    <td><%= link_to 'Edit', edit_user_path(user) %></td>
-    <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <% if user.active? %>
+      <td><%= link_to 'Deactivate', deactivate_user_path(user), :method=>:post %></td>
+    <% else %>
+      <td><%= link_to 'Activate', activate_user_path(user), :method=>:post %></td>
+    <% end %>
   </tr>
 <% end %>
 </table>
@@ -27,3 +30,4 @@
 <br />
 
 <%= link_to 'New User', new_user_path %>
+</div>
