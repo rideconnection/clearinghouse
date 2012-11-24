@@ -11,6 +11,13 @@ class User < ActiveRecord::Base
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :phone, :roles, :role_ids, :title
+    
+  validate do |user|
+    # Let Devise handle the length requirement.
+    if user.password_required? && (user.password.blank? || !user.password.match(/\d/) || !user.password.match(/[\W_&&[^\s] ]/))
+      user.errors[:password] << "have at least one number and at least one non-alphanumeric character"
+    end
+  end
 
   def has_role?(role_sym)
     roles.any? { |r| r.name.underscore.to_sym == role_sym }
