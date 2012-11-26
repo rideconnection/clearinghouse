@@ -13,7 +13,7 @@ class Ability
       can :manage, User do |u|
         user.provider and user.provider == u.provider or user.id == u.id
       end
-    elsif user.has_role? :scheduler or user.has_role? :dispatcher
+    else # Scheduler, dispatcher, or CSR
       can :manage, User do |u|
         user.id == u.id
       end
