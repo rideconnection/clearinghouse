@@ -75,6 +75,8 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
+        # Devise logs users out on password change
+        sign_in(@user, :bypass => true)
         format.html { redirect_to :back, notice: 'User was successfully updated.' }
         format.json { head :no_content }
       else
