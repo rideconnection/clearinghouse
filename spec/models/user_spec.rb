@@ -55,6 +55,15 @@ describe User do
       
       @user.password = @user.password_confirmation = "aaaaaaaaaaaaaaaaaa 1"
       @user.valid?.should be_true
+      
+      @user.password = @user.password_confirmation = "password"
+      @user.valid?.should be_false
+      
+      @user.password = @user.password_confirmation = "password1"
+      @user.valid?.should be_false
+      
+      @user.password = @user.password_confirmation = "password 1"
+      @user.valid?.should be_true
     end
   end
 

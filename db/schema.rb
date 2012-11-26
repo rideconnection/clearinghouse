@@ -120,8 +120,8 @@ ActiveRecord::Schema.define(:version => 20121120081521) do
     t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
     t.hstore   "eligibility"
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
