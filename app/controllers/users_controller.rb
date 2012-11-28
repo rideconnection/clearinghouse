@@ -71,12 +71,15 @@ class UsersController < ApplicationController
     if params[:user][:password].blank?
       params[:user].delete("password")
       params[:user].delete("password_confirmation")
+      need_relogin = false
+    elsif @user == current_user
+      need_relogin = true
     end
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
         # Devise logs users out on password change
-        sign_in(@user, :bypass => true)
+        sign_in(@user, :bypass => true) if need_relogin
         format.html { redirect_to :back, notice: 'User was successfully updated.' }
         format.json { head :no_content }
       else
