@@ -1,4 +1,8 @@
+require 'api'
+
 Clearinghouse::Application.routes.draw do
+  mount Clearinghouse::API => "/"
+  
   devise_for :users
 
   resources :open_capacities

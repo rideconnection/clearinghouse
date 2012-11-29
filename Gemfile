@@ -32,6 +32,9 @@ gem 'cancan', '~> 1.6.8'
 gem 'devise', '~> 2.1'
 gem 'jquery-rails'
 
+# API web service
+gem 'grape', '~> 0.2.2'
+
 # Javascript engine
 gem 'therubyracer'
 
