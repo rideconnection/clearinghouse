@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121120081521) do
+ActiveRecord::Schema.define(:version => 20121130154432) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -91,7 +91,10 @@ ActiveRecord::Schema.define(:version => 20121120081521) do
     t.integer  "primary_contact_id"
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
+    t.string   "api_key"
   end
+
+  add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true
 
   create_table "roles", :force => true do |t|
     t.string "name"
