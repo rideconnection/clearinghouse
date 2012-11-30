@@ -97,3 +97,30 @@ application's models, you can run:
     rake erd
 
 which will produce a file called 'erd.pdf' in the current directory.
+
+Testing
+-------
+
+We are using Rspec for unit testing. You can run the tests using either of the
+following commands:
+
+    bundle exec rake test
+    bundle exec rspec spec
+
+Speeding up your tests
+----------------------
+
+The spork gem has been included and preconfigured in order to help speed up the 
+execution of tests. If you are only going to be running the test suite once or 
+need to setup a CI server, you won't want to use spork. But if you will be
+running tests frequently, while developing a new feature or refactoring, etc., 
+then preloading your test environment into spork will save you a few seconds 
+or minutes per test execution. To use spork while testing, first boot up spork:
+
+    bundle exec spork
+
+The `--drb` option for rspec has been enabled by default, so the tests will 
+automatically use the spork server if it is running. Note that because spork 
+preloads your environment, you will have to restart the spork server anytime 
+you modify your model or configuration files, or anything else that will be
+cached by the Rails server.
