@@ -13,57 +13,22 @@ describe User do
   end
 
   describe "password" do
-    it "must be 8 - 20 characters in length and have at least one number and at least one non-alphanumeric character" do
-      @user.password = @user.password_confirmation = nil
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = ""
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aaaaaa"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aaa123"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aa  aa"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "1---1"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aa 12"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aaaaaaaaaaaaaaaaaaa 1"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "aaaa 1"
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "aa_123"
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "1----1"
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "aaa 12"
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "11111111111111      "
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "aaaaaaaaaaaaaaaaaa 1"
-      @user.valid?.should be_true
-      
-      @user.password = @user.password_confirmation = "password"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "password1"
-      @user.valid?.should be_false
-      
-      @user.password = @user.password_confirmation = "password 1"
-      @user.valid?.should be_true
+    describe "complexity requirements" do
+      # must be 6 - 20 characters in length and have at least one number and at least one non-alphanumeric character
+      it { should_not accept_values_for(:password, nil, "") }    
+      it { should_not accept_values_for(:password, "aaaaaa") }
+      it { should_not accept_values_for(:password, "aaa123") }
+      it { should_not accept_values_for(:password, "aa  aa") }
+      it { should_not accept_values_for(:password, "1---1") }
+      it { should_not accept_values_for(:password, "aa 12") }
+      it { should_not accept_values_for(:password, "aaaaaaaaaaaaaaaaaaa 1") }
+    
+      it { should accept_values_for(:password, "aaaa 1") }
+      it { should accept_values_for(:password, "aa_123") }
+      it { should accept_values_for(:password, "1----1") }
+      it { should accept_values_for(:password, "aaa 12") }
+      it { should accept_values_for(:password, "11111111111111      ") }
+      it { should accept_values_for(:password, "aaaaaaaaaaaaaaaaaa 1") }
     end
   end
 
