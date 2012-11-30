@@ -38,7 +38,17 @@ gem 'grape', '~> 0.2.2'
 # Javascript engine
 gem 'therubyracer'
 
+group :development do
+  gem 'spork-rails'
+  gem 'thin'
+end
+
+group :test do
+  gem "accept_values_for", "~> 0.4.3"
+end
+
 group :test, :development do
+  gem 'factory_girl_rails', '~> 4.1.0'
   gem 'rails-erd'
   gem 'rspec-rails'
   gem 'ruby-debug19'
