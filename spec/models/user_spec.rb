@@ -12,10 +12,15 @@ describe User do
     Role.new({:name => :guest}).save!
   end
 
+  describe "email" do
+    it { should_not accept_values_for(:email, nil, "") }
+    it { should accept_values_for(:email, "a@b.c") }
+  end
+
   describe "password" do
     describe "complexity requirements" do
       # must be 6 - 20 characters in length and have at least one number and at least one non-alphanumeric character
-      it { should_not accept_values_for(:password, nil, "") }    
+      it { should_not accept_values_for(:password, nil, "") }
       it { should_not accept_values_for(:password, "aaaaaa") }
       it { should_not accept_values_for(:password, "aaa123") }
       it { should_not accept_values_for(:password, "aa  aa") }
