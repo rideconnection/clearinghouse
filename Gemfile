@@ -51,7 +51,7 @@ group :test, :development do
   gem 'factory_girl_rails', '~> 4.1.0'
   gem 'rails-erd'
   gem 'rspec-rails'
-  gem 'ruby-debug19'
+  gem 'debugger'
 end
 
 # To use ActiveModel has_secure_password
