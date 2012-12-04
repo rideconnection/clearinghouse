@@ -54,6 +54,9 @@ And run the following commands:
     GRANT ALL ON geometry_columns TO PUBLIC;
     GRANT ALL ON geography_columns TO PUBLIC;
     GRANT ALL ON spatial_ref_sys TO PUBLIC;
+    -- You may need these to avoid persmissions problems with test suites
+    ALTER TABLE geometry_columns OWNER TO clearinghouse;
+    ALTER TABLE spatial_ref_sys OWNER TO clearinghouse;
 
     CREATE EXTENSION fuzzystrmatch;
     CREATE EXTENSION hstore;
@@ -101,11 +104,11 @@ which will produce a file called 'erd.pdf' in the current directory.
 Testing
 -------
 
-We are using Rspec for unit testing. You can run the tests using either of the
-following commands:
+We are using Rspec for unit testing. You can run the tests using:
 
-    bundle exec rake test
-    bundle exec rspec spec
+    bundle exec rake test:all
+
+(This task is defined in lib/tasks/alltests.rake)
 
 Speeding up your tests
 ----------------------
