@@ -47,16 +47,16 @@ group :test do
   gem "accept_values_for", "~> 0.4.3"
   gem 'capybara'
   gem 'database_cleaner'
-  gem 'factory_girl_rails', '~> 4.1.0'
   gem 'launchy'
   gem 'rspec-rails'
 end
 
 group :test, :development do
+  gem 'debugger'
+  gem 'factory_girl_rails', '~> 4.1.0'
   gem 'minitest-rails', git: 'git://github.com/blowmage/minitest-rails.git'
   gem 'minitest-rails-capybara',
     git: 'git://github.com/blowmage/minitest-rails-capybara.git'
-  gem 'ruby-debug19'
   gem 'spork-rails'
   gem 'spork-testunit', git: 'git://github.com/sporkrb/spork-testunit.git'
   gem 'spork-minitest', git: 'git://github.com/semaperepelitsa/spork-minitest.git'
@@ -67,7 +67,3 @@ end
 
 # Use unicorn as the app server
 # gem 'unicorn'
-
-# To use debugger
-# gem 'debugger'
-

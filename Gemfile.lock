@@ -112,6 +112,13 @@ GEM
     columnize (0.3.6)
     daemons (1.1.9)
     database_cleaner (0.9.1)
+    debugger (1.2.2)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.1.1)
+      debugger-ruby_core_source (~> 1.1.5)
+    debugger-linecache (1.1.2)
+      debugger-ruby_core_source (>= 1.1.1)
+    debugger-ruby_core_source (1.1.5)
     devise (2.1.2)
       bcrypt-ruby (~> 3.0)
       orm_adapter (~> 0.1)
@@ -232,14 +239,6 @@ GEM
       activesupport (>= 3.0)
       railties (>= 3.0)
       rspec (~> 2.11.0)
-    ruby-debug-base19 (0.11.25)
-      columnize (>= 0.3.1)
-      linecache19 (>= 0.5.11)
-      ruby_core_source (>= 0.1.4)
-    ruby-debug19 (0.11.6)
-      columnize (>= 0.3.1)
-      linecache19 (>= 0.5.11)
-      ruby-debug-base19 (>= 0.11.19)
     ruby-graphviz (1.0.8)
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
@@ -302,6 +301,7 @@ DEPENDENCIES
   capybara
   coffee-rails (~> 3.2.1)
   database_cleaner
+  debugger
   devise (~> 2.1)
   factory_girl_rails (~> 4.1.0)
   grape (~> 0.2.2)
@@ -314,7 +314,6 @@ DEPENDENCIES
   rails-erd
   rgeo
   rspec-rails
-  ruby-debug19
   rvm-capistrano
   sass-rails (~> 3.2.3)
   spork-minitest!

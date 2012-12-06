@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121130154432) do
+ActiveRecord::Schema.define(:version => 20121205115900) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -62,6 +62,15 @@ ActiveRecord::Schema.define(:version => 20121130154432) do
     t.string "description"
   end
 
+  create_table "nonces", :force => true do |t|
+    t.string   "nonce"
+    t.integer  "provider_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "nonces", ["nonce", "provider_id"], :name => "index_nonces_on_nonce_and_provider_id", :unique => true
+
   create_table "open_capacities", :force => true do |t|
     t.integer  "service_id"
     t.integer  "seats_open"
@@ -92,6 +101,7 @@ ActiveRecord::Schema.define(:version => 20121130154432) do
     t.datetime "created_at",         :null => false
     t.datetime "updated_at",         :null => false
     t.string   "api_key"
+    t.string   "private_key"
   end
 
   add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true

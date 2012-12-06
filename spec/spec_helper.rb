@@ -39,10 +39,8 @@ Spork.prefork do
     # the seed, which is printed after each run.
     #     --seed 1234
     config.order = "random"
-  
-    config.include RSpec::Rails::RequestExampleGroup, :type => :request, :example_group => {
-      :file_path => /spec\/api/
-    }
+    
+    config.include ApiMacros, :type => :request
   end
 end
 
