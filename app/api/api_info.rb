@@ -3,7 +3,7 @@ module Clearinghouse
     namespace :info do
       desc "Provides information about the API"
       get do
-        { desc: "Clearinghouse Provider API", stable_version: 'v1' }
+        { description: "Clearinghouse Provider API", available_versions: ['v1'], current_version: 'v1' }
       end
     end
   end
