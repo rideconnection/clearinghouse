@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121205115900) do
+ActiveRecord::Schema.define(:version => 20121208060740) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -52,9 +52,11 @@ ActiveRecord::Schema.define(:version => 20121205115900) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                          :null => false
-    t.datetime "updated_at",                                          :null => false
-    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
+    t.datetime "created_at",                                                :null => false
+    t.datetime "updated_at",                                                :null => false
+    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
+    t.integer  "addressable_id"
+    t.string   "addressable_type"
   end
 
   create_table "mobility_types", :force => true do |t|
@@ -102,6 +104,7 @@ ActiveRecord::Schema.define(:version => 20121205115900) do
     t.datetime "updated_at",         :null => false
     t.string   "api_key"
     t.string   "private_key"
+    t.boolean  "active"
   end
 
   add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true
@@ -133,8 +136,8 @@ ActiveRecord::Schema.define(:version => 20121205115900) do
     t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
-    t.hstore   "eligibility"
     t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.hstore   "eligibility"
   end
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|

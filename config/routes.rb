@@ -6,20 +6,21 @@ Clearinghouse::Application.routes.draw do
   devise_for :users
 
   resources :open_capacities
-  resources :providers
+  resources :providers do
+    post 'activate', :on => :member
+    post 'deactivate', :on => :member
+  end
   resources :trip_tickets do
     post 'search', :on=>:collection
   end
-  scope '/admin' do
-    root :to => "admin#index", :as => :admin
-    resources :users do
-      member do
-        post '/activate' => 'users#activate'
-        post '/deactivate' => 'users#deactivate'
-      end
+  resources :users do
+    member do
+      post '/activate' => 'users#activate'
+      post '/deactivate' => 'users#deactivate'
     end
   end
 
+  match 'admin', :controller=>:admin, :action=>:index
   match 'reports', :controller=>:reports, :action=>:index
 
   root :to => 'home#dashboard'

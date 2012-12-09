@@ -1,15 +1,21 @@
 class Provider < ActiveRecord::Base
   has_many :services
   has_many :nonces
-  has_one :location, :foreign_key => :address_id
-  has_one :user, :foreign_key => :primary_contact_id
+  has_one :address, :class_name => :Location, :as => :addressable,
+          :validate => true, :dependent => :destroy
+  belongs_to :primary_contact, :foreign_key => :primary_contact_id,
+             :class_name => :User
 
-  attr_accessible :address_id, :name, :primary_contact_id
+  # :address_attributes is needed to support mass-assignment of nested attrs
+  attr_accessible :active, :address, :address_attributes, :name,
+                  :primary_contact_id
+  accepts_nested_attributes_for :address
   
   after_create :generate_initial_api_keys
   
   validates :api_key, uniqueness: true, presence: {on: :update}
   validates :private_key, presence: {on: :update}
+  validates_presence_of :name, :address, :primary_contact_id
   
   def regenerate_keys!(force = true)
     generate_api_key!     if force || !self.api_key.present?
