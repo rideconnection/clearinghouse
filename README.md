@@ -104,9 +104,10 @@ which will produce a file called 'erd.pdf' in the current directory.
 Testing
 -------
 
-We are using Rspec for unit testing. You can run the tests using:
+We currently have two test suites, you can run them with the commands:
 
-    bundle exec rake test:all
+    bundle exec rspec spec
+    bundle exec rake test:integration
 
 (This task is defined in lib/tasks/alltests.rake)
 
@@ -118,12 +119,18 @@ execution of tests. If you are only going to be running the test suite once or
 need to setup a CI server, you won't want to use spork. But if you will be
 running tests frequently, while developing a new feature or refactoring, etc., 
 then preloading your test environment into spork will save you a few seconds 
-or minutes per test execution. To use spork while testing, first boot up spork:
+or minutes per test execution.
 
-    bundle exec spork
+You'll need two instances of spork for the two test suites:
 
-The `--drb` option for rspec has been enabled by default, so the tests will 
-automatically use the spork server if it is running. Note that because spork 
-preloads your environment, you will have to restart the spork server anytime 
-you modify your model or configuration files, or anything else that will be
-cached by the Rails server.
+    bundle exec spork rspec    (in terminal one)
+    bundle exec spork minitest (in terminal two)
+
+You can then run the test suites with the commands:
+
+    bundle exec rspec spec
+    bundle exec testdrb test/integration/**/*_test.rb
+
+RSpec will use the DRb server by default. The minitest tests need to be run
+with the "testdrb" command.  There is a rake task called "test:all" that will
+run both of these for you.
