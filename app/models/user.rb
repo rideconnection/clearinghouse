@@ -1,16 +1,15 @@
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
-  # :token_authenticatable, :confirmable,
-  # :lockable, :rememberable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :trackable, :validatable
+  # :token_authenticatable, :confirmable, :lockable, :rememberable,
+  # :registerable, :timeoutable and :omniauthable
+  devise :database_authenticatable, :recoverable, :trackable, :validatable
 
   # Setup accessible (or protected) attributes for your model
   belongs_to :provider
   has_and_belongs_to_many :roles
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :phone, :roles, :role_ids, :title
+    :phone, :provider, :provider_id, :roles, :role_ids, :title
     
   # This pattern should technically work, but it doesn't...
   # validates_format_of :password, :if => :password_required?,
@@ -23,7 +22,7 @@ class User < ActiveRecord::Base
     end
   end
 
-                      
+  default_scope order('name ASC')
 
   def has_role?(role_sym)
     roles.any? { |r| r.name.underscore.to_sym == role_sym }

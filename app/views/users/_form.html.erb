@@ -35,11 +35,29 @@
     <%= f.label :phone %><br />
     <%= f.text_field :phone %>
   </div>
-  <% if current_user != @user %>
   <div class="field">
-    <%= f.label :role %><br />
-    <%= collection_select :user, :role_ids, Role.all, :id, :name %>
+    <%= f.label :provider %><br/>
+    <% if can? :set_provider, User %>
+      <%= collection_select :user, :provider_id, Provider.all, :id, :name,
+                            :include_blank => true %>
+    <% else %>
+      <% if @user.provider.nil? %>
+        <span style="color: #aaa">(none)</span>
+      <% else %>
+        <%= link_to @user.provider.name, provider_path(@user.provider) %>
+      <% end %>
+    <% end %>
   </div>
+  <% if can? :set_any_role, @user and @user != current_user %>
+    <div class="field">
+      <%= f.label :role %><br />
+      <%= collection_select :user, :role_ids, Role.all, :id, :name %>
+    </div>
+  <% elsif can? :set_provider_role, @user and @user != current_user %>
+    <div class="field">
+      <%= f.label :role %><br />
+      <%= collection_select :user, :role_ids, Role.provider_roles, :id, :name %>
+    </div>
   <% end %>
   <div class="actions">
     <%= f.submit %>

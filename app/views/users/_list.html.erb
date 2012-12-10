@@ -1,0 +1,29 @@
+<table>
+  <tr>
+    <th>Email</th>
+    <th>Name</th>
+    <th>Title</th>
+    <th>Phone</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% users.each do |user| %>
+  <tr>
+    <td><%= link_to user.email, user_path(user) %></td>
+    <td><%= user.name %></td>
+    <td><%= user.title %></td>
+    <td><%= user.phone %></td>
+    <% if can? :edit, user %>
+      <td><%= link_to 'Edit User', edit_user_path(user) %></td>
+      <% if user.active? %>
+        <td><%= link_to 'Deactivate User', deactivate_user_path(user),
+                        :method=>:post %></td>
+      <% else %>
+        <td><%= link_to 'Activate User', activate_user_path(user),
+                        :method=>:post %></td>
+      <% end %>
+    <% end %>
+  </tr>
+<% end %>
+</table>

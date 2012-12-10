@@ -21,7 +21,8 @@
       </ul>
       <% if current_user %>
         <div id="account">
-          <%= link_to current_user.email, edit_user_path(current_user) %>
+          Hello,
+          <%= link_to current_user.name, edit_user_path(current_user) %>
           <%= link_to '(Logout)', destroy_user_session_path, {:method=>:delete} %>
         </div>
         <%= form_tag search_trip_tickets_path, :id=>'search-form' do %>

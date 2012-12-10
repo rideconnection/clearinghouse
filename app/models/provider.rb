@@ -1,6 +1,7 @@
 class Provider < ActiveRecord::Base
   has_many :services
   has_many :nonces
+  has_many :users
   has_one :address, :class_name => :Location, :as => :addressable,
           :validate => true, :dependent => :destroy
   belongs_to :primary_contact, :foreign_key => :primary_contact_id,
@@ -12,6 +13,7 @@ class Provider < ActiveRecord::Base
   accepts_nested_attributes_for :address
   
   after_create :generate_initial_api_keys
+  after_save :update_user_provider
   
   validates :api_key, uniqueness: true, presence: {on: :update}
   validates :private_key, presence: {on: :update}
@@ -39,4 +41,12 @@ class Provider < ActiveRecord::Base
     generate_api_key! unless self.api_key.present?
     generate_private_key! unless self.private_key.present?
   end  
+
+  # If a user has been made primary contact of this provider, then the user
+  # should be a member of this provider.
+  def update_user_provider
+    self.primary_contact.provider = self
+    self.primary_contact.save!
+  end
+
 end

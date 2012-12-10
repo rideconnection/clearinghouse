@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   load_and_authorize_resource
+
   # GET /users
   # GET /users.json
   def index
@@ -33,8 +34,9 @@ class UsersController < ApplicationController
   # GET /users/new
   # GET /users/new.json
   def new
-    @user = User.new
-
+    if !current_user.has_role?(:site_admin)
+      @user.provider = current_user.provider
+    end
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @user }
@@ -43,17 +45,25 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.find(params[:id])
   end
 
   # POST /users
   # POST /users.json
   def create
-    @user = User.new(params[:user])
-
+    if !current_user.has_role?(:site_admin)
+      @user.provider = current_user.provider
+    end
+    if params[:user].has_key?(:role_ids)
+      if Role.provider_roles.exists?(Role.find(params[:user][:role_ids]))
+        authorize! :set_provider_role, User
+      else
+        authorize! :set_any_role, User
+      end
+    end
     respond_to do |format|
       if @user.save
-        format.html { redirect_to users_path, notice: 'User was successfully created.' }
+        destination = current_user.has_role?(:site_admin) ? users_path : provider_path(@user.provider)
+        format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
       else
         format.html { render action: "new" }
@@ -65,7 +75,16 @@ class UsersController < ApplicationController
   # PUT /users/1
   # PUT /users/1.json
   def update
-    @user = User.find(params[:id])
+    if params[:user].has_key?(:provider_id)
+      authorize! :set_provider, @user
+    end
+    if params[:user].has_key?(:role_ids)
+      if Role.provider_roles.exists?(Role.find(params[:user][:role_ids]))
+        authorize! :set_provider_role, @user
+      else
+        authorize! :set_any_role, @user
+      end
+    end
     if params[:user][:password].blank?
       params[:user].delete("password")
       params[:user].delete("password_confirmation")
@@ -100,7 +119,6 @@ class UsersController < ApplicationController
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
-    @user = User.find(params[:id])
     @user.destroy
 
     respond_to do |format|

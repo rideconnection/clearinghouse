@@ -8,13 +8,15 @@
     <th>Name</th>
     <th>Contact</th>
     <th></th>
+    <th></th>
   </tr>
   <% @providers.each do |provider| %>
     <tr>
       <td><%= provider.id %></td>
-      <td><%= link_to provider.name, edit_provider_path(provider) %></td>
+      <td><%= link_to provider.name, provider_path(provider) %></td>
       <td><%= link_to provider.primary_contact.name,
                       edit_user_path(provider.primary_contact) %></td>
+      <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
       <% if provider.active? %>
         <td><%= link_to 'Deactivate', deactivate_provider_path(provider),
                         :method=>:post %></td>
