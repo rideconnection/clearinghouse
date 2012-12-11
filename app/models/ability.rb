@@ -11,6 +11,12 @@ class Ability
       can :update, Provider do |provider|
         user.provider == provider
       end
+      can :keys, Provider do |provider|
+        user.provider == provider
+      end
+      can :reset_keys, Provider do |provider|
+        user.provider == provider
+      end
       # TODO: Refactor
       can :create, User
       can :update, User do |u|

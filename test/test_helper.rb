@@ -1,3 +1,4 @@
+$LOAD_PATH << "test"
 require 'rubygems'
 require 'spork'
 
@@ -30,9 +31,8 @@ Spork.prefork do
     end
   end
 
-  DatabaseCleaner.strategy = :truncation
+  DatabaseCleaner.strategy = :truncation, {:except => %w[spatial_ref_sys]}
   MiniTest::Rails.override_testunit!
-
 end
 
 Spork.each_run do

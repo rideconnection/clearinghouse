@@ -7,8 +7,12 @@ Clearinghouse::Application.routes.draw do
 
   resources :open_capacities
   resources :providers do
-    post 'activate', :on => :member
-    post 'deactivate', :on => :member
+    member do
+      post 'activate'
+      post 'deactivate'
+      get  'keys'
+      post 'reset_keys'
+    end
   end
   resources :trip_tickets do
     post 'search', :on=>:collection

@@ -2,6 +2,9 @@
 <% if can? :edit, @provider %>
   <%= link_to 'Edit Provider', edit_provider_path(@provider) %>
 <% end %>
+<% if can? :keys, @provider %>
+  <%= link_to 'View API Keys', keys_provider_path(@provider) %>
+<% end %>
 
 <%= render 'locations/show_fields', :location => @provider.address %>
 
