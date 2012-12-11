@@ -7,10 +7,15 @@ class << self
   end
 end
 
-admin_roles = [:site_admin, :provider_admin]
+admin_roles = {
+  site_admin: Role.where(:name => :site_admin).first,
+  provider_admin: Role.where(:name => :provider_admin).first
+}
 ActiveRecord::Base.transaction do
   puts "-- Loading sandbox data"
   sa = find_or_create_user_by_role_name_and_index(:site_admin, nil)
+  sa.roles << admin_roles[:site_admin] unless sa.roles.include?(admin_roles[:site_admin])
+  sa.save!
   puts "---- Site Admin: \"#{sa.email}\""
   
   2.times do |i|
@@ -24,6 +29,7 @@ ActiveRecord::Base.transaction do
     puts "---- Provider \##{index}: \"#{p.name}\""
     
     pc.provider = p unless pc.provider.present?
+    pc.roles << admin_roles[:provider_admin] unless pc.roles.include?(admin_roles[:provider_admin])
     pc.save! if pc.changed?
     puts "------ Provider Admin: \"#{pc.email}\""
     

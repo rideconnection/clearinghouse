@@ -49,6 +49,7 @@ And run the following commands:
     CREATE LANGUAGE plpgsql;
     
     -- Install PostGIS (your file paths may vary)
+    -- For Brew installations, use the path /usr/local/share/postgis/
     \i /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
     \i /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
     GRANT ALL ON geometry_columns TO PUBLIC;
