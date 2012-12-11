@@ -2,9 +2,9 @@ source 'https://rubygems.org'
 
 gem 'capistrano'
 gem 'capistrano-ext'
+gem 'pg'
 gem 'rails', '3.2.8'
 gem 'rvm-capistrano'
-gem 'pg'
 
 # PostgreSQL hstore support
 gem 'activerecord-postgres-hstore',
@@ -31,6 +31,7 @@ gem 'audited-activerecord', '~> 3.0'
 gem 'cancan', '~> 1.6.8'
 gem 'devise', '~> 2.1'
 gem 'jquery-rails'
+gem 'seedbank'
 
 # API web service
 gem 'grape', '~> 0.2.2'

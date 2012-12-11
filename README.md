@@ -91,6 +91,13 @@ used to create new databases with these extensions already installed.
 
 5. Ensure the test suite passes: rake spec
 
+Seeding your development database
+---------------------------------
+
+Run `rake db:seed` to add some starter data. Note that this is automatically 
+done when you run the `db:setup` rake task. Run `rake -T db:seed` to see other
+seeding options.
+
 Generating ER diagram
 ---------------------
 
