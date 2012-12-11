@@ -1,25 +1,22 @@
-<p id="notice"><%= notice %></p>
+<h2><%= @user.name %></h2>
 
 <p>
-  <b>Email:</b>
-  <%= @user.email %>
+<% if can? :edit, @user %>
+  <%= link_to 'Edit User', edit_user_path(@user) %>
+<% end %>
 </p>
+
+<% unless @user.provider.nil? %>
+  <% unless @user.title.blank? %><%= @user.title %> at<% end %>
+  <%= link_to @user.provider.name, provider_path(@user.provider) %>
+<% end %>
+
 
 <p>
-  <b>Name:</b>
-  <%= @user.name %>
+  <% unless @user.email.blank? %>
+    <%= link_to @user.email, "mailto:#{@user.email}" %><br/>
+  <% end %>
+  <% unless @user.phone.blank? %><%= @user.phone %><br/><% end %>
 </p>
 
-<p>
-  <b>Title:</b>
-  <%= @user.title %>
-</p>
-
-<p>
-  <b>Phone:</b>
-  <%= @user.phone %>
-</p>
-
-
-<%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>

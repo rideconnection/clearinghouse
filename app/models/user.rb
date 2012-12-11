@@ -24,6 +24,11 @@ class User < ActiveRecord::Base
 
   default_scope order('name ASC')
 
+  # All users, sorted by provider
+  scope :all_by_provider, select('users.*, providers.name as provider_name')
+   .joins("LEFT JOIN providers ON users.provider_id = providers.id")
+   .reorder('users.provider_id IS NULL DESC, provider_name ASC, users.name ASC')
+
   def has_role?(role_sym)
     roles.any? { |r| r.name.underscore.to_sym == role_sym }
   end

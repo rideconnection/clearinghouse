@@ -1,7 +1,7 @@
 <div id="users">
 <h1>Listing users</h1>
 
-<%= render 'list', :users => @users %>
+<%= render 'list', :users => @users, :show_provider => true %>
 <br />
 
 <%= link_to 'New User', new_user_path %>

@@ -14,10 +14,10 @@
               user_path(@provider.primary_contact) %>
 </p>
 
-<% if can? :edit, @provider %>
-  <h3>Members</h3>
-  <%= render 'users/list', :users => @provider.users %>
-  <br/>
+<h3>Members</h3>
+<%= render 'users/list', :users => @provider.users %>
+<br/>
+<% if can? :create, User %>
   <%= link_to 'Create New User', new_user_path %><br/>
 <% end %>
 

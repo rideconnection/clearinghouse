@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   # GET /users.json
   def index
     authorize! :index, Ability # Workaround CanCan issue allowing index to all
-    @users = User.all
+    @users = User.all_by_provider
 
     respond_to do |format|
       format.html # index.html.erb
