@@ -1,0 +1,18 @@
+common: &common
+  adapter: postgis
+  host: localhost
+  username: clearinghouse
+  password: clearinghouse
+  template: template_clearinghouse
+  min_messages: warning
+  pool: 5
+  timeout: 5000
+
+development:
+  <<: *common
+  database: clearinghouse_dev
+
+test:
+  <<: *common
+  database: clearinghouse_test
+

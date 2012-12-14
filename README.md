@@ -25,6 +25,7 @@ Setting up the development environment:
 
 1. Install your Ruby environment:
    - Trust the local .rvmrc file when you enter this repository directory.
+   - rvm pkg install zlib
    - rvm install ruby-1.9.3-p286
    - gem install bundler
    - bundle install
@@ -68,29 +69,13 @@ And run the following commands:
 We now have a database template called `template_clearinghouse` that can be
 used to create new databases with these extensions already installed.
 
-3. Create your config/database.yml with a development and test database:
-
-    common: &common
-      adapter: postgis
-      host: localhost
-      username: clearinghouse
-      password: clearinghouse
-      template: template_clearinghouse
-      min_messages: warning
-      pool: 5
-      timeout: 5000
-    
-    development:
-      <<: *common
-      database: clearinghouse_dev
-    
-    test:
-      <<: *common
-      database: clearinghouse_test
+3. Copy config/database.yml.example to config/database.yml and edit as needed.
 
 4. Create your development and test databases: rake db:setup
 
-5. Ensure the test suite passes: rake spec
+5. Ensure the test suite passes: 
+    bundle exec rake spec
+    bundle exec rake test:integration
 
 Seeding your development database
 ---------------------------------
@@ -106,6 +91,8 @@ If you'd like to see an ER diagram based on the current state of the
 application's models, you can run:
 
     rake erd
+
+You may need to install the graphviz library to generate the diagram.
 
 which will produce a file called 'erd.pdf' in the current directory.
 
@@ -138,6 +125,9 @@ You can then run the test suites with the commands:
 
     bundle exec rspec spec
     bundle exec testdrb test/integration/**/*_test.rb
+
+Or:
+    bundle exec rake test:all
 
 RSpec will use the DRb server by default. The minitest tests need to be run
 with the "testdrb" command.  There is a rake task called "test:all" that will
