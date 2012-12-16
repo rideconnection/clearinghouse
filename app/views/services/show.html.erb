@@ -1,0 +1,29 @@
+<h2><%= @provider.name %></h2>
+<% if can? :edit, @provider %>
+  <%= link_to 'Edit Details', edit_provider_path(@provider) %>
+<% end %>
+
+<%= render 'locations/show_fields', :location => @provider.address %>
+
+<p>
+  <b>Primary Contact:</b>
+  <%= link_to @provider.primary_contact.name,
+              user_path(@provider.primary_contact) %>
+</p>
+<br/>
+
+<h3>Services</h3>
+<%= render(:partial => 'services/list', :collection => @provider.services) ||
+    '<p>No services defined.</p>'.html_safe %>
+<br/>
+
+<h3>Members</h3>
+<%= render 'users/list', :users => @provider.users %>
+<br/>
+<% if can? :create, User %>
+  <%= link_to 'Create New User', new_user_path %><br/>
+<% end %>
+
+<br />
+
+<%= link_to 'Back', providers_path %>

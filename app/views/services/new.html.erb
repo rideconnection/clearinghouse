@@ -1,0 +1,7 @@
+<h2>
+  <%= link_to 'Providers', providers_path %> &gt;
+  <%= link_to @service.provider.name, provider_path(@service.provider) %> &gt;
+  New Service
+</h2>
+
+<%= render 'form' %>

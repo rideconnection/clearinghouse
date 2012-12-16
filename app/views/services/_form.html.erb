@@ -1,0 +1,87 @@
+<%= form_for([@service.provider, @service]) do |f| %>
+  <% if @service.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@service.errors.count, "error") %> prohibited this service from being saved:</h2>
+      <ul>
+      <% @service.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+
+  <h3>Service Area</h3>
+
+  <h3>Operating Hours</h3>
+  <table style="border-collapse: collapse">
+    <% Date::DAYNAMES.each_with_index do |day_name, day_value| %>
+    <% hours = @hours[day_value] %>
+    <tr <%= (!hours.nil? and hours.errors.any?) ?
+            'class=row_with_errors' : '' %>>
+      <td><%= day_name %></td>
+      <td>
+        <%= radio_button_tag "hours[#{day_value}]", 'closed',
+                             (hours.nil? or hours.is_closed?),
+                             :id => "hours-#{day_value}-closed",
+                             :class => "hours-#{day_value}" %>
+        Closed
+        <%= radio_button_tag "hours[#{day_value}]", 'open24',
+                             (!hours.nil? and hours.is_24_hours?),
+                             :id => "hours-#{day_value}-open-24",
+                             :class => "hours-#{day_value}" %>
+        Open 24 hours
+        <%= radio_button_tag "hours[#{day_value}]", 'open',
+                             (!hours.nil? and hours.is_regular_hours?),
+                             :id => "hours-#{day_value}-open",
+                             :class => "hours-#{day_value}" %>
+        Open...
+        <select id="start-hour-<%= day_value %>"
+                name="start_hour[<%= day_value %>]">
+          <% @start_hours.each do |h| %>
+            <option value="<%= h %>"
+              <%= !hours.nil? and h == hours.open_time ? "selected" : "" %>>
+              <%= h.to_formatted_s :time %>
+            </option>
+          <% end %>
+        </select> to
+        <select id="end-hour-<%= day_value %>"
+                name="end_hour[<%= day_value %>]">
+          <% @end_hours.each do |h| %>
+            <option value="<%= h %>"
+              <%= !hours.nil? and h == hours.close_time ? "selected" : "" %>>
+              <%= h.to_formatted_s :time %></option>
+          <% end %>
+        </select>
+      </td>
+      <% if !hours.nil? and hours.errors.any? %>
+      <td>
+        <% hours.errors.full_messages.each do |msg| %>
+          <span class="error"><%= msg %></span><br/>
+        <% end %>
+      </td>
+      <% end %>
+    </tr>
+    <% end %>
+  </table>
+  <br/>
+  
+  <h3>Eligibility and Funding</h3>
+
+  <h3>Rates</h3>
+  <div class="field">
+    <%= f.label :rate %><br />
+    <%= f.text_field :rate %>
+  </div>
+
+
+
+  <br/>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

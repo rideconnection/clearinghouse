@@ -100,3 +100,7 @@ p.warning {
     list-style: square;
   }
 }
+
+tr.row_with_errors {
+    border: 2px solid red;
+}

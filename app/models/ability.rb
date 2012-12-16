@@ -18,6 +18,10 @@ class Ability
         user.provider == provider
       end
       # TODO: Refactor
+      can :create, Service
+      can :update, Service do |s|
+        user.provider == s.provider
+      end
       can :create, User
       can :update, User do |u|
         user.provider and user.provider == u.provider
@@ -33,6 +37,7 @@ class Ability
       end
     end
     can :read, Provider
+    can :read, Service
     can :read, User
     can :update, User do |u|
       user.id == u.id

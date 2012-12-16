@@ -1,0 +1,29 @@
+<div class="service_detail" style="margin-left: 1em">
+  <h4 style="margin-bottom: 0.5em"><%= service.name %></h4>
+  <% if can? :edit, service %>
+    <%= link_to 'Edit Service',
+                edit_provider_service_path(service.provider, service) %><br/>
+  <% end %>
+  <div style="margin-left: 1em">
+    <h4>Hours</h4>
+    <table>
+    <% service.operating_hours.each do |h| %>
+      <tr>
+        <th><%= Date::DAYNAMES[h.day_of_week] %></th>
+        <td>
+          <% if h.is_closed? %>
+            Closed
+          <% elsif h.is_24_hours? %>
+            Open 24 hours
+          <% else %>
+            Open <%= h.open_time.to_formatted_s(:time) %>
+            - <%= h.close_time.to_formatted_s(:time) %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+    </table>
+    <h4>Rates and Fares</h4>
+    <p><%= service.rate %></p>
+  </div>
+</div>

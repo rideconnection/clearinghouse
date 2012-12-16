@@ -32,6 +32,7 @@ gem 'cancan', '~> 1.6.8'
 gem 'devise', '~> 2.1'
 gem 'jquery-rails'
 gem 'seedbank'
+gem 'time_of_day'
 
 # API web service
 gem 'grape', '~> 0.2.2'

@@ -13,15 +13,14 @@ Clearinghouse::Application.routes.draw do
       get  'keys'
       post 'reset_keys'
     end
+    resources :services, :except => [ :index, :destroy ]
   end
   resources :trip_tickets do
     post 'search', :on=>:collection
   end
   resources :users do
-    member do
-      post '/activate' => 'users#activate'
-      post '/deactivate' => 'users#deactivate'
-    end
+    post 'activate', :on => :member
+    post 'deactivate', :on => :member
   end
 
   match 'admin', :controller=>:admin, :action=>:index

@@ -1,6 +1,9 @@
-<h2><%= @provider.name %></h2>
+<h2>
+  <%= link_to 'Providers', providers_path %> &gt;
+  <%= @provider.name %>
+</h2>
 <% if can? :edit, @provider %>
-  <%= link_to 'Edit Provider', edit_provider_path(@provider) %>
+  <%= link_to 'Edit Details', edit_provider_path(@provider) %>
 <% end %>
 <% if can? :keys, @provider %>
   <%= link_to 'View API Keys', keys_provider_path(@provider) %>
@@ -13,8 +16,23 @@
   <%= link_to @provider.primary_contact.name,
               user_path(@provider.primary_contact) %>
 </p>
+<br/>
 
-<h3>Members</h3>
+<h3><%= @provider.name %> Services</h3>
+
+<% if @provider.services.any? %>
+  <% @provider.services.each do |service| %>
+    <%= render 'services/detail', :service => service %>
+  <% end %>
+<% else %>
+  <p>No services defined.</p>
+<% end %>
+<% if can? :create, Service %>
+  <%= link_to 'Create New Service', new_provider_service_path(@provider) %><br/>
+<% end %>
+<br/>
+
+<h3><%= @provider.name %> Members</h3>
 <%= render 'users/list', :users => @provider.users %>
 <br/>
 <% if can? :create, User %>
