@@ -1,3 +1,8 @@
+<% content_for :head do %>
+<script src="https://maps-api-ssl.google.com/maps/api/js?v=3.10&sensor=false"
+        type="text/javascript" charset="utf-8"></script>
+<% end %>
+
 <%= form_for([@service.provider, @service]) do |f| %>
   <% if @service.errors.any? %>
     <div id="error_explanation">
@@ -16,6 +21,19 @@
   </div>
 
   <h3>Service Area</h3>
+  <div id="service_area">
+    <div id="map-definition"></div>
+    <div id="map-help">
+      <h4>Defining your service area</h4>
+      <ul>
+        <li>Create points to define the shape map by clicking the map.</li>
+        <li>Click a point to remove it from the shape.</li>
+        <li>Drag the virtual point between two points to create a new point.</li>
+      </ul>
+      <br/><br/>
+      <input type="button" id="clear-map" value="Delete all points" />
+    </div>
+  </div>
 
   <h3>Operating Hours</h3>
   <table style="border-collapse: collapse">
@@ -69,19 +87,39 @@
     <% end %>
   </table>
   <br/>
-  
+
   <h3>Eligibility and Funding</h3>
+  <p>
+    <b>TBD</b>
+  </p>
 
   <h3>Rates</h3>
   <div class="field">
-    <%= f.label :rate %><br />
-    <%= f.text_field :rate %>
+    <%= f.text_area :rate, :rows => 5 %><br/>
+    Enter a brief description of your rate structure.
   </div>
-
-
 
   <br/>
   <div class="actions">
     <%= f.submit %>
   </div>
 <% end %>
+
+<%# Make the polygon available for the map to display %>
+<script type="text/javascript" charset="utf-8">
+  <%
+    points = []
+    if !@service.service_area.nil?
+      @service.service_area.exterior_ring().points.each do |p|
+        points << "new google.maps.LatLng(#{p.y}, #{p.x})"
+      end
+    end
+  %>
+  var points = [ <%= points.join(", ") %> ];
+  $(document).ready(function() {
+    services = new Services();
+    services.initialize();
+    services.create_map_editor(points);
+  });
+</script>
+

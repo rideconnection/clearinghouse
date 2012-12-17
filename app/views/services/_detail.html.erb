@@ -5,6 +5,9 @@
                 edit_provider_service_path(service.provider, service) %><br/>
   <% end %>
   <div style="margin-left: 1em">
+    <h4>Service Area</h4>
+    <div id="map-<%= service.id %>" class="map-view"></div>
+    <br/>
     <h4>Hours</h4>
     <table>
     <% service.operating_hours.each do |h| %>
@@ -26,4 +29,22 @@
     <h4>Rates and Fares</h4>
     <p><%= service.rate %></p>
   </div>
+  <script type="text/javascript" charset="utf-8">
+    <%
+      points = []
+      if !service.service_area.nil?
+        service.service_area.exterior_ring().points.each do |p|
+          points << "new google.maps.LatLng(#{p.y}, #{p.x})"
+        end
+      end
+    %>
+    $(document).ready(function() {
+      var points = [ <%= points.join(", ") %> ];
+      if (!window.services) {
+        services = new Services([]);
+        services.initialize();
+      }
+      services.create_map_view($("#map-<%= service.id %>")[0], points);
+    });
+  </script>
 </div>

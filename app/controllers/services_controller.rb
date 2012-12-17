@@ -24,6 +24,7 @@ class ServicesController < ApplicationController
     respond_to do |format|
       begin
         @service.provider = Provider.find(params[:provider_id])
+        update_polygon
         Service.transaction do
           @service.save!
           create_or_update_hours
@@ -41,6 +42,7 @@ class ServicesController < ApplicationController
   def update
     respond_to do |format|
       begin
+        update_polygon
         Service.transaction do
           @service.update_attributes params[:service]
           create_or_update_hours
@@ -118,5 +120,19 @@ class ServicesController < ApplicationController
       break if t == OperatingHours::END_OF_DAY
       t = (t + interval).time_of_day
     end
+  end
+
+  def update_polygon
+    points = []
+    if !params[:service_area].nil?
+      params[:service_area].each_pair do |key, value|
+        points << "#{value[:lng]} #{value[:lat]}"
+      end
+    end
+    wkt = nil
+    if points.any?
+      wkt = "POLYGON ((#{points.join(", ")}))"
+    end
+    @service.service_area = wkt
   end
 end
