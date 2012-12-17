@@ -1,7 +1,12 @@
 <div id="dashboard">
   <div id="dashboard-column-1" class="dashboard-column">
     <div id="summary">
-      <h2>My Provider Name</h2>
+      <% if current_user.provider.nil? %>
+        <h2>Home</h2>
+      <% else %>
+        <h2><%= link_to current_user.provider.name,
+                        provider_path(current_user.provider) %></h2>
+      <% end %>
       This is a summary section.
     </div>
     <div id="filters">

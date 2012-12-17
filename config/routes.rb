@@ -13,7 +13,7 @@ Clearinghouse::Application.routes.draw do
       get  'keys'
       post 'reset_keys'
     end
-    resources :services, :except => [ :index, :destroy ]
+    resources :services, :except => [ :index, :show, :destroy ]
   end
   resources :trip_tickets do
     post 'search', :on=>:collection

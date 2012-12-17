@@ -1,13 +1,6 @@
 class ServicesController < ApplicationController
   load_and_authorize_resource
 
-  def show
-    respond_to do |format|
-      format.html # show.html.erb
-      format.json { render json: @service }
-    end
-  end
-
   def new
     prepare_form
     respond_to do |format|

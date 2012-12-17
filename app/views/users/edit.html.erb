@@ -1,5 +1,9 @@
-<h1>Editing user</h1>
+<% if @user == current_user %>
+<h2>Edit Profile</h2>
+<% else %>
+<h2>Editing user</h2>
+<% end %>
 
 <%= render 'form' %>
 
-<%= link_to 'Back', users_path %>
+<%= link_to 'Back', :back %>
