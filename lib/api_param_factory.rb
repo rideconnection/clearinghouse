@@ -49,6 +49,7 @@ module ApiParamFactory
     end
   end
 
+  # Convert all non-enumerable values to strings (because that's how they'll be recieved on the API side)
   def self.hash_stringify(value)
     case value
     when Hash  then

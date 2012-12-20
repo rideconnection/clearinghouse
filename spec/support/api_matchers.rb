@@ -10,16 +10,14 @@ shared_examples "requires authenticatable params" do  |*additional_params|
   # This still won't be an authenticatable request, but just make sure we are not getting HTTP 400
   it "is valid with min params" do
     send(method, url, all_params)
-    debugger if response.status == 400
-    expect(response.status).to_not eq(400)
+    expect(response.status).to_not eq(403)
     expect(response.body).not_to include("missing parameter:")
   end
 
   all_params.keys.each do |param|
     it "requires #{param} in params" do
       send(method, url, all_params.except(param))
-      debugger if response.status != 400
-      expect(response.status).to eq(400)
+      expect(response.status).to eq(403)
       expect(response.body).to include("missing parameter: #{param}")
     end
   end

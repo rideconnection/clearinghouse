@@ -15,16 +15,21 @@ module Clearinghouse
       # Log it
       Rails.logger.error "#{e.message}\n\n#{e.backtrace.join("\n")}"
       
-      # Notify external service of the error
+      # TODO - Notify external service of the error
       # Airbrake.notify(e)
       
+      message = { :error => e.message }
+      status = 500
       if e.class.name == "ValidationError"
-        Rack::Response.new({ :error => e.message }, 400, { "Content-type" => "application/json" }).finish
-      elsif Rails.env.production?
-        Rack::Response.new({ :error => e.message }, 500, { "Content-type" => "application/json" }).finish
-      else
-        Rack::Response.new({ :error => e.message, :backtrace => e.backtrace }, 500, { 'Content-type' => 'application/json' }).finish
+        status = 403
+      elsif e.class.name == "ActiveRecord::RecordNotFound"
+        status = 404
       end
+      if !Rails.env.production?
+        message = message.merge({ :backtrace => e.backtrace })
+      end
+      
+      Rack::Response.new(message, status, { 'Content-type' => 'application/json' }).finish
     end
     
     scope :open_endpoints do
