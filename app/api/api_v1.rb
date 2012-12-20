@@ -20,7 +20,7 @@ module Clearinghouse
       namespace :users do
         desc "Get a list of users belonging to this provider"
         get do
-          present current_provider.users, with: Clearinghouse::Entities::User
+          present current_provider.users, with: Clearinghouse::Entities::V1::User
         end
 
         params do
@@ -29,7 +29,7 @@ module Clearinghouse
         scope :requires_id do
           desc "Get a specific user"
           get :show do
-            present current_provider.users.find(params[:id]), with: Clearinghouse::Entities::User
+            present current_provider.users.find(params[:id]), with: Clearinghouse::Entities::V1::User
           end
         
           desc "Update a specific user"
@@ -42,9 +42,9 @@ module Clearinghouse
             end
           
             if user.update_attributes(params[:user])
-              present user, with: Clearinghouse::Entities::User
+              present user, with: Clearinghouse::Entities::V1::User
             else
-              error!({message: "Could not save user", errors: user.errors}, status: :unprocessable_entity)
+              error!({message: "Could not update user", errors: user.errors}, status: :unprocessable_entity)
             end
           end
         
@@ -53,7 +53,7 @@ module Clearinghouse
             user = current_provider.users.find(params[:id])
 
             if user.update_attribute(:active, true)
-              present user, with: Clearinghouse::Entities::User
+              present user, with: Clearinghouse::Entities::V1::User
             else
               error!({message: "Could not activate user", errors: user.errors}, status: :unprocessable_entity)
             end
@@ -64,7 +64,7 @@ module Clearinghouse
             user = current_provider.users.find(params[:id])
           
             if user.update_attribute(:active, false)
-              present user, with: Clearinghouse::Entities::User
+              present user, with: Clearinghouse::Entities::V1::User
             else
               error!({message: "Could not deactivate user", errors: user.errors}, status: :unprocessable_entity)
             end
@@ -73,9 +73,20 @@ module Clearinghouse
       end
       
       namespace :provider do
-        desc "Says hello"
-        get :hello do
-          "Hello, claimant!"
+        desc "Get details about the current provider"
+        get do
+          present current_provider, with: Clearinghouse::Entities::V1::Provider
+        end
+        
+        desc "Update the current provider (currently limited to primary_contact_id only)"
+        put :update do
+          # currently limited to primary_contact_id only
+          allowed_params = params[:provider].select{|k,v| [:primary_contact_id].include?(k.to_sym) }
+          if current_provider.update_attributes(allowed_params)
+            present current_provider, with: Clearinghouse::Entities::V1::Provider
+          else
+            error!({message: "Could not update provider", errors: current_provider.errors}, status: :unprocessable_entity)
+          end
         end
       end
     end
