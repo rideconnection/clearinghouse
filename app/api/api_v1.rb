@@ -26,27 +26,48 @@ module Clearinghouse
         params do
           requires :id, :type => Integer, :desc => 'User ID.'
         end
-        desc "Get a specific user"
-        get :show do
-          present current_provider.users.find(params[:id]), with: Clearinghouse::Entities::User
-        end
-        
-        params do
-          requires :id, :type => Integer, :desc => 'User ID.'
-        end
-        desc "Update a specific user"
-        put :update do
-          user = current_provider.users.find(params[:id])
-          
-          if params[:user] && params[:user].try(:[], :password).blank?
-            params[:user].delete("password")
-            params[:user].delete("password_confirmation")
+        scope :requires_id do
+          desc "Get a specific user"
+          get :show do
+            present current_provider.users.find(params[:id]), with: Clearinghouse::Entities::User
           end
+        
+          desc "Update a specific user"
+          put :update do
+            user = current_provider.users.find(params[:id])
           
-          if user.update_attributes(params[:user])
-            present user, with: Clearinghouse::Entities::User
-          else
-            error!({message: "Could not authenticate #{source}", errors: user.errors}, status: :unprocessable_entity)
+            if params[:user] && params[:user].try(:[], :password).blank?
+              params[:user].delete("password")
+              params[:user].delete("password_confirmation")
+            end
+          
+            if user.update_attributes(params[:user])
+              present user, with: Clearinghouse::Entities::User
+            else
+              error!({message: "Could not save user", errors: user.errors}, status: :unprocessable_entity)
+            end
+          end
+        
+          desc "Activates a specific user"
+          put :activate do
+            user = current_provider.users.find(params[:id])
+
+            if user.update_attribute(:active, true)
+              present user, with: Clearinghouse::Entities::User
+            else
+              error!({message: "Could not activate user", errors: user.errors}, status: :unprocessable_entity)
+            end
+          end
+        
+          desc "Activates a specific user"
+          put :deactivate do
+            user = current_provider.users.find(params[:id])
+          
+            if user.update_attribute(:active, false)
+              present user, with: Clearinghouse::Entities::User
+            else
+              error!({message: "Could not deactivate user", errors: user.errors}, status: :unprocessable_entity)
+            end
           end
         end
       end
