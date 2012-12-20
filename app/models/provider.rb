@@ -24,6 +24,13 @@ class Provider < ActiveRecord::Base
     generate_private_key! if force || !self.private_key.present?
   end
   
+  def generate_nonce
+    begin
+      nonce = SecureRandom.hex
+    end while self.nonces.exists?(nonce: nonce)
+    nonce
+  end
+  
   private
   
   def generate_api_key!

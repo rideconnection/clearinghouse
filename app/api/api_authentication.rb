@@ -1,6 +1,4 @@
-require 'base64'
-require 'cgi'
-require 'openssl'
+require 'api_param_factory'
 
 module API_Authentication
   def self.included(api)
@@ -26,8 +24,8 @@ module API_Authentication
         timestamp   = request.params.delete("timestamp")
         hmac_digest = request.params.delete("hmac_digest")
 
-        raise_authentication_error("api_key")     unless current_provider
-        
+        raise_authentication_error("api_key") unless current_provider
+                
         unless Rails.env.development?
           raise_authentication_error("nonce")       unless authenticate_nonce(nonce)
           raise_authentication_error("timestamp")   unless authenticate_timestamp(timestamp)
@@ -43,8 +41,15 @@ module API_Authentication
         (5.minutes.ago.to_i..5.minutes.from_now.to_i).include?(Time.parse(timestamp).to_i)
       end
 
+      # NOTE - If we send a param in the request like `:foo => {:bar => "baz"}` then params[:foo] will == "{:bar=>\"baz\"}"
+      #        If we send it like `"foo[bar]" => "baz"` then params[:foo] == {:bar => "baz"}
+      #        This causes problems when we create the digest based off of the latter format, because the HMAC we recreate on
+      #        this end will be based on a nested hash, not a flattened request param. So either we can't use nested params,
+      #        or the sending agent has to know to create the digest using the nested hash format, but send the values using
+      #        the flat string format. See #hash_convert in /lib/api_param_factory.rb for an example of how to flatten a 
+      #        nested hash.
       def authenticate_hmac_digest(hmac_digest, private_key, nonce, timestamp, request_params)
-        hmac_digest == OpenSSL::HMAC.hexdigest('sha1', private_key, [nonce, timestamp, request_params.to_json].join(':'))
+        hmac_digest == ApiParamFactory.hmac_digest(private_key, nonce, timestamp, request_params)
       end
 
       def authenticate_nonce(nonce)
