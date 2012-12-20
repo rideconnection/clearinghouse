@@ -54,9 +54,9 @@ ActiveRecord::Schema.define(:version => 20121208060740) do
     t.string   "zip"
     t.datetime "created_at",                                                :null => false
     t.datetime "updated_at",                                                :null => false
-    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
     t.integer  "addressable_id"
     t.string   "addressable_type"
+    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
   end
 
   create_table "mobility_types", :force => true do |t|
@@ -136,8 +136,8 @@ ActiveRecord::Schema.define(:version => 20121208060740) do
     t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
     t.hstore   "eligibility"
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|

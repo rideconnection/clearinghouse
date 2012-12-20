@@ -2,7 +2,7 @@ require 'base64'
 require 'cgi'
 require 'openssl'
 
-RSpec::Matchers.define :require_minimum_request_params do |url, params|
+RSpec::Matchers.define :require_request_params do |url, params|
   match do |_|
     get url
     response.status.should == 400
@@ -43,19 +43,20 @@ module ApiMacros
   module ClassMethods
   end
   
-  def minimum_protected_api_params(provider, request_params = {})
+  def protected_api_params(provider, additional_params = {})
     timestamp = Time.now.xmlschema
     nonce = api_nonce(provider)
     {
       api_key:     provider.api_key,
       nonce:       nonce,
       timestamp:   timestamp,
-      hmac_digest: api_hmac_digest(provider.private_key, nonce, timestamp, request_params)
-    }
+      hmac_digest: api_hmac_digest(provider.private_key, nonce, timestamp, additional_params)
+    }.merge(additional_params)
   end
   
-  def api_hmac_digest(private_key, nonce, timestamp, request_params)
-    OpenSSL::HMAC.hexdigest('sha1', private_key, [nonce, timestamp, request_params.to_json].join(':'))
+  def api_hmac_digest(private_key, nonce, timestamp, additional_params)
+    additional_params.update(additional_params){|k,v| v.to_s}
+    OpenSSL::HMAC.hexdigest('sha1', private_key, [nonce, timestamp, additional_params.to_json].join(':'))
   end
   
   def api_nonce(provider)

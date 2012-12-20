@@ -7,9 +7,12 @@ module API_Authentication
     api.params do
       # TODO - Add more validations, i.e. length, format, etc.
       requires :api_key,     type: String, desc: "Your provider API key."
-      requires :nonce,       type: String, desc: "Your unique request nonce."
-      requires :timestamp,   type: String, desc: "The timestamp of your request."
-      requires :hmac_digest, type: String, desc: "Your HMAC message digest."
+      
+      unless Rails.env.development?
+        requires :nonce,       type: String, desc: "Your unique request nonce."
+        requires :timestamp,   type: String, desc: "The timestamp of your request."
+        requires :hmac_digest, type: String, desc: "Your HMAC message digest."
+      end
     end
     
     api.helpers do
@@ -24,9 +27,12 @@ module API_Authentication
         hmac_digest = request.params.delete("hmac_digest")
 
         raise_authentication_error("api_key")     unless current_provider
-        raise_authentication_error("nonce")       unless authenticate_nonce(nonce)
-        raise_authentication_error("timestamp")   unless authenticate_timestamp(timestamp)
-        raise_authentication_error("hmac_digest") unless authenticate_hmac_digest(hmac_digest, current_provider.private_key, nonce, timestamp, request.params)
+        
+        unless Rails.env.development?
+          raise_authentication_error("nonce")       unless authenticate_nonce(nonce)
+          raise_authentication_error("timestamp")   unless authenticate_timestamp(timestamp)
+          raise_authentication_error("hmac_digest") unless authenticate_hmac_digest(hmac_digest, current_provider.private_key, nonce, timestamp, request.params)
+        end
       end
 
       def authenticate_current_provider(api_key)
