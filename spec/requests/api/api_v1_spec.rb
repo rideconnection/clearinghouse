@@ -57,5 +57,15 @@ describe Clearinghouse::API_v1 do
         response.body.should include(%Q{"name":"#{@user1.name}"})
       end
     end
+
+    describe "PUT /api/v1/users/update" do
+      include_examples "requires authenticatable params", :id => 1
+
+      it "should return the specified provider user as JSON" do
+        put "/api/v1/users/update", ApiParamFactory.authenticatable_params(@provider, {:id => @user1.id, :user => {:name => "Mary"}})
+        response.status.should == 200
+        response.body.should include(%Q{"name":"Mary"})
+      end
+    end
   end
 end

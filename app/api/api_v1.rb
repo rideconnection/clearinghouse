@@ -30,6 +30,25 @@ module Clearinghouse
         get :show do
           present current_provider.users.find(params[:id]), with: Clearinghouse::Entities::User
         end
+        
+        params do
+          requires :id, :type => Integer, :desc => 'User ID.'
+        end
+        desc "Update a specific user"
+        put :update do
+          user = current_provider.users.find(params[:id])
+          
+          if params[:user] && params[:user].try(:[], :password).blank?
+            params[:user].delete("password")
+            params[:user].delete("password_confirmation")
+          end
+          
+          if user.update_attributes(params[:user])
+            present user, with: Clearinghouse::Entities::User
+          else
+            error!({message: "Could not authenticate #{source}", errors: user.errors}, status: :unprocessable_entity)
+          end
+        end
       end
       
       namespace :provider do
