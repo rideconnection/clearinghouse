@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121208060740) do
+ActiveRecord::Schema.define(:version => 20130108041029) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -39,6 +39,12 @@ ActiveRecord::Schema.define(:version => 20121208060740) do
   add_index "audits", ["auditable_id", "auditable_type"], :name => "auditable_index"
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
+
+  create_table "ethnicities", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "funding_sources", :force => true do |t|
     t.string   "name"
@@ -191,7 +197,6 @@ ActiveRecord::Schema.define(:version => 20121208060740) do
     t.integer  "approved_claim_id"
     t.boolean  "customer_information_withheld"
     t.date     "customer_dob"
-    t.string   "customer_name"
     t.integer  "customer_address_id"
     t.string   "customer_primary_phone"
     t.string   "customer_emergency_phone"
@@ -216,6 +221,13 @@ ActiveRecord::Schema.define(:version => 20121208060740) do
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
     t.integer  "mobility_type_id"
+    t.string   "customer_primary_language"
+    t.string   "customer_first_name"
+    t.string   "customer_last_name"
+    t.string   "customer_middle_name"
+    t.time     "requested_pickup_time"
+    t.time     "requested_drop_off_time"
+    t.integer  "customer_ethnicity_id"
   end
 
   create_table "users", :force => true do |t|

@@ -1,6 +1,8 @@
 require 'api'
 
 Clearinghouse::Application.routes.draw do
+  resources :trip_tickets
+
   mount Clearinghouse::API => "/"
   
   devise_for :users
@@ -16,15 +18,15 @@ Clearinghouse::Application.routes.draw do
     resources :services, :except => [ :index, :show, :destroy ]
   end
   resources :trip_tickets do
-    post 'search', :on=>:collection
+    post 'search', :on => :collection
   end
   resources :users do
     post 'activate', :on => :member
     post 'deactivate', :on => :member
   end
 
-  match 'admin', :controller=>:admin, :action=>:index
-  match 'reports', :controller=>:reports, :action=>:index
+  match 'admin', :controller => :admin, :action => :index
+  match 'reports', :controller => :reports, :action => :index
 
   root :to => 'home#dashboard'
 end

@@ -1,3 +1,43 @@
 <div id="trip-tickets">
   <h2>Trip Tickets</h2>
+
+  <table>
+    <tr>
+      <th>Customer</th>
+      <th>Mobility type</th>
+      <th>Deboarding time</th>
+      <th>Pick up loc.</th>
+      <th>Drop off loc.</th>
+      <th>Appointment</th>
+      <th>Attendants</th>
+      <th>Guests</th>
+      <th>Assistive devices</th>
+      <th>Service animals</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+
+  <% @trip_tickets.each do |trip_ticket| %>
+    <tr>
+      <td><%= trip_ticket.customer_full_name %></td>
+      <td><%= trip_ticket.mobility_type_id %></td>
+      <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
+      <td><%= address_and_city trip_ticket.pick_up_location %></td>
+      <td><%= address_and_city trip_ticket.drop_off_location %></td>
+      <td><%= display_appointment_time trip_ticket %></td>
+      <td><%= trip_ticket.num_attendants.to_i %></td>
+      <td><%= trip_ticket.num_guests.to_i %></td>
+      <td>TODO</td>
+      <td>TODO</td>
+      <td><%= link_to 'Show', trip_ticket %></td>
+      <td><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %></td>
+      <td><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
+  <% end %>
+  </table>
+
+  <br />
+
+  <%= link_to 'New Trip ticket', new_trip_ticket_path %>
 </div>
