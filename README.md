@@ -132,3 +132,26 @@ Or:
 RSpec will use the DRb server by default. The minitest tests need to be run
 with the "testdrb" command.  There is a rake task called "test:all" that will
 run both of these for you.
+
+Deployment
+==========
+
+This application uses capistrano for deployment.  Check out config/deploy.rb 
+and config/deploy/ for basic deployment recipes and configuration.
+
+Deployment uses key-based authentication. To deploy, you'll need to add your 
+public key on the staging/production servers so you can run commands as the 
+"deployer" user.
+
+To set this up, talk to another developer to get your public key on the 
+machines. If you need to do system administration on the servers, you'll need 
+your own user accout set up as well.
+
+Once you have SSH access as deployer, you can deploy:
+
+ run: `cap [staging|production] deploy`
+
+Remember to push your changes to the main repository first, since the deploy
+process pulls from there.  Database migrations are currently performed by hand
+after deploying.
+
