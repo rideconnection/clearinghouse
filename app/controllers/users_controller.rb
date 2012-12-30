@@ -50,6 +50,8 @@ class UsersController < ApplicationController
   # POST /users
   # POST /users.json
   def create
+
+    # TODO: Factor into model
     if !current_user.has_role?(:site_admin)
       @user.provider = current_user.provider
     end
@@ -60,8 +62,10 @@ class UsersController < ApplicationController
         authorize! :set_any_role, User
       end
     end
+
     respond_to do |format|
       if @user.save
+        NewUserMailer.welcome(@user).deliver
         destination = current_user.has_role?(:site_admin) ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }

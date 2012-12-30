@@ -1,0 +1,16 @@
+Hi, <%= @user.email %><br/> <br/>
+
+You have been added as a user to the Ride Connection Clearinghouse application. <br/><br/> 
+
+<% if @need_to_send_link %>
+  Please set up a password for your account by following this link: 
+  
+  <%= edit_password_url(@user, :reset_password_token => @user.reset_password_token) %>
+  <br/><br/>
+
+<% else %>
+  You have been assigned the password <%= @password %><br/><br/>
+
+  You can visit the site here:<br/>
+  <%= @url %><br/><br/>
+<% end %>

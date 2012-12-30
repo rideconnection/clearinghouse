@@ -9,8 +9,9 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :roles
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :phone, :provider, :provider_id, :roles, :role_ids, :title
+    :must_generate_password, :phone, :provider, :provider_id, :roles, :role_ids, :title
     
+
   # This pattern should technically work, but it doesn't...
   # validates_format_of :password, :if => :password_required?,
   #                     :with => /^(?=.*[0-9])(?=.*[\W_&&[^\s] ])[\w\W&&[^\s] ]{6,20}$/i, # Regexp tested at http://www.rubular.com/r/7peotZQNui
@@ -22,12 +23,17 @@ class User < ActiveRecord::Base
     end
   end
 
+  before_validation :generate_a_password, :on => :create
+
   default_scope order('name ASC')
 
   # All users, sorted by provider
   scope :all_by_provider, select('users.*, providers.name as provider_name')
    .joins("LEFT JOIN providers ON users.provider_id = providers.id")
    .reorder('users.provider_id IS NULL DESC, provider_name ASC, users.name ASC')
+
+  # Temporary attribute for auto-generated password tokens
+  attr_accessor :must_generate_password 
 
   def has_role?(role_sym)
     roles.any? { |r| r.name.underscore.to_sym == role_sym }
@@ -39,5 +45,20 @@ class User < ActiveRecord::Base
 
   def inactive_message
     "Sorry, this account has been deactivated."
+  end
+
+  def need_to_generate_password?
+    !!must_generate_password
+  end
+
+  private
+
+  def generate_a_password
+    if need_to_generate_password?
+      temp_token = Devise.friendly_token.first(10) + "!1"
+      self.password = self.password_confirmation = temp_token
+      self.reset_password_token = User.reset_password_token
+      self.reset_password_sent_at = Time.now
+    end
   end
 end

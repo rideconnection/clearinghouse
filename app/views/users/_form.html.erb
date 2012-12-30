@@ -15,6 +15,12 @@
     <%= f.label :email %><br />
     <%= f.text_field :email %>
   </div>
+  <% if @user.new_record? %>
+    <div>
+      <%= f.label "Send activation link instead of setting password" %><br />
+      <%= check_box_tag "user[must_generate_password]" %>
+    </div>
+  <% end %>
   <div>
     <%= f.label :password %><br />
     <%= f.password_field :password %>
