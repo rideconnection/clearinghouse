@@ -3,6 +3,6 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 $(document).ready -> 
-  $("#user_generate_password").click ->
-    new_value = $("#user_generate_password").prop("checked")
+  $("#user_must_generate_password").click ->
+    new_value = $("#user_must_generate_password").prop("checked")
     $("#user_password, #user_password_confirmation").prop("disabled", new_value)
