@@ -149,9 +149,13 @@ your own user accout set up as well.
 
 Once you have SSH access as deployer, you can deploy:
 
- run: `cap [staging|production] deploy`
+  run: `cap [staging|production] deploy`
+
+To migrate the database, run:
+  run: `cap [staging|production] deploy:migrate`
+
+Run cap -T for more command documentation.
 
 Remember to push your changes to the main repository first, since the deploy
-process pulls from there.  Database migrations are currently performed by hand
-after deploying.
+process pulls from there.  
 
