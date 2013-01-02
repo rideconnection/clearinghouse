@@ -12,6 +12,7 @@ Clearinghouse::Application.configure do
     :user_name            => 'panopticdev',
     :password             => 'panopticpilot2299',
     :authentication       => 'plain',
-    :enable_starttls_auto => true 
+    :enable_starttls_auto => true,
+    :openssl_verify_mode  => 'none'
   }
 end
