@@ -9,7 +9,8 @@ class User < ActiveRecord::Base
   has_and_belongs_to_many :roles
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :must_generate_password, :phone, :provider, :provider_id, :roles, :role_ids, :title
+    :must_generate_password, :phone, :provider, :provider_id, :roles, :role_ids, 
+    :title
     
 
   # This pattern should technically work, but it doesn't...
