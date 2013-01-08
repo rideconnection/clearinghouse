@@ -4,6 +4,8 @@
   <p id="notice"><%= notice %></p>
 
   <%= render 'form' %>
-
+  
   <%= link_to 'Back', trip_tickets_path %>
+
+  <%= render 'shared/audit_trail', :record => @trip_ticket %>
 </div>
