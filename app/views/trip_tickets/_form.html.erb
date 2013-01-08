@@ -1,0 +1,205 @@
+<%= form_for(@trip_ticket) do |f| %>
+  <% if @trip_ticket.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@trip_ticket.errors.count, "error") %> prohibited this trip_ticket from being saved:</h2>
+
+      <ul>
+      <% @trip_ticket.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <fieldset id="originator" class="">
+    <legend>Originator</legend>
+    
+    <div class="field">
+      <%= f.label :origin_provider_id, "Provider" %><br />
+      <%= f.collection_select :origin_provider_id, Provider.all, :id, :name, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :origin_customer_id, "Customer ID" %><br />
+      <%= f.text_field :origin_customer_id, :readonly => true %>
+    </div>
+    <div class="field">
+      <%= f.label :origin_trip_id, "Trip ID" %><br />
+      <%= f.text_field :origin_trip_id, :readonly => true %>
+    </div>
+  </fieldset>
+
+  <fieldset id="claimant" class="">
+    <legend>Claimant</legend>
+    
+    <div class="field">
+      <%= f.label :claimant_provider_id, "Provider" %><br />
+      <%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :claimant_customer_id, "Customer ID" %><br />
+      <%= f.text_field :claimant_customer_id, :readonly => true %>
+    </div>
+    <div class="field">
+      <%= f.label :claimant_trip_id, "Trip ID" %><br />
+      <%= f.text_field :claimant_trip_id, :readonly => true %>
+    </div>    
+    <div class="field">
+      <%= f.label :approved_claim_id %><br />
+      <%= f.text_field :approved_claim_id, :readonly => true %>
+    </div>
+  </fieldset>
+  
+  <fieldset id="customer" class="">
+    <legend>Customer</legend>
+    <div class="field">
+      <%= f.label :customer_first_name, "First Name" %><br />
+      <%= f.text_field :customer_first_name %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_middle_name, "Middle Name" %><br />
+      <%= f.text_field :customer_middle_name %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_last_name, "Last Name" %><br />
+      <%= f.text_field :customer_last_name %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_dob, "Date of Birth" %><br />
+      <%= f.date_select(:customer_dob, 
+                        :order => [:month, :day, :year],
+                        :prompt => { :day => 'Select day', :month => 'Select month', :year => 'Select year' },
+                        :start_year => Time.now.year - 100,
+                        :end_year => Time.now.year
+          ) 
+      %>
+    </div>
+    <%= f.fields_for :customer_address do |af| %>
+      <%= render 'locations/address_form', :f => af %>
+    <% end %>    
+    <div class="field">
+      <%= f.label :customer_primary_phone, "Primary Phone Number" %><br />
+      <%= f.phone_field :customer_primary_phone %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_emergency_phone, "Emergency Phone Number" %><br />
+      <%= f.phone_field :customer_emergency_phone %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_primary_language, "Primary Language" %><br />
+      <%= f.text_field :customer_primary_language %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_ethnicity_id, "Ethnicity" %><br />
+      <%= f.collection_select :customer_ethnicity_id, Ethnicity.all, :id, :name, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_impairment_description, "Impairment Description" %><br />
+      <%= f.text_field :customer_impairment_description %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_information_withheld, "Information Withheld?" %><br />
+      <%= f.select :customer_information_withheld, [["Yes", true], ["No", false]], :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_notes %><br />
+      <%= f.text_area :customer_notes %>
+    </div>
+  </fieldset>  
+
+  <fieldset id="drop_off_location" class="">
+    <legend>Drop Off Location</legend>
+    <%= f.fields_for :drop_off_location do |af| %>
+      <%= render 'locations/address_form', :f => af %>
+    <% end %>
+  </fieldset>  
+
+  <fieldset id="pick_up_location" class="">
+    <legend>Pick Up Location</legend>
+
+    <%= f.fields_for :pick_up_location do |af| %>
+      <%= render 'locations/address_form', :f => af %>
+    <% end %>
+  </fieldset>  
+
+  <fieldset id="trip_information" class="">
+    <legend>Trip Information</legend>
+    
+    <div class="field">
+      <%= f.label :appointment_time %><br />
+      <%= f.time_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :requested_pickup_time %><br />
+      <%= f.time_select :requested_pickup_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :requested_drop_off_time %><br />
+      <%= f.time_select :requested_drop_off_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :earliest_pick_up_time %><br />
+      <%= f.time_select :earliest_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :allowed_time_variance %> (in minutes)<br />
+      <%= f.select :allowed_time_variance, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_boarding_time, "Boarding time required" %> (in minutes)<br />
+      <%= f.number_field :customer_boarding_time, :min => 0, :max => 15 %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_deboarding_time, "Deboarding time required" %> (in minutes)<br />
+      <%= f.number_field :customer_deboarding_time, :min => 0, :max => 15 %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_seats_required, "Seats Required" %><br />
+      <%= f.number_field :customer_seats_required, :min => 0 %>
+    </div>
+    <div class="field">
+      <%= f.label :mobility_type_id %><br />
+      <%= f.collection_select :mobility_type_id, MobilityType.all, :id, :name, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :num_attendants, "Number of Attendants" %><br />
+      <%= f.number_field :num_attendants, :min => 0 %>
+    </div>
+    <div class="field">
+      <%= f.label :num_guests, "Number of Guests" %><br />
+      <%= f.number_field :num_guests, :min => 0 %>
+    </div>
+    <div class="field">
+      <%= f.label :scheduling_priority %><br />
+      <%= f.select :scheduling_priority, TripTicket::SCHEDULING_PRIORITY.invert, :include_blank => true %>
+    </div>
+    <div class="field">
+      <%= f.label :trip_purpose_code %><br />
+      <%= f.text_field :trip_purpose_code %>
+    </div>
+    <div class="field">
+      <%= f.label :trip_purpose_description %><br />
+      <%= f.text_field :trip_purpose_description %>
+    </div>    
+    <div class="field">
+      <%= f.label :trip_notes %><br />
+      <%= f.text_area :trip_notes %>
+    </div>
+  </fieldset>
+
+  <fieldset id="info" class="">
+    <legend>Info</legend>
+    
+    <div class="field">
+      <%= f.label :created_at %>:
+      <%= @trip_ticket.created_at %>
+    </div>
+    <div class="field">
+      <%= f.label :updated_at %>:
+      <%= @trip_ticket.updated_at %>
+    </div>    
+  </fieldset>
+  
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
