@@ -14,8 +14,8 @@ class TripTicket < ActiveRecord::Base
   has_one :trip_result
   
   SCHEDULING_PRIORITY = {
-    :pickup => "Pickup",
-    :dropoff => "Drop-off"
+    "pickup"  => "Pickup",
+    "dropoff" => "Drop-off"
   }
   
   attr_accessible :allowed_time_variance, :appointment_time,
@@ -38,11 +38,12 @@ class TripTicket < ActiveRecord::Base
   audited
   
   validates_presence_of :customer_dob, :customer_ethnicity_id,
-    :customer_first_name, :customer_impairment_description,
-    :customer_information_withheld, :customer_last_name,
-    :customer_primary_phone, :customer_seats_required, :origin_provider_id,
-    :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
-    :trip_purpose_code, :trip_purpose_description
+    :customer_first_name, :customer_last_name, :customer_primary_phone,
+    :customer_seats_required, :origin_provider_id, :requested_drop_off_time,
+    :requested_pickup_time
+  
+  validates :customer_information_withheld, :inclusion => { :in => [true, false] }
+  validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
   
   after_initialize do
     if self.new_record?

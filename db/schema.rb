@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130108041029) do
+ActiveRecord::Schema.define(:version => 20130108170125) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -211,7 +211,7 @@ ActiveRecord::Schema.define(:version => 20130108041029) do
     t.integer  "drop_off_location_id"
     t.time     "earliest_pick_up_time"
     t.time     "appointment_time"
-    t.integer  "scheduling_priority"
+    t.string   "scheduling_priority"
     t.integer  "allowed_time_variance"
     t.integer  "num_attendants"
     t.integer  "num_guests"

@@ -1,6 +1,6 @@
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
-  before_filter :setup_locations, :except => :index
+  before_filter :setup_locations, :except => [:index, :search]
 
   # GET /trip_tickets
   # GET /trip_tickets.json
