@@ -1,0 +1,42 @@
+<%= form_for(@provider_relationship) do |f| %>
+  <% if @provider_relationship.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@provider_relationship.errors.count, "error") %> prohibited this provider relationship from being saved:</h2>
+
+      <ul>
+      <% @provider_relationship.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @provider_relationship.new_record? && @provider %>
+    <%= hidden_field_tag "provider_relationship[requesting_provider_id]", @provider.id %>
+
+    <div class="field">
+      <%= f.label :cooperating_provider_id %><br />
+      <%= f.collection_select(:cooperating_provider_id, Provider.all, :id, :name, :prompt => 'Please select provider') %>
+    </div>
+  <% end %>
+
+  <% unless @provider_relationship.new_record? %>
+    <% if can? :edit, @provider_relationship.requesting_provider %>
+      <div class="field">
+        <%= f.label :automatic_requester_approval, requesterequester_label_for(@provider_relationship) %><br />
+        <%= f.check_box :automatic_requester_approval %>
+      </div>
+    <% end %>
+
+    <% if can? :edit, @provider_relationship.cooperating_provider %>
+      <div class="field">
+        <%= f.label :automatic_cooperator_approval, cooperator_approval_label_for(@provider_relationship) %><br />
+        <%= f.check_box :automatic_requester_approval %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit "Submit" %>
+  </div>
+<% end %>

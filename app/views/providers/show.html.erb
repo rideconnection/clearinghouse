@@ -23,6 +23,46 @@
 </p>
 <br/>
 
+<h3><%= @provider.name %> Partners</h3>
+
+<table>
+  <tr>
+    <td><strong>Provider Name</strong></td>
+    <td><strong>Status</strong></td>
+    <td><strong>Actions</strong></td>
+  </tr>
+  <% @provider.approved_partnerships.each do |partnership| %>
+    <tr>
+      <td><%= partnership.partner_for_provider(@provider).name %></td>
+      <td>Approved</td>
+      <td><%= link_to 'Edit Partnership', edit_provider_relationship_path(partnership) %></td>
+      <td><%= button_to 'End Partnership', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+      </td>
+    </tr>
+  <% end %>
+  <% @provider.partnerships_awaiting_its_approval.each do |partnership| %>
+    <tr>
+      <td><%= partnership.requesting_provider.name %></td>
+      <td>Pending</td>
+      <td><%= button_to 'Approve', provider_relationship_activate_path(partnership), :method => :post %></td>
+      <td><%= button_to 'Deny', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+    </tr>
+  <% end %>
+  <% @provider.pending_partnerships_initiated_by_it.each do |partnership| %>
+    <tr>
+      <td><%= partnership.cooperating_provider.name %></td>
+      <td>Pending approval</td>
+      <td><%= button_to 'Cancel', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+    </tr>
+  <% end %>
+</table>
+
+<% if can? :create, ProviderRelationship %>
+  <%= link_to 'Set Up New Provider Partnership', new_provider_relationship_path(:provider_id => @provider) %><br/>
+<% end %>
+
+<br/>
+
 <h3><%= @provider.name %> Services</h3>
 
 <% if @provider.services.any? %>

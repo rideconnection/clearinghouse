@@ -8,6 +8,11 @@ Clearinghouse::Application.routes.draw do
   devise_for :users
 
   resources :open_capacities
+
+  resources :provider_relationships do
+    post 'activate'
+  end
+
   resources :providers do
     member do
       post 'activate'
@@ -17,9 +22,11 @@ Clearinghouse::Application.routes.draw do
     end
     resources :services, :except => [ :index, :show, :destroy ]
   end
+
   resources :trip_tickets do
     post 'search', :on => :collection
   end
+
   resources :users do
     post 'activate', :on => :member
     post 'deactivate', :on => :member

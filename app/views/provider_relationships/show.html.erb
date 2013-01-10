@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Requesting provider:</b>
+  <%= @provider_relationship.requesting_provider_id %>
+</p>
+
+<p>
+  <b>Cooperating provider:</b>
+  <%= @provider_relationship.cooperating_provider_id %>
+</p>
+
+<p>
+  <b>Approved at:</b>
+  <%= @provider_relationship.approved_at %>
+</p>
+
+<p>
+  <b>Automatic requester approval:</b>
+  <%= @provider_relationship.automatic_requester_approval %>
+</p>
+
+<p>
+  <b>Automatic cooperator approval:</b>
+  <%= @provider_relationship.automatic_cooperator_approval %>
+</p>
+
+
+<%= link_to 'Edit', edit_provider_relationship_path(@provider_relationship) %> |
+<%= link_to 'Back', provider_relationships_path %>

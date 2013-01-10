@@ -6,37 +6,53 @@ class ProviderTest < ActionController::IntegrationTest
   Warden.test_mode!
   
   setup do
-    @provider = FactoryGirl.create(:provider)
+    @provider = FactoryGirl.create(:provider, :name => "Microsoft")
+    @provider_2 = FactoryGirl.create(:provider, :name => "Google")
     @password = "password 1"
-    @user = FactoryGirl.create(:user, :password => @password, :password_confirmation => @password, :provider => @provider)
+
+    @user = FactoryGirl.create(:user, 
+      :password => @password, 
+      :password_confirmation => @password, 
+      :provider => @provider)
     @user.roles = [Role.find_or_create_by_name!("provider_admin")]
     @user.save!
+
+    @user_2 = FactoryGirl.create(:user, 
+      :password => @password, 
+      :password_confirmation => @password, 
+      :provider => @provider_2)
+    @user_2.roles = [Role.find_or_create_by_name!("provider_admin")]
+    @user_2.save!
+
+    login_as @user, :scope => :user
+  end
+
+  teardown do
+    Provider.destroy_all
+    ProviderRelationship.destroy_all
+    User.destroy_all
   end
 
   test "provider_admin can create users, triggering an email" do
     @user.roles << Role.find_or_create_by_name!("site_admin")
-    login_as(@user, :scope => :user)
     visit '/'
     click_link "Admin"
   end
 
   test "provider_admin user can view keys" do
-    login_as(@user, :scope => :user)
     visit "/providers/#{@user.provider.id}/keys"
     assert page.has_content?(@provider.api_key)
     assert page.has_content?(@provider.private_key)
   end
 
   test "non-provider_admin user cannot view keys" do
-    user = FactoryGirl.create(:user, :provider => @provider)
-    login_as(user, :scope => :user)
-    assert_raise(CanCan::AccessDenied) {
-      visit "/providers/#{user.provider.id}/keys"
-    }
+    @user.roles.destroy_all
+    assert_raise(CanCan::AccessDenied) do
+      visit "/providers/#{@user.provider.id}/keys"
+    end
   end
 
   test "provider_admin user cannot reset keys without accepting conditions" do
-    login_as(@user, :scope => :user)
     visit "/providers/#{@user.provider.id}/keys"
     fill_in 'reset_keys[password]', :with => @password
     click_button 'Reset API Keys'
@@ -44,7 +60,6 @@ class ProviderTest < ActionController::IntegrationTest
   end
 
   test "provider_admin user cannot reset keys without entering password" do
-    login_as(@user, :scope => :user)
     visit "/providers/#{@user.provider.id}/keys"
     check 'reset_keys[accept]'
     click_button 'Reset API Keys'
@@ -55,7 +70,6 @@ class ProviderTest < ActionController::IntegrationTest
     old_api_key = @provider.api_key
     old_private_key = @provider.private_key
     
-    login_as(@user, :scope => :user)
     visit "/providers/#{@user.provider.id}/keys"
     check 'reset_keys[accept]'
     fill_in 'reset_keys[password]', :with => @password
@@ -67,6 +81,34 @@ class ProviderTest < ActionController::IntegrationTest
     assert page.has_content?(@provider.api_key)
     assert page.has_content?(@provider.private_key)
     assert page.has_content?("API keys have been regenerated")
+  end
+
+  test "provider_admin user can start a relationship with another provider" do
+    # Request partnership as second provider admin:
+    visit "/providers"
+    click_link "Microsoft" 
+    click_link "Set Up New Provider Partnership"
+    select "Google", :from => "provider_relationship_cooperating_provider_id"
+    click_button "Submit"
+    assert page.has_content?("successfully created.")
+    assert page.has_content?("Pending")
+    logout
+
+    # Approve partnership as second provider admin
+    login_as @user_2, :scope => :user
+    visit "/providers"
+    click_link "Google" 
+    click_button "Approve"
+    assert page.has_content?("Provider relationship activated!")
+    assert page.has_content?("Approved")
+    
+    # Set automatic approval
+    click_link "Edit Partnership"
+    assert page.has_content? "Automatically approve Google's tickets?"
+    check "provider_relationship_automatic_requester_approval"
+    click_button "Submit"
+    assert page.has_content?("successfully updated")
+    assert page.has_content?("Approved")
   end
 
   # test "non-admin user can't access provider keys" do

@@ -17,6 +17,13 @@ class Ability
       can :reset_keys, Provider do |provider|
         user.provider == provider
       end
+      can :create, ProviderRelationship
+      can :manage, ProviderRelationship do |relationship|
+        relationship.includes_user? user
+      end
+      can :activate, ProviderRelationship do |relationship|
+        relationship.cooperating_provider == user.provider
+      end
       # TODO: Refactor
       can :create, Service
       can :update, Service do |s|
@@ -37,6 +44,7 @@ class Ability
       end
     end
     can :read, Provider
+    can :read, ProviderRelationship
     can :read, Service
     can :read, User
     can :update, User do |u|
