@@ -12,7 +12,6 @@
 # It's strongly recommended to check this file into your version control system.
 
 ActiveRecord::Schema.define(:version => 20130108170125) do
-
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
     t.text   "f_geometry_column"
@@ -100,6 +99,16 @@ ActiveRecord::Schema.define(:version => 20130108170125) do
     t.time     "close_time"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+  end
+
+  create_table "provider_relationships", :force => true do |t|
+    t.integer  "requesting_provider_id"
+    t.integer  "cooperating_provider_id"
+    t.date     "approved_at"
+    t.boolean  "automatic_requester_approval"
+    t.boolean  "automatic_cooperator_approval"
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
   end
 
   create_table "providers", :force => true do |t|
