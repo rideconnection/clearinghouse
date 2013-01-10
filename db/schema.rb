@@ -11,7 +11,8 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130108170125) do
+ActiveRecord::Schema.define(:version => 20130110232336) do
+
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
     t.text   "f_geometry_column"
