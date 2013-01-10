@@ -19,6 +19,31 @@ class Provider < ActiveRecord::Base
   validates :private_key, presence: {on: :update}
   validates_presence_of :name, :address, :primary_contact_id
   
+  def approved_partnerships
+    partnerships = ProviderRelationship.where(
+      %Q{
+        (requesting_provider_id = ? OR cooperating_provider_id = ?) 
+        AND approved_at IS NOT NULL
+      },
+      id, id
+    )
+    partnerships.includes(:cooperating_provider, :requesting_provider)
+  end
+
+  def pending_partnerships_initiated_by_it
+    partnerships = ProviderRelationship.where(
+      :requesting_provider_id => id, 
+      :approved_at => nil)
+    partnerships.includes(:cooperating_provider, :requesting_provider)
+  end
+
+  def partnerships_awaiting_its_approval
+    partnerships = ProviderRelationship.where(
+      :cooperating_provider_id => id, 
+      :approved_at => nil)
+    partnerships.includes(:cooperating_provider, :requesting_provider)
+  end
+
   def regenerate_keys!(force = true)
     generate_api_key!     if force || !self.api_key.present?
     generate_private_key! if force || !self.private_key.present?

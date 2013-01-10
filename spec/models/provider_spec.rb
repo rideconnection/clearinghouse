@@ -84,7 +84,32 @@ describe Provider do
       @provider.private_key.should_not == old_private_key
     end
   end
+ 
   
+  describe "with an unapproved partnership" do
+    before do
+      @partner = FactoryGirl.create(:provider)
+      @partnership = ProviderRelationship.create!(
+        :requesting_provider => @provider,
+        :cooperating_provider => @partner 
+      )
+    end
+
+    it "should know its approved partnerships" do
+      assert @provider.approved_partnerships.empty?
+      @partnership.approve!
+      assert @provider.approved_partnerships.any?
+    end
+
+    it "should know which partnerships are pending approval and by whom" do
+      assert_equal @provider.pending_partnerships_initiated_by_it, [@partnership]
+      assert_equal @provider.partnerships_awaiting_its_approval, []
+
+      assert_equal @partner.partnerships_awaiting_its_approval, [@partnership]
+      assert_equal @partner.pending_partnerships_initiated_by_it, []
+    end
+  end
+
   it "should have an association to many nonces" do
     @provider.should respond_to(:nonces)
     nonce = FactoryGirl.build(:nonce)
