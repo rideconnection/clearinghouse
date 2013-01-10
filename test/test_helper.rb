@@ -31,7 +31,7 @@ Spork.prefork do
     end
   end
 
-  DatabaseCleaner.strategy = :truncation, {:except => %w[spatial_ref_sys]}
+  DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
   MiniTest::Rails.override_testunit!
 end
 

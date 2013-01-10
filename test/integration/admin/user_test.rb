@@ -6,14 +6,15 @@ class UserTest < ActionController::IntegrationTest
   Warden.test_mode!
 
   setup do
+    @provider = FactoryGirl.create(:provider, :name => "Microsoft")
     @user = FactoryGirl.create(:user)
     @user.roles << Role.find_or_create_by_name!("site_admin")
     login_as(@user, :scope => :user)
   end
 
   teardown do
-    Provider.destroy_all
     User.destroy_all
+    Provider.destroy_all
   end
 
   test "admin can create a new user and have password sent to user" do  
@@ -27,7 +28,7 @@ class UserTest < ActionController::IntegrationTest
     fill_in "user[name]", :with => "Steve Smith"
     fill_in "user[title]", :with => "Manager"
     fill_in "user[phone]", :with => "1231231234"
-    select "My Provider", :from => "user[provider_id]"
+    select "Microsoft", :from => "user[provider_id]"
     click_button "Create User"
 
     mail = ActionMailer::Base.deliveries.last
@@ -47,7 +48,7 @@ class UserTest < ActionController::IntegrationTest
     fill_in "user[name]", :with => "Steve Smith"
     fill_in "user[title]", :with => "Manager"
     fill_in "user[phone]", :with => "1231231234"
-    select "My Provider", :from => "user[provider_id]"
+    select "Microsoft", :from => "user[provider_id]"
     click_button "Create User"
 
     mail = ActionMailer::Base.deliveries.last

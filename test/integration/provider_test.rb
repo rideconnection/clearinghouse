@@ -12,18 +12,12 @@ class ProviderTest < ActionController::IntegrationTest
     @user.roles = [Role.find_or_create_by_name!("provider_admin")]
     @user.save!
   end
-  
 
-  describe "a site admin" do
-    setup do 
-      @user.roles << Role.find_or_create_by_name!("site_admin")
-    end
-
-    test "provider_admin can create users, triggering an email" do
-      login_as(@user, :scope => :user)
-      visit '/'
-      click_link "Admin"
-    end
+  test "provider_admin can create users, triggering an email" do
+    @user.roles << Role.find_or_create_by_name!("site_admin")
+    login_as(@user, :scope => :user)
+    visit '/'
+    click_link "Admin"
   end
 
   test "provider_admin user can view keys" do

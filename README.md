@@ -121,10 +121,13 @@ You'll need two instances of spork for the two test suites:
     bundle exec spork rspec    (in terminal one)
     bundle exec spork minitest (in terminal two)
 
+Or:
+    bundle exec spork rspec& bundle exec spork minitest&
+
 You can then run the test suites with the commands:
 
     bundle exec rspec spec
-    bundle exec testdrb test/integration/**/*_test.rb
+    find test -name "*_test.rb" -type f | xargs bundle exec testdrb
 
 Or:
     bundle exec rake test:all
