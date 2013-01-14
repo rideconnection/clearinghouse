@@ -97,4 +97,11 @@ class UserTest < ActionController::IntegrationTest
     assert page.has_content?('User was successfully updated.')
     assert find_field('user[title]').value == 'Lord of Winterfell'
   end
+
+  test "user can't view admin functions without proper permissions" do
+    @user.roles.destroy_all
+    visit "/users"
+    assert_equal current_url, root_url 
+    assert page.has_content?("You are not authorized to access this page.")
+  end
 end
