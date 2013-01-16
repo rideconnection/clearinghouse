@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'capistrano'
 gem 'capistrano-ext'
 gem 'pg'
-gem 'rails', '3.2.8'
+gem 'rails', '~> 3.2.8'
 gem 'rvm-capistrano'
 
 # PostgreSQL hstore support
@@ -35,7 +35,7 @@ gem 'seedbank'
 gem 'time_of_day'
 
 # API web service
-gem 'grape', '~> 0.2.2'
+gem 'grape', '0.2.2'
 
 # Javascript engine
 gem 'therubyracer'
@@ -62,7 +62,7 @@ group :test, :development do
   gem 'spork-rails'
   gem 'spork-testunit', git: 'git://github.com/sporkrb/spork-testunit.git'
   gem 'spork-minitest', git: 'git://github.com/semaperepelitsa/spork-minitest.git'
-  gem 'turn'
+  gem 'turn', :require => false
 end
 
 # To use ActiveModel has_secure_password
