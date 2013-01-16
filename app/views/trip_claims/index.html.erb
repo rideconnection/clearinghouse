@@ -1,0 +1,23 @@
+<h1>Listing trip_claims</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @trip_claims.each do |trip_claim| %>
+  <tr>
+    <td><%= trip_claim.name %></td>
+    <td><%= link_to 'Show', trip_claim %></td>
+    <td><%= link_to 'Edit', edit_trip_claim_path(trip_claim) %></td>
+    <td><%= link_to 'Destroy', trip_claim, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Trip claim', new_trip_claim_path %>

@@ -35,7 +35,7 @@ Spork.prefork do
   DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
   MiniTest::Rails.override_testunit!
   Turn.config.format = :pretty
-  Turn.config.trace = 10
+  Turn.config.trace = 20
 end
 
 Spork.each_run do

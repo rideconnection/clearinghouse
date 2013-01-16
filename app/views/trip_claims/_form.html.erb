@@ -1,0 +1,21 @@
+<%= form_for(@trip_claim) do |f| %>
+  <% if @trip_claim.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@trip_claim.errors.count, "error") %> prohibited this trip_claim from being saved:</h2>
+
+      <ul>
+      <% @trip_claim.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

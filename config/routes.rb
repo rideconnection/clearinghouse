@@ -1,8 +1,6 @@
 require 'api'
 
 Clearinghouse::Application.routes.draw do
-  resources :trip_tickets
-
   mount Clearinghouse::API => "/"
   
   devise_for :users
@@ -21,6 +19,11 @@ Clearinghouse::Application.routes.draw do
       post 'reset_keys'
     end
     resources :services, :except => [ :index, :show, :destroy ]
+  end
+
+  resources :trip_claims do
+    post 'approve'
+    post 'decline'
   end
 
   resources :trip_tickets do
