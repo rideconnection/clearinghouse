@@ -1,46 +1,40 @@
 class Ability
   include CanCan::Ability
  
+  # Note: Latter ability rules override previous ones
+  # Available roles: :site_admin, :provider_admin, :scheduler, :dispatcher, :csr
+ 
   def initialize(user)
     user ||= User.new # guest user
- 
+     
+    can :read, Provider
+    can :read, Service
+    can :read, TripTicket
+    can :read, User
+    can :update, User, :id => user.id
+
     if user.has_role? :site_admin
       can :manage, :all
-      can :set_provider, User
     elsif user.has_role? :provider_admin
-      can :update, Provider do |provider|
-        user.provider == provider
+      can [:update, :keys, :reset_keys], Provider do |p|
+        user.provider == p
       end
-      can :keys, Provider do |provider|
-        user.provider == provider
-      end
-      can :reset_keys, Provider do |provider|
-        user.provider == provider
-      end
-      # TODO: Refactor
+
       can :create, Service
       can :update, Service do |s|
         user.provider == s.provider
       end
+      
       can :create, User
-      can :update, User do |u|
+      can [:update, :activate, :deactivate, :set_provider_role], User do |u|
         user.provider and user.provider == u.provider
       end
-      can :activate, User do |u|
-        user.provider and user.provider == u.provider
-      end
-      can :deactivate, User do |u|
-        user.provider and user.provider == u.provider
-      end
-      can :set_provider_role, User do |u|
-        user.provider and user.provider == u.provider
+      
+      can :create, TripTicket
+      can :update, TripTicket do |t|
+        user.provider and user.provider == t.originator
       end
     end
-    can :read, Provider
-    can :read, Service
-    can :read, User
-    can :update, User do |u|
-      user.id == u.id
-    end
+
   end
 end
