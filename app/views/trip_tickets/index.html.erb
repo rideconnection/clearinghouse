@@ -31,13 +31,13 @@
       <td>TODO</td>
       <td>TODO</td>
       <td><%= link_to 'Show', trip_ticket %></td>
-      <td><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %></td>
-      <td><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <td><% if can? :edit, trip_ticket %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
+      <td><% if can? :destroy, trip_ticket %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
     </tr>
   <% end %>
   </table>
 
   <br />
 
-  <%= link_to 'New Trip ticket', new_trip_ticket_path %>
+  <% if can? :create, TripTicket %><%= link_to 'New Trip ticket', new_trip_ticket_path %><% end %>
 </div>

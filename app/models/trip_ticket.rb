@@ -1,6 +1,6 @@
 class TripTicket < ActiveRecord::Base
-  belongs_to :originator, :foreign_key => :origin_provider_id
-  belongs_to :claimant,   :foreign_key => :claimant_provider_id
+  belongs_to :originator, :class_name => :Provider, :foreign_key => :origin_provider_id
+  belongs_to :claimant,   :class_name => :Provider, :foreign_key => :claimant_provider_id
 
   has_one :customer_address, :class_name => :Location, :as => :addressable,
           :validate => true, :dependent => :destroy
