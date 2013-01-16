@@ -6,10 +6,11 @@ Spork.prefork do
   ENV["RAILS_ENV"] = "test"
   require File.expand_path('../../config/environment', __FILE__)
 
-  require 'database_cleaner'
+  require "database_cleaner"
   require "minitest/autorun"
   require "minitest/rails"
   require "minitest/rails/capybara"
+  require "turn/autorun"
 
   class MiniTest::Rails::ActiveSupport::TestCase
     # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in
@@ -33,6 +34,8 @@ Spork.prefork do
 
   DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
   MiniTest::Rails.override_testunit!
+  Turn.config.format = :pretty
+  Turn.config.trace = 10
 end
 
 Spork.each_run do

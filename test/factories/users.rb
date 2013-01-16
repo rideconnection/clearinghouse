@@ -8,5 +8,22 @@ FactoryGirl.define do
     password "password 1"
     password_confirmation { |u| u.password }
     provider
+    
+    # Roles
+    factory :csr do
+      role :name => :csr
+    end
+    factory :dispatcher do
+      role :name => :dispatcher
+    end
+    factory :scheduler do
+      role :name => :scheduler
+    end
+    factory :provider_admin do
+      role :name => :provider_admin
+    end
+    factory :site_admin do
+      role :name => :site_admin
+    end
   end
 end

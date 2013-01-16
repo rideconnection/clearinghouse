@@ -62,6 +62,7 @@ group :test, :development do
   gem 'spork-rails'
   gem 'spork-testunit', git: 'git://github.com/sporkrb/spork-testunit.git'
   gem 'spork-minitest', git: 'git://github.com/semaperepelitsa/spork-minitest.git'
+  gem 'turn'
 end
 
 # To use ActiveModel has_secure_password

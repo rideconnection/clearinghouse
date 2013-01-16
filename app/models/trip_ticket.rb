@@ -57,6 +57,6 @@ class TripTicket < ActiveRecord::Base
   end
   
   def customer_full_name
-    [customer_first_name, customer_middle_name, customer_last_name].compact.reject(&:blank?).join(" ")
+    [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end
 end
