@@ -1,23 +1,28 @@
-<h1>Listing trip_claims</h1>
+<div id="trip-claims">
+  <h2>Trip Claims</h2>
+  
+  <table>
+    <tr>
+      <th>Ticket</th>
+      <th>Status</th>
+      <th>Pickup Time</th>
+      <th>Fare</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
 
-<table>
-  <tr>
-    <th>Name</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @trip_claims.each do |trip_claim| %>
-  <tr>
-    <td><%= trip_claim.name %></td>
-    <td><%= link_to 'Show', trip_claim %></td>
-    <td><%= link_to 'Edit', edit_trip_claim_path(trip_claim) %></td>
-    <td><%= link_to 'Destroy', trip_claim, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
-
-<%= link_to 'New Trip claim', new_trip_claim_path %>
+  <% @trip_claims.each do |trip_claim| %>
+    <tr>
+      <td><%= trip_claim.trip_ticket.to_param %></td>
+      <td><%= trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[trip_claim.status].to_s.humanize.titlecase %></td>
+      <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
+      <td><%= trip_claim.proposed_fare %></td>
+      <td><%= link_to 'Show', trip_ticket_path(trip_claim.trip_ticket, :anchor => :trip_claims) %></td>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    </tr>
+  <% end %>
+  
+  </table>
+</div>

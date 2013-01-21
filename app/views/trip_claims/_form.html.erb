@@ -1,4 +1,4 @@
-<%= form_for(@trip_claim) do |f| %>
+<%= form_for([@trip_ticket, @trip_claim]) do |f| %>
   <% if @trip_claim.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@trip_claim.errors.count, "error") %> prohibited this trip_claim from being saved:</h2>
@@ -12,8 +12,35 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.label :status %>: <%= @trip_claim.status %>
+  </div>
+  <div class="field">
+    <%= f.label :proposed_pickup_time %>
+    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+      <br /><%= f.datetime_select(:proposed_pickup_time, 
+                                  :order => [:month, :day, :year, :hour, :minute],
+                                  :default => DateTime.current,
+                                  :ampm => true
+      ) %>
+    <% else %>
+      <%= @trip_claim.proposed_pickup_time %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label :proposed_fare %>:
+    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+      <br /><%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
+    <% else %>
+      <%= @trip_claim.proposed_fare %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label :notes %>:<br />
+    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+      <%= f.text_area :notes %>
+    <% else %>
+      <%= @trip_claim.notes %>
+    <% end %>
   </div>
   <div class="actions">
     <%= f.submit %>

@@ -10,8 +10,8 @@ class TripTicket < ActiveRecord::Base
           :validate => true, :dependent => :destroy
   
   has_one :mobility_type
-  has_many :trip_claims
-  has_one :trip_result
+  has_many :trip_claims, :dependent => :destroy
+  has_one :trip_result, :dependent => :destroy
   
   SCHEDULING_PRIORITY = {
     "pickup"  => "Pickup",
@@ -58,5 +58,13 @@ class TripTicket < ActiveRecord::Base
   
   def customer_full_name
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
+  end
+  
+  def approved?
+    self.trip_claims.where(:status => TripClaim::STATUS[:approved]).count > 1
+  end
+  
+  def includes_claim_from?(provider)
+    self.trip_claims.where(:claimant_provider_id => provider.id).count > 1
   end
 end

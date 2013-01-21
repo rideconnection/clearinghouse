@@ -2,39 +2,16 @@
 
 FactoryGirl.define do
   factory :trip_ticket do
-    allowed_time_variance ""
-    appointment_time ""
-    approved_claim_id ""
-    claimant_customer_id ""
-    claimant_provider_id ""
-    claimant_trip_id ""
-    customer_address_id ""
-    customer_boarding_time ""
-    customer_deboarding_time ""
-    customer_dob ""
-    customer_emergency_phone ""
-    customer_impairment_description ""
-    customer_information_withheld ""
-    customer_first_name ""
-    customer_last_name ""
-    customer_middle_name ""
-    customer_notes ""
-    customer_primary_phone ""
-    customer_seats_required ""
-    created_at ""
-    updated_at ""
-    drop_off_location_id ""
-    earliest_pick_up_time ""
-    mobility_type_id ""
-    num_attendants ""
-    num_guests ""
-    origin_customer_id ""
-    origin_provider_id ""
-    origin_trip_id ""
-    pick_up_location_id ""
-    scheduling_priority ""
-    trip_notes ""
-    trip_purpose_code ""
-    trip_purpose_description "MyString"
+    customer_dob "2012-01-01"
+    customer_information_withheld false
+    customer_first_name "First"
+    customer_last_name "Last"
+    customer_primary_phone "555-555-5555"
+    customer_seats_required 1
+    customer_ethnicity_id 1
+    requested_drop_off_time { Time.now }
+    requested_pickup_time { Time.now }
+    association :originator, :factory => :provider
+    scheduling_priority "pickup"
   end
 end

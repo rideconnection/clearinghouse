@@ -5,4 +5,9 @@
 
   <%= link_to 'Show', @trip_ticket %> |
   <%= link_to 'Back', trip_tickets_path %>
+
+  <hr />
+  <div id="audit_trail">
+    <%= render 'shared/audit_trail', :record => @trip_ticket %>
+  </div>
 </div>

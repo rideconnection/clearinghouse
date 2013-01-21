@@ -20,4 +20,23 @@ class TripTicketTest < ActiveSupport::TestCase
     t.num_attendants.must_equal 0
     t.num_guests.must_equal 0
   end
+  
+  it "knows if it's been approved" do
+    t = FactoryGirl.create(:trip_ticket)
+    t.approved?.must_equal false
+    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => t)
+    t.approved?.must_equal false
+    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => t)
+    t.approved?.must_equal true
+    t.destroy
+  end
+  
+  it "knows if it has a claim from a specific provider" do
+    t = FactoryGirl.create(:trip_ticket)
+    p = FactoryGirl.create(:provider)
+    FactoryGirl.create(:trip_claim, :trip_ticket => t)
+    t.includes_claim_from?(p).must_equal false
+    FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
+    t.includes_claim_from?(p).must_equal true
+  end
 end

@@ -40,6 +40,10 @@ class User < ActiveRecord::Base
     roles.any? { |r| r.name.underscore.to_sym == role_sym }
   end
 
+  def has_any_role?(role_syms)
+    role_syms.select{|role_sym| self.has_role?(role_sym)}.size > 0
+  end
+
   def active_for_authentication?
     !!active
   end

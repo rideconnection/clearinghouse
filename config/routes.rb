@@ -21,13 +21,17 @@ Clearinghouse::Application.routes.draw do
     resources :services, :except => [ :index, :show, :destroy ]
   end
 
-  resources :trip_claims do
-    post 'approve'
-    post 'decline'
-  end
-
+  resources :trip_claims, :only => :index
+  
   resources :trip_tickets do
     post 'search', :on => :collection
+
+    resources :trip_claims, :except => [:index] do
+      member do
+        post 'approve'
+        post 'decline'
+      end
+    end
   end
 
   resources :users do

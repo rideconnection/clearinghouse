@@ -1,12 +1,38 @@
 class TripClaim < ActiveRecord::Base
   belongs_to :trip_ticket
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
+  
+  STATUS = {
+    :pending => 0,
+    :approved => 1,
+    :declined => -1
+  }
 
-  attr_accessible :claimant_provider_id, :claimant_service_id,
-    :rate, :status, :trip_ticket_id
+  attr_accessible :claimant_provider_id, :claimant_service_id, :status, 
+    :trip_ticket_id, :proposed_pickup_time, :proposed_fare, :notes
 
-  validates_presence_of :claimant_provider_id, :claimant_service_id,
-    :rate, :status, :trip_ticket_id
+  validates_presence_of :claimant_provider_id, :status, :trip_ticket_id, 
+    :proposed_pickup_time
+    
+  validate :trip_ticket_is_not_claimed, :one_claim_per_trip_ticket_per_claimant
 
   audited
+  
+  def approved?
+    status == STATUS[:approved]
+  end
+  
+  private
+  
+  def trip_ticket_is_not_claimed
+    if self.trip_ticket && self.trip_ticket.approved?
+      errors.add(:base, "You cannot create or modify a claim on a trip ticket once it has been claimed")
+    end
+  end
+
+  def one_claim_per_trip_ticket_per_claimant
+    if !self.persisted? && self.trip_ticket && self.claimant && self.trip_ticket.includes_claim_from?(self.claimant)
+      errors.add(:base, "You may only create one claim per ticket per provider")
+    end
+  end
 end

@@ -16,6 +16,7 @@
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
 
   <% @trip_tickets.each do |trip_ticket| %>
@@ -33,6 +34,7 @@
       <td><%= link_to 'Show', trip_ticket %></td>
       <td><% if can? :edit, trip_ticket %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
       <td><% if can? :destroy, trip_ticket %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
+      <td><% if !trip_ticket.approved? && can?(:create, TripClaim) %><%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %><% end %></td>
     </tr>
   <% end %>
   </table>

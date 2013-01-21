@@ -6,10 +6,13 @@ class Ability
  
   def initialize(user)
     user ||= User.new # guest user
-     
+
     can :read, Provider
     can :read, ProviderRelationship
     can :read, Service
+    can :read, TripClaim do |tc|
+      user.provider && (user.provider == tc.claimant || user.provider == tc.trip_ticket.originator)
+    end
     can :read, TripTicket
     can :read, User
     can :update, User, :id => user.id
@@ -36,13 +39,24 @@ class Ability
       
       can :create, User
       can [:update, :activate, :deactivate, :set_provider_role], User do |u|
-        user.provider and user.provider == u.provider
+        user.provider && user.provider == u.provider
       end
       
       can :create, TripTicket
-      can :update, TripTicket do |t|
-        user.provider and user.provider == t.originator
+      can [:update, :destroy], TripTicket do |t|
+        user.provider && user.provider == t.originator
       end
+    elsif user.has_any_role? [:scheduler, :provider_admin]
+      can :create, TripClaim do |tc|
+        user.provider && user.provider != tc.trip_ticket.originator
+      end
+      can [:update, :destroy], TripClaim do |tc|
+        user.provider && user.provider == tc.claimant
+      end
+    end
+
+    can :read_multiple, Array do |arr|
+      arr.empty? || arr.inject(true){|r, el| r && can?(:read, el)}
     end
   end
 end

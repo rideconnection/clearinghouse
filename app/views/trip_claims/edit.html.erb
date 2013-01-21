@@ -1,6 +1,11 @@
-<h1>Editing trip_claim</h1>
+<div id="trip-claim-edit">
+  <h1>Editing trip_claim</h1>
 
 <%= render 'form' %>
 
-<%= link_to 'Show', @trip_claim %> |
-<%= link_to 'Back', trip_claims_path %>
+<%= link_to 'Back', trip_ticket_path(@trip_ticket, :anchor => :trip_claims) %>
+
+<hr />
+<div id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_ticket %>
+</div>

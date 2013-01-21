@@ -1,0 +1,35 @@
+<h2>Trip Claims</h2>
+
+<table>
+
+  <tr>
+    <th>Status</th>
+    <th>Pickup Time</th>
+    <th>Fare</th>
+    <% if provider_admin %>
+      <th></th>
+      <th></th>
+      <th></th>
+    <% else %>
+      <th></th>
+      <th></th>
+    <% end %>
+  </tr>
+
+<% trip_claims.each do |trip_claim| %>
+  <tr>
+    <td><%= trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[trip_claim.status].to_s.humanize.titlecase %></td>
+    <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
+    <td><%= trip_claim.proposed_fare %></td>
+    <% if provider_admin %>
+      <td><%= link_to 'Details', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Approve', approve_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to APPROVE this claim?' } %></td>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Decline', decline_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to DECLINE this claim?' } %></td>
+    <% else %>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
+      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %></td>
+    <% end %>
+  </tr>
+<% end %>
+
+</table>

@@ -5,7 +5,25 @@
 
   <%= render 'form' %>
   
+  <br />
+  
   <%= link_to 'Back', trip_tickets_path %>
+  
+  <hr />
+  <div id="trip_claims">
+    <% if @trip_ticket.originator == current_user.provider %>
+      <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims, :provider_admin => true %>
+    <% else %>
+      <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.where(:claimant_provider_id => current_user.provider.id), :provider_admin => false %>
+    <% end %>
 
-  <%= render 'shared/audit_trail', :record => @trip_ticket %>
+    <% if can?(:create, TripClaim) && !@trip_ticket.approved? && !@trip_ticket.includes_claim_from?(current_user.provider) %>
+      <%= link_to "Submit Claim", new_trip_ticket_trip_claim_path(@trip_ticket) %><br />
+    <% end %>    
+  </div>
+
+  <hr />
+  <div id="audit_trail">
+    <%= render 'shared/audit_trail', :record => @trip_ticket %>
+  </div>
 </div>

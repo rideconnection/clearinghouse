@@ -33,7 +33,8 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets.json
   def create
     @trip_ticket = TripTicket.new(params[:trip_ticket])
-
+    @trip_ticket.originator = current_user.provider unless !@trip_ticket.origin_provider_id.blank?
+    
     respond_to do |format|
       if @trip_ticket.save
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully created.' }
