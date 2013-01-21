@@ -47,6 +47,17 @@ class ProviderRelationship < ActiveRecord::Base
   def approved?
     approved_at?
   end
+  
+  def self.relationship_exists?(provider_1, provider_2)
+    exists?([
+      %Q{
+        (requesting_provider_id = ? AND cooperating_provider_id = ?) OR
+        (requesting_provider_id = ? AND cooperating_provider_id = ?) 
+      },
+      provider_1.id, provider_2.id,
+      provider_2.id, provider_1.id
+    ])
+  end
 
   private
 
@@ -57,19 +68,9 @@ class ProviderRelationship < ActiveRecord::Base
   end
 
   def must_be_unique_relationship
-    if relationships_with_the_same_providers.any?
+    if requesting_provider.present? && cooperating_provider.present? && ProviderRelationship.relationship_exists?(requesting_provider, cooperating_provider)
       errors.add(:base, 
         "There is already a relationship between these providers")
     end
-  end
-
-  def relationships_with_the_same_providers
-    ProviderRelationship.where(
-      %Q{
-        (requesting_provider_id = ? AND cooperating_provider_id = ?) OR
-        (requesting_provider_id = ? AND cooperating_provider_id = ?) },
-      requesting_provider_id, cooperating_provider_id,
-      cooperating_provider_id, requesting_provider_id
-    )
   end
 end
