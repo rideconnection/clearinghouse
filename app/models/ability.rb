@@ -13,7 +13,9 @@ class Ability
     can :read, TripClaim do |tc|
       user.provider && (user.provider == tc.claimant || user.provider == tc.trip_ticket.originator)
     end
-    can :read, TripTicket
+    can :read, TripTicket do |t|
+      user.provider && (user.provider == t.originator || ProviderRelationship.relationship_exists?(user.provider, t.originator))
+    end
     can :read, User
     can :update, User, :id => user.id
 
