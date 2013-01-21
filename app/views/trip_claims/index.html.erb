@@ -18,9 +18,9 @@
       <td><%= trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[trip_claim.status].to_s.humanize.titlecase %></td>
       <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
       <td><%= trip_claim.proposed_fare %></td>
-      <td><%= link_to 'Show', trip_ticket_path(trip_claim.trip_ticket, :anchor => :trip_claims) %></td>
-      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
-      <td><%= link_to_unless trip_claim.trip_ticket.approved?, 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      <td><%= link_to 'Details', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
+      <td><% if can? :edit, trip_claim %><%= link_to 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %><% end %></td>
+      <td><% if can? :destroy, trip_claim %><%= link_to 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %><% end %></td>
     </tr>
   <% end %>
   

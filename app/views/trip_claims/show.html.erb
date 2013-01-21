@@ -6,7 +6,7 @@
 
   <ul>
     <li><%= link_to 'Back', trip_ticket_path(@trip_ticket, :anchor => :trip_claims) %></li>
-    <% if !@trip_ticket.approved? %>
+    <% if !@trip_ticket.claimed? %>
       <% if can? :edit, @trip_claim %>
         <li><%= link_to 'Edit', edit_trip_ticket_trip_claim_path(@trip_ticket, @trip_claim) %></li>
       <% end %>

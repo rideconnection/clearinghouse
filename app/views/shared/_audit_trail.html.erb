@@ -2,7 +2,7 @@
 <% if record.audits.size -%>
   <ul>
     <% record.audits.each do |audit| -%>
-      <li><strong><%= audit.created_at.to_s(:long) %></strong> by <em><%=audit.user.name %></em><br>
+      <li><strong><%= audit.created_at.to_s(:long) %></strong><% if audit.user %> by <em><%=audit.user.name %></em><% end %><br>
         <% if audit.action == "create" %>
           Record created
         <% elsif audit.action == "destroy" %>

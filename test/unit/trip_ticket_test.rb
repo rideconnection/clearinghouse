@@ -21,13 +21,13 @@ class TripTicketTest < ActiveSupport::TestCase
     t.num_guests.must_equal 0
   end
   
-  it "knows if it's been approved" do
+  it "knows if it's been claimed" do
     t = FactoryGirl.create(:trip_ticket)
-    t.approved?.must_equal false
+    t.claimed?.must_equal false
     FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => t)
-    t.approved?.must_equal false
+    t.claimed?.must_equal false
     FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => t)
-    t.approved?.must_equal true
+    t.claimed?.must_equal true
     t.destroy
   end
   

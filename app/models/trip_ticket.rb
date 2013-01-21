@@ -60,11 +60,11 @@ class TripTicket < ActiveRecord::Base
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end
   
-  def approved?
-    self.trip_claims.where(:status => TripClaim::STATUS[:approved]).count > 1
+  def claimed?
+    self.trip_claims(true).where(:status => TripClaim::STATUS[:approved]).count > 0
   end
   
   def includes_claim_from?(provider)
-    self.trip_claims.where(:claimant_provider_id => provider.id).count > 1
+    self.trip_claims(true).where(:claimant_provider_id => provider.id).count > 0
   end
 end

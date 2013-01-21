@@ -42,6 +42,10 @@ class Ability
         user.provider && user.provider == u.provider
       end
       
+      can [:approve, :decline], TripClaim do |tc|
+        tc.editable? && (user.provider && tc.trip_ticket && user.provider == tc.trip_ticket.originator)
+      end
+
       can :create, TripTicket
       can [:update, :destroy], TripTicket do |t|
         user.provider && user.provider == t.originator
@@ -51,7 +55,7 @@ class Ability
         user.provider && user.provider != tc.trip_ticket.originator
       end
       can [:update, :destroy], TripClaim do |tc|
-        user.provider && user.provider == tc.claimant
+        tc.editable? && (user.provider && user.provider == tc.claimant)
       end
     end
 

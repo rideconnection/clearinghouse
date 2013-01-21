@@ -17,7 +17,7 @@
       <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.where(:claimant_provider_id => current_user.provider.id), :provider_admin => false %>
     <% end %>
 
-    <% if can?(:create, TripClaim) && !@trip_ticket.approved? && !@trip_ticket.includes_claim_from?(current_user.provider) %>
+    <% if can?(:create, TripClaim) && !@trip_ticket.claimed? && !@trip_ticket.includes_claim_from?(current_user.provider) %>
       <%= link_to "Submit Claim", new_trip_ticket_trip_claim_path(@trip_ticket) %><br />
     <% end %>    
   </div>

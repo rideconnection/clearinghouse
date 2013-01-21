@@ -89,7 +89,7 @@ class TripClaimsController < ApplicationController
 
   # PUT /trip_claims/1/decline
   def decline
-    @trip_claim.decline
+    @trip_claim.decline!
     
     respond_to do |format|
       format.html { redirect_to @trip_ticket, notice: 'Trip claim was successfully declined.' }

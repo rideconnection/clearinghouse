@@ -18,14 +18,35 @@ class TripClaim < ActiveRecord::Base
 
   audited
   
+  after_initialize do
+    if self.new_record?
+      self.status = STATUS[:pending]
+    end
+  end
+
+  def approve!
+    self.status = STATUS[:approved]
+    save!
+    self.trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => STATUS[:declined])
+  end
+  
   def approved?
     status == STATUS[:approved]
+  end
+  
+  def decline!
+    self.status = STATUS[:declined]
+    save!
+  end
+  
+  def editable?
+    (self.status.blank? || self.status == STATUS[:pending]) && (!self.trip_ticket.present? || !self.trip_ticket.claimed?)
   end
   
   private
   
   def trip_ticket_is_not_claimed
-    if self.trip_ticket && self.trip_ticket.approved?
+    if self.trip_ticket && self.trip_ticket.claimed?
       errors.add(:base, "You cannot create or modify a claim on a trip ticket once it has been claimed")
     end
   end
