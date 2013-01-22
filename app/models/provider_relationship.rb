@@ -49,14 +49,17 @@ class ProviderRelationship < ActiveRecord::Base
   end
   
   def self.relationship_exists?(provider_1, provider_2)
-    exists?([
-      %Q{
-        (requesting_provider_id = ? AND cooperating_provider_id = ?) OR
-        (requesting_provider_id = ? AND cooperating_provider_id = ?) 
-      },
-      provider_1.id, provider_2.id,
-      provider_2.id, provider_1.id
-    ])
+    self.partner_ids_for_provider(provider_1).include? provider_2.id
+  end
+  
+  def self.partners_for_provider(provider)
+    Provider.where(:id => self.partner_ids_for_provider(provider))
+  end
+
+  def self.partner_ids_for_provider(provider)
+    select([:requesting_provider_id, :cooperating_provider_id]).
+      where(%Q{(requesting_provider_id = ? OR cooperating_provider_id = ?)}, provider.id, provider.id).
+      collect{|r| r.requesting_provider_id == provider.id ? r.cooperating_provider_id : r.requesting_provider_id }
   end
 
   private

@@ -19,11 +19,27 @@ class ProviderRelationshipTest < ActiveSupport::TestCase
   end
 
   describe "ProviderRelationship class" do
-    it "can test if a relationshop exists between two providers" do
+    it "can test if a relationship exists between two providers" do
       ProviderRelationship.relationship_exists?(@provider_1, @provider_2).must_equal true
       ProviderRelationship.relationship_exists?(@provider_2, @provider_1).must_equal true
       ProviderRelationship.relationship_exists?(@provider_1, @alternate_provider).must_equal false
       ProviderRelationship.relationship_exists?(@provider_2, @alternate_provider).must_equal false
+    end
+    
+    it "can return an array of partner provider ids for a given provider" do
+      partners = ProviderRelationship.partner_ids_for_provider(@provider_1)
+      partners.must_include @provider_2.id
+      partners.wont_include @alternate_provider.id
+
+      ProviderRelationship.partner_ids_for_provider(@alternate_provider).must_equal []
+    end
+    
+    it "can return an array of partner providers for a given provider" do
+      partners = ProviderRelationship.partners_for_provider(@provider_1)
+      partners.must_include @provider_2
+      partners.wont_include @alternate_provider
+
+      ProviderRelationship.partners_for_provider(@alternate_provider).must_equal []
     end
   end
   
