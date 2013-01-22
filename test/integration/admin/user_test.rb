@@ -102,6 +102,6 @@ class UserTest < ActionController::IntegrationTest
     @user.roles.destroy_all
     visit "/users"
     assert_equal current_url, root_url 
-    assert page.has_content?("You are not authorized to access this page.")
+    assert page.has_content?("You are not authorized to access that page.")
   end
 end

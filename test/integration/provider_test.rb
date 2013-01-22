@@ -47,9 +47,8 @@ class ProviderTest < ActionController::IntegrationTest
 
   test "non-provider_admin user cannot view keys" do
     @user.roles.destroy_all
-    assert_raise(CanCan::AccessDenied) do
-      visit "/providers/#{@user.provider.id}/keys"
-    end
+    visit "/providers/#{@user.provider.id}/keys"
+    assert page.has_content?("You are not authorized to access that page.")
   end
 
   test "provider_admin user cannot reset keys without accepting conditions" do
