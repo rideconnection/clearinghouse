@@ -61,6 +61,10 @@ class Ability
       end
     end
 
+    # If you're trying to check `can? :read_multiple, @my_resources` where 
+    # @my_resources is a collection of objects from an ActiveRecord::Relation
+    # query, remember to use `@my_resources.all` instead to convert it to an 
+    # Array otherwise this `can` definition won't be matched
     can :read_multiple, Array do |arr|
       arr.empty? || arr.inject(true){|r, el| r && can?(:read, el)}
     end

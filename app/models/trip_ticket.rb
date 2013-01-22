@@ -60,6 +60,12 @@ class TripTicket < ActiveRecord::Base
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end
   
+  # TODO - Add a timestamp or other field to enable us to quickly query
+  # whether a ticket has been claimed or not. Currently we have to load all of
+  # the associated trip_claims and iterate over those first. We should be able
+  # able to do something like TripTicket.where('claimed_at IS NULL`) or
+  # similar. This would also require refactoring of some code in the TripClaim
+  # model to match (with the TripTicket field being the authoritative source.)
   def claimed?
     self.trip_claims(true).where(:status => TripClaim::STATUS[:approved]).count > 0
   end
