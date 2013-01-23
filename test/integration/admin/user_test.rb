@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UserTest < ActionController::IntegrationTest
+class UserIntegrationTest < ActionController::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -8,6 +8,7 @@ class UserTest < ActionController::IntegrationTest
   setup do
     @provider = FactoryGirl.create(:provider, :name => "Microsoft")
     @user = FactoryGirl.create(:user)
+    @other_user = FactoryGirl.create(:user, :name => "Muffin Bon Visor")
     @user.roles << Role.find_or_create_by_name!("site_admin")
     login_as(@user, :scope => :user)
   end
@@ -99,9 +100,12 @@ class UserTest < ActionController::IntegrationTest
   end
 
   test "user can't view admin functions without proper permissions" do
-    @user.roles.destroy_all
     visit "/users"
-    assert_equal current_url, root_url 
-    assert page.has_content?("You are not authorized to access that page.")
+    assert page.has_content?("Muffin Bon Visor")
+    
+    @user.roles.destroy_all
+    
+    visit "/users"
+    assert !page.has_content?("Muffin Bon Visor")
   end
 end

@@ -7,6 +7,7 @@ class UserTest < ActiveSupport::TestCase
     setup do
       @provider = FactoryGirl.create(:provider)
       @user = FactoryGirl.build(:user, :provider_id => nil)
+      @not_site_admin = FactoryGirl.create(:role, :name => "not_site_admin")
       @site_admin = FactoryGirl.create(:role, :name => "site_admin")
     end
     
@@ -15,7 +16,8 @@ class UserTest < ActiveSupport::TestCase
       @provider.destroy
     end
     
-    it "should require a provider_id when a user is not a site_admin" do
+    it "should require a provider_id when a user has any roles but is not a site_admin" do
+      @user.roles << @not_site_admin
       @user.valid?.must_equal false
       @user.errors[:provider_id].must_include "is required for all non-administrative users"
       

@@ -11,7 +11,6 @@ class User < ActiveRecord::Base
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider, :provider_id, :roles, :role_ids, 
     :title
-    
 
   validate do |user|
     # This pattern should technically work, but it doesn't...
@@ -24,7 +23,7 @@ class User < ActiveRecord::Base
     end
 
     # Non-administrative users must be assigned to a provider
-    if !user.has_admin_role? && !user.provider.present?
+    if user.roles.any? && !user.has_admin_role? && !user.provider.present?
       user.errors[:provider_id] << "is required for all non-administrative users"
     end
   end
@@ -34,9 +33,8 @@ class User < ActiveRecord::Base
   default_scope order('name ASC')
 
   # All users, sorted by provider
-  scope :all_by_provider, select('users.*, providers.name as provider_name')
-   .joins("LEFT JOIN providers ON users.provider_id = providers.id")
-   .reorder('users.provider_id IS NULL DESC, provider_name ASC, users.name ASC')
+  scope :all_by_provider, joins("LEFT JOIN providers ON users.provider_id = providers.id").
+    reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC')
 
   # Temporary attribute for auto-generated password tokens
   attr_accessor :must_generate_password 

@@ -11,6 +11,6 @@ class Role < ActiveRecord::Base
   end
   
   def self.is_admin_role?(role)
-    role.name == :site_admin.to_s
+    role.name.to_sym == :site_admin
   end
 end

@@ -18,6 +18,8 @@ class ProviderRelationship < ActiveRecord::Base
   validate :must_reference_different_providers
 
   validate :must_be_unique_relationship, :on => :create 
+  
+  scope :approved, where("approved_at IS NOT NULL")
 
   def name
     name_1 = requesting_provider.name
@@ -48,16 +50,17 @@ class ProviderRelationship < ActiveRecord::Base
     approved_at?
   end
   
-  def self.relationship_exists?(provider_1, provider_2)
-    self.partner_ids_for_provider(provider_1).include? provider_2.id
+  def self.relationship_exists?(provider_1, provider_2, only_approved = false)
+    self.partner_ids_for_provider(provider_1, only_approved).include? provider_2.id
   end
   
-  def self.partners_for_provider(provider)
-    Provider.where(:id => self.partner_ids_for_provider(provider))
+  def self.partners_for_provider(provider, only_approved = true)
+    Provider.where(:id => self.partner_ids_for_provider(provider, only_approved))
   end
 
-  def self.partner_ids_for_provider(provider)
-    select([:requesting_provider_id, :cooperating_provider_id]).
+  def self.partner_ids_for_provider(provider, only_approved = true)
+    (only_approved ? self.approved : self).
+      select([:requesting_provider_id, :cooperating_provider_id]).
       where(%Q{(requesting_provider_id = ? OR cooperating_provider_id = ?)}, provider.id, provider.id).
       collect{|r| r.requesting_provider_id == provider.id ? r.cooperating_provider_id : r.requesting_provider_id }
   end

@@ -1,13 +1,11 @@
 class TripClaimsController < ApplicationController
+  load_and_authorize_resource :trip_claim, :only => :index
   load_and_authorize_resource :trip_ticket, :except => :index
   load_and_authorize_resource :trip_claim, :through => :trip_ticket, :except => :index
   
   # GET /trip_claims
   # GET /trip_claims.json
   def index
-    @trip_claims = TripClaim.where(:claimant_provider_id => current_user.provider.id)
-    authorize! :read_multiple, @trip_claims.all
-    
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @trip_claims }
@@ -39,7 +37,7 @@ class TripClaimsController < ApplicationController
   # POST /trip_claims
   # POST /trip_claims.json
   def create
-    @trip_claim.claimant = current_user.provider
+    @trip_claim.claimant = current_user.provider unless current_user.has_admin_role?
     @trip_claim.status = TripClaim::STATUS[:pending]
     respond_to do |format|
       if @trip_claim.save

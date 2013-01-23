@@ -1,20 +1,10 @@
 class TripTicketsController < ApplicationController
-  load_and_authorize_resource :except => :index
+  load_and_authorize_resource
   before_filter :setup_locations, :except => [:index, :search]
 
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
-    # CanCan's accessible_by (used by load_resource) cannot be used with a 
-    # block 'can' definition, so we'll do it the old fashioned way.
-    # TODO - limit the query or page results
-    if current_user.has_role? :site_admin
-      @trip_tickets = TripTicket.all
-    else
-      @trip_tickets = TripTicket.where(:origin_provider_id => ProviderRelationship.partner_ids_for_provider(current_user.provider) + [current_user.provider.id]).all
-    end
-    authorize! :read_multiple, @trip_tickets
-    
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @trip_tickets }
