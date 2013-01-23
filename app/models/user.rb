@@ -13,14 +13,19 @@ class User < ActiveRecord::Base
     :title
     
 
-  # This pattern should technically work, but it doesn't...
-  # validates_format_of :password, :if => :password_required?,
-  #                     :with => /^(?=.*[0-9])(?=.*[\W_&&[^\s] ])[\w\W&&[^\s] ]{6,20}$/i, # Regexp tested at http://www.rubular.com/r/7peotZQNui
-  #                     :message => "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
-  # So...                    
   validate do |user|
+    # This pattern should technically work, but it doesn't...
+    # validates_format_of :password, :if => :password_required?,
+    #                     :with => /^(?=.*[0-9])(?=.*[\W_&&[^\s] ])[\w\W&&[^\s] ]{6,20}$/i, # Regexp tested at http://www.rubular.com/r/7peotZQNui
+    #                     :message => "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
+    # So...                    
     if user.password_required? && (user.password.blank? || !(6..20).include?(user.password.length) || !user.password.match(/\d/) || !user.password.match(/[\W_&&[^\s] ]/))
       user.errors[:password] << "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
+    end
+
+    # Non-administrative users must be assigned to a provider
+    if !user.has_admin_role? && !user.provider.present?
+      user.errors[:provider_id] << "is required for all non-administrative users"
     end
   end
 
@@ -42,6 +47,10 @@ class User < ActiveRecord::Base
 
   def has_any_role?(role_syms)
     role_syms.select{|role_sym| self.has_role?(role_sym)}.size > 0
+  end
+  
+  def has_admin_role?
+    roles.any? && roles.inject(true){|memo, role| memo && role.is_admin_role?}
   end
 
   def active_for_authentication?

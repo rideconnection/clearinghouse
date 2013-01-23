@@ -49,8 +49,7 @@ class UsersController < ApplicationController
 
   # POST /users
   # POST /users.json
-  def create
-
+  def create    
     # TODO: Factor into model
     if !current_user.has_role?(:site_admin)
       @user.provider = current_user.provider
