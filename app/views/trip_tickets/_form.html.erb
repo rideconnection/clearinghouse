@@ -19,7 +19,7 @@
       <% if can? :edit, @trip_ticket %>
         <br /><%= f.collection_select :origin_provider_id, Provider.all, :id, :name, :include_blank => true %>
       <% else %>
-        <%= @trip_ticket.origin_provider_id %>
+        <%= @trip_ticket.originator.name %>
       <% end %>
     </div>
     <div class="field">
@@ -48,7 +48,7 @@
       <% if can? :edit, @trip_ticket %>
         <br /><%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
       <% else %>
-        <%= @trip_ticket.claimant_provider_id %>
+        <%= @trip_ticket.claimant.name if @trip_ticket.claimant.present? %>
       <% end %>
     </div>
     <div class="field">
