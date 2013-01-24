@@ -19,9 +19,10 @@ Setting up the development environment:
 
 0. Prerequsites:
    - RVM
-   - PostgreSQL, e.g.:
+   - PostgreSQL and system packages, e.g.:
          apt-get install postgresql postgresql-contrib-9.1 \
-                         postgresql-9.1-postgis postgresql-server-dev-9.1
+                         postgresql-9.1-postgis postgresql-server-dev-9.1i \
+                         build-essential
 
 1. Install your Ruby environment:
    - Trust the local .rvmrc file when you enter this repository directory.
