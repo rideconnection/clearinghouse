@@ -71,7 +71,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def claimable_by?(user)
-    !self.claimed? && (user.has_admin_role? || !self.includes_claim_from(user.provider))
+    !self.claimed? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
   
   def includes_claim_from?(provider)
