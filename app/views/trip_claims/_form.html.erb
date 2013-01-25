@@ -12,6 +12,14 @@
   <% end %>
 
   <div class="field">
+    <%= f.label :claimant_provider_id, "Provider" %>:
+    <% if current_user.has_admin_role? %>
+      <br /><%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
+    <% else %>
+      <%= @trip_claim.claimant.name %>
+    <% end %>
+  </div>
+  <div class="field">
     <%= f.label :status %>: <%= @trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[@trip_claim.status].to_s.humanize.titlecase %>
   </div>
   <div class="field">

@@ -27,7 +27,7 @@ class TripClaim < ActiveRecord::Base
   def approve!
     self.status = STATUS[:approved]
     save!
-    self.trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => STATUS[:declined])
+    trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => STATUS[:declined])
   end
   
   def approved?
@@ -52,7 +52,7 @@ class TripClaim < ActiveRecord::Base
   end
 
   def one_claim_per_trip_ticket_per_claimant
-    if !self.persisted? && self.trip_ticket && self.claimant && self.trip_ticket.includes_claim_from?(self.claimant)
+    if !self.persisted? && self.trip_ticket.present? && self.claimant.present? && self.trip_ticket.includes_claim_from?(self.claimant)
       errors.add(:base, "You may only create one claim per ticket per provider")
     end
   end

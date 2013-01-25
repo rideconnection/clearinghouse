@@ -67,10 +67,14 @@ class TripTicket < ActiveRecord::Base
   # similar. This would also require refactoring of some code in the TripClaim
   # model to match (with the TripTicket field being the authoritative source.)
   def claimed?
-    self.trip_claims(true).where(:status => TripClaim::STATUS[:approved]).count > 0
+    self.trip_claims.where(:status => TripClaim::STATUS[:approved]).count > 0
+  end
+  
+  def claimable_by?(user)
+    !self.claimed? && (user.has_admin_role? || !self.includes_claim_from(user.provider))
   end
   
   def includes_claim_from?(provider)
-    self.trip_claims(true).where(:claimant_provider_id => provider.id).count > 0
+    self.trip_claims.where(:claimant_provider_id => provider.id).count > 0
   end
 end

@@ -1,45 +1,58 @@
-class << self
-  def find_or_create_user_by_role_name_and_index(role_name, index)
-    email = "#{role_name.to_s.underscore}#{index.blank? ? "" : "_#{index}"}@clearinghouse.org"
-    name  = "Test #{role_name.to_s.titlecase}#{index.blank? ? "" : " #{index}"}"
-    pass  = "password 1"
-    User.find_or_create_by_email!(email: email, password: pass, password_confirmation: pass, name: name)
-  end
-end
-
-admin_roles = {
-  site_admin: Role.where(:name => :site_admin).first,
-  provider_admin: Role.where(:name => :provider_admin).first
-}
 ActiveRecord::Base.transaction do
   puts "-- Loading sandbox data"
-  sa = find_or_create_user_by_role_name_and_index(:site_admin, nil)
-  sa.roles << admin_roles[:site_admin] unless sa.roles.include?(admin_roles[:site_admin])
-  sa.save!
-  puts "---- Site Admin: \"#{sa.email}\""
   
-  2.times do |i|
-    index = i + 1
-    p = Provider.find_or_initialize_by_name("Provider \##{index}")
-    pc = find_or_create_user_by_role_name_and_index(:provider_admin, index)
+  provider_1 = FactoryGirl.create(:provider, :name => "Google")
+  provider_2 = FactoryGirl.create(:provider, :name => "Yahoo")
+  provider_3 = FactoryGirl.create(:provider, :name => "Microsoft")
 
-    p.address = Location.create(address_1: "#{index} Clearing House Rd", city: "Portland", state: "OR", zip: "97210") unless p.address.present?
-    p.primary_contact = pc unless p.primary_contact.present?
-    p.save! if p.changed?
-    puts "---- Provider \##{index}: \"#{p.name}\""
+  provider_relationship_1 = ProviderRelationship.create!(:requesting_provider => provider_1, :cooperating_provider => provider_2)
+  provider_relationship_2 = ProviderRelationship.create!(:requesting_provider => provider_2, :cooperating_provider => provider_3)
+  provider_relationship_3 = ProviderRelationship.create!(:requesting_provider => provider_3, :cooperating_provider => provider_1)
+  provider_relationship_1.approve!
+  provider_relationship_2.approve!
+
+  # Open trip ticket from provider_1
+  trip_ticket_1  = FactoryGirl.create(:trip_ticket, :originator => provider_1)
+  FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_1, :claimant => provider_2, :status => TripClaim::STATUS[:pending])
+
+  # Claimed trip ticket from provider_1
+  trip_ticket_2  = FactoryGirl.create(:trip_ticket, :originator => provider_1)
+  FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_2, :claimant => provider_2, :status => TripClaim::STATUS[:approved])
+
+  # Open trip ticket from provider_2, no claims
+  trip_ticket_3  = FactoryGirl.create(:trip_ticket, :originator => provider_2)
+
+  # Claimed trip ticket from provider_2
+  trip_ticket_4  = FactoryGirl.create(:trip_ticket, :originator => provider_2)
+  FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_1, :status => TripClaim::STATUS[:declined])
+  FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_3, :status => TripClaim::STATUS[:approved])
+
+  # Open trip ticket from provider_3, no claims
+  trip_ticket_5  = FactoryGirl.create(:trip_ticket, :originator => provider_3)
+
+  # Claimed trip ticket from provider_3
+  trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => provider_3)
+  FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_6, :claimant => provider_2, :status => TripClaim::STATUS[:approved])
+  
+  user_password = "password 1"
+
+  site_admin = FactoryGirl.create(:user, :provider => nil, :email => "site_admin@clearinghouse.org", :name => "Site Admin", :password => user_password, :password_confirmation => user_password)
+  site_admin.roles << Role.find_by_name("site_admin")
+  puts "User site_admin@clearinghouse.org created with password '#{user_password}'"
     
-    pc.provider = p unless pc.provider.present?
-    pc.roles << admin_roles[:provider_admin] unless pc.roles.include?(admin_roles[:provider_admin])
-    pc.save! if pc.changed?
-    puts "------ Provider Admin: \"#{pc.email}\""
+  [provider_1, provider_2, provider_3].each_with_index do |provider,index|
+    FactoryGirl.create(:service, :provider => provider, :name => "#{provider.name} service 1")
+    FactoryGirl.create(:service, :provider => provider, :name => "#{provider.name} service 2")
     
-    Role.where('name NOT IN (?)', admin_roles).each do |role|
-      u = find_or_create_user_by_role_name_and_index(role.name, i+1)
-      u.provider = p unless u.provider.present?
-      u.roles << role unless u.roles.include?(role)
-      u.save! if u.changed?
-      puts "------ #{role.name.titlecase}: \"#{u.email}\""
+    Role.provider_roles.each do |role|
+      email = "#{role.name.underscore}_#{index + 1}@clearinghouse.org"
+      name  = "Test #{role.name.titlecase} #{index + 1}"
+
+      user = FactoryGirl.create(:user, :provider => provider, :email => email, :name => name, :password => user_password, :password_confirmation => user_password)
+      user.roles << role
+      puts "User #{email} created with password '#{user_password}'"
     end
   end
+  
   puts "-- Done loading sandbox data"
 end

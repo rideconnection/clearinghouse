@@ -5,7 +5,7 @@ class Service < ActiveRecord::Base
   has_one :funding_source
 
   attr_accessible :eligibility, :funding_id, :name, :operating_hours_id,
-    :rate, :req_min_age, :req_veteran, :service_area
+    :rate, :req_min_age, :req_veteran, :service_area, :provider_id
 
   validates_presence_of :name, :provider
 

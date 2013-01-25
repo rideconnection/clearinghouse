@@ -11,13 +11,9 @@
   
   <hr />
   <div id="trip_claims">
-    <% if @trip_ticket.originator == current_user.provider %>
-      <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims, :provider_admin => true %>
-    <% else %>
-      <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.where(:claimant_provider_id => current_user.provider.id), :provider_admin => false %>
-    <% end %>
+    <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability), :provider_admin => can?(:update, @trip_ticket) %>
 
-    <% if can?(:create, TripClaim) && !@trip_ticket.claimed? && !@trip_ticket.includes_claim_from?(current_user.provider) %>
+    <% if can?(:create, @trip_ticket.trip_claims.build) && @trip_ticket.claimable_by?(current_user) %>
       <%= link_to "Submit Claim", new_trip_ticket_trip_claim_path(@trip_ticket) %><br />
     <% end %>    
   </div>

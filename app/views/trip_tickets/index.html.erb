@@ -3,6 +3,8 @@
 
   <table>
     <tr>
+      <th>Originator</th>
+      <th>Status</th>
       <th>Customer</th>
       <th>Mobility type</th>
       <th>Deboarding time</th>
@@ -21,6 +23,8 @@
 
   <% @trip_tickets.each do |trip_ticket| %>
     <tr>
+      <td><%= trip_ticket.originator.name %></td>
+      <td>TODO</td>
       <td><%= trip_ticket.customer_full_name %></td>
       <td><%= trip_ticket.mobility_type_id %></td>
       <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
@@ -32,9 +36,9 @@
       <td>TODO</td>
       <td>TODO</td>
       <td><%= link_to 'Show', trip_ticket %></td>
-      <td><% if can? :edit, trip_ticket %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
-      <td><% if can? :destroy, trip_ticket %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
-      <td><% if !trip_ticket.claimed? && can?(:create, TripClaim) %><%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %><% end %></td>
+      <td><% if can?(:edit, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
+      <td><% if can?(:destroy, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
+      <td><% if can?(:create, trip_ticket.trip_claims.build) && trip_ticket.trip_ticket.claimable_by?(current_user) %><%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %><% end %></td>
     </tr>
   <% end %>
   </table>
