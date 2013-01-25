@@ -35,7 +35,7 @@ gem 'seedbank'
 gem 'time_of_day'
 
 # API web service
-gem 'grape', '0.2.2'
+gem 'grape', '~> 0.2.5'
 
 # Javascript engine
 gem 'therubyracer'

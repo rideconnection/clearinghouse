@@ -9,8 +9,6 @@ module Clearinghouse
   class API < Grape::API
     prefix 'api'
     format :json
-    default_format :json
-    error_format :json
     rescue_from :all do |e|
       # Log it
       Rails.logger.error "#{e.message}\n\n#{e.backtrace.join("\n")}"
@@ -20,9 +18,9 @@ module Clearinghouse
       
       message = { :error => e.message }
       status = 500
-      if e.class.name == "ValidationError"
+      if e.is_a? Grape::Exceptions::ValidationError
         status = 403
-      elsif e.class.name == "ActiveRecord::RecordNotFound"
+      elsif e.is_a? ActiveRecord::RecordNotFound
         status = 404
       end
       if !Rails.env.production?
