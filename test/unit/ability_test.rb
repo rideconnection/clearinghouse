@@ -183,6 +183,10 @@ class AbilityTest < ActiveSupport::TestCase
       it "cannot destroy its own user record" do
         assert @site_admin.cannot?(:destroy, @current_user)
       end
+      
+      it "cannot deactivate its own user record" do
+        assert @site_admin.cannot?(:deactivate, @current_user)
+      end
     end    
   
     describe "users" do
@@ -472,6 +476,10 @@ class AbilityTest < ActiveSupport::TestCase
       
       it "cannot destroy its own user record" do
         assert @provider_admin.cannot?(:destroy, @current_user)
+      end
+      
+      it "cannot deactivate its own user record" do
+        assert @provider_admin.cannot?(:deactivate, @current_user)
       end
     end    
     
@@ -801,6 +809,10 @@ class AbilityTest < ActiveSupport::TestCase
       
       it "cannot destroy its own user record" do
         assert @scheduler.cannot?(:destroy, @current_user)
+      end
+      
+      it "cannot deactivate its own user record" do
+        assert @scheduler.cannot?(:deactivate, @current_user)
       end
     end    
     
