@@ -29,7 +29,7 @@ class Ability
       can :read, Service, :provider_id => user.provider_id
 
       # Users can access a list trip claims belonging to their own provider, and can additionally read individual trip claims associated with trip_tickets that belong to their own provider
-      can :read, TripClaim, ['claimant_provider_id = ?', user.provider_id] do |tc|
+      can :read, TripClaim, TripClaim.joins(:trip_ticket).where('trip_claims.claimant_provider_id = ? OR trip_tickets.origin_provider_id = ?', user.provider_id, user.provider_id) do |tc|
         tc.claimant_provider_id == user.provider_id || tc.trip_ticket.origin_provider_id == user.provider_id
       end
 

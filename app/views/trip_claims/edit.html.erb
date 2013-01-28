@@ -3,7 +3,8 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Back', trip_ticket_path(@trip_ticket, :anchor => :trip_claims) %>
+<%= link_to 'Trip Claims', trip_claims_path %><br>
+<%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
 
 <hr />
 <div id="audit_trail">
