@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :ethnicity do
-    name "MyString"
+    name "My Ethnicity"
   end
 end

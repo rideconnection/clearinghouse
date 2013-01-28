@@ -24,15 +24,6 @@ GIT
       spork
 
 GIT
-  remote: git://github.com/softa/activerecord-postgres-hstore.git
-  revision: 396f5af9af5eb70b7d9721a5bb14e14afee5cc38
-  specs:
-    activerecord-postgres-hstore (0.4.1)
-      pg
-      rails
-      rake
-
-GIT
   remote: git://github.com/sporkrb/spork-testunit.git
   revision: 8087255296d20dc8e2ff45d4e4c09b09d3078a8d
   specs:
@@ -68,6 +59,9 @@ GEM
       tzinfo (~> 0.3.29)
     activerecord-postgis-adapter (0.5.0)
       rgeo-activerecord (~> 0.4.6)
+    activerecord-postgres-hstore (0.5.3)
+      rails
+      rake
     activeresource (3.2.11)
       activemodel (= 3.2.11)
       activesupport (= 3.2.11)
@@ -301,7 +295,7 @@ PLATFORMS
 DEPENDENCIES
   accept_values_for (~> 0.4.3)
   activerecord-postgis-adapter
-  activerecord-postgres-hstore!
+  activerecord-postgres-hstore
   audited
   audited-activerecord (~> 3.0)
   cancan (~> 1.6.8)

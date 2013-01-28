@@ -10,6 +10,7 @@ class TripTicket < ActiveRecord::Base
           :validate => true, :dependent => :destroy
   
   has_one :mobility_type
+  has_one :customer_ethnicity, :class_name => :Ethnicity
   has_many :trip_claims, :dependent => :destroy
   has_one :trip_result, :dependent => :destroy
   
@@ -31,7 +32,8 @@ class TripTicket < ActiveRecord::Base
    :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,
    :origin_trip_id, :pick_up_location_attributes, :pick_up_location_id,
    :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
-   :trip_notes, :trip_purpose_code, :trip_purpose_description
+   :trip_notes, :trip_purpose_code, :trip_purpose_description,
+   :customer_identifiers
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
 

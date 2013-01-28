@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130119045404) do
+ActiveRecord::Schema.define(:version => 20130128211925) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -240,7 +240,10 @@ ActiveRecord::Schema.define(:version => 20130119045404) do
     t.time     "requested_pickup_time"
     t.time     "requested_drop_off_time"
     t.integer  "customer_ethnicity_id"
+    t.hstore   "customer_identifiers"
   end
+
+  add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
 
   create_table "users", :force => true do |t|
     t.string   "email"

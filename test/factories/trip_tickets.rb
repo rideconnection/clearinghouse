@@ -8,10 +8,13 @@ FactoryGirl.define do
     customer_last_name "Last"
     customer_primary_phone "555-555-5555"
     customer_seats_required 1
-    customer_ethnicity_id 1
     requested_drop_off_time { Time.now }
     requested_pickup_time { Time.now }
-    association :originator, :factory => :provider
     scheduling_priority "pickup"
+    customer_ethnicity_id 1
+    association :originator, :factory => :provider
+    association :customer_address, :factory => :location
+    association :pick_up_location, :factory => :location
+    association :drop_off_location, :factory => :location
   end
 end

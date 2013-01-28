@@ -7,8 +7,7 @@ gem 'rails', '~> 3.2.8'
 gem 'rvm-capistrano'
 
 # PostgreSQL hstore support
-gem 'activerecord-postgres-hstore',
-    git: 'git://github.com/softa/activerecord-postgres-hstore.git'
+gem 'activerecord-postgres-hstore'
 
 # Geospatial support
 gem 'rgeo'
