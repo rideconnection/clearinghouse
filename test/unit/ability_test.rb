@@ -395,12 +395,12 @@ class AbilityTest < ActiveSupport::TestCase
     end
     
     describe "trip claims" do
-      it "can use accessible_by to find trip claims belonging to their own provider" do
+      it "can use accessible_by to find trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
         accessible = TripClaim.accessible_by(@provider_admin)
+        accessible.must_include @trip_claim_1_1
+        accessible.must_include @trip_claim_2_1
         accessible.must_include @trip_claim_4_1
     
-        accessible.wont_include @trip_claim_1_1
-        accessible.wont_include @trip_claim_2_1
         accessible.wont_include @trip_claim_4_2
         accessible.wont_include @trip_claim_6_1
       end
@@ -728,10 +728,10 @@ class AbilityTest < ActiveSupport::TestCase
     describe "trip claims" do
       it "can use accessible_by to find trip claims belonging to their own provider" do
         accessible = TripClaim.accessible_by(@scheduler)
+        accessible.must_include @trip_claim_1_1
+        accessible.must_include @trip_claim_2_1
         accessible.must_include @trip_claim_4_1
     
-        accessible.wont_include @trip_claim_1_1
-        accessible.wont_include @trip_claim_2_1
         accessible.wont_include @trip_claim_4_2
         accessible.wont_include @trip_claim_6_1
       end

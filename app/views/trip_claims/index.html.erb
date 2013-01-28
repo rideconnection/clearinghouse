@@ -2,35 +2,42 @@
   <h2>Trip Claims</h2>
   
   <table>
-    <tr>
-      <% if current_user.has_admin_role? %>
-        <th>Claimant</th>
-      <% end %>
+    <tr style="text-align: center; vertical-align: bottom">
+      <th>Originator</th>
+      <th>Claimant</th>
       <th>Ticket</th>
       <th>Status</th>
-      <th>Pickup Time</th>
-      <th>Fare</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>Proposed<br>Pickup Time</th>
+      <th>Proposed<br>Fare</th>
       <th></th>
     </tr>
 
   <% @trip_claims.each do |trip_claim| %>
     <tr>
-      <% if current_user.has_admin_role? %>
-        <td><%= trip_claim.claimant.name %></td>
-      <% end %>
-      <td><%= trip_claim.trip_ticket.to_param %></td>
+      <td><%= trip_claim.trip_ticket.originator.name %></td>
+      <td><%= trip_claim.claimant.name %></td>
+      <td><%= address_and_city trip_claim.trip_ticket.pick_up_location %></td>
       <td><%= trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[trip_claim.status].to_s.humanize.titlecase %></td>
       <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
       <td><%= trip_claim.proposed_fare %></td>
-      <td><%= link_to 'Details', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>
-      <td><% if can?(:approve, trip_claim) && !trip_claim.trip_ticket.claimed? %><%= link_to 'Approve', approve_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to APPROVE this claim?' } %><% end %></td>
-      <td><% if can?(:decline, trip_claim) && !trip_claim.trip_ticket.claimed? %><%= link_to 'Decline', decline_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to DECLINE this claim?' } %><% end %></td>
-      <td><% if can?(:edit, trip_claim) && !trip_claim.trip_ticket.claimed? %><%= link_to 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %><% end %></td>
-      <td><% if can?(:destroy, trip_claim) && !trip_claim.trip_ticket.claimed? %><%= link_to 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %><% end %></td>
+      <td>
+        <ul>
+          <li><%= link_to 'View Ticket', trip_ticket_path(trip_claim.trip_ticket) %></li>
+          <li><%= link_to 'View Claim', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></li>
+          <% if can?(:approve, trip_claim) && !trip_claim.trip_ticket.claimed? %>
+            <li><%= link_to 'Approve', approve_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to APPROVE this claim?' } %></li>
+          <% end %>
+          <% if can?(:decline, trip_claim) && !trip_claim.trip_ticket.claimed? %>
+            <li><%= link_to 'Decline', decline_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :post, data: { confirm: 'Are you sure you want to DECLINE this claim?' } %></li>
+          <% end %>
+          <% if can?(:edit, trip_claim) && !trip_claim.trip_ticket.claimed? %>
+            <li><%= link_to 'Edit', edit_trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></li>
+          <% end %>
+          <% if can?(:destroy, trip_claim) && !trip_claim.trip_ticket.claimed? %>
+            <li><%= link_to 'Rescind', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim), method: :delete, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %></li>
+          <% end %>
+        </ul>
+      </td>
     </tr>
   <% end %>
   
