@@ -23,6 +23,7 @@ class TripTicketsController < ApplicationController
   # GET /trip_tickets/new
   # GET /trip_tickets/new.json
   def new    
+    @trip_ticket.originator = current_user.provider unless current_user.has_admin_role?
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @trip_ticket }
