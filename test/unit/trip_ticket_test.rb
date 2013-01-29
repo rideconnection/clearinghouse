@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class TripTicketTest < ActiveSupport::TestCase
+  setup do
+    @trip_ticket = FactoryGirl.create(:trip_ticket)
+  end
+  
   it "returns the customer's full name" do
     t = TripTicket.new
     t.customer_first_name = "Billy"
@@ -22,21 +26,30 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   it "knows if it's been claimed" do
-    t = FactoryGirl.create(:trip_ticket)
-    t.claimed?.must_equal false
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => t)
-    t.claimed?.must_equal false
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => t)
-    t.claimed?.must_equal true
-    t.destroy
+    @trip_ticket.claimed?.must_equal false
+    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @trip_ticket)
+    @trip_ticket.claimed?.must_equal false
+    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => @trip_ticket)
+    @trip_ticket.claimed?.must_equal true
   end
   
   it "knows if it has a claim from a specific provider" do
-    t = FactoryGirl.create(:trip_ticket)
     p = FactoryGirl.create(:provider)
-    FactoryGirl.create(:trip_claim, :trip_ticket => t)
-    t.includes_claim_from?(p).must_equal false
-    FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
-    t.includes_claim_from?(p).must_equal true
+    FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+    @trip_ticket.includes_claim_from?(p).must_equal false
+    FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => p)
+    @trip_ticket.includes_claim_from?(p).must_equal true
+  end
+  
+  it "has an hstore field for customer_identifiers which returns a hash" do
+    assert_equal nil, @trip_ticket.customer_identifiers
+    @trip_ticket.customer_identifiers = {
+      :Some => 'Thing',
+      1 => 2
+    }
+    @trip_ticket.save!
+    @trip_ticket.reload
+    # NOTE - Keys and values are coerced to strings
+    assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
 end
