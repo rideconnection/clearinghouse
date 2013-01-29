@@ -7,7 +7,7 @@
   <%= csrf_meta_tags %>
   <%= yield :head %>
 </head>
-<body>
+<body data-controller="<%= params[:controller] %>" data-action="<%= params[:action] %>">
 <div id="wrapper">
   <div id="header">
     <div id="main-nav">
