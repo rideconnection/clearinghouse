@@ -27,12 +27,12 @@ class TripTicket < ActiveRecord::Base
    :customer_last_name, :customer_middle_name, :customer_notes,
    :customer_primary_language, :customer_primary_phone,
    :customer_seats_required, :drop_off_location_attributes,
-   :drop_off_location_id, :earliest_pick_up_time, :mobility_type_id,
+   :drop_off_location_id, :earliest_pick_up_time,
    :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,
    :origin_trip_id, :pick_up_location_attributes, :pick_up_location_id,
    :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
    :trip_notes, :trip_purpose_code, :trip_purpose_description,
-   :customer_identifiers
+   :customer_identifiers, :customer_mobility_impairments
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
 

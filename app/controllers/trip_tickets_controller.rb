@@ -33,6 +33,8 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets
   # POST /trip_tickets.json
   def create
+    params[:trip_ticket][:customer_mobility_impairments].try(:reject!) {|v| v.blank? } 
+
     @trip_ticket = TripTicket.new(params[:trip_ticket])
     @trip_ticket.originator = current_user.provider unless !@trip_ticket.origin_provider_id.blank?
     
@@ -50,6 +52,8 @@ class TripTicketsController < ApplicationController
   # PUT /trip_tickets/1
   # PUT /trip_tickets/1.json
   def update
+    params[:trip_ticket][:customer_mobility_impairments].try(:reject!) {|v| v.blank? }
+
     respond_to do |format|
       if @trip_ticket.update_attributes(params[:trip_ticket])
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully updated.' }

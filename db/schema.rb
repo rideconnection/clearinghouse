@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130130192338) do
+ActiveRecord::Schema.define(:version => 20130130204218) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -196,45 +196,45 @@ ActiveRecord::Schema.define(:version => 20130130192338) do
   end
 
   create_table "trip_tickets", :force => true do |t|
-    t.integer  "origin_provider_id"
-    t.integer  "origin_customer_id"
-    t.integer  "claimant_provider_id"
-    t.integer  "claimant_customer_id"
-    t.integer  "approved_claim_id"
-    t.boolean  "customer_information_withheld"
-    t.date     "customer_dob"
-    t.integer  "customer_address_id"
-    t.string   "customer_primary_phone"
-    t.string   "customer_emergency_phone"
-    t.text     "customer_impairment_description"
-    t.integer  "customer_boarding_time"
-    t.integer  "customer_deboarding_time"
-    t.integer  "customer_seats_required"
-    t.text     "customer_notes"
-    t.integer  "origin_trip_id"
-    t.integer  "claimant_trip_id"
-    t.integer  "pick_up_location_id"
-    t.integer  "drop_off_location_id"
-    t.time     "earliest_pick_up_time"
-    t.time     "appointment_time"
-    t.string   "scheduling_priority"
-    t.integer  "allowed_time_variance"
-    t.integer  "num_attendants"
-    t.integer  "num_guests"
-    t.string   "trip_purpose_code"
-    t.string   "trip_purpose_description"
-    t.text     "trip_notes"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
-    t.integer  "mobility_type_id"
-    t.string   "customer_primary_language"
-    t.string   "customer_first_name"
-    t.string   "customer_last_name"
-    t.string   "customer_middle_name"
-    t.time     "requested_pickup_time"
-    t.time     "requested_drop_off_time"
-    t.hstore   "customer_identifiers"
-    t.string   "customer_ethnicity"
+    t.integer      "origin_provider_id"
+    t.integer      "origin_customer_id"
+    t.integer      "claimant_provider_id"
+    t.integer      "claimant_customer_id"
+    t.integer      "approved_claim_id"
+    t.boolean      "customer_information_withheld"
+    t.date         "customer_dob"
+    t.integer      "customer_address_id"
+    t.string       "customer_primary_phone"
+    t.string       "customer_emergency_phone"
+    t.text         "customer_impairment_description"
+    t.integer      "customer_boarding_time"
+    t.integer      "customer_deboarding_time"
+    t.integer      "customer_seats_required"
+    t.text         "customer_notes"
+    t.integer      "origin_trip_id"
+    t.integer      "claimant_trip_id"
+    t.integer      "pick_up_location_id"
+    t.integer      "drop_off_location_id"
+    t.time         "earliest_pick_up_time"
+    t.time         "appointment_time"
+    t.string       "scheduling_priority"
+    t.integer      "allowed_time_variance"
+    t.integer      "num_attendants"
+    t.integer      "num_guests"
+    t.string       "trip_purpose_code"
+    t.string       "trip_purpose_description"
+    t.text         "trip_notes"
+    t.datetime     "created_at",                      :null => false
+    t.datetime     "updated_at",                      :null => false
+    t.string       "customer_primary_language"
+    t.string       "customer_first_name"
+    t.string       "customer_last_name"
+    t.string       "customer_middle_name"
+    t.time         "requested_pickup_time"
+    t.time         "requested_drop_off_time"
+    t.hstore       "customer_identifiers"
+    t.string_array "customer_mobility_impairments"
+    t.string       "customer_ethnicity"
   end
 
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
