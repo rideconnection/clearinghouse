@@ -59,6 +59,8 @@ GEM
       tzinfo (~> 0.3.29)
     activerecord-postgis-adapter (0.5.0)
       rgeo-activerecord (~> 0.4.6)
+    activerecord-postgres-array (0.0.8)
+      activerecord
     activerecord-postgres-hstore (0.5.3)
       rails
       rake
@@ -295,6 +297,7 @@ PLATFORMS
 DEPENDENCIES
   accept_values_for (~> 0.4.3)
   activerecord-postgis-adapter
+  activerecord-postgres-array
   activerecord-postgres-hstore
   audited
   audited-activerecord (~> 3.0)

@@ -6,7 +6,7 @@
       <th>Originator</th>
       <th>Status</th>
       <th>Customer</th>
-      <th>Mobility type</th>
+      <th>Mobility Impairments</th>
       <th>Deboarding time</th>
       <th>Pick up loc.</th>
       <th>Drop off loc.</th>
@@ -26,7 +26,7 @@
       <td><%= trip_ticket.originator.name %></td>
       <td>TODO</td>
       <td><%= trip_ticket.customer_full_name %></td>
-      <td><%= trip_ticket.mobility_type_id %></td>
+      <td><%= trip_ticket.customer_mobility_impairments.try(:join, ', ') %></td>
       <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
       <td><%= address_and_city trip_ticket.pick_up_location %></td>
       <td><%= address_and_city trip_ticket.drop_off_location %></td>

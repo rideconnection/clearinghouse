@@ -148,11 +148,11 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_ethnicity_id, "Ethnicity" %>:
+      <%= f.label :customer_ethnicity, "Ethnicity" %>:
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.collection_select :customer_ethnicity_id, Ethnicity.all, :id, :name, :include_blank => true %>
+        <br /><%= f.text_field :customer_ethnicity %>
       <% else %>
-        <%= @trip_ticket.customer_ethnicity_id %>
+        <%= @trip_ticket.customer_ethnicity %>
       <% end %>
     </div>
     <div class="field">
@@ -190,58 +190,117 @@
               <a href="#" class='removeHstoreAttribute'>X</a>
             </div>
           <% end %>
+          
+          <% 
+            customer_identifier_fields = '<div class="field hstoreAttribute">' + 
+                                         text_field_tag('', '', :name => '', :id => '', :placeholder => 'New Attribute name', :value => '', :class => "hstoreAttributeName") + ' ' +
+                                         text_field_tag('', '', :name => '', :id => '', :placeholder => 'value', :value => '', :class => 'hstoreAttributeValue') + 
+                                         '<a href="#" class="removeHstoreAttribute">X</a></div>'
+          %>
 
-          <div id="customer_identifier_template" style="display: none">
-            <%= text_field_tag '', '', :name => '', :id => '', :placeholder => 'New Attribute name', :value => '', :class => "hstoreAttributeName" %>
-            <%= text_field_tag '', '', :name => '', :id => '', :placeholder => 'value', :value => '', :class => 'hstoreAttributeValue' %>
-          </div>
+          <%= raw(customer_identifier_fields) %>
 
           <a href="#" id="add_customer_identifier">Add Customer Identifier</a>
 
-          <%= content_for :head do %>
-            <script type='text/javascript'>
-              $(document).ready(function() {
-                $('#customer_identifiers').delegate('.hstoreAttributeName', 'keyup', function(e){
-                  $nameEl  = $(this);
-                  name     = $.trim($nameEl.val()).toLowerCase();
-                  $valueEl = $($nameEl.siblings('.hstoreAttributeValue')[0]);
-                  $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + name);
-                  $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
-                  $valueEl.attr('placeholder', 'value for ' + name);
-                });
-
-                $('#customer_identifiers').delegate('.removeHstoreAttribute', 'click', function(event){
-                  event.preventDefault();
-                  $(this).closest('.hstoreAttribute').remove();
-                  blankify_customer_identifiers();
-                });
-
-                $('#add_customer_identifier').on('click', function(event){
-                  event.preventDefault();
-                  $(this).before('<div class="field hstoreAttribute">' + $('#customer_identifier_template').html() + '<a href="#" class="removeHstoreAttribute">X</a></div>');
-                  blankify_customer_identifiers();
-                });
-
-                $('#add_customer_identifier').trigger('click');
-
-                function blankify_customer_identifiers() {
-                  $customer_identifiers = $('#customer_identifiers');
-                  hstoreAttributeCount = $customer_identifiers.find('.hstoreAttribute').size();
-                  if (hstoreAttributeCount == 0) {
-                    $customer_identifiers.append('<input type="hidden" id="trip_ticket_customer_identifiers_blank" name="trip_ticket[customer_identifiers]" value="">');
-                  }
-                  else {
-                    $('#trip_ticket_customer_identifiers_blank').remove();
-                  }
-                }
+          <script type='text/javascript'>
+            $(document).ready(function() {
+              $('#customer_identifiers').delegate('.hstoreAttributeName', 'keyup', function(e){
+                $nameEl  = $(this);
+                name     = $.trim($nameEl.val()).toLowerCase();
+                $valueEl = $($nameEl.siblings('.hstoreAttributeValue')[0]);
+                $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + name);
+                $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
+                $valueEl.attr('placeholder', 'value for ' + name);
               });
-            </script>
-          <% end %>
+
+              $('#customer_identifiers').delegate('.removeHstoreAttribute', 'click', function(event){
+                event.preventDefault();
+                $(this).closest('.hstoreAttribute').remove();
+                blankify_customer_identifiers();
+              });
+
+              $('#add_customer_identifier').on('click', function(event){
+                event.preventDefault();
+                $(this).before('<%= j raw(customer_identifier_fields) %>');
+                blankify_customer_identifiers();
+              });
+
+              function blankify_customer_identifiers() {
+                $customer_identifiers = $('#customer_identifiers');
+                hstoreAttributeCount = $customer_identifiers.find('.hstoreAttribute').size();
+                if (hstoreAttributeCount == 0) {
+                  $customer_identifiers.append('<input type="hidden" id="trip_ticket_customer_identifiers_blank" name="trip_ticket[customer_identifiers]" value="">');
+                }
+                else {
+                  $('#trip_ticket_customer_identifiers_blank').remove();
+                }
+              }
+            });
+          </script>
         <% end %>
       <% else %>
         <ul>
           <% @trip_ticket.customer_identifiers.try(:each) do |k,v| %>
             <li><strong><%= k %></strong>: <%= v %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    </fieldset>
+    <fieldset id="customer_mobility_impairments" class="">
+      <legend>Mobility Impairments</legend>
+      <% customer_mobility_impairment_fields = nil %>
+      <% if can? :edit, @trip_ticket %>
+        <% customer_mobility_impairment_fields_index = 0 %>
+        <% @trip_ticket.customer_mobility_impairments.try(:each_with_index) do |v,index| %>
+          <div class="field pgStringArray">
+            <%= text_field_tag "trip_ticket[customer_mobility_impairments][]", v, :id => "trip_ticket_customer_mobility_impairments_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue" %>
+            <a href="#" class='removePgStringArray'>X</a>
+          </div>
+          <% customer_mobility_impairment_fields_index += 1 %>
+        <% end %>
+      
+        <%
+          customer_mobility_impairment_fields = '<div class="field pgStringArray">' + 
+                                                text_field_tag('trip_ticket[customer_mobility_impairments][]', '', :id => 'trip_ticket_customer_mobility_impairments_?', :placeholder => 'New mobility impairment', :class => "pgStringArrayValue") + ' ' +
+                                                '<a href="#" class="removePgStringArray">X</a></div>'
+        %>
+
+        <%= raw(customer_mobility_impairment_fields.gsub('?', customer_mobility_impairment_fields_index.to_s)) %>
+
+        <a href="#" id="add_customer_mobility_impairment">Add Mobility Impairment</a>
+
+        <script type='text/javascript'>
+          window.__customer_mobility_impairment_fields_index = <%= customer_mobility_impairment_fields_index %>
+          $(document).ready(function() {
+            $('#customer_mobility_impairments').delegate('.removePgStringArray', 'click', function(event){
+              event.preventDefault();
+              $(this).closest('.pgStringArray').remove();
+              blankify_customer_mobility_impairments();
+            });
+
+            $('#add_customer_mobility_impairment').on('click', function(event){
+              event.preventDefault();
+              window.__customer_mobility_impairment_fields_index += 1;
+              $(this).before('<%= j raw(customer_mobility_impairment_fields) %>'.replace('?', window.__customer_mobility_impairment_fields_index));
+              blankify_customer_mobility_impairments();
+            });
+
+            function blankify_customer_mobility_impairments() {
+              $customer_mobility_impairments = $('#customer_mobility_impairments');
+              pgStringArrayCount = $customer_mobility_impairments.find('.pgStringArray').size();
+              if (pgStringArrayCount == 0) {
+                $customer_mobility_impairments.append('<input type="hidden" id="trip_ticket_customer_mobility_impairments_blank" name="trip_ticket[customer_mobility_impairments][]" value="">');
+              }
+              else {
+                $('#trip_ticket_customer_mobility_impairments_blank').remove();
+              }
+            }
+          });
+        </script>
+      <% else %>
+        <ul>
+          <% @trip_ticket.customer_mobility_impairments.try(:each) do |v| %>
+            <li><%= v %></li>
           <% end %>
         </ul>
       <% end %>
@@ -335,14 +394,6 @@
         <br /><%= f.number_field :customer_seats_required, :min => 0 %>
       <% else %>
         <%= @trip_ticket.customer_seats_required %>
-      <% end %>
-    </div>
-    <div class="field">
-      <%= f.label :mobility_type_id %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.collection_select :mobility_type_id, MobilityType.all, :id, :name, :include_blank => true %>
-      <% else %>
-        <%= @trip_ticket.mobility_type_id %>
       <% end %>
     </div>
     <div class="field">

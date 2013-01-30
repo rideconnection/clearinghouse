@@ -9,6 +9,9 @@ gem 'rvm-capistrano'
 # PostgreSQL hstore support
 gem 'activerecord-postgres-hstore'
 
+# PostgreSQL array support 
+gem "activerecord-postgres-array"
+
 # Geospatial support
 gem 'rgeo'
 gem 'activerecord-postgis-adapter'
