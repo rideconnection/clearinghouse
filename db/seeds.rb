@@ -10,26 +10,3 @@
   Role.find_or_create_by_name(r)
 end
 
-[
-  'African American',
-  'American Indian/Alaska Native',
-  'Asian Indian',
-  'Asian',
-  'Caucasian',
-  'Chinese',
-  'Filipino',
-  'Guamanian or Chamorro',
-  'Hispanic',
-  'Japanese',
-  'Korean',
-  'Native Hawaiian',
-  'Other',
-  'Pacific Islander',
-  'Refused',
-  'Russian',
-  'Samoan',
-  'Unknown',
-  'Vietnamese',
-].each do |e|
-  Ethnicity.find_or_create_by_name(e)
-end

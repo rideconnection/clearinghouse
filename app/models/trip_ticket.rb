@@ -10,7 +10,6 @@ class TripTicket < ActiveRecord::Base
           :validate => true, :dependent => :destroy
   
   has_one :mobility_type
-  has_one :customer_ethnicity, :class_name => :Ethnicity
   has_many :trip_claims, :dependent => :destroy
   has_one :trip_result, :dependent => :destroy
   
@@ -23,7 +22,7 @@ class TripTicket < ActiveRecord::Base
    :approved_claim_id, :claimant_customer_id, :claimant_provider_id,
    :claimant_trip_id, :customer_address_attributes, :customer_address_id,
    :customer_boarding_time, :customer_deboarding_time, :customer_dob,
-   :customer_emergency_phone, :customer_ethnicity_id, :customer_first_name,
+   :customer_emergency_phone, :customer_ethnicity, :customer_first_name,
    :customer_impairment_description, :customer_information_withheld,
    :customer_last_name, :customer_middle_name, :customer_notes,
    :customer_primary_language, :customer_primary_phone,
@@ -39,10 +38,9 @@ class TripTicket < ActiveRecord::Base
 
   audited
   
-  validates_presence_of :customer_dob, :customer_ethnicity_id,
-    :customer_first_name, :customer_last_name, :customer_primary_phone,
-    :customer_seats_required, :origin_provider_id, :requested_drop_off_time,
-    :requested_pickup_time
+  validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
+    :customer_primary_phone, :customer_seats_required, :origin_provider_id, 
+    :requested_drop_off_time, :requested_pickup_time
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }

@@ -16,8 +16,6 @@ class TripTicketsTest < ActionController::IntegrationTest
     @user.roles = [Role.find_or_create_by_name!("provider_admin")]
     @user.save!
 
-    @ethnicity = FactoryGirl.create(:ethnicity)
-
     login_as @user, :scope => :user
     visit '/'
   end
@@ -32,6 +30,8 @@ class TripTicketsTest < ActionController::IntegrationTest
     click_link "New Trip ticket"
     
     fill_in_minimum_required_trip_ticket_fields
+
+    fill_in "Ethnicity", :with => "Asian"
     
     click_button "Create Trip ticket"
     
@@ -89,7 +89,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     end
 
     test "provider admins should see pairs of customer identifier attribute fields when editing a trip ticket (but cannot modify the current keys or add new pairs without javascript)" do
-      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_ethnicity_id => @ethnicity.id)
+      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
       trip_ticket.customer_identifiers = {:charlie => 'Brown', :solid => 'Gold'}
       trip_ticket.save!
 
@@ -144,7 +144,6 @@ class TripTicketsTest < ActionController::IntegrationTest
     fill_in 'Last Name', :with => 'Scott'
     fill_in 'Primary Phone Number', :with => '555-1212'
     select 'No', :from => 'Information Withheld?'    
-    select(find(:xpath, "//*[@id='trip_ticket_customer_ethnicity_id']/option[2]").text, :from => :trip_ticket_customer_ethnicity_id)
     select_date 30.years.ago, :from => :trip_ticket_customer_dob
     select 'Pickup', :from => 'Scheduling priority'
   end

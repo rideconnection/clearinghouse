@@ -11,7 +11,6 @@ FactoryGirl.define do
     requested_drop_off_time { Time.now }
     requested_pickup_time { Time.now }
     scheduling_priority "pickup"
-    customer_ethnicity_id 1
     association :originator, :factory => :provider
     association :customer_address, :factory => :location
     association :pick_up_location, :factory => :location

@@ -148,11 +148,11 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_ethnicity_id, "Ethnicity" %>:
+      <%= f.label :customer_ethnicity, "Ethnicity" %>:
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.collection_select :customer_ethnicity_id, Ethnicity.all, :id, :name, :include_blank => true %>
+        <br /><%= f.text_field :customer_ethnicity %>
       <% else %>
-        <%= @trip_ticket.customer_ethnicity_id %>
+        <%= @trip_ticket.customer_ethnicity %>
       <% end %>
     </div>
     <div class="field">
