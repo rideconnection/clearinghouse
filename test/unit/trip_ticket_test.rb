@@ -53,29 +53,18 @@ class TripTicketTest < ActiveSupport::TestCase
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
   
-  it "has an string_array field for customer_mobility_impairments which returns an array" do
-    assert_equal nil, @trip_ticket.customer_mobility_impairments
-    @trip_ticket.customer_mobility_impairments = [
-      :customer,
-      'MOBILITY',
-      1
-    ]
-    @trip_ticket.save!
-    @trip_ticket.reload
-    # NOTE - Values are coerced to strings
-    assert_equal ['customer', 'MOBILITY', '1'], @trip_ticket.customer_mobility_impairments
-  end
-  
-  it "has an string_array field for customer_eligibility_factors which returns an array" do
-    assert_equal nil, @trip_ticket.customer_eligibility_factors
-    @trip_ticket.customer_eligibility_factors = [
-      :customer,
-      'ELIGIBILITY',
-      1
-    ]
-    @trip_ticket.save!
-    @trip_ticket.reload
-    # NOTE - Values are coerced to strings
-    assert_equal ['customer', 'ELIGIBILITY', '1'], @trip_ticket.customer_eligibility_factors
+  [:customer_mobility_impairments, :customer_eligibility_factors].each do |field_sym|
+    it "has an string_array field for #{field_sym.to_s} which returns an array" do
+      assert_equal nil, @trip_ticket.send(field_sym)
+      @trip_ticket.send("#{field_sym.to_s}=".to_sym, [
+        :a,
+        'B',
+        1
+      ])
+      @trip_ticket.save!
+      @trip_ticket.reload
+      # NOTE - Values are coerced to strings
+      assert_equal ['a', 'B', '1'], @trip_ticket.send(field_sym)
+    end
   end
 end
