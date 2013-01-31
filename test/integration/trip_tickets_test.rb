@@ -38,74 +38,85 @@ class TripTicketsTest < ActionController::IntegrationTest
     assert page.has_content?("Trip ticket was successfully created")
   end
 
-  describe "customer_mobility_impairments fields" do
-    test "provider admins should see a single customer mobility impairment field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do
-      click_link "Trip Tickets"
-      click_link "New Trip ticket"
+  [:customer_mobility_impairments, :customer_eligibility_factors].each do |field_sym|
+    describe "#{field_sym.to_s} string_array fields" do
+      test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do
+        click_link "Trip Tickets"
+        click_link "New Trip ticket"
       
-      assert_equal 1, all('#customer_mobility_impairments .pgStringArrayValue').size
+        fill_in_minimum_required_trip_ticket_fields
       
-      fill_in_minimum_required_trip_ticket_fields
+        within("##{field_sym.to_s}") do
+          assert_equal 1, all('.pgStringArrayValue').size
+          all('.pgStringArrayValue')[0].set('A')
+        end      
       
-      all('#customer_mobility_impairments .pgStringArrayValue')[0].set('Stilts')
-      
-      click_button "Create Trip ticket"
+        click_button "Create Trip ticket"
 
-      assert page.has_content?("Trip ticket was successfully created")
-      assert_equal 2, all('#customer_mobility_impairments .pgStringArrayValue').size # "Stilts" + blank      
-      assert page.has_selector?('.pgStringArrayValue[value=\'Stilts\']')
-    end
+        assert page.has_content?("Trip ticket was successfully created")
 
-    test "provider admins should see customer mobility impairment fields when editing a trip ticket (and can modify the current values without javascript, but cannot add more than a single new value)" do
-      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
-      trip_ticket.customer_mobility_impairments = ['stilts', 'Ilizarov apparatus']
-      trip_ticket.save!
-
-      visit "/trip_tickets/#{trip_ticket.id}"
-    
-      within('#customer_mobility_impairments') do
-        # NOTE - we cannot predict the order of these hstore attributes
-        assert page.has_selector?('.pgStringArrayValue[value=\'stilts\']')
-        assert page.has_selector?('.pgStringArrayValue[value=\'Ilizarov apparatus\']')
-      
-        find('.pgStringArrayValue[value=\'\']').set('Gymnasterka')
-        find('.pgStringArrayValue[value=\'stilts\']').set('')
+        within("##{field_sym.to_s}") do
+          assert_equal 2, all('.pgStringArrayValue').size # "A" + blank      
+          assert page.has_selector?('.pgStringArrayValue[value=\'A\']')
+        end
       end
-    
-      click_button "Update Trip ticket"
-    
-      assert page.has_content?("Trip ticket was successfully updated")
-      assert_equal 3, all('#customer_mobility_impairments .pgStringArrayValue').size # "Ilizarov apparatus" + "Gymnasterka" + blank
-      assert page.has_selector?('.pgStringArrayValue[value=\'Ilizarov apparatus\']')
-      assert page.has_selector?('.pgStringArrayValue[value=\'Gymnasterka\']')
-      assert page.has_no_selector?('.pgStringArrayValue[value=\'stilts\']')
-    end
 
-    test "users who cannot edit an existing trip ticket should see an unordered list of customer mobility impairments" do
-      provider_2 = FactoryGirl.create(:provider)
-      relationship = ProviderRelationship.create!(
-        :requesting_provider => @provider,
-        :cooperating_provider => provider_2
-      )
-      relationship.approve!
-      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => provider_2)
-      trip_ticket.customer_mobility_impairments = ['stilts', 'Ilizarov apparatus']
-      trip_ticket.save!
+      test "provider admins should see #{field_sym.to_s} fields when editing a trip ticket (and can modify the current values without javascript, but cannot add more than a single new value)" do
+        # NOTE users can modify the current values without javascript, but cannot add more than a single new value
 
-      visit "/trip_tickets/#{trip_ticket.id}"
-      
-      within('#customer_mobility_impairments') do
-        # NOTE - we cannot predict the order of these hstore attributes
-        assert page.has_no_selector?('.pgStringArrayValue[value=\'stilts\']')
-        assert page.has_no_selector?('.pgStringArrayValue[value=\'Ilizarov apparatus\']')
-      
-        assert page.has_selector?('li', :text => "stilts")
-        assert page.has_selector?('li', :text => "Ilizarov apparatus")
+        trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        trip_ticket.send("#{field_sym.to_s}=".to_sym, ['A', 'B'])
+        trip_ticket.save!
+
+        visit "/trip_tickets/#{trip_ticket.id}"
+
+        within("##{field_sym.to_s}") do
+          # NOTE - we cannot predict the order of these hstore attributes
+          assert page.has_selector?('.pgStringArrayValue[value=\'A\']')
+          assert page.has_selector?('.pgStringArrayValue[value=\'B\']')
+
+          find('.pgStringArrayValue[value=\'\']').set('C')
+          find('.pgStringArrayValue[value=\'B\']').set('')
+        end
+
+        click_button "Update Trip ticket"
+
+        assert page.has_content?("Trip ticket was successfully updated")
+
+        within("##{field_sym.to_s}") do
+          assert_equal 3, all('.pgStringArrayValue').size # "A" + "B" + blank
+          assert page.has_selector?('.pgStringArrayValue[value=\'A\']')
+          assert page.has_selector?('.pgStringArrayValue[value=\'C\']')
+          assert page.has_no_selector?('.pgStringArrayValue[value=\'B\']')
+        end
+      end
+
+      test "users who cannot edit an existing trip ticket should see an unordered list of #{field_sym.to_s}" do
+        provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => provider_2
+        )
+        relationship.approve!
+        trip_ticket = FactoryGirl.create(:trip_ticket, :originator => provider_2)
+        trip_ticket.send("#{field_sym.to_s}=".to_sym, ['A', 'B'])
+        trip_ticket.save!
+
+        visit "/trip_tickets/#{trip_ticket.id}"
+
+        within("##{field_sym.to_s}") do
+          # NOTE - we cannot predict the order of these hstore attributes
+          assert page.has_no_selector?('.pgStringArrayValue[value=\'A\']')
+          assert page.has_no_selector?('.pgStringArrayValue[value=\'B\']')
+
+          assert page.has_selector?('li', :text => "A")
+          assert page.has_selector?('li', :text => "B")
+        end
       end
     end
   end
-  
-  describe "customer_identifiers fields" do
+    
+  describe "customer_identifiers hstore fields" do
     # test "provider admins can add customer identifier attributes to a new trip ticket (using javascript)" do
     #   skip "Having trouble getting user logins to work with selenium - cdb 2013-01-29"
     #   

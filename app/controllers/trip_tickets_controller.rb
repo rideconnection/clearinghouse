@@ -33,7 +33,7 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets
   # POST /trip_tickets.json
   def create
-    params[:trip_ticket][:customer_mobility_impairments].try(:reject!) {|v| v.blank? } 
+    compact_string_array_params
 
     @trip_ticket = TripTicket.new(params[:trip_ticket])
     @trip_ticket.originator = current_user.provider unless !@trip_ticket.origin_provider_id.blank?
@@ -52,7 +52,7 @@ class TripTicketsController < ApplicationController
   # PUT /trip_tickets/1
   # PUT /trip_tickets/1.json
   def update
-    params[:trip_ticket][:customer_mobility_impairments].try(:reject!) {|v| v.blank? }
+    compact_string_array_params
 
     respond_to do |format|
       if @trip_ticket.update_attributes(params[:trip_ticket])
@@ -82,5 +82,11 @@ class TripTicketsController < ApplicationController
     @trip_ticket.build_customer_address  unless @trip_ticket.customer_address
     @trip_ticket.build_drop_off_location unless @trip_ticket.drop_off_location
     @trip_ticket.build_pick_up_location  unless @trip_ticket.pick_up_location
+  end
+  
+  def compact_string_array_params
+    [:customer_mobility_impairments, :customer_eligibility_factors].each do |field_sym|
+      params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? } 
+    end
   end
 end

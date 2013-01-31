@@ -56,13 +56,26 @@ class TripTicketTest < ActiveSupport::TestCase
   it "has an string_array field for customer_mobility_impairments which returns an array" do
     assert_equal nil, @trip_ticket.customer_mobility_impairments
     @trip_ticket.customer_mobility_impairments = [
-      :Some,
-      'Thing',
+      :customer,
+      'MOBILITY',
       1
     ]
     @trip_ticket.save!
     @trip_ticket.reload
     # NOTE - Values are coerced to strings
-    assert_equal ['Some', 'Thing', '1'], @trip_ticket.customer_mobility_impairments
+    assert_equal ['customer', 'MOBILITY', '1'], @trip_ticket.customer_mobility_impairments
+  end
+  
+  it "has an string_array field for customer_eligibility_factors which returns an array" do
+    assert_equal nil, @trip_ticket.customer_eligibility_factors
+    @trip_ticket.customer_eligibility_factors = [
+      :customer,
+      'ELIGIBILITY',
+      1
+    ]
+    @trip_ticket.save!
+    @trip_ticket.reload
+    # NOTE - Values are coerced to strings
+    assert_equal ['customer', 'ELIGIBILITY', '1'], @trip_ticket.customer_eligibility_factors
   end
 end

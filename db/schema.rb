@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130131022251) do
+ActiveRecord::Schema.define(:version => 20130131030634) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -230,8 +230,10 @@ ActiveRecord::Schema.define(:version => 20130131022251) do
     t.hstore       "customer_identifiers"
     t.string_array "customer_mobility_impairments"
     t.string       "customer_ethnicity"
+    t.string_array "customer_eligibility_factors"
   end
 
+  add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
   add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
 

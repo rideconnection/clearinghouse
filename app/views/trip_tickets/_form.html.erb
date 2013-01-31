@@ -246,65 +246,73 @@
         </ul>
       <% end %>
     </fieldset>
-    <fieldset id="customer_mobility_impairments" class="">
-      <legend>Mobility Impairments</legend>
-      <% customer_mobility_impairment_fields = nil %>
-      <% if can? :edit, @trip_ticket %>
-        <% customer_mobility_impairment_fields_index = 0 %>
-        <% @trip_ticket.customer_mobility_impairments.try(:each_with_index) do |v,index| %>
-          <div class="field pgStringArray">
-            <%= text_field_tag "trip_ticket[customer_mobility_impairments][]", v, :id => "trip_ticket_customer_mobility_impairments_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue" %>
-            <a href="#" class='removePgStringArray'>X</a>
-          </div>
-          <% customer_mobility_impairment_fields_index += 1 %>
-        <% end %>
-      
-        <%
-          customer_mobility_impairment_fields = '<div class="field pgStringArray">' + 
-                                                text_field_tag('trip_ticket[customer_mobility_impairments][]', '', :id => 'trip_ticket_customer_mobility_impairments_?', :placeholder => 'New mobility impairment', :class => "pgStringArrayValue") + ' ' +
-                                                '<a href="#" class="removePgStringArray">X</a></div>'
-        %>
-
-        <%= raw(customer_mobility_impairment_fields.gsub('?', customer_mobility_impairment_fields_index.to_s)) %>
-
-        <a href="#" id="add_customer_mobility_impairment">Add Mobility Impairment</a>
-
-        <script type='text/javascript'>
-          window.__customer_mobility_impairment_fields_index = <%= customer_mobility_impairment_fields_index %>
-          $(document).ready(function() {
-            $('#customer_mobility_impairments').delegate('.removePgStringArray', 'click', function(event){
-              event.preventDefault();
-              $(this).closest('.pgStringArray').remove();
-              blankify_customer_mobility_impairments();
-            });
-
-            $('#add_customer_mobility_impairment').on('click', function(event){
-              event.preventDefault();
-              window.__customer_mobility_impairment_fields_index += 1;
-              $(this).before('<%= j raw(customer_mobility_impairment_fields) %>'.replace('?', window.__customer_mobility_impairment_fields_index));
-              blankify_customer_mobility_impairments();
-            });
-
-            function blankify_customer_mobility_impairments() {
-              $customer_mobility_impairments = $('#customer_mobility_impairments');
-              pgStringArrayCount = $customer_mobility_impairments.find('.pgStringArray').size();
-              if (pgStringArrayCount == 0) {
-                $customer_mobility_impairments.append('<input type="hidden" id="trip_ticket_customer_mobility_impairments_blank" name="trip_ticket[customer_mobility_impairments][]" value="">');
-              }
-              else {
-                $('#trip_ticket_customer_mobility_impairments_blank').remove();
-              }
-            }
-          });
-        </script>
-      <% else %>
-        <ul>
-          <% @trip_ticket.customer_mobility_impairments.try(:each) do |v| %>
-            <li><%= v %></li>
+    
+    <% 
+      field_indexes = {}
+      {
+        :customer_mobility_impairments => "Mobility Impairment",
+        :customer_eligibility_factors => "Eligibility Factors"
+      }.each do |field_sym, legend| 
+    %>
+      <fieldset id="<%= field_sym.to_s %>" class="">
+        <legend><%= legend.pluralize %></legend>
+        <% if can? :edit, @trip_ticket %>
+          <% field_indexes[field_sym] = 0 %>
+          <% @trip_ticket.send(field_sym).try(:each_with_index) do |v,index| %>
+            <div class="field pgStringArray">
+              <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue" %>
+              <a href="#" class='removePgStringArray'>X</a>
+            </div>
+            <% field_indexes[field_sym] += 1 %>
           <% end %>
-        </ul>
-      <% end %>
-    </fieldset>
+      
+          <%
+            field_html = '<div class="field pgStringArray">' + 
+                         text_field_tag("trip_ticket[#{field_sym.to_s}][]", '', :id => "trip_ticket_#{field_sym.to_s}_?", :placeholder => "New #{legend}", :class => "pgStringArrayValue") + ' ' +
+                         '<a href="#" class="removePgStringArray">X</a></div>'
+          %>
+
+          <%= raw(field_html.gsub('?', field_indexes[field_sym].to_s)) %>
+
+          <a href="#" id="add_<%= field_sym.to_s %>">Add Mobility Impairment</a>
+
+          <script type='text/javascript'>
+            window.field_indexes_<%= field_sym.to_s %> = <%= field_indexes[field_sym] %>
+            $(document).ready(function() {
+              $('#<%= field_sym.to_s %>').delegate('.removePgStringArray', 'click', function(event){
+                event.preventDefault();
+                $(this).closest('.pgStringArray').remove();
+                blankify_<%= field_sym.to_s %>();
+              });
+
+              $('#add_<%= field_sym.to_s %>').on('click', function(event){
+                event.preventDefault();
+                window.field_indexes_<%= field_sym.to_s %> += 1;
+                $(this).before('<%= j raw(field_html) %>'.replace('?', window.field_indexes_<%= field_sym.to_s %>));
+                blankify_<%= field_sym.to_s %>();
+              });
+
+              function blankify_<%= field_sym.to_s %>() {
+                $<%= field_sym.to_s %> = $('#<%= field_sym.to_s %>');
+                pgStringArrayCount = $<%= field_sym.to_s %>.find('.pgStringArray').size();
+                if (pgStringArrayCount == 0) {
+                  $<%= field_sym.to_s %>.append('<input type="hidden" id="trip_ticket_<%= field_sym.to_s %>_blank" name="trip_ticket[<%= field_sym.to_s %>][]" value="">');
+                }
+                else {
+                  $('#trip_ticket_<%= field_sym.to_s %>_blank').remove();
+                }
+              }
+            });
+          </script>
+        <% else %>
+          <ul>
+            <% @trip_ticket.send(field_sym).try(:each) do |v| %>
+              <li><%= v %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      </fieldset>
+    <% end %>
   </fieldset>
 
   <fieldset id="drop_off_location" class="">
