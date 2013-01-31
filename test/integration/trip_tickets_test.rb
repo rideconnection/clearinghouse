@@ -38,7 +38,11 @@ class TripTicketsTest < ActionController::IntegrationTest
     assert page.has_content?("Trip ticket was successfully created")
   end
 
-  [:customer_mobility_impairments, :customer_eligibility_factors].each do |field_sym|
+  [
+    :customer_mobility_impairments, 
+    :customer_eligibility_factors, 
+    :customer_assistive_devices
+  ].each do |field_sym|
     describe "#{field_sym.to_s} string_array fields" do
       test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do
         click_link "Trip Tickets"
@@ -84,7 +88,9 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_content?("Trip ticket was successfully updated")
 
         within("##{field_sym.to_s}") do
+          # PROTIP - If this fails, update the TripTicketsController#compact_string_array_params method
           assert_equal 3, all('.pgStringArrayValue').size # "A" + "B" + blank
+          
           assert page.has_selector?('.pgStringArrayValue[value=\'A\']')
           assert page.has_selector?('.pgStringArrayValue[value=\'C\']')
           assert page.has_no_selector?('.pgStringArrayValue[value=\'B\']')

@@ -85,7 +85,11 @@ class TripTicketsController < ApplicationController
   end
   
   def compact_string_array_params
-    [:customer_mobility_impairments, :customer_eligibility_factors].each do |field_sym|
+    [
+      :customer_mobility_impairments, 
+      :customer_eligibility_factors, 
+      :customer_assistive_devices
+    ].each do |field_sym|
       params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? } 
     end
   end
