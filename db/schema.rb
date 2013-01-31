@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130131021917) do
+ActiveRecord::Schema.define(:version => 20130131022251) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -233,6 +233,7 @@ ActiveRecord::Schema.define(:version => 20130131021917) do
   end
 
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
+  add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
 
   create_table "users", :force => true do |t|
     t.string   "email"
