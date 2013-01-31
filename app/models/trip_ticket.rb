@@ -9,7 +9,6 @@ class TripTicket < ActiveRecord::Base
   has_one :drop_off_location, :class_name => :Location, :as => :addressable,
           :validate => true, :dependent => :destroy
   
-  has_one :mobility_type
   has_many :trip_claims, :dependent => :destroy
   has_one :trip_result, :dependent => :destroy
   
