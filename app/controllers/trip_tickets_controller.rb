@@ -92,6 +92,7 @@ class TripTicketsController < ApplicationController
       :customer_service_animals,
       :guest_or_attendant_service_animals,
       :guest_or_attendant_assistive_devices,
+      :trip_funders,
     ].each do |field_sym|
       params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? } 
     end

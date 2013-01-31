@@ -34,7 +34,7 @@ class TripTicket < ActiveRecord::Base
    :customer_identifiers, :customer_mobility_impairments, 
    :customer_eligibility_factors, :customer_assistive_devices, 
    :customer_service_animals, :guest_or_attendant_service_animals,
-   :guest_or_attendant_assistive_devices
+   :guest_or_attendant_assistive_devices, :trip_funders
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
 
