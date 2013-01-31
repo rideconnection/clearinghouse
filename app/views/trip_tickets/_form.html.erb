@@ -251,8 +251,9 @@
       field_indexes = {}
       {
         :customer_mobility_impairments => "Mobility Impairment",
-        :customer_eligibility_factors => "Eligibility Factors",
-        :customer_assistive_devices => "Assistive Devices",
+        :customer_eligibility_factors  => "Eligibility Factor",
+        :customer_assistive_devices    => "Assistive Device",
+        :customer_service_animals      => "Service Animal",
       }.each do |field_sym, legend| 
     %>
       <fieldset id="<%= field_sym.to_s %>" class="">
@@ -275,7 +276,7 @@
 
           <%= raw(field_html.gsub('?', field_indexes[field_sym].to_s)) %>
 
-          <a href="#" id="add_<%= field_sym.to_s %>">Add Mobility Impairment</a>
+          <a href="#" id="add_<%= field_sym.to_s %>">Add <%= legend %></a>
 
           <script type='text/javascript'>
             window.field_indexes_<%= field_sym.to_s %> = <%= field_indexes[field_sym] %>

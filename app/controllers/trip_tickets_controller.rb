@@ -88,7 +88,8 @@ class TripTicketsController < ApplicationController
     [
       :customer_mobility_impairments, 
       :customer_eligibility_factors, 
-      :customer_assistive_devices
+      :customer_assistive_devices,
+      :customer_service_animals,
     ].each do |field_sym|
       params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? } 
     end
