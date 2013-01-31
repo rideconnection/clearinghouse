@@ -251,9 +251,10 @@
       field_indexes = {}
       {
         :customer_mobility_impairments => "Mobility Impairment",
-        :customer_eligibility_factors  => "Eligibility Factor",
-        :customer_assistive_devices    => "Assistive Device",
-        :customer_service_animals      => "Service Animal",
+        :customer_eligibility_factors => "Eligibility Factor",
+        :customer_assistive_devices => "Assistive Device",
+        :customer_service_animals => "Service Animal",
+        :guest_or_attendant_service_animals => "Guest or Attendant Service Animal",
       }.each do |field_sym, legend| 
     %>
       <fieldset id="<%= field_sym.to_s %>" class="">

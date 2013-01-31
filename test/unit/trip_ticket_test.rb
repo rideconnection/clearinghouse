@@ -58,6 +58,7 @@ class TripTicketTest < ActiveSupport::TestCase
     :customer_eligibility_factors, 
     :customer_assistive_devices,
     :customer_service_animals,
+    :guest_or_attendant_service_animals,
   ].each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)

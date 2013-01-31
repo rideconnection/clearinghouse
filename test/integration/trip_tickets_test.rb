@@ -43,6 +43,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     :customer_eligibility_factors, 
     :customer_assistive_devices,
     :customer_service_animals,
+    :guest_or_attendant_service_animals,
   ].each do |field_sym|
     describe "#{field_sym.to_s} string_array fields" do
       test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do

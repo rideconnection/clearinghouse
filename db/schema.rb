@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130131045135) do
+ActiveRecord::Schema.define(:version => 20130131045804) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -219,8 +219,8 @@ ActiveRecord::Schema.define(:version => 20130131045135) do
     t.string       "trip_purpose_code"
     t.string       "trip_purpose_description"
     t.text         "trip_notes"
-    t.datetime     "created_at",                      :null => false
-    t.datetime     "updated_at",                      :null => false
+    t.datetime     "created_at",                         :null => false
+    t.datetime     "updated_at",                         :null => false
     t.string       "customer_primary_language"
     t.string       "customer_first_name"
     t.string       "customer_last_name"
@@ -233,6 +233,7 @@ ActiveRecord::Schema.define(:version => 20130131045135) do
     t.string_array "customer_eligibility_factors"
     t.string_array "customer_assistive_devices"
     t.string_array "customer_service_animals"
+    t.string_array "guest_or_attendant_service_animals"
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
@@ -240,6 +241,7 @@ ActiveRecord::Schema.define(:version => 20130131045135) do
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
   add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
+  add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
 
   create_table "users", :force => true do |t|
     t.string   "email"
