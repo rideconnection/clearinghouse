@@ -150,7 +150,8 @@
     <div class="field">
       <%= f.label :customer_ethnicity, "Ethnicity" %>:
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_ethnicity %>
+        <br /><%= select_tag "ethnicity_selection", options_for_select(TripTicket::ETHNICITY_CHOICES), :include_blank => true  %>
+        <br /><%= f.text_field :customer_ethnicity, :placeholder => "Other ethnicity" %>
       <% else %>
         <%= @trip_ticket.customer_ethnicity %>
       <% end %>

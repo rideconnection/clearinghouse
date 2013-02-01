@@ -16,6 +16,8 @@ class TripTicket < ActiveRecord::Base
     "pickup"  => "Pickup",
     "dropoff" => "Drop-off"
   }
+
+  ETHNICITY_CHOICES = ['Hispanic origin', 'Not of Hispanic origin']
   
   attr_accessible :allowed_time_variance, :appointment_time,
    :approved_claim_id, :claimant_customer_id, :claimant_provider_id,
