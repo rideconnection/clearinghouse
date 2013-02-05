@@ -45,6 +45,10 @@ class Provider < ActiveRecord::Base
       :approved_at => nil)
     partnerships.includes(:cooperating_provider, :requesting_provider)
   end
+  
+  def can_auto_approve_for?(provider)
+    !!((r = ProviderRelationship.find_approved_relationship_between(self, provider)) && r.provider_can_auto_approve?(self))
+  end
 
   def regenerate_keys!(force = true)
     generate_api_key!     if force || !self.api_key.present?

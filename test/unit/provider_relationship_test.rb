@@ -55,6 +55,27 @@ class ProviderRelationshipTest < ActiveSupport::TestCase
       ProviderRelationship.partners_for_provider(@provider_3).must_equal []
       ProviderRelationship.partners_for_provider(@alternate_provider).must_equal []
     end
+    
+    it "can find an approved relationship between two providers" do
+      assert_equal @relationship_1, ProviderRelationship.find_approved_relationship_between(@provider_1, @provider_2)
+      assert_equal @relationship_1, ProviderRelationship.find_approved_relationship_between(@provider_2, @provider_1)
+
+      assert_nil ProviderRelationship.find_approved_relationship_between(@provider_1, @provider_3)
+      assert_nil ProviderRelationship.find_approved_relationship_between(@provider_2, @provider_3)
+      assert_nil ProviderRelationship.find_approved_relationship_between(@provider_1, @alternate_provider)
+      assert_nil ProviderRelationship.find_approved_relationship_between(@provider_2, @alternate_provider)
+    end
+    
+    it "can find any relationship between two providers" do
+      assert_equal @relationship_1, ProviderRelationship.find_any_relationship_between(@provider_1, @provider_2)
+      assert_equal @relationship_1, ProviderRelationship.find_any_relationship_between(@provider_2, @provider_1)
+      assert_equal @relationship_2, ProviderRelationship.find_any_relationship_between(@provider_1, @provider_3)
+      assert_equal @relationship_2, ProviderRelationship.find_any_relationship_between(@provider_3, @provider_1)
+
+      assert_nil ProviderRelationship.find_any_relationship_between(@provider_2, @provider_3)
+      assert_nil ProviderRelationship.find_any_relationship_between(@provider_1, @alternate_provider)
+      assert_nil ProviderRelationship.find_any_relationship_between(@provider_2, @alternate_provider)
+    end
   end
   
   describe "A provider relationship" do
@@ -97,6 +118,18 @@ class ProviderRelationshipTest < ActiveSupport::TestCase
       assert_equal @relationship_1.partner_for_provider(@provider_1), @provider_2
       assert_equal @relationship_1.partner_for_provider(@provider_2), @provider_1
       assert_equal @relationship_1.partner_for_provider(@alternate_provider), nil
+    end
+    
+    it "knows if one of the cooperating providers has been granted auto-approve permission by the other" do
+      # :requesting_provider => @provider_1
+      # :cooperating_provider => @provider_2
+
+      @relationship_1.automatic_requester_approval = false
+      @relationship_1.automatic_cooperator_approval = true
+      @relationship_1.save!
+      
+      assert_equal false, @relationship_1.provider_can_auto_approve?(@provider_1)
+      assert_equal true, @relationship_1.provider_can_auto_approve?(@provider_2)
     end
   end
 end

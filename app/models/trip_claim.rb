@@ -23,6 +23,10 @@ class TripClaim < ActiveRecord::Base
       self.status = STATUS[:pending]
     end
   end
+  
+  after_create do
+    self.approve! if self.can_be_auto_approved?
+  end
 
   def approve!
     self.status = STATUS[:approved]
@@ -31,7 +35,7 @@ class TripClaim < ActiveRecord::Base
   end
   
   def approved?
-    status == STATUS[:approved]
+    self.status == STATUS[:approved]
   end
   
   def decline!
@@ -41,6 +45,10 @@ class TripClaim < ActiveRecord::Base
   
   def editable?
     (self.status.blank? || self.status == STATUS[:pending]) && (!self.trip_ticket.present? || !self.trip_ticket.claimed?)
+  end
+  
+  def can_be_auto_approved?
+    self.claimant.can_auto_approve_for?(self.trip_ticket.originator)
   end
   
   private

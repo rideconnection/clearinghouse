@@ -95,4 +95,53 @@ class TripClaimTest < ActiveSupport::TestCase
     c2.reload
     c2.status.must_equal TripClaim::STATUS[:declined]        
   end
+  
+  it "won't be automatically approved if the provider relationship does not allow" do
+    p1 = FactoryGirl.create(:provider)
+    p2 = FactoryGirl.create(:provider)
+    r = ProviderRelationship.create!(
+      :requesting_provider => p1,
+      :cooperating_provider => p2,
+      :automatic_requester_approval => false,
+      :automatic_cooperator_approval => false,
+      :approved_at => Time.now
+    )
+    tt = FactoryGirl.create(:trip_ticket, :originator => p1)
+    tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p2)
+    assert_equal false, tc.approved?, "Expected trip claim to not be approved"
+    assert_equal false, tt.claimed?, "Expected trip ticket to not be claimed"
+  end
+  
+  it "will be automatically approved if the provider relationship allows" do
+    p1 = FactoryGirl.create(:provider)
+    p2 = FactoryGirl.create(:provider)
+    r = ProviderRelationship.create!(
+      :requesting_provider => p1,
+      :cooperating_provider => p2,
+      :automatic_requester_approval => false,
+      :automatic_cooperator_approval => true,
+      :approved_at => Time.now
+    )
+    
+    tt = FactoryGirl.create(:trip_ticket, :originator => p1)
+    tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p2)
+    assert_equal true, tc.approved?, "Expected trip claim to be approved"
+    assert_equal true, tt.claimed?, "Expected trip ticket to be claimed"
+
+    # Auto approval flags should not be interchangable
+    tt = FactoryGirl.create(:trip_ticket, :originator => p2)
+    tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p1)
+    assert_equal false, tc.approved?, "Expected trip claim to not be approved"
+    assert_equal false, tt.claimed?, "Expected trip ticket to not be claimed"
+
+    # The reverse should work
+    r.automatic_requester_approval = true
+    r.automatic_cooperator_approval = false
+    r.save!
+    
+    tt = FactoryGirl.create(:trip_ticket, :originator => p2)
+    tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p1)
+    assert_equal true, tc.approved?, "Expected trip claim to be approved"
+    assert_equal true, tt.claimed?, "Expected trip ticket to be claimed"
+  end
 end
