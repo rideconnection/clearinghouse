@@ -3,6 +3,16 @@ require 'test_helper'
 class UserTest < ActiveSupport::TestCase
   # Some test still exist in spec/models/user_spec.rb
   
+  it "returns display_name based on available information" do
+    user = User.new email: "new_guy@rideconnection.org", name: nil
+    
+    # If name is not available
+    assert_equal "new_guy@rideconnection.org", user.display_name
+    
+    user.name = "Old Guy"
+    assert_equal "Old Guy", user.display_name
+  end
+  
   describe "user provider" do
     setup do
       @provider = FactoryGirl.create(:provider)

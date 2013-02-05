@@ -1,6 +1,7 @@
 require 'api'
 
 Clearinghouse::Application.routes.draw do
+
   mount Clearinghouse::API => "/"
   
   devise_for :users
@@ -32,6 +33,8 @@ Clearinghouse::Application.routes.draw do
         post 'decline'
       end
     end
+    
+    resources :trip_ticket_comments
   end
 
   resources :users do

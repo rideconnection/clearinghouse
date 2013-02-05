@@ -11,6 +11,7 @@ class TripTicket < ActiveRecord::Base
   
   has_many :trip_claims, :dependent => :destroy
   has_one :trip_result, :dependent => :destroy
+  has_many :trip_ticket_comments, :dependent => :destroy
   
   SCHEDULING_PRIORITY = {
     "pickup"  => "Pickup",

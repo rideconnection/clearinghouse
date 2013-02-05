@@ -2,7 +2,13 @@
   <h2>Trip Ticket</h2>
 
   <p id="notice"><%= notice %></p>
-
+  
+  <p>
+    <a href="#trip_claims">Claims</a> |
+    <a href="#trip_ticket_comments">Comments</a> |
+    <a href="#audit_trail">Audit Trail</a>
+  </p>
+    
   <%= render 'form' %>
   
   <br />
@@ -11,10 +17,19 @@
   
   <hr />
   <div id="trip_claims">
-    <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability), :provider_admin => can?(:update, @trip_ticket) %>
+    <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability) %>
 
     <% if can?(:create, current_user.provider.trip_claims.build(:trip_ticket_id => @trip_ticket.id)) && @trip_ticket.claimable_by?(current_user) %>
       <%= link_to "Submit Claim", new_trip_ticket_trip_claim_path(@trip_ticket) %><br />
+    <% end %>    
+  </div>
+
+  <hr />
+  <div id="trip_ticket_comments">
+    <%= render 'trip_ticket_comments', :trip_ticket_comments => @trip_ticket.trip_ticket_comments.accessible_by(current_ability) %>
+
+    <% if can?(:create, @trip_ticket.trip_ticket_comments.build) %>
+      <%= link_to "Add Comments", new_trip_ticket_trip_ticket_comment_path(@trip_ticket) %><br />
     <% end %>    
   </div>
 

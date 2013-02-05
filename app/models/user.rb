@@ -62,6 +62,14 @@ class User < ActiveRecord::Base
   def need_to_generate_password?
     !!must_generate_password
   end
+  
+  def display_name
+    if name.blank?
+      email
+    else
+      name
+    end
+  end
 
   private
 

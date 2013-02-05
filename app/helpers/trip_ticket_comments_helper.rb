@@ -1,0 +1,2 @@
+module TripTicketCommentsHelper
+end

@@ -1,0 +1,29 @@
+<%= form_for([@trip_ticket, @trip_ticket_comment]) do |f| %>
+  <% if @trip_ticket_comment.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@trip_ticket_comment.errors.count, "error") %> prohibited this trip_ticket_comment from being saved:</h2>
+
+      <ul>
+      <% @trip_ticket_comment.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :user_id %>
+    <%= @trip_ticket_comment.user.display_name %>
+  </div>
+  <div class="field">
+    <%= f.label :trip_ticket_id %>
+    <%= @trip_ticket.to_param %>
+  </div>
+  <div class="field">
+    <%= f.label :body %><br />
+    <%= f.text_area :body %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

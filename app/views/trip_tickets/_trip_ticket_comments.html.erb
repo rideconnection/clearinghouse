@@ -1,0 +1,25 @@
+<h2>Comments</h2>
+
+<table>
+
+  <tr>
+    <th>User</th>
+    <th>Body</th>
+    <th>Date</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% trip_ticket_comments.each do |trip_ticket_comment| %>
+  <tr>
+    <td><%= trip_ticket_comment.user.display_name %></td>
+    <td><%= trip_ticket_comment.body.truncate(30) %></td>
+    <td><%= trip_ticket_comment.created_at.to_s(:long) %></td>
+    <td><%= link_to 'Details', trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %></td>
+    <td><% if can?(:edit, trip_ticket_comment) %><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %><% end %></td>
+    <td><% if can?(:destroy, trip_ticket_comment) %><%= link_to 'Destroy', trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment), method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
+  </tr>
+<% end %>
+
+</table>

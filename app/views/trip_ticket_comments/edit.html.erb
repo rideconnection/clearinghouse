@@ -1,0 +1,14 @@
+<div id="trip-ticket-comment-edit">
+  <h2>Editing Comment</h2>
+
+  <%= render 'form' %>
+
+  <%= link_to 'Comment Details', [@trip_ticket, @trip_ticket_comment] %><br>
+  <%= link_to 'Comments', trip_ticket_trip_ticket_comments_path(@trip_ticket) %><br>
+  <%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
+
+  <hr />
+  <div id="audit_trail">
+    <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
+  </div>
+</div>

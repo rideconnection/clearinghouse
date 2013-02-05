@@ -23,6 +23,7 @@ class AbilityTest < ActiveSupport::TestCase
     # Open trip ticket from provider_1
     @trip_ticket_1  = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
     @trip_claim_1_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_1, :claimant => @provider_2, :status => TripClaim::STATUS[:pending])
+    @trip_ticket_comment_1_1 = FactoryGirl.create(:trip_ticket_comment, :trip_ticket => @trip_ticket_1)
 
     # Claimed trip ticket from provider_1
     @trip_ticket_2  = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
@@ -30,6 +31,7 @@ class AbilityTest < ActiveSupport::TestCase
 
     # Open trip ticket from provider_2, no claims
     @trip_ticket_3  = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
+    @trip_ticket_comment_3_1 = FactoryGirl.create(:trip_ticket_comment, :trip_ticket => @trip_ticket_3)
 
     # Claimed trip ticket from provider_2
     @trip_ticket_4  = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
@@ -38,6 +40,7 @@ class AbilityTest < ActiveSupport::TestCase
 
     # Open trip ticket from provider_3, no claims
     @trip_ticket_5  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
+    @trip_ticket_comment_5_1 = FactoryGirl.create(:trip_ticket_comment, :trip_ticket => @trip_ticket_5)
 
     # Claimed trip ticket from provider_3
     @trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
@@ -168,6 +171,40 @@ class AbilityTest < ActiveSupport::TestCase
         assert @site_admin.can?(:decline, @trip_claim_4_1)
         assert @site_admin.can?(:decline, @trip_claim_4_2)
         assert @site_admin.can?(:decline, @trip_claim_6_1)
+      end
+    end
+  
+    describe "trip ticket comments" do
+      it "can use accessible_by to load a list of accessible resources" do
+        accessible = TripTicketComment.accessible_by(@site_admin)
+        accessible.must_include @trip_ticket_comment_1_1
+        accessible.must_include @trip_ticket_comment_3_1
+        accessible.must_include @trip_ticket_comment_5_1
+      end
+  
+      it "allows :create access to all regardless of trip_ticket originating provider or provider relationships" do
+        assert @site_admin.can?(:create, TripTicketComment.new)
+        assert @site_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
+        assert @site_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
+        assert @site_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
+      end
+  
+      it "allows :read access to all regardless of originating provider or provider relationships" do
+        assert @site_admin.can?(:read, @trip_ticket_comment_1_1)
+        assert @site_admin.can?(:read, @trip_ticket_comment_3_1)
+        assert @site_admin.can?(:read, @trip_ticket_comment_5_1)
+      end
+  
+      it "allows :update access to all regardless of originating provider or provider relationships" do
+        assert @site_admin.can?(:update, @trip_ticket_comment_1_1)
+        assert @site_admin.can?(:update, @trip_ticket_comment_3_1)
+        assert @site_admin.can?(:update, @trip_ticket_comment_5_1)
+      end
+  
+      it "allows :destroy access to all regardless of originating provider or provider relationships" do
+        assert @site_admin.can?(:destroy, @trip_ticket_comment_1_1)
+        assert @site_admin.can?(:destroy, @trip_ticket_comment_3_1)
+        assert @site_admin.can?(:destroy, @trip_ticket_comment_5_1)
       end
     end
   
@@ -462,6 +499,45 @@ class AbilityTest < ActiveSupport::TestCase
         assert @provider_admin.cannot?(:decline, @trip_claim_4_1)
         assert @provider_admin.cannot?(:decline, @trip_claim_4_2)
         assert @provider_admin.cannot?(:decline, @trip_claim_6_1)
+      end
+    end
+    
+    describe "trip ticket comments" do
+      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider" do
+        accessible = TripTicketComment.accessible_by(@provider_admin)
+        accessible.must_include @trip_ticket_comment_1_1
+
+        accessible.wont_include @trip_ticket_comment_3_1
+        accessible.wont_include @trip_ticket_comment_5_1
+      end
+    
+      it "can create trip ticket comments on trip tickets belonging to their own provider" do
+        assert @provider_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
+    
+        assert @provider_admin.cannot?(:create, TripTicketComment.new)
+        assert @provider_admin.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
+        assert @provider_admin.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
+      end
+    
+      it "can read trip ticket comments belonging to trip_tickets from their own provider" do
+        assert @provider_admin.can?(:read, @trip_ticket_comment_1_1)
+    
+        assert @provider_admin.cannot?(:read, @trip_ticket_comment_3_1)
+        assert @provider_admin.cannot?(:read, @trip_ticket_comment_5_1)
+      end
+    
+      it "can update trip ticket comments belonging to trip_tickets from their own provider" do
+        assert @provider_admin.can?(:update, @trip_ticket_comment_1_1)
+    
+        assert @provider_admin.cannot?(:update, @trip_ticket_comment_3_1)
+        assert @provider_admin.cannot?(:update, @trip_ticket_comment_5_1)
+      end
+    
+      it "can destroy trip ticket comments belonging to trip_tickets from their own provider" do
+        assert @provider_admin.can?(:destroy, @trip_ticket_comment_1_1)
+    
+        assert @provider_admin.cannot?(:destroy, @trip_ticket_comment_3_1)
+        assert @provider_admin.cannot?(:destroy, @trip_ticket_comment_5_1)
       end
     end
     
@@ -795,6 +871,43 @@ class AbilityTest < ActiveSupport::TestCase
         assert @scheduler.cannot?(:decline, @trip_claim_4_1)
         assert @scheduler.cannot?(:decline, @trip_claim_4_2)
         assert @scheduler.cannot?(:decline, @trip_claim_6_1)
+      end
+    end
+    
+    describe "trip ticket comments" do
+      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider" do
+        accessible = TripTicketComment.accessible_by(@scheduler)
+        accessible.must_include @trip_ticket_comment_1_1
+
+        accessible.wont_include @trip_ticket_comment_3_1
+        accessible.wont_include @trip_ticket_comment_5_1
+      end
+    
+      it "can create trip ticket comments on trip tickets belonging to their own provider" do
+        assert @scheduler.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
+    
+        assert @scheduler.cannot?(:create, TripTicketComment.new)
+        assert @scheduler.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
+        assert @scheduler.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
+      end
+    
+      it "can read trip ticket comments belonging to trip_tickets from their own provider" do
+        assert @scheduler.can?(:read, @trip_ticket_comment_1_1)
+    
+        assert @scheduler.cannot?(:read, @trip_ticket_comment_3_1)
+        assert @scheduler.cannot?(:read, @trip_ticket_comment_5_1)
+      end
+    
+      it "cannot update trip claims regardless of their provider" do    
+        assert @scheduler.cannot?(:update, @trip_ticket_comment_1_1)
+        assert @scheduler.cannot?(:update, @trip_ticket_comment_3_1)
+        assert @scheduler.cannot?(:update, @trip_ticket_comment_5_1)
+      end
+    
+      it "cannot destroy trip claims regardless of their provider" do    
+        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_1_1)
+        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_3_1)
+        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_5_1)
       end
     end
     
