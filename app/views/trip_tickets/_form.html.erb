@@ -148,6 +148,15 @@
       <% end %>
     </div>
     <div class="field">
+      <%= f.label :customer_race, "Race" %>:
+      <% if can? :edit, @trip_ticket %>
+        <br /><%= select_tag "race_selection", options_for_select(TripTicket::RACE_CHOICES), :include_blank => true  %>
+        <br /><%= f.text_field :customer_race, :placeholder => "Other Race" %>
+      <% else %>
+        <%= @trip_ticket.customer_ethnicity %>
+      <% end %>
+    </div>
+    <div class="field">
       <%= f.label :customer_ethnicity, "Ethnicity" %>:
       <% if can? :edit, @trip_ticket %>
         <br /><%= select_tag "ethnicity_selection", options_for_select(TripTicket::ETHNICITY_CHOICES), :include_blank => true  %>

@@ -17,7 +17,18 @@ class TripTicket < ActiveRecord::Base
     "dropoff" => "Drop-off"
   }
 
-  ETHNICITY_CHOICES = ['Hispanic origin', 'Not of Hispanic origin']
+  ETHNICITY_CHOICES = [
+    'Hispanic origin', 
+    'Not of Hispanic origin'
+  ]
+
+  RACE_CHOICES = [
+    "American Indian or Alaskan Native",
+    "Asian or Pacific Islander",
+    "Black",
+    "Hispanic",
+    "White"
+  ]
   
   attr_accessible :allowed_time_variance, :appointment_time,
    :approved_claim_id, :claimant_customer_id, :claimant_provider_id,
@@ -26,7 +37,7 @@ class TripTicket < ActiveRecord::Base
    :customer_emergency_phone, :customer_ethnicity, :customer_first_name,
    :customer_impairment_description, :customer_information_withheld,
    :customer_last_name, :customer_middle_name, :customer_notes,
-   :customer_primary_language, :customer_primary_phone,
+   :customer_primary_language, :customer_primary_phone, :customer_race, 
    :customer_seats_required, :drop_off_location_attributes,
    :drop_off_location_id, :earliest_pick_up_time,
    :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,

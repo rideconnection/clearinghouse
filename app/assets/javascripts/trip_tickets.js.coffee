@@ -3,7 +3,11 @@
 # You can use CoffeeScript in this file: http://jashkenas.github.com/coffee-script/
 
 $(document).ready -> 
-  $("#ethnicity_selection").change ->
-    new_value = $(this).find("option:selected").val()
-    $("#trip_ticket_customer_ethnicity").val(new_value)
+  fillTextWithOption("#trip_ticket_customer_ethnicity", "#ethnicity_selection")
+  fillTextWithOption("#trip_ticket_customer_race", "#race_selection")
 
+fillTextWithOption = (text_input_selector, select_input_selector) ->
+  $(select_input_selector).change ->
+    new_value = $(this).find("option:selected").val()
+    $(text_input_selector).val(new_value)
+  

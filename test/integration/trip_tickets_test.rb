@@ -31,7 +31,8 @@ class TripTicketsTest < ActionController::IntegrationTest
     
     fill_in_minimum_required_trip_ticket_fields
 
-    fill_in "Ethnicity", :with => "Asian"
+    fill_in "Ethnicity", :with => "Not of Hispanic Origin"
+    fill_in "Race", :with => "Asian"
     
     click_button "Create Trip ticket"
     
