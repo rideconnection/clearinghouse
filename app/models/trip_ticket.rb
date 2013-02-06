@@ -30,6 +30,18 @@ class TripTicket < ActiveRecord::Base
     "Hispanic",
     "White"
   ]
+
+  ARRAY_FIELDS = {
+    :customer_mobility_impairments => "Mobility Impairment",
+    :customer_eligibility_factors => "Eligibility Factor",
+    :customer_assistive_devices => "Assistive Device",
+    :customer_service_animals => "Service Animal",
+    :guest_or_attendant_service_animals => "Guest or Attendant Service Animal",
+    :guest_or_attendant_assistive_devices => "Guest or Attendant Assistive Device",
+    :trip_funders => "Trip Funder",
+  }
+
+  ARRAY_FIELD_NAMES = ARRAY_FIELDS.keys
   
   attr_accessible :allowed_time_variance, :appointment_time,
    :approved_claim_id, :claimant_provider_id,

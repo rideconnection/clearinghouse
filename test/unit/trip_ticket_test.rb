@@ -53,15 +53,7 @@ class TripTicketTest < ActiveSupport::TestCase
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
   
-  [
-    :customer_mobility_impairments, 
-    :customer_eligibility_factors, 
-    :customer_assistive_devices,
-    :customer_service_animals,
-    :guest_or_attendant_service_animals,
-    :guest_or_attendant_assistive_devices,
-    :trip_funders,
-  ].each do |field_sym|
+  ARRAY_FIELD_NAMES.each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)
       @trip_ticket.send("#{field_sym.to_s}=".to_sym, [
