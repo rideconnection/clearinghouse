@@ -335,7 +335,7 @@
     <div class="field">
       <%= f.label :appointment_time %>:
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.time_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <br /><%= f.datetime_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.appointment_time %>
       <% end %>
@@ -359,7 +359,7 @@
     <div class="field">
       <%= f.label :earliest_pick_up_time %>:
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.time_select :earliest_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <br /><%= f.datetime_select :earliest_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.earliest_pick_up_time %>
       <% end %>
