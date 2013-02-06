@@ -66,8 +66,8 @@ class TripTicket < ActiveRecord::Base
   audited
   
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
-    :customer_primary_phone, :customer_seats_required, :origin_provider_id, 
-    :requested_drop_off_time, :requested_pickup_time
+    :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
+    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }

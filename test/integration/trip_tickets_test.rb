@@ -33,7 +33,6 @@ class TripTicketsTest < ActionController::IntegrationTest
 
     fill_in "Ethnicity", :with => "Not of Hispanic Origin"
     fill_in "Race", :with => "Asian"
-
     fill_in "Trip Purpose", :with => "Some information"
     
     click_button "Create Trip ticket"
@@ -228,6 +227,10 @@ class TripTicketsTest < ActionController::IntegrationTest
   private
 
   def fill_in_minimum_required_trip_ticket_fields
+    within('#originator') do
+      fill_in "Customer ID", :with => "ABC123"
+    end
+
     within('#customer') do
       fill_in 'Address Line 1', :with => '123 Some Place'
       fill_in 'City', :with => 'Some City'

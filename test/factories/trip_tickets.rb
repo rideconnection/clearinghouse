@@ -8,6 +8,7 @@ FactoryGirl.define do
     customer_last_name "Last"
     customer_primary_phone "555-555-5555"
     customer_seats_required 1
+    origin_customer_id "ABC123"
     requested_drop_off_time { Time.now }
     requested_pickup_time { Time.now }
     scheduling_priority "pickup"
