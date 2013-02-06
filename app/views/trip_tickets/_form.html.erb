@@ -421,15 +421,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :trip_purpose_code %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :trip_purpose_code %>
-      <% else %>
-        <%= @trip_ticket.trip_purpose_code %>
-      <% end %>
-    </div>
-    <div class="field">
-      <%= f.label :trip_purpose_description %>:
+      <%= f.label :trip_purpose_description, "Trip Purpose" %>:
       <% if can? :edit, @trip_ticket %>
         <br /><%= f.text_field :trip_purpose_description %>
       <% else %>

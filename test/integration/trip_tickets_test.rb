@@ -33,6 +33,8 @@ class TripTicketsTest < ActionController::IntegrationTest
 
     fill_in "Ethnicity", :with => "Not of Hispanic Origin"
     fill_in "Race", :with => "Asian"
+
+    fill_in "Trip Purpose", :with => "Some information"
     
     click_button "Create Trip ticket"
     
