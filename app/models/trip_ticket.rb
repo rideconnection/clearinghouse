@@ -32,7 +32,7 @@ class TripTicket < ActiveRecord::Base
   ]
   
   attr_accessible :allowed_time_variance, :appointment_time,
-   :approved_claim_id, :claimant_customer_id, :claimant_provider_id,
+   :approved_claim_id, :claimant_provider_id,
    :claimant_trip_id, :customer_address_attributes, :customer_address_id,
    :customer_boarding_time, :customer_deboarding_time, :customer_dob,
    :customer_emergency_phone, :customer_ethnicity, :customer_first_name,

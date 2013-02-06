@@ -20,6 +20,14 @@
     <% end %>
   </div>
   <div class="field">
+    <%= f.label :claimant_customer_id, "Customer ID" %>:
+    <% if can? :edit, @trip_claim %>
+      <br /><%= f.text_field :claimant_customer_id, :readonly => true %>
+    <% else %>
+      <%= @trip_ticket.claimant_customer_id %>
+    <% end %>
+  </div>
+  <div class="field">
     <%= f.label :status %>: <%= @trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[@trip_claim.status].to_s.humanize.titlecase %>
   </div>
   <div class="field">

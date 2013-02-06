@@ -52,14 +52,6 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :claimant_customer_id, "Customer ID" %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :claimant_customer_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.claimant_customer_id %>
-      <% end %>
-    </div>
-    <div class="field">
       <%= f.label :claimant_trip_id, "Trip ID" %>:
       <% if can? :edit, @trip_ticket %>
         <br /><%= f.text_field :claimant_trip_id, :readonly => true %>
