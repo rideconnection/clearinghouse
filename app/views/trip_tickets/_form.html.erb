@@ -193,7 +193,8 @@
       <legend>Customer Identifiers</legend>
       <% if can? :edit, @trip_ticket %>
         <%= f.fields_for :customer_identifiers, @trip_ticket.customer_identifiers do |ci| %>
-          <% @trip_ticket.customer_identifiers.try(:each) do |k,v| %>
+          <% # TODO - Refactor this line to use an array constant of fields to ignore. Also, see if this is a bug for Rails or the Hstore gem %>
+          <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace]).try(:each) do |k,v| %>
             <div class="field hstoreAttribute">
               <%= text_field_tag k, k, :class => 'hstoreAttributeName' %>
               <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue' %>
