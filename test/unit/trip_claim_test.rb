@@ -7,7 +7,8 @@ class TripClaimTest < ActiveSupport::TestCase
       :proposed_fare => "1.23", 
       :proposed_pickup_time => DateTime.now, 
       :status => "Pending", 
-      :trip_ticket_id => 1
+      :trip_ticket_id => 1,
+      :claimant_trip_id => "ABC123",
     )
     tc.valid?.must_equal true
   end

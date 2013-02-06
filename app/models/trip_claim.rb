@@ -8,8 +8,9 @@ class TripClaim < ActiveRecord::Base
     :declined => -1
   }
 
-  attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, :status, 
-    :trip_ticket_id, :proposed_pickup_time, :proposed_fare, :notes
+  attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
+    :claimant_trip_id, :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, 
+    :notes
 
   validates_presence_of :claimant_provider_id, :status, :trip_ticket_id, 
     :proposed_pickup_time

@@ -51,11 +51,11 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                                :null => false
-    t.datetime "updated_at",                                                :null => false
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
     t.integer  "addressable_id"
     t.string   "addressable_type"
-    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
+    t.spatial  "position",         :limit => {:no_constraints=>true}
   end
 
   create_table "nonces", :force => true do |t|
@@ -136,12 +136,12 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                                    :null => false
-    t.datetime "updated_at",                                                    :null => false
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.spatial  "service_area",       :limit => {:no_constraints=>true}
   end
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
