@@ -38,7 +38,11 @@
       <td><%= link_to 'Show', trip_ticket %></td>
       <td><% if can?(:edit, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
       <td><% if can?(:destroy, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
-      <td><% if can?(:create, current_user.provider.trip_claims.build(:trip_ticket_id => trip_ticket.id)) && trip_ticket.claimable_by?(current_user) %><%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %><% end %></td>
+      <td>
+        <% if can?(:create, current_user.provider.trip_claims.build(:trip_ticket_id => trip_ticket.id)) && trip_ticket.claimable_by?(current_user) %>
+          <%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %>
+        <% end %>
+      </td>
     </tr>
   <% end %>
   </table>

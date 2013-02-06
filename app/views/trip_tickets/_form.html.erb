@@ -59,14 +59,6 @@
         <%= @trip_ticket.claimant_trip_id %>
       <% end %>
     </div>
-    <div class="field">
-      <%= f.label :approved_claim_id %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :approved_claim_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.approved_claim_id %>
-      <% end %>
-    </div>
   </fieldset>
 
   <fieldset id="customer" class="">
