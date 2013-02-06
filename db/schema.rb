@@ -11,8 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130205185247) do
-
+ActiveRecord::Schema.define(:version => 20130206215441) do
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
     t.text   "f_geometry_column"
@@ -165,6 +164,8 @@ ActiveRecord::Schema.define(:version => 20130205185247) do
     t.datetime "proposed_pickup_time"
     t.string   "proposed_fare"
     t.text     "notes"
+    t.integer  "claimant_customer_id"
+    t.integer  "claimant_trip_id"
   end
 
   create_table "trip_results", :force => true do |t|
@@ -204,8 +205,6 @@ ActiveRecord::Schema.define(:version => 20130205185247) do
     t.integer      "origin_provider_id"
     t.integer      "origin_customer_id"
     t.integer      "claimant_provider_id"
-    t.integer      "claimant_customer_id"
-    t.integer      "approved_claim_id"
     t.boolean      "customer_information_withheld"
     t.date         "customer_dob"
     t.integer      "customer_address_id"
@@ -220,8 +219,6 @@ ActiveRecord::Schema.define(:version => 20130205185247) do
     t.integer      "claimant_trip_id"
     t.integer      "pick_up_location_id"
     t.integer      "drop_off_location_id"
-    t.time         "earliest_pick_up_time"
-    t.time         "appointment_time"
     t.string       "scheduling_priority"
     t.integer      "allowed_time_variance"
     t.integer      "num_attendants"
@@ -247,6 +244,8 @@ ActiveRecord::Schema.define(:version => 20130205185247) do
     t.string_array "guest_or_attendant_assistive_devices"
     t.string_array "trip_funders"
     t.string       "customer_race"
+    t.datetime     "earliest_pick_up_time"
+    t.datetime     "appointment_time"
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
