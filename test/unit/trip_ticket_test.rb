@@ -67,4 +67,18 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_equal ['a', 'B', '1'], @trip_ticket.send(field_sym)
     end
   end
+  
+  it "has a search method that matches on a customer's first, middle, and last name" do
+    u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
+    u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob')
+    u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob')
+    u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim')
+    
+    results = TripTicket.search('bob')
+    
+    assert_includes results, u1
+    assert_includes results, u2
+    assert_includes results, u3
+    refute_includes results, u4
+  end
 end
