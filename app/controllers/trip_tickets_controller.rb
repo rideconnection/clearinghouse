@@ -1,10 +1,14 @@
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
-  before_filter :setup_locations, :except => [:index, :search]
+  skip_load_resource :only => :index
+  before_filter :setup_locations, :except => :index
 
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
+    @trip_tickets = TripTicket.accessible_by(current_ability)
+    @trip_tickets = @trip_tickets.search(params[:q]) if params[:q].present?
+    
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @trip_tickets }

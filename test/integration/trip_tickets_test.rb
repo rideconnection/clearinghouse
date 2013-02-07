@@ -229,6 +229,31 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
   end
+  
+  describe "search" do
+    setup do
+      @u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :originator => @provider)
+      @u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob', :originator => @provider)
+      @u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob', :originator => @provider)
+      @u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim', :originator => @provider)
+      @u5 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
+    end
+    
+    it "returns trip tickets accessible by the current user with a matching first, middle, or last customer name" do
+      visit "/trip_tickets"
+      
+      within('#trip_ticket_search') do
+        fill_in "Search", :with => 'BOB'
+        click_button "Search"
+      end
+
+      assert page.has_link?("", {:href => trip_ticket_path(@u1)})
+      assert page.has_link?("", {:href => trip_ticket_path(@u2)})
+      assert page.has_link?("", {:href => trip_ticket_path(@u3)})
+      assert page.has_no_link?("", {:href => trip_ticket_path(@u4)})
+      assert page.has_no_link?("", {:href => trip_ticket_path(@u5)})
+    end
+  end
 
   private
 

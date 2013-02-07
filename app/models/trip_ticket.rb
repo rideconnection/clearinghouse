@@ -93,4 +93,18 @@ class TripTicket < ActiveRecord::Base
   def includes_claim_from?(provider)
     self.trip_claims.where(:claimant_provider_id => provider.id).count > 0
   end
+  
+  def self.search(customer_name)
+    value = customer_name.strip.downcase
+    sql, values = [], []
+    [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
+      sql << "(LOWER(%s) LIKE ? OR
+        dmetaphone(%s) = dmetaphone(?) OR 
+        dmetaphone(%s) = dmetaphone_alt(?) OR
+        dmetaphone_alt(%s) = dmetaphone(?) OR 
+        dmetaphone_alt(%s) = dmetaphone_alt(?))" % [field, field, field, field, field]
+      values.push "%#{value}%", value, value, value, value
+    end
+    where(sql.join(' OR '), *values)
+  end
 end

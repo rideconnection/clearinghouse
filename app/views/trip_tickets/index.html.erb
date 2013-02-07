@@ -1,5 +1,10 @@
 <div id="trip-tickets">
   <h2>Trip Tickets</h2>
+  
+  <%= form_tag trip_tickets_path, :id=>'trip_ticket_search', :method => :get do %>
+    <%= search_field_tag :q, params[:q], :placeholder=>'Search' %>
+    <%= submit_tag 'Search', :name => '' %>
+  <% end %>
 
   <table>
     <tr>
