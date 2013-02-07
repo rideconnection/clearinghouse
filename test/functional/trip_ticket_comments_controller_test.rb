@@ -31,7 +31,7 @@ class TripTicketCommentsControllerTest < ActionController::TestCase
 
   test "should create trip_ticket_comment" do
     assert_difference('TripTicketComment.count') do
-      post :create, trip_ticket_id: @trip_ticket, trip_ticket_comment: { body: @trip_ticket_comment.body, trip_ticket_id: @trip_ticket_id }
+      post :create, trip_ticket_id: @trip_ticket, trip_ticket_comment: { body: @trip_ticket_comment.body }
     end
 
     assert_redirected_to trip_ticket_trip_ticket_comment_path(assigns(:trip_ticket), assigns(:trip_ticket_comment))
@@ -48,7 +48,7 @@ class TripTicketCommentsControllerTest < ActionController::TestCase
   end
 
   test "should update trip_ticket_comment" do
-    put :update, trip_ticket_id: @trip_ticket, id: @trip_ticket_comment, trip_ticket_comment: { body: @trip_ticket_comment.body, trip_ticket_id: @trip_ticket_id }
+    put :update, trip_ticket_id: @trip_ticket, id: @trip_ticket_comment, trip_ticket_comment: { body: @trip_ticket_comment.body }
     assert_redirected_to trip_ticket_trip_ticket_comment_path(assigns(:trip_ticket), assigns(:trip_ticket_comment))
   end
 
