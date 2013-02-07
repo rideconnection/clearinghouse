@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130206215441) do
+ActiveRecord::Schema.define(:version => 20130207231428) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -52,12 +52,14 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                          :null => false
-    t.datetime "updated_at",                                          :null => false
+    t.datetime "created_at",                                                :null => false
+    t.datetime "updated_at",                                                :null => false
     t.integer  "addressable_id"
     t.string   "addressable_type"
-    t.spatial  "position",         :limit => {:no_constraints=>true}
+    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
   end
+
+  add_index "locations", ["addressable_id", "addressable_type"], :name => "index_locations_on_addressable_id_and_addressable_type"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"
@@ -66,7 +68,9 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "updated_at",  :null => false
   end
 
+  add_index "nonces", ["created_at"], :name => "index_nonces_on_created_at"
   add_index "nonces", ["nonce", "provider_id"], :name => "index_nonces_on_nonce_and_provider_id", :unique => true
+  add_index "nonces", ["provider_id"], :name => "index_nonces_on_provider_id"
 
   create_table "open_capacities", :force => true do |t|
     t.integer  "service_id"
@@ -82,6 +86,8 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "updated_at",             :null => false
   end
 
+  add_index "open_capacities", ["service_id"], :name => "index_open_capacities_on_service_id"
+
   create_table "operating_hours", :force => true do |t|
     t.integer  "service_id"
     t.integer  "day_of_week"
@@ -90,6 +96,8 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
   end
+
+  add_index "operating_hours", ["service_id"], :name => "index_operating_hours_on_service_id"
 
   create_table "provider_relationships", :force => true do |t|
     t.integer  "requesting_provider_id"
@@ -100,6 +108,10 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "created_at",                    :null => false
     t.datetime "updated_at",                    :null => false
   end
+
+  add_index "provider_relationships", ["cooperating_provider_id"], :name => "index_provider_relationships_on_cooperating_provider_id"
+  add_index "provider_relationships", ["requesting_provider_id", "cooperating_provider_id"], :name => "index_provider_relationships_on_requesting_provider_id_and_coo", :unique => true
+  add_index "provider_relationships", ["requesting_provider_id"], :name => "index_provider_relationships_on_requesting_provider_id"
 
   create_table "providers", :force => true do |t|
     t.string   "name"
@@ -118,10 +130,16 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.string "name"
   end
 
+  add_index "roles", ["name"], :name => "index_roles_on_name"
+
   create_table "roles_users", :id => false, :force => true do |t|
     t.integer "role_id"
     t.integer "user_id"
   end
+
+  add_index "roles_users", ["role_id", "user_id"], :name => "index_roles_users_on_role_id_and_user_id", :unique => true
+  add_index "roles_users", ["role_id"], :name => "index_roles_users_on_role_id"
+  add_index "roles_users", ["user_id"], :name => "index_roles_users_on_user_id"
 
   create_table "service_requests", :force => true do |t|
     t.integer  "trip_ticket_id"
@@ -133,17 +151,21 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "updated_at",       :null => false
   end
 
+  add_index "service_requests", ["trip_ticket_id"], :name => "index_service_requests_on_trip_ticket_id"
+
   create_table "services", :force => true do |t|
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
+    t.datetime "created_at",                                                    :null => false
+    t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:no_constraints=>true}
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
+
+  add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
     t.text "table_name",      :null => false
@@ -169,6 +191,9 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.integer  "claimant_trip_id"
   end
 
+  add_index "trip_claims", ["claimant_provider_id"], :name => "index_trip_claims_on_claimant_provider_id"
+  add_index "trip_claims", ["trip_ticket_id"], :name => "index_trip_claims_on_trip_ticket_id"
+
   create_table "trip_results", :force => true do |t|
     t.integer  "trip_ticket_id"
     t.integer  "trip_claim_id"
@@ -191,6 +216,8 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.datetime "updated_at",             :null => false
     t.integer  "extra_securement_count"
   end
+
+  add_index "trip_results", ["trip_ticket_id"], :name => "index_trip_results_on_trip_ticket_id"
 
   create_table "trip_ticket_comments", :force => true do |t|
     t.integer  "trip_ticket_id"
@@ -236,8 +263,8 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.time         "requested_pickup_time"
     t.time         "requested_drop_off_time"
     t.hstore       "customer_identifiers"
-    t.string       "customer_ethnicity"
     t.string_array "customer_mobility_impairments"
+    t.string       "customer_ethnicity"
     t.string_array "customer_eligibility_factors"
     t.string_array "customer_assistive_devices"
     t.string_array "customer_service_animals"
@@ -256,6 +283,7 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
   add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
   add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
+  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"
 
   create_table "users", :force => true do |t|
@@ -278,6 +306,7 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
+  add_index "users", ["provider_id"], :name => "index_users_on_provider_id"
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 
   create_table "waypoints", :force => true do |t|
