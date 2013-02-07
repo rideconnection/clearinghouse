@@ -22,22 +22,24 @@
         <%= @trip_ticket.originator.name %>
       <% end %>
     </div>
-    <div class="field">
-      <%= f.label :origin_customer_id, "Customer ID" %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :origin_customer_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.origin_customer_id %>
-      <% end %>
-    </div>
-    <div class="field">
-      <%= f.label :origin_trip_id, "Trip ID" %>:
-      <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :origin_trip_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.origin_trip_id %>
-      <% end %>
-    </div>
+    <% if can? :edit, @trip_ticket %>
+      <div class="field">
+        <%= f.label :origin_customer_id, "Customer ID" %>:
+        <% if can? :edit, @trip_ticket %>
+          <br /><%= f.text_field :origin_customer_id %>
+        <% else %>
+          <%= @trip_ticket.origin_customer_id %>
+        <% end %>
+      </div>
+      <div class="field">
+        <%= f.label :origin_trip_id, "Trip ID" %>:
+        <% if can? :edit, @trip_ticket %>
+          <br /><%= f.text_field :origin_trip_id %>
+        <% else %>
+          <%= @trip_ticket.origin_trip_id %>
+        <% end %>
+      </div>
+    <% end %>
   </fieldset>
 
   <fieldset id="claimant" class="">
