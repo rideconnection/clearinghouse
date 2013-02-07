@@ -12,6 +12,7 @@
 # It's strongly recommended to check this file into your version control system.
 
 ActiveRecord::Schema.define(:version => 20130206215441) do
+
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
     t.text   "f_geometry_column"
@@ -235,8 +236,8 @@ ActiveRecord::Schema.define(:version => 20130206215441) do
     t.time         "requested_pickup_time"
     t.time         "requested_drop_off_time"
     t.hstore       "customer_identifiers"
-    t.string_array "customer_mobility_impairments"
     t.string       "customer_ethnicity"
+    t.string_array "customer_mobility_impairments"
     t.string_array "customer_eligibility_factors"
     t.string_array "customer_assistive_devices"
     t.string_array "customer_service_animals"
