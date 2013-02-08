@@ -42,7 +42,7 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   it "has an hstore field for customer_identifiers which returns a hash" do
-    assert_equal nil, @trip_ticket.customer_identifiers
+    assert_equal({}, @trip_ticket.customer_identifiers)
     @trip_ticket.customer_identifiers = {
       :Some => 'Thing',
       1 => 2

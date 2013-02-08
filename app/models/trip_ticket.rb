@@ -1,4 +1,6 @@
 class TripTicket < ActiveRecord::Base
+  serialize :customer_identifiers, ActiveRecord::Coders::Hstore
+  
   belongs_to :originator, :class_name => :Provider, :foreign_key => :origin_provider_id
   belongs_to :claimant,   :class_name => :Provider, :foreign_key => :claimant_provider_id
 
