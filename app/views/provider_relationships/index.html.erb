@@ -14,14 +14,14 @@
 
 <% @provider_relationships.each do |provider_relationship| %>
   <tr>
-    <td><%= provider_relationship.requesting_provider_id %></td>
-    <td><%= provider_relationship.cooperating_provider_id %></td>
+    <td><%= provider_relationship.requesting_provider.name %></td>
+    <td><%= provider_relationship.cooperating_provider.name %></td>
     <td><%= provider_relationship.approved_at %></td>
     <td><%= provider_relationship.automatic_requester_approval %></td>
     <td><%= provider_relationship.automatic_cooperator_approval %></td>
     <td><%= link_to 'Show', provider_relationship %></td>
-    <td><%= link_to 'Edit', edit_provider_relationship_path(provider_relationship) %></td>
-    <td><%= link_to 'Destroy', provider_relationship, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <td><% if can? :edit, provider_relationship %><%= link_to 'Edit', edit_provider_relationship_path(provider_relationship) %><% end %></td>
+    <td><% if can? :destroy, provider_relationship %><%= link_to 'Destroy', provider_relationship, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
   </tr>
 <% end %>
 </table>

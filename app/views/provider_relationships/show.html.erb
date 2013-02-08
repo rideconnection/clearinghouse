@@ -2,12 +2,12 @@
 
 <p>
   <b>Requesting provider:</b>
-  <%= @provider_relationship.requesting_provider_id %>
+  <%= @provider_relationship.requesting_provider.name %>
 </p>
 
 <p>
   <b>Cooperating provider:</b>
-  <%= @provider_relationship.cooperating_provider_id %>
+  <%= @provider_relationship.cooperating_provider.name %>
 </p>
 
 <p>
@@ -26,5 +26,5 @@
 </p>
 
 
-<%= link_to 'Edit', edit_provider_relationship_path(@provider_relationship) %> |
+<% if can? :edit, @provider_relationship %><%= link_to 'Edit', edit_provider_relationship_path(@provider_relationship) %> |<% end %>
 <%= link_to 'Back', provider_relationships_path %>

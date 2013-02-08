@@ -4,8 +4,6 @@ class ProviderRelationshipsController < ApplicationController
   # GET /provider_relationships
   # GET /provider_relationships.json
   def index
-    @provider_relationships = ProviderRelationship.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @provider_relationships }
@@ -15,8 +13,6 @@ class ProviderRelationshipsController < ApplicationController
   # GET /provider_relationships/1
   # GET /provider_relationships/1.json
   def show
-    @provider_relationship = ProviderRelationship.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @provider_relationship }
@@ -27,7 +23,6 @@ class ProviderRelationshipsController < ApplicationController
   # GET /provider_relationships/new.json
   def new
     @provider = Provider.find(params[:provider_id])
-    @provider_relationship = ProviderRelationship.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -37,15 +32,11 @@ class ProviderRelationshipsController < ApplicationController
 
   # GET /provider_relationships/1/edit
   def edit
-    @provider_relationship = ProviderRelationship.find(params[:id])
   end
 
   # POST /provider_relationships
   # POST /provider_relationships.json
   def create
-    @provider_relationship = ProviderRelationship.new(
-      params[:provider_relationship])
-
     respond_to do |format|
       if @provider_relationship.save
         format.html do 
@@ -71,8 +62,6 @@ class ProviderRelationshipsController < ApplicationController
   # PUT /provider_relationships/1
   # PUT /provider_relationships/1.json
   def update
-    @provider_relationship = ProviderRelationship.find(params[:id])
-
     respond_to do |format|
       if @provider_relationship.update_attributes(params[:provider_relationship])
         format.html do 
@@ -92,7 +81,6 @@ class ProviderRelationshipsController < ApplicationController
   # DELETE /provider_relationships/1
   # DELETE /provider_relationships/1.json
   def destroy
-    @provider_relationship = ProviderRelationship.find(params[:id])
     @provider_relationship.destroy
 
     respond_to do |format|
