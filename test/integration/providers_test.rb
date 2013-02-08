@@ -103,7 +103,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
     
     # Set automatic approval
     click_link "Edit Partnership"
-    assert page.has_content? "Automatically approve Google's tickets?"
+    assert page.has_content? "Automatically approve Microsoft's claims on this provider's tickets?"
     check "provider_relationship_automatic_requester_approval"
     click_button "Submit"
     assert page.has_content?("successfully updated")

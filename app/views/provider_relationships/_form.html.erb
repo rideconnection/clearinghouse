@@ -21,17 +21,17 @@
   <% end %>
 
   <% unless @provider_relationship.new_record? %>
-    <% if can? :edit, @provider_relationship.requesting_provider %>
+    <% if can? :edit, @provider_relationship.cooperating_provider %>
       <div class="field">
         <%= f.label :automatic_requester_approval, requester_approval_label_for(@provider_relationship) %><br />
         <%= f.check_box :automatic_requester_approval %>
       </div>
     <% end %>
 
-    <% if can? :edit, @provider_relationship.cooperating_provider %>
+    <% if can? :edit, @provider_relationship.requesting_provider %>
       <div class="field">
         <%= f.label :automatic_cooperator_approval, cooperator_approval_label_for(@provider_relationship) %><br />
-        <%= f.check_box :automatic_requester_approval %>
+        <%= f.check_box :automatic_cooperator_approval %>
       </div>
     <% end %>
   <% end %>
