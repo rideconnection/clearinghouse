@@ -25,19 +25,11 @@
     <% if can? :edit, @trip_ticket %>
       <div class="field">
         <%= f.label :origin_customer_id, "Customer ID" %>:
-        <% if can? :edit, @trip_ticket %>
-          <br /><%= f.text_field :origin_customer_id %>
-        <% else %>
-          <%= @trip_ticket.origin_customer_id %>
-        <% end %>
+        <br /><%= f.text_field :origin_customer_id %>
       </div>
       <div class="field">
         <%= f.label :origin_trip_id, "Trip ID" %>:
-        <% if can? :edit, @trip_ticket %>
-          <br /><%= f.text_field :origin_trip_id %>
-        <% else %>
-          <%= @trip_ticket.origin_trip_id %>
-        <% end %>
+        <br /><%= f.text_field :origin_trip_id %>
       </div>
     <% end %>
   </fieldset>
