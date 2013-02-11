@@ -7,7 +7,9 @@ gem 'rails', '~> 3.2'
 gem 'rvm-capistrano'
 
 # PostgreSQL hstore support
-gem 'activerecord-postgres-hstore', '~> 0.5'
+# Locking this down to 0.6.0 until this is fixed:
+# https://github.com/engageis/activerecord-postgres-hstore/issues/83
+gem 'activerecord-postgres-hstore', '0.6.0'
 
 # PostgreSQL array support 
 gem 'activerecord-postgres-array', '~> 0.0'

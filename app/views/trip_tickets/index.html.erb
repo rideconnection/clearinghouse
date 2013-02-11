@@ -3,7 +3,8 @@
   
   <%= form_tag trip_tickets_path, :id=>'trip_ticket_search', :method => :get do %>
     <%= search_field_tag :q, params[:q], :placeholder=>'Search' %>
-    <%= submit_tag 'Search', :name => '' %>
+    <%= submit_tag 'Search', :name => '' %> 
+    <% if params[:q] %><%= link_to "Clear Search", trip_tickets_path %><% end %>
   <% end %>
 
   <table>

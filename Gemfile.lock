@@ -61,9 +61,8 @@ GEM
       rgeo-activerecord (~> 0.4.6)
     activerecord-postgres-array (0.0.8)
       activerecord
-    activerecord-postgres-hstore (0.7.3)
-      pg-hstore (>= 1.1.5)
-      rails (>= 3.1)
+    activerecord-postgres-hstore (0.6.0)
+      rails
       rake
     activeresource (3.2.11)
       activemodel (= 3.2.11)
@@ -179,7 +178,6 @@ GEM
     nokogiri (1.5.6)
     orm_adapter (0.4.0)
     pg (0.14.1)
-    pg-hstore (1.1.6)
     polyglot (0.3.3)
     rack (1.4.4)
     rack-accept (0.4.5)
@@ -297,7 +295,7 @@ DEPENDENCIES
   accept_values_for
   activerecord-postgis-adapter (~> 0.5)
   activerecord-postgres-array (~> 0.0)
-  activerecord-postgres-hstore (~> 0.5)
+  activerecord-postgres-hstore (= 0.6.0)
   audited (~> 3.0)
   audited-activerecord (~> 3.0)
   cancan (~> 1.6)
