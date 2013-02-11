@@ -82,6 +82,7 @@ class TripTicket < ActiveRecord::Base
       self.customer_seats_required = 1
       self.num_attendants = 0
       self.num_guests = 0
+      self.customer_identifiers = {}
     end
   end
   

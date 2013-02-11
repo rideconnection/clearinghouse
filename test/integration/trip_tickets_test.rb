@@ -247,6 +247,25 @@ class TripTicketsTest < ActionController::IntegrationTest
       assert page.has_no_link?("", {:href => trip_ticket_path(@u4)})
       assert page.has_no_link?("", {:href => trip_ticket_path(@u5)})
     end
+    
+    it "provides a link to clear the search results once a search has been applied" do
+      visit "/trip_tickets"
+      
+      within('#trip_ticket_search') do
+        assert page.has_no_link?("Clear Search")
+        fill_in "Search", :with => 'BOB'
+        click_button "Search"
+      end
+        
+      within('#trip_ticket_search') do
+        assert page.has_link?("Clear Search")
+        click_link "Clear Search"
+      end
+
+      within('#trip_ticket_search') do
+        assert page.has_no_link?("Clear Search")
+      end
+    end
   end
 
   private
