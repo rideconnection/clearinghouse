@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130207231428) do
+ActiveRecord::Schema.define(:version => 20130211180507) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -153,19 +153,8 @@ ActiveRecord::Schema.define(:version => 20130207231428) do
 
   add_index "service_requests", ["trip_ticket_id"], :name => "index_service_requests_on_trip_ticket_id"
 
-  create_table "services", :force => true do |t|
-    t.string   "name"
-    t.integer  "provider_id"
-    t.integer  "funding_source_id"
-    t.datetime "created_at",                                                    :null => false
-    t.datetime "updated_at",                                                    :null => false
-    t.integer  "operating_hours_id"
-    t.text     "rate"
-    t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
-  end
-
-  add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
+# Could not dump table "services" because of following StandardError
+#   Unknown type 'hstore' for column 'eligibility'
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
     t.text "table_name",      :null => false
@@ -229,62 +218,8 @@ ActiveRecord::Schema.define(:version => 20130207231428) do
 
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
-  create_table "trip_tickets", :force => true do |t|
-    t.integer      "origin_provider_id"
-    t.integer      "origin_customer_id"
-    t.integer      "claimant_provider_id"
-    t.boolean      "customer_information_withheld"
-    t.date         "customer_dob"
-    t.integer      "customer_address_id"
-    t.string       "customer_primary_phone"
-    t.string       "customer_emergency_phone"
-    t.text         "customer_impairment_description"
-    t.integer      "customer_boarding_time"
-    t.integer      "customer_deboarding_time"
-    t.integer      "customer_seats_required"
-    t.text         "customer_notes"
-    t.integer      "origin_trip_id"
-    t.integer      "claimant_trip_id"
-    t.integer      "pick_up_location_id"
-    t.integer      "drop_off_location_id"
-    t.string       "scheduling_priority"
-    t.integer      "allowed_time_variance"
-    t.integer      "num_attendants"
-    t.integer      "num_guests"
-    t.string       "trip_purpose_code"
-    t.string       "trip_purpose_description"
-    t.text         "trip_notes"
-    t.datetime     "created_at",                           :null => false
-    t.datetime     "updated_at",                           :null => false
-    t.string       "customer_primary_language"
-    t.string       "customer_first_name"
-    t.string       "customer_last_name"
-    t.string       "customer_middle_name"
-    t.time         "requested_pickup_time"
-    t.time         "requested_drop_off_time"
-    t.hstore       "customer_identifiers"
-    t.string_array "customer_mobility_impairments"
-    t.string       "customer_ethnicity"
-    t.string_array "customer_eligibility_factors"
-    t.string_array "customer_assistive_devices"
-    t.string_array "customer_service_animals"
-    t.string_array "guest_or_attendant_service_animals"
-    t.string_array "guest_or_attendant_assistive_devices"
-    t.string_array "trip_funders"
-    t.string       "customer_race"
-    t.datetime     "earliest_pick_up_time"
-    t.datetime     "appointment_time"
-  end
-
-  add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
-  add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
-  add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
-  add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
-  add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
-  add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
-  add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
-  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
-  add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"
+# Could not dump table "trip_tickets" because of following StandardError
+#   Unknown type 'hstore' for column 'customer_identifiers'
 
   create_table "users", :force => true do |t|
     t.string   "email"
