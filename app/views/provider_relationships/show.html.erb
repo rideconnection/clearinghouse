@@ -27,4 +27,8 @@
 
 
 <% if can? :edit, @provider_relationship %><%= link_to 'Edit', edit_provider_relationship_path(@provider_relationship) %> |<% end %>
-<%= link_to 'Back', provider_relationships_path %>
+<% if @current_user.provider.present? %>
+  <%= link_to 'Back', @current_user.provider %>
+<% else %>
+  <%= link_to 'Back', providers_path %>
+<% end %>

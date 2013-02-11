@@ -8,7 +8,7 @@ Clearinghouse::Application.routes.draw do
 
   resources :open_capacities
 
-  resources :provider_relationships do
+  resources :provider_relationships, :except => :index do
     post 'activate'
   end
 

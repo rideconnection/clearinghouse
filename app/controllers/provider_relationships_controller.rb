@@ -1,15 +1,6 @@
 class ProviderRelationshipsController < ApplicationController
   load_and_authorize_resource
 
-  # GET /provider_relationships
-  # GET /provider_relationships.json
-  def index
-    respond_to do |format|
-      format.html # index.html.erb
-      format.json { render json: @provider_relationships }
-    end
-  end
-
   # GET /provider_relationships/1
   # GET /provider_relationships/1.json
   def show
@@ -81,10 +72,11 @@ class ProviderRelationshipsController < ApplicationController
   # DELETE /provider_relationships/1
   # DELETE /provider_relationships/1.json
   def destroy
+    @provider = provider_for_request
     @provider_relationship.destroy
 
     respond_to do |format|
-      format.html { redirect_to provider_relationships_url }
+      format.html { redirect_to @provider, notice: 'Provider relationship destroyed!'}
       format.json { head :no_content }
     end
   end

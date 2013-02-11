@@ -3,4 +3,8 @@
 <%= render 'form' %>
 
 <%= link_to 'Show', @provider_relationship %> |
-<%= link_to 'Back', provider_relationships_path %>
+<% if @current_user.provider.present? %>
+  <%= link_to 'Back', @current_user.provider %>
+<% else %>
+  <%= link_to 'Back', providers_path %>
+<% end %>
