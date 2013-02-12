@@ -1,19 +1,15 @@
 class TripTicket < ActiveRecord::Base
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
-  belongs_to :originator, :class_name => :Provider, :foreign_key => :origin_provider_id
-  belongs_to :claimant,   :class_name => :Provider, :foreign_key => :claimant_provider_id
-
-  has_one :customer_address, :class_name => :Location, :as => :addressable,
-          :validate => true, :dependent => :destroy
-  has_one :pick_up_location, :class_name => :Location, :as => :addressable,
-          :validate => true, :dependent => :destroy
-  has_one :drop_off_location, :class_name => :Location, :as => :addressable,
-          :validate => true, :dependent => :destroy
+  belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
+  belongs_to :claimant, :foreign_key => :claimant_provider_id, :class_name => :Provider, :validate => true
+  belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy
+  belongs_to :pick_up_location,  :class_name => :Location, :validate => true, :dependent => :destroy
+  belongs_to :drop_off_location, :class_name => :Location, :validate => true, :dependent => :destroy
   
   has_many :trip_claims, :dependent => :destroy
-  has_one :trip_result, :dependent => :destroy
   has_many :trip_ticket_comments, :dependent => :destroy
+  has_one  :trip_result, :dependent => :destroy
   
   SCHEDULING_PRIORITY = {
     "pickup"  => "Pickup",

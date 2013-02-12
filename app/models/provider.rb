@@ -2,10 +2,8 @@ class Provider < ActiveRecord::Base
   has_many :services
   has_many :nonces
   has_many :users
-  has_one :address, :class_name => :Location, :as => :addressable,
-          :validate => true, :dependent => :destroy
-  belongs_to :primary_contact, :foreign_key => :primary_contact_id,
-             :class_name => :User
+  belongs_to :address, :class_name => :Location, :validate => true, :dependent => :destroy
+  belongs_to :primary_contact, :class_name => :User
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
   

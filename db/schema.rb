@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130211180507) do
+ActiveRecord::Schema.define(:version => 20130212222413) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -52,14 +52,10 @@ ActiveRecord::Schema.define(:version => 20130211180507) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                                :null => false
-    t.datetime "updated_at",                                                :null => false
-    t.integer  "addressable_id"
-    t.string   "addressable_type"
-    t.spatial  "position",         :limit => {:srid=>4326, :type=>"point"}
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
-
-  add_index "locations", ["addressable_id", "addressable_type"], :name => "index_locations_on_addressable_id_and_addressable_type"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"
