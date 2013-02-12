@@ -46,16 +46,6 @@ class ProviderRelationshipTest < ActiveSupport::TestCase
       ProviderRelationship.partner_ids_for_provider(@alternate_provider).must_equal []
     end
     
-    it "can return an array of approved partner providers for a given provider" do
-      partners = ProviderRelationship.partners_for_provider(@provider_1)
-      partners.must_include @provider_2
-      partners.wont_include @provider_3
-      partners.wont_include @alternate_provider
-
-      ProviderRelationship.partners_for_provider(@provider_3).must_equal []
-      ProviderRelationship.partners_for_provider(@alternate_provider).must_equal []
-    end
-    
     it "can find an approved relationship between two providers" do
       assert_equal @relationship_1, ProviderRelationship.find_approved_relationship_between(@provider_1, @provider_2)
       assert_equal @relationship_1, ProviderRelationship.find_approved_relationship_between(@provider_2, @provider_1)

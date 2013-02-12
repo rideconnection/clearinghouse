@@ -54,10 +54,6 @@ class ProviderRelationship < ActiveRecord::Base
     self.find_any_relationship_between(provider_1, provider_2).present?
   end
   
-  def self.partners_for_provider(provider, only_approved = true)
-    Provider.where(:id => self.partner_ids_for_provider(provider, only_approved))
-  end
-
   def self.partner_ids_for_provider(provider, only_approved = true)
     (only_approved ? self.approved : self).
       select([:requesting_provider_id, :cooperating_provider_id]).
