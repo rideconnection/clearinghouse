@@ -224,46 +224,126 @@ class TripTicketsTest < ActionController::IntegrationTest
     end
   end
   
-  describe "search" do
-    setup do
-      @u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :originator => @provider)
-      @u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob', :originator => @provider)
-      @u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob', :originator => @provider)
-      @u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim', :originator => @provider)
-      @u5 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
-    end
-    
-    it "returns trip tickets accessible by the current user with a matching first, middle, or last customer name" do
-      visit "/trip_tickets"
-      
-      within('#trip_ticket_search') do
-        fill_in "Search", :with => 'BOB'
-        click_button "Search"
+  describe "filtering" do
+    describe "clear filters" do
+      setup do
+        @u1 = FactoryGirl.create(:trip_ticket, :customer_last_name => 'Jim', :originator => @provider)
       end
-
-      assert page.has_link?("", {:href => trip_ticket_path(@u1)})
-      assert page.has_link?("", {:href => trip_ticket_path(@u2)})
-      assert page.has_link?("", {:href => trip_ticket_path(@u3)})
-      assert page.has_no_link?("", {:href => trip_ticket_path(@u4)})
-      assert page.has_no_link?("", {:href => trip_ticket_path(@u5)})
-    end
     
-    it "provides a link to clear the search results once a search has been applied" do
-      visit "/trip_tickets"
+      it "provides a link to clear the search results" do
+        visit "/trip_tickets"
       
-      within('#trip_ticket_search') do
-        assert page.has_no_link?("Clear Search")
-        fill_in "Search", :with => 'BOB'
-        click_button "Search"
-      end
+        within('#trip_ticket_filters') do
+          fill_in "Customer Name", :with => 'BOB'
+          click_button "Search"
+        end
         
-      within('#trip_ticket_search') do
-        assert page.has_link?("Clear Search")
-        click_link "Clear Search"
+        assert page.has_no_link?("", {:href => trip_ticket_path(@u1)})
+        
+        within('#trip_ticket_filters') do
+          assert page.has_link?("Clear All Filters")
+          click_link "Clear All Filters"
+        end
+        
+        assert page.has_link?("", {:href => trip_ticket_path(@u1)})
       end
+    end
+    
+    describe "customer name search" do
+      setup do
+        @u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :originator => @provider)
+        @u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob', :originator => @provider)
+        @u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob', :originator => @provider)
+        @u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim', :originator => @provider)
+        @u5 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching first, middle, or last customer name" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "Customer Name", :with => 'BOB'
+          click_button "Search"
+        end
 
-      within('#trip_ticket_search') do
-        assert page.has_no_link?("Clear Search")
+        assert page.has_link?("", {:href => trip_ticket_path(@u1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@u2)})
+        assert page.has_link?("", {:href => trip_ticket_path(@u3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@u4)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@u5)})
+      end
+    end
+    
+    describe "customer address or phone search" do
+      setup do
+        @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+        @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+        @l3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+        @l4 = FactoryGirl.create(:trip_ticket,                           :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street",  :address_2 => ""))
+        @l5 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_primary_phone => "800-555-soak")   # <- contrived, I know
+        @l6 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_emergency_phone => "555-oak-1234") # <- contrived, I know
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching customer street address or phone numbers" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "Customer Address or Phone", :with => 'OAK'
+          click_button "Search"
+        end
+
+        assert page.has_link?("", {:href => trip_ticket_path(@l1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@l2)})
+        assert page.has_link?("", {:href => trip_ticket_path(@l5)})
+        assert page.has_link?("", {:href => trip_ticket_path(@l6)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l4)})
+      end
+    end
+    
+    describe "pick up location search" do
+      setup do
+        @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+        @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+        @l3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+        @l4 = FactoryGirl.create(:trip_ticket,                           :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street",  :address_2 => ""))
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching pick up location address" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "Pickup Address", :with => 'OAK'
+          click_button "Search"
+        end
+
+        assert page.has_link?("", {:href => trip_ticket_path(@l1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@l2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l4)})
+      end
+    end
+    
+    describe "drop off location search" do
+      setup do
+        @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+        @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+        @l3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+        @l4 = FactoryGirl.create(:trip_ticket,                           :drop_off_location => FactoryGirl.create(:location, :address_1 => "Oak Street",  :address_2 => ""))
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching drop off location address" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "Dropoff Address", :with => 'OAK'
+          click_button "Search"
+        end
+
+        assert page.has_link?("", {:href => trip_ticket_path(@l1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@l2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@l4)})
       end
     end
   end

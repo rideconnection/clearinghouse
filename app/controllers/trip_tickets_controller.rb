@@ -7,7 +7,12 @@ class TripTicketsController < ApplicationController
   # GET /trip_tickets.json
   def index
     @trip_tickets = TripTicket.accessible_by(current_ability)
-    @trip_tickets = @trip_tickets.search(params[:q]) if params[:q].present?
+    
+    params[:trip_ticket_filters].try(:each) do |filter,value|
+      if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
+        @trip_tickets = @trip_tickets.send("filter_by_#{filter.to_s}", value)
+      end
+    end
     
     respond_to do |format|
       format.html # index.html.erb

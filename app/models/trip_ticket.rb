@@ -104,17 +104,70 @@ class TripTicket < ActiveRecord::Base
     self.trip_claims.where(:claimant_provider_id => provider.id).count > 0
   end
   
-  def self.search(customer_name)
-    value = customer_name.strip.downcase
-    sql, values = [], []
-    [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
-      sql << "(LOWER(%s) LIKE ? OR
+  class << self
+    def filter_by_customer_name(customer_name)
+      value = customer_name.strip.downcase
+      sql, values = [], []
+      [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
+        sql << fuzzy_string_search(field, value)
+        values.push "%#{value}%", value, value, value, value
+      end
+      where(sql.join(' OR '), *values)
+    end
+    
+    def filter_by_customer_address_or_phone(customer_address_or_phone)
+      # We need to manually write our join here since there's a chance
+      # we could be joining/filtering on multiple locations
+      join = 'LEFT OUTER JOIN "locations" as "customer_address" ON "customer_address"."id" = "trip_tickets"."customer_address_id"'
+      value = customer_address_or_phone.strip.downcase
+      sql, values = [], []
+      ['customer_address.address_1', 'customer_address.address_2'].each do |field|
+        sql << fuzzy_string_search(field, value)
+        values.push "%#{value}%", value, value, value, value
+      end
+      sql << "LOWER(customer_primary_phone) LIKE ?"
+      sql << "LOWER(customer_emergency_phone) LIKE ?"
+      values.push "%#{value}%", "%#{value}%"
+      
+      joins(join).where([sql.join(' OR '), *values])
+    end
+  
+    def filter_by_pick_up_location(pick_up_location)
+      # We need to manually write our join here since there's a chance
+      # we could be joining/filtering on multiple locations
+      join = 'LEFT OUTER JOIN "locations" as "pick_up_location" ON "pick_up_location"."id" = "trip_tickets"."pick_up_location_id"'
+      value = pick_up_location.strip.downcase
+      sql, values = [], []
+      ['pick_up_location.address_1', 'pick_up_location.address_2'].each do |field|
+        sql << fuzzy_string_search(field, value)
+        values.push "%#{value}%", value, value, value, value
+      end
+
+      joins(join).where([sql.join(' OR '), *values])
+    end
+  
+    def filter_by_drop_off_location(drop_off_location)
+      # We need to manually write our join here since there's a chance
+      # we could be joining/filtering on multiple locations
+      join = 'LEFT OUTER JOIN "locations" as "drop_off_location" ON "drop_off_location"."id" = "trip_tickets"."drop_off_location_id"'
+      value = drop_off_location.strip.downcase
+      sql, values = [], []
+      ['drop_off_location.address_1', 'drop_off_location.address_2'].each do |field|
+        sql << fuzzy_string_search(field, value)
+        values.push "%#{value}%", value, value, value, value
+      end
+
+      joins(join).where([sql.join(' OR '), *values])
+    end
+  
+    private
+  
+    def fuzzy_string_search(field, value)
+      "(LOWER(%s) LIKE ? OR
         dmetaphone(%s) = dmetaphone(?) OR 
         dmetaphone(%s) = dmetaphone_alt(?) OR
         dmetaphone_alt(%s) = dmetaphone(?) OR 
         dmetaphone_alt(%s) = dmetaphone_alt(?))" % [field, field, field, field, field]
-      values.push "%#{value}%", value, value, value, value
     end
-    where(sql.join(' OR '), *values)
   end
 end

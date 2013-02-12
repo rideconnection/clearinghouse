@@ -68,17 +68,59 @@ class TripTicketTest < ActiveSupport::TestCase
     end
   end
   
-  it "has a search method that matches on a customer's first, middle, and last name" do
-    u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
-    u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob')
-    u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob')
-    u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim')
+  describe "filter methods" do
+    it "has a filter_by_customer_name method that matches on a customer's first, middle, and last name" do
+      u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
+      u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob')
+      u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob')
+      u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim')
     
-    results = TripTicket.search('bob')
+      results = TripTicket.filter_by_customer_name('bob')
     
-    assert_includes results, u1
-    assert_includes results, u2
-    assert_includes results, u3
-    refute_includes results, u4
+      assert_includes results, u1
+      assert_includes results, u2
+      assert_includes results, u3
+      refute_includes results, u4
+    end
+
+    it "has a filter_by_customer_address_or_phone method that matches on the customer address association's address_1 or address_2, or on the customer's primary or emergency phone numbers" do
+      l1 = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+      l2 = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+      l3 = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+      l4 = FactoryGirl.create(:trip_ticket, :customer_primary_phone => "800-555-soak")   # <- contrived, I know
+      l5 = FactoryGirl.create(:trip_ticket, :customer_emergency_phone => "555-oak-1234") # <- contrived, I know
+    
+      results = TripTicket.filter_by_customer_address_or_phone('oak')
+    
+      assert_includes results, l1
+      assert_includes results, l2
+      assert_includes results, l4
+      assert_includes results, l5
+      refute_includes results, l3
+    end
+
+    it "has a filter_by_pick_up_location method that matches on the pickup location association's address_1 or address_2" do
+      l1 = FactoryGirl.create(:trip_ticket, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+      l2 = FactoryGirl.create(:trip_ticket, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+      l3 = FactoryGirl.create(:trip_ticket, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+    
+      results = TripTicket.filter_by_pick_up_location('oak')
+    
+      assert_includes results, l1
+      assert_includes results, l2
+      refute_includes results, l3
+    end
+
+    it "has a filter_by_pick_up_location method that matches on the dropoff location association's address_1 or address_2" do
+      l1 = FactoryGirl.create(:trip_ticket, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+      l2 = FactoryGirl.create(:trip_ticket, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
+      l3 = FactoryGirl.create(:trip_ticket, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => ""), :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street"))
+    
+      results = TripTicket.filter_by_drop_off_location('oak')
+    
+      assert_includes results, l1
+      assert_includes results, l2
+      refute_includes results, l3
+    end
   end
 end
