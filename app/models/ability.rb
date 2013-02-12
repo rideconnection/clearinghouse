@@ -22,7 +22,7 @@ class Ability
       
       # Users can read provider relationships that their own provider belongs to
       can :read, ProviderRelationship, ['cooperating_provider_id = ? OR requesting_provider_id = ?', user.provider_id, user.provider_id] do |pr|
-        pr.cooperating_provider_id == user.provider_id || pr.requesting_provider_id == user.provider_id
+        pr.includes_user?(user)
       end
 
       # Users can read services belonging to their own provider
@@ -48,7 +48,7 @@ class Ability
 
         # Provider admins can update and destroy provider relationships that their own provider belongs to
         can [:update, :destroy], ProviderRelationship do |pr|
-          [pr.cooperating_provider_id, pr.requesting_provider_id].include? user.provider_id
+          pr.includes_user?(user)
         end
         
         # Provider admins can activate (aka approve) provider relationships sent to their own provider
