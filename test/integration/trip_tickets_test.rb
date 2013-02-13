@@ -249,7 +249,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
     
-    describe "customer name search" do
+    describe "customer name filter" do
       setup do
         @u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :originator => @provider)
         @u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob', :originator => @provider)
@@ -274,7 +274,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
     
-    describe "customer address or phone search" do
+    describe "customer address or phone filter" do
       setup do
         @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
         @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
@@ -301,7 +301,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
     
-    describe "pick up location search" do
+    describe "pick up location filter" do
       setup do
         @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
         @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :pick_up_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
@@ -324,7 +324,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
     
-    describe "drop off location search" do
+    describe "drop off location filter" do
       setup do
         @l1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
         @l2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :drop_off_location => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))
@@ -344,6 +344,86 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("", {:href => trip_ticket_path(@l2)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@l3)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@l4)})
+      end
+    end
+    
+    describe "originating provider filter" do
+      setup do
+        @provider_2 = FactoryGirl.create(:provider, :name => "Google")
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_2
+        )
+        relationship.approve!
+        @provider_3 = FactoryGirl.create(:provider, :name => "Yahoo")
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_3
+        )
+        relationship.approve!
+        @t1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        @t2 = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
+        @t3 = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
+        @t4 = FactoryGirl.create(:trip_ticket)
+      end
+    
+      it "returns trip tickets accessible by the current user with matching originating providers" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "Microsoft", :from => "Originating Provider"
+          select "Google", :from => "Originating Provider"
+          click_button "Search"
+        end
+        
+        assert page.has_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+      end
+    end
+    
+    describe "claiming provider filter" do
+      setup do
+        @provider_2 = FactoryGirl.create(:provider, :name => "Google")
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_2
+        )
+        relationship.approve!
+        @provider_3 = FactoryGirl.create(:provider, :name => "Yahoo")
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_3
+        )
+        relationship.approve!
+        
+        @t1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @t1, :claimant => @provider_2)
+        
+        @t2 = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @t2, :claimant => @provider_3)
+        
+        @t3 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @t3)
+        
+        @t4 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @t4, :claimant => @provider)
+      end
+    
+      it "returns trip tickets accessible by the current user with matching claiming providers" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "Microsoft", :from => "Claiming Provider"
+          select "Google", :from => "Claiming Provider"
+          click_button "Search"
+        end
+        
+        assert page.has_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
       end
     end
   end

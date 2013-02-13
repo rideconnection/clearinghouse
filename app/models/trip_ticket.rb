@@ -160,6 +160,14 @@ class TripTicket < ActiveRecord::Base
       joins(join).where([sql.join(' OR '), *values])
     end
   
+    def filter_by_originating_provider(originating_providers)
+      where(:origin_provider_id => Array(originating_providers).map(&:to_i))
+    end
+  
+    def filter_by_claiming_provider(claiming_providers)
+      joins(:trip_claims).joins('LEFT OUTER JOIN "providers" as "claimants" ON "claimants"."id" = trip_claims.claimant_provider_id').where('claimants.id IN (?)', Array(claiming_providers).map(&:to_i))
+    end
+  
     private
   
     def fuzzy_string_search(field, value)

@@ -132,5 +132,47 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_includes results, l2
       refute_includes results, l3
     end
+
+    it "has a filter_by_originating_provider method that matches on the trip ticket originator" do
+      provider_1 = FactoryGirl.create(:provider)
+      provider_2 = FactoryGirl.create(:provider)
+      t1 = FactoryGirl.create(:trip_ticket, :originator => provider_1)
+      t2 = FactoryGirl.create(:trip_ticket, :originator => provider_2)
+      t3 = FactoryGirl.create(:trip_ticket)
+    
+      results = TripTicket.filter_by_originating_provider(provider_1.id)
+    
+      assert_includes results, t1
+      refute_includes results, t2
+      refute_includes results, t3
+    
+      results = TripTicket.filter_by_originating_provider([provider_1.id, provider_2.id])
+    
+      assert_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+    end
+
+    it "has a filter_by_claiming_provider method that matches trip ticket trip claim claimants" do
+      provider_1 = FactoryGirl.create(:provider)
+      provider_2 = FactoryGirl.create(:provider)
+      t1 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :trip_ticket => t1, :claimant => provider_1)
+      t2 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :trip_ticket => t2, :claimant => provider_2)
+      t3 = FactoryGirl.create(:trip_ticket)
+    
+      results = TripTicket.filter_by_claiming_provider(provider_1.id)
+    
+      assert_includes results, t1
+      refute_includes results, t2
+      refute_includes results, t3
+    
+      results = TripTicket.filter_by_claiming_provider([provider_1.id, provider_2.id])
+    
+      assert_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+    end
   end
 end

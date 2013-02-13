@@ -5,23 +5,33 @@
     <label>Filters</label>
     <%= form_tag trip_tickets_path, :method => :get do %>
       <div class="field">
-        <%= label_tag :trip_ticket_filters_customer_name, "Customer Name" %>:
+        <%= label_tag :trip_ticket_filters_customer_name, "Customer Name" %>:<br>
         <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name %>
       </div>
     
       <div class="field">
-        <%= label_tag :trip_ticket_filters_customer_address_or_phone, "Customer Address or Phone" %>:
+        <%= label_tag :trip_ticket_filters_customer_address_or_phone, "Customer Address or Phone" %>:<br>
         <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone %>
       </div>
     
       <div class="field">
-        <%= label_tag :trip_ticket_filters_pick_up_location, "Pickup Address" %>:
+        <%= label_tag :trip_ticket_filters_pick_up_location, "Pickup Address" %>:<br>
         <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location %>
       </div>
     
       <div class="field">
-        <%= label_tag :trip_ticket_filters_drop_off_location, "Dropoff Address" %>:
+        <%= label_tag :trip_ticket_filters_drop_off_location, "Dropoff Address" %>:<br>
         <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location %>
+      </div>
+    
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_originating_provider, "Originating Provider" %>:<br>
+        <%= select_tag 'trip_ticket_filters[originating_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :originating_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_originating_provider} %>
+      </div>
+    
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_claiming_provider, "Claiming Provider" %>:<br>
+        <%= select_tag 'trip_ticket_filters[claiming_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :claiming_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_claiming_provider} %>
       </div>
     
       <%= submit_tag 'Search', :name => '' %><br>
