@@ -110,7 +110,7 @@ class TripTicket < ActiveRecord::Base
       sql, values = [], []
       [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
         sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value
+        values.push "%#{value}%", value, value, value, value, value, value
       end
       where(sql.join(' OR '), *values)
     end
@@ -123,7 +123,7 @@ class TripTicket < ActiveRecord::Base
       sql, values = [], []
       ['customer_address.address_1', 'customer_address.address_2'].each do |field|
         sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value
+        values.push "%#{value}%", value, value, value, value, value, value
       end
       sql << "LOWER(customer_primary_phone) LIKE ?"
       sql << "LOWER(customer_emergency_phone) LIKE ?"
@@ -140,7 +140,7 @@ class TripTicket < ActiveRecord::Base
       sql, values = [], []
       ['pick_up_location.address_1', 'pick_up_location.address_2'].each do |field|
         sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value
+        values.push "%#{value}%", value, value, value, value, value, value
       end
 
       joins(join).where([sql.join(' OR '), *values])
@@ -154,7 +154,7 @@ class TripTicket < ActiveRecord::Base
       sql, values = [], []
       ['drop_off_location.address_1', 'drop_off_location.address_2'].each do |field|
         sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value
+        values.push "%#{value}%", value, value, value, value, value, value
       end
 
       joins(join).where([sql.join(' OR '), *values])
@@ -163,11 +163,12 @@ class TripTicket < ActiveRecord::Base
     private
   
     def fuzzy_string_search(field, value)
-      "(LOWER(%s) LIKE ? OR
+      "(LOWER(%s) LIKE ? OR (
+        (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
         dmetaphone(%s) = dmetaphone(?) OR 
         dmetaphone(%s) = dmetaphone_alt(?) OR
         dmetaphone_alt(%s) = dmetaphone(?) OR 
-        dmetaphone_alt(%s) = dmetaphone_alt(?))" % [field, field, field, field, field]
+        dmetaphone_alt(%s) = dmetaphone_alt(?))))" % [field, field, field, field, field]
     end
   end
 end

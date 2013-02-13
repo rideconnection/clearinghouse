@@ -69,6 +69,16 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   describe "filter methods" do
+    it "prevents fuzzy string comparisons from matching blank values" do
+      u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '555')
+      u2 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '')
+    
+      results = TripTicket.filter_by_customer_name('555')
+    
+      assert_includes results, u1
+      refute_includes results, u2
+    end
+
     it "has a filter_by_customer_name method that matches on a customer's first, middle, and last name" do
       u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
       u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob')
