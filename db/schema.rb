@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130212222413) do
+ActiveRecord::Schema.define(:version => 20130213212610) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -106,7 +106,6 @@ ActiveRecord::Schema.define(:version => 20130212222413) do
   end
 
   add_index "provider_relationships", ["cooperating_provider_id"], :name => "index_provider_relationships_on_cooperating_provider_id"
-  add_index "provider_relationships", ["requesting_provider_id", "cooperating_provider_id"], :name => "index_provider_relationships_on_requesting_provider_id_and_coo", :unique => true
   add_index "provider_relationships", ["requesting_provider_id"], :name => "index_provider_relationships_on_requesting_provider_id"
 
   create_table "providers", :force => true do |t|
