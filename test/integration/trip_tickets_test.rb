@@ -426,6 +426,120 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
       end
     end
+    
+    describe "trip ticket status filter" do
+      before do
+        # unclaimed
+        @t1_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        @t1_2 = FactoryGirl.create(:trip_ticket)
+
+        # one claim, not approved
+        @t2_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2_1)
+        
+        @t2_2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2_2)
+        
+        @t3_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3_1)
+
+        @t3_2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3_2)
+
+        # multiple claims, none approved
+        @t4_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4_1)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4_1)
+
+        @t4_2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4_2)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4_2)
+
+        # multiple claims, one approved
+        @t5_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_1)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5_1)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_1).approve!
+
+        @t5_2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_2)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5_2)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_2).approve!
+
+        # one claim, approved
+        @t6_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6_1).approve!
+
+        @t6_2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6_2).approve!
+      end
+      
+      it "returns trip tickets accessible by the current user that have an approved claim" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "approved", :from => "Claim Status"
+          click_button "Search"
+        end
+        
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t5_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t6_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
+      end
+      
+      it "returns trip tickets accessible by the current user that have claims, but none approved" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "unapproved", :from => "Claim Status"
+          click_button "Search"
+        end        
+        
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t2_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t3_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t4_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
+      end
+      
+      it "returns trip tickets accessible by the current user that have no claims on them" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "unclaimed", :from => "Claim Status"
+          click_button "Search"
+        end
+        
+        assert page.has_link?("",    {:href => trip_ticket_path(@t1_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
+      end
+    end
   end
 
   private

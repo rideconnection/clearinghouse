@@ -45,7 +45,7 @@ class TripClaim < ActiveRecord::Base
   end
   
   def editable?
-    (self.status.blank? || self.status == STATUS[:pending]) && (!self.trip_ticket.present? || !self.trip_ticket.claimed?)
+    (self.status.blank? || self.status == STATUS[:pending]) && (!self.trip_ticket.present? || !self.trip_ticket.approved?)
   end
   
   def can_be_auto_approved?
@@ -55,8 +55,8 @@ class TripClaim < ActiveRecord::Base
   private
   
   def trip_ticket_is_not_claimed
-    if self.trip_ticket && self.trip_ticket.claimed?
-      errors.add(:base, "You cannot create or modify a claim on a trip ticket once it has been claimed")
+    if self.trip_ticket && self.trip_ticket.approved?
+      errors.add(:base, "You cannot create or modify a claim on a trip ticket once it has an approved claim")
     end
   end
 

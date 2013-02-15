@@ -86,18 +86,12 @@ class TripTicket < ActiveRecord::Base
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end
   
-  # TODO - Add a timestamp or other field to enable us to quickly query
-  # whether a ticket has been claimed or not. Currently we have to load all of
-  # the associated trip_claims and iterate over those first. We should be able
-  # able to do something like TripTicket.where('claimed_at IS NULL`) or
-  # similar. This would also require refactoring of some code in the TripClaim
-  # model to match (with the TripTicket field being the authoritative source.)
-  def claimed?
-    self.trip_claims.where(:status => TripClaim::STATUS[:approved]).count > 0
+  def approved?
+    TripTicket.unscoped.joins(:trip_claims).select('1').where('trip_tickets.id = ? AND trip_claims.status = ?', self.id, TripClaim::STATUS[:approved]).count > 0
   end
   
   def claimable_by?(user)
-    !self.claimed? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
+    !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
   
   def includes_claim_from?(provider)
@@ -105,6 +99,21 @@ class TripTicket < ActiveRecord::Base
   end
   
   class << self
+    def approved
+      approved_trip_ticket_ids = select_approved_trip_ticket_ids
+      where(:id => approved_trip_ticket_ids)
+    end
+    
+    def unclaimed
+      unclaimed_trip_ticket_ids = Array(TripTicket.unscoped.select('trip_tickets.id').joins('LEFT OUTER JOIN trip_claims ON trip_claims.trip_ticket_id = trip_tickets.id GROUP BY trip_tickets.id HAVING count(trip_claims.id) = 0').pluck('trip_tickets.id'))
+      where(:id => unclaimed_trip_ticket_ids)
+    end
+    
+    def unapproved
+      unapproved_trip_ticket_ids = Array(TripTicket.unscoped.select('trip_tickets.id').joins('LEFT OUTER JOIN trip_claims ON trip_claims.trip_ticket_id = trip_tickets.id GROUP BY trip_tickets.id HAVING count(trip_claims.id) > 0').pluck('trip_tickets.id')) - select_approved_trip_ticket_ids
+      where(:id => unapproved_trip_ticket_ids)
+    end
+    
     def filter_by_customer_name(customer_name)
       value = customer_name.strip.downcase
       sql, values = [], []
@@ -168,7 +177,22 @@ class TripTicket < ActiveRecord::Base
       joins(:trip_claims).joins('LEFT OUTER JOIN "providers" as "claimants" ON "claimants"."id" = trip_claims.claimant_provider_id').where('claimants.id IN (?)', Array(claiming_providers).map(&:to_i))
     end
   
+    def filter_by_claim_status(status)
+      case status.to_sym
+      when :unclaimed
+        unclaimed
+      when :approved
+        approved
+      when :unapproved
+        unapproved
+      end
+    end
+  
     private
+    
+    def select_approved_trip_ticket_ids
+      Array(TripTicket.unscoped.select('DISTINCT trip_tickets.id').joins(:trip_claims).where('trip_claims.status = ?', TripClaim::STATUS[:approved]).pluck('trip_tickets.id'))
+    end
   
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE ? OR (

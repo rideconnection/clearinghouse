@@ -34,6 +34,11 @@
         <%= select_tag 'trip_ticket_filters[claiming_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :claiming_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_claiming_provider} %>
       </div>
     
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_claim_status, "Claim Status" %>:<br>
+        <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :unapproved, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :include_blank => true, :id => :trip_ticket_filters_claim_status %>
+      </div>
+    
       <%= submit_tag 'Search', :name => '' %><br>
       <%= link_to "Clear All Filters", trip_tickets_path %>
     <% end %>
@@ -74,8 +79,8 @@
       <td>TODO</td>
       <td>TODO</td>
       <td><%= link_to 'Show', trip_ticket %></td>
-      <td><% if can?(:edit, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
-      <td><% if can?(:destroy, trip_ticket) && !trip_ticket.claimed? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
+      <td><% if can?(:edit, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
+      <td><% if can?(:destroy, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
       <td>
         <% if can?(:create, current_user.provider.trip_claims.build(:trip_ticket_id => trip_ticket.id)) && trip_ticket.claimable_by?(current_user) %>
           <%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %>

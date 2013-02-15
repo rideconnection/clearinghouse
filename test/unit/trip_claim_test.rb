@@ -37,7 +37,7 @@ class TripClaimTest < ActiveSupport::TestCase
     c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p, :status => TripClaim::STATUS[:approved])
     c2 = FactoryGirl.build(:trip_claim, :trip_ticket => t, :claimant => p)
     c2.valid?.must_equal false
-    c2.errors[:base].must_include "You cannot create or modify a claim on a trip ticket once it has been claimed"
+    c2.errors[:base].must_include "You cannot create or modify a claim on a trip ticket once it has an approved claim"
   end
   
   it "can only belong to one ticket per provider" do
@@ -65,7 +65,7 @@ class TripClaimTest < ActiveSupport::TestCase
     failed_val = lambda { c2.decline! }
     failed_val.must_raise ActiveRecord::RecordInvalid
     error = failed_val.call rescue $!
-    error.message.must_include "You cannot create or modify a claim on a trip ticket once it has been claimed"
+    error.message.must_include "You cannot create or modify a claim on a trip ticket once it has an approved claim"
   end
   
   it "can be approved" do
@@ -84,7 +84,7 @@ class TripClaimTest < ActiveSupport::TestCase
     failed_val = lambda { c2.approve! }
     failed_val.must_raise ActiveRecord::RecordInvalid
     error = failed_val.call rescue $!
-    error.message.must_include "You cannot create or modify a claim on a trip ticket once it has been claimed"
+    error.message.must_include "You cannot create or modify a claim on a trip ticket once it has an approved claim"
   end
   
   it "sets all other claims to 'declined' when approved" do
@@ -110,7 +110,7 @@ class TripClaimTest < ActiveSupport::TestCase
     tt = FactoryGirl.create(:trip_ticket, :originator => p1)
     tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p2)
     assert_equal false, tc.approved?, "Expected trip claim to not be approved"
-    assert_equal false, tt.claimed?, "Expected trip ticket to not be claimed"
+    assert_equal false, tt.approved?, "Expected trip ticket to not be approved"
   end
   
   it "will be automatically approved if the provider relationship allows" do
@@ -127,13 +127,13 @@ class TripClaimTest < ActiveSupport::TestCase
     tt = FactoryGirl.create(:trip_ticket, :originator => p1)
     tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p2)
     assert_equal true, tc.approved?, "Expected trip claim to be approved"
-    assert_equal true, tt.claimed?, "Expected trip ticket to be claimed"
+    assert_equal true, tt.approved?, "Expected trip ticket to be approved"
 
     # Auto approval flags should not be interchangable
     tt = FactoryGirl.create(:trip_ticket, :originator => p2)
     tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p1)
     assert_equal false, tc.approved?, "Expected trip claim to not be approved"
-    assert_equal false, tt.claimed?, "Expected trip ticket to not be claimed"
+    assert_equal false, tt.approved?, "Expected trip ticket to not be claimed"
 
     # The reverse should work
     r.automatic_requester_approval = true
@@ -143,6 +143,6 @@ class TripClaimTest < ActiveSupport::TestCase
     tt = FactoryGirl.create(:trip_ticket, :originator => p2)
     tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p1)
     assert_equal true, tc.approved?, "Expected trip claim to be approved"
-    assert_equal true, tt.claimed?, "Expected trip ticket to be claimed"
+    assert_equal true, tt.approved?, "Expected trip ticket to be claimed"
   end
 end

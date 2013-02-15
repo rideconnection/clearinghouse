@@ -25,12 +25,14 @@ class TripTicketTest < ActiveSupport::TestCase
     t.num_guests.must_equal 0
   end
   
-  it "knows if it's been claimed" do
-    @trip_ticket.claimed?.must_equal false
+  it "knows if it has an approved claim" do
+    @trip_ticket.approved?.must_equal false
+    
     FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @trip_ticket)
-    @trip_ticket.claimed?.must_equal false
+    @trip_ticket.approved?.must_equal false
+
     FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => @trip_ticket)
-    @trip_ticket.claimed?.must_equal true
+    @trip_ticket.approved?.must_equal true
   end
   
   it "knows if it has a claim from a specific provider" do
@@ -68,6 +70,112 @@ class TripTicketTest < ActiveSupport::TestCase
     end
   end
   
+  describe "scopes" do
+    before do
+      TripTicket.destroy_all
+      
+      # unclaimed
+      @t1 = FactoryGirl.create(:trip_ticket)
+
+      # one claim, not approved
+      @t2 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2)
+      
+      @t3 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3)
+
+      # multiple claims, none approved
+      @t4 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4)
+
+      # multiple claims, one approved
+      @t5 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5).approve!
+
+      # one claim, approved
+      @t6 = FactoryGirl.create(:trip_ticket)
+      FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6).approve!
+    end
+    
+    describe "approved" do
+      it "has an approved scope" do
+        assert_respond_to TripTicket, :approved
+        assert_equal "ActiveRecord::Relation", TripTicket.approved.class.name
+      end
+      
+      it "returns only approved records" do
+        results = TripTicket.approved
+
+        refute_includes results, @t1
+        refute_includes results, @t2
+        refute_includes results, @t3
+        refute_includes results, @t4
+        assert_includes results, @t5
+        assert_includes results, @t6
+      end
+      
+      it "returns an empty result set if no tickets match" do
+        @t5.destroy
+        @t6.destroy
+        
+        assert_equal [], TripTicket.approved
+      end
+    end
+
+    describe "unclaimed" do
+      it "has an unclaimed scope" do
+        assert_respond_to TripTicket, :unclaimed
+        assert_equal "ActiveRecord::Relation", TripTicket.unclaimed.class.name
+      end
+      
+      it "returns only unclaimed records" do
+        results = TripTicket.unclaimed
+
+        assert_includes results, @t1
+        refute_includes results, @t2
+        refute_includes results, @t3
+        refute_includes results, @t4
+        refute_includes results, @t5
+        refute_includes results, @t6
+      end
+      
+      it "returns an empty result set if no tickets match" do
+        @t1.destroy
+        
+        assert_equal [], TripTicket.unclaimed
+      end
+    end
+
+    describe "unapproved" do
+      it "has an unapproved scope" do
+        assert_respond_to TripTicket, :unapproved
+        assert_equal "ActiveRecord::Relation", TripTicket.unapproved.class.name
+      end
+      
+      it "returns only claimed but unapproved records" do
+        results = TripTicket.unapproved
+
+        refute_includes results, @t1
+        assert_includes results, @t2
+        assert_includes results, @t3
+        assert_includes results, @t4
+        refute_includes results, @t5
+        refute_includes results, @t6
+      end
+      
+      it "returns an empty result set if no tickets match" do
+        @t2.destroy
+        @t3.destroy
+        @t4.destroy
+        
+        assert_equal [], TripTicket.unapproved
+      end
+    end
+  end
+
   describe "filter methods" do
     it "prevents fuzzy string comparisons from matching blank values" do
       u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '555')
@@ -173,6 +281,77 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_includes results, t1
       assert_includes results, t2
       refute_includes results, t3
+    end
+    
+    describe "filter_by_claim_status" do
+      before do
+        # unclaimed
+        @t1 = FactoryGirl.create(:trip_ticket)
+
+        # one claim, not approved
+        @t2 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2)
+        
+        @t3 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3)
+
+        # multiple claims, none approved
+        @t4 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4)
+
+        # multiple claims, one approved
+        @t5 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5).approve!
+
+        # one claim, approved
+        @t6 = FactoryGirl.create(:trip_ticket)
+        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6).approve!
+      end
+      
+      it "has a filter_by_claim_status method" do
+        assert_respond_to TripTicket, :filter_by_claim_status
+      end
+      
+      it "matches trip tickets that have no claims on them" do
+        results = TripTicket.filter_by_claim_status(:unclaimed)
+    
+        assert_includes results, @t1
+        refute_includes results, @t2
+        refute_includes results, @t3
+        refute_includes results, @t4
+        refute_includes results, @t5
+        refute_includes results, @t6
+      end
+      
+      it "matches trip tickets that have claims, but none approved" do
+        results = TripTicket.filter_by_claim_status(:unapproved)
+
+        refute_includes results, @t1
+        assert_includes results, @t2
+        assert_includes results, @t3
+        assert_includes results, @t4
+        refute_includes results, @t5
+        refute_includes results, @t6
+      end
+      
+      it "matches trip tickets that have an approved claim" do
+        results = TripTicket.filter_by_claim_status(:approved)
+
+        refute_includes results, @t1
+        refute_includes results, @t2
+        refute_includes results, @t3
+        refute_includes results, @t4
+        assert_includes results, @t5
+        assert_includes results, @t6
+      end
+
+      it "it returns nil with an invalid filter type" do
+        assert_nil TripTicket.filter_by_claim_status("")
+        assert_nil TripTicket.filter_by_claim_status(:foo)
+      end      
     end
   end
 end
