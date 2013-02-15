@@ -40,9 +40,27 @@
       </div>
     
       <div class="field">
+        <%= label_tag :trip_ticket_filters_scheduling_priority, "Scheduling Priority" %>:<br>
+        <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :include_blank => true, :id => :trip_ticket_filters_scheduling_priority %>
+      </div>
+    
+      <div class="field">
         <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required" %>:<br>
         <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99 %>
         to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99 %>
+      </div>
+    
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_trip_time_start_hour, "Trip Time" %>:<br>
+        <%= 
+          select_hour params[:trip_ticket_filters][:trip_time][:start][:hour], :field_name => 'hour', :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start_hour, :ampm => true, :include_blank => true
+        %>:<%= 
+          select_minute params[:trip_ticket_filters][:trip_time][:start][:minute], :field_name => 'minute', :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start_minute, :minute_step => 15, :include_blank => true
+        %> to <%= 
+          select_hour params[:trip_ticket_filters][:trip_time][:end][:hour], :field_name => 'hour', :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end_hour, :ampm => true, :include_blank => true
+        %>:<%= 
+          select_minute params[:trip_ticket_filters][:trip_time][:end][:minute], :field_name => 'minute', :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end_minute, :minute_step => 15, :include_blank => true
+        %>
       </div>
     
       <%= submit_tag 'Search', :name => '' %><br>

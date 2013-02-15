@@ -386,5 +386,44 @@ class TripTicketTest < ActiveSupport::TestCase
       refute_includes results, t7
       assert_includes results, t8
     end
+
+    it "has a filter_by_scheduling_priority method that matches on the the tickets scheduling priority" do
+      t1 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'dropoff')
+      t2 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'pickup')
+    
+      results = TripTicket.filter_by_scheduling_priority('pickup')
+      
+      refute_includes results, t1
+      assert_includes results, t2
+    
+      results = TripTicket.filter_by_scheduling_priority('dropoff')
+    
+      assert_includes results, t1
+      refute_includes results, t2
+    end
+
+    it "has a filter_by_trip_time method that matches on the the pickup OR drop-off times" do
+      t1 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('12:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+      t2 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('12:00'))
+      t3 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+    
+      results = TripTicket.filter_by_trip_time({:start => '', :end => '05:00'})
+      
+      refute_includes results, t1
+      refute_includes results, t2
+      refute_includes results, t3
+    
+      results = TripTicket.filter_by_trip_time({:start => '11:30', :end => '14:00'})
+    
+      assert_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+    
+      results = TripTicket.filter_by_trip_time({:start => '12:00', :end => '00:00'})
+    
+      assert_includes results, t1
+      assert_includes results, t2
+      assert_includes results, t3
+    end
   end
 end

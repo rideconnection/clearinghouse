@@ -193,6 +193,18 @@ class TripTicket < ActiveRecord::Base
       where('(num_attendants + customer_seats_required + num_guests) BETWEEN ? AND ?', range[0], range[1])
     end
   
+    def filter_by_scheduling_priority(scheduling_priority)
+      where(:scheduling_priority => scheduling_priority)
+    end
+
+    def filter_by_trip_time(value_hash)
+      range = [
+        begin; Time.parse(value_hash[:start]).strftime("%H:%M:00"); rescue; "00:00:00"; end,
+        begin; Time.parse(value_hash[:end]).strftime("%H:%M:00"); rescue; "00:00:00"; end
+      ].sort
+      where('(requested_pickup_time BETWEEN ? AND ?) OR (requested_drop_off_time BETWEEN ? AND ?)', range[0], range[1], range[0], range[1])
+    end
+  
     private
     
     def select_approved_trip_ticket_ids

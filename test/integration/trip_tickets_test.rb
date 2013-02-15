@@ -594,6 +594,92 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
       end      
     end
+
+    describe "scheduling priority filter" do
+      setup do
+        @t1 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'dropoff', :originator => @provider)
+        @t2 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'pickup',  :originator => @provider)
+        @t3 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'dropoff')
+        @t4 = FactoryGirl.create(:trip_ticket, :scheduling_priority => 'pickup')
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching scheduling priority" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "Drop-off", :from => 'Scheduling Priority'
+          click_button "Search"
+        end
+
+        assert page.has_link?("",    {:href => trip_ticket_path(@t1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+      
+        within('#trip_ticket_filters') do
+          select "Pickup", :from => 'Scheduling Priority'
+          click_button "Search"
+        end
+
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+      end
+    end
+
+    describe "trip time filter" do
+      setup do
+        @t1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :requested_pickup_time => Time.zone.parse('12:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+        @t2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('12:00'))
+        @t3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+        @t4 = FactoryGirl.create(:trip_ticket,                           :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('12:00'))
+      end
+    
+      it "returns trip tickets accessible by the current user with a requested_pickup_time or requested_drop_off_time between the selected times" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          select "", :from => 'trip_ticket_filters_trip_time_start_hour'
+          select "", :from => 'trip_ticket_filters_trip_time_start_minute'
+          select "05 AM", :from => 'trip_ticket_filters_trip_time_end_hour'
+          select "00", :from => 'trip_ticket_filters_trip_time_end_minute'
+          click_button "Search"
+        end
+
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+        
+        within('#trip_ticket_filters') do
+          select "11 AM", :from => 'trip_ticket_filters_trip_time_start_hour'
+          select "30", :from => 'trip_ticket_filters_trip_time_start_minute'
+          select "02 PM", :from => 'trip_ticket_filters_trip_time_end_hour'
+          select "00", :from => 'trip_ticket_filters_trip_time_end_minute'
+          click_button "Search"
+        end
+
+        assert page.has_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+        
+        
+        within('#trip_ticket_filters') do
+          select "12 PM", :from => 'trip_ticket_filters_trip_time_start_hour'
+          select "00", :from => 'trip_ticket_filters_trip_time_start_minute'
+          select "", :from => 'trip_ticket_filters_trip_time_end_hour'
+          select "", :from => 'trip_ticket_filters_trip_time_end_minute'
+          click_button "Search"
+        end
+
+        assert page.has_link?("", {:href => trip_ticket_path(@t1)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t2)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
+      end
+    end
   end
 
   private
