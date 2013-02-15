@@ -353,5 +353,38 @@ class TripTicketTest < ActiveSupport::TestCase
         assert_nil TripTicket.filter_by_claim_status(:foo)
       end      
     end
+
+    it "has a filter_by_seats_required method that matches on the combined number of seats required" do
+      t1 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 0)
+      t2 = FactoryGirl.create(:trip_ticket, :num_attendants => 2, :customer_seats_required => 2, :num_guests => 2)
+      t3 = FactoryGirl.create(:trip_ticket, :num_attendants => 6, :customer_seats_required => 2, :num_guests => 2)
+      t4 = FactoryGirl.create(:trip_ticket, :num_attendants => 6, :customer_seats_required => 0, :num_guests => 0)
+      t5 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 6, :num_guests => 0)
+      t6 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 6)
+      t7 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 8)
+      t8 = FactoryGirl.create(:trip_ticket, :num_attendants => 1, :customer_seats_required => 1, :num_guests => 1)
+    
+      results = TripTicket.filter_by_seats_required({:min => 3, :max => 6})
+    
+      refute_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+      assert_includes results, t4
+      assert_includes results, t5
+      assert_includes results, t6
+      refute_includes results, t7
+      assert_includes results, t8
+    
+      results = TripTicket.filter_by_seats_required({:min => 3, :max => 0})
+    
+      assert_includes results, t1
+      refute_includes results, t2
+      refute_includes results, t3
+      refute_includes results, t4
+      refute_includes results, t5
+      refute_includes results, t6
+      refute_includes results, t7
+      assert_includes results, t8
+    end
   end
 end

@@ -187,6 +187,11 @@ class TripTicket < ActiveRecord::Base
         unapproved
       end
     end
+    
+    def filter_by_seats_required(value_hash)
+      range = [value_hash.try(:[], :min).to_i, value_hash.try(:[], :max).to_i].sort
+      where('(num_attendants + customer_seats_required + num_guests) BETWEEN ? AND ?', range[0], range[1])
+    end
   
     private
     
