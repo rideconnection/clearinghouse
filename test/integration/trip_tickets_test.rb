@@ -540,6 +540,60 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
       end
     end
+    
+    describe "trip ticket seats required filter" do
+      before do
+        @t01 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 0, :originator => @provider)
+        @t02 = FactoryGirl.create(:trip_ticket, :num_attendants => 2, :customer_seats_required => 2, :num_guests => 2, :originator => @provider)
+        @t03 = FactoryGirl.create(:trip_ticket, :num_attendants => 6, :customer_seats_required => 2, :num_guests => 2, :originator => @provider)
+        @t04 = FactoryGirl.create(:trip_ticket, :num_attendants => 6, :customer_seats_required => 0, :num_guests => 0, :originator => @provider)
+        @t05 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 6, :num_guests => 0, :originator => @provider)
+        @t06 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 6, :originator => @provider)
+        @t07 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 8, :originator => @provider)
+        @t08 = FactoryGirl.create(:trip_ticket, :num_attendants => 1, :customer_seats_required => 1, :num_guests => 1, :originator => @provider)
+
+        @t09 = FactoryGirl.create(:trip_ticket, :num_attendants => 2, :customer_seats_required => 2, :num_guests => 2)
+        @t10 = FactoryGirl.create(:trip_ticket, :num_attendants => 6, :customer_seats_required => 0, :num_guests => 0)
+      end
+      
+      it "returns trip tickets accessible by the current user that have no claims on them" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_seats_required_min", :with => "3"
+          fill_in "trip_ticket_filters_seats_required_max", :with => "6"
+          click_button "Search"
+        end
+        
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t05)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t06)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
+
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_seats_required_min", :with => "3"
+          fill_in "trip_ticket_filters_seats_required_max", :with => "0"
+          click_button "Search"
+        end
+        
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t06)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
+      end      
+    end
   end
 
   private

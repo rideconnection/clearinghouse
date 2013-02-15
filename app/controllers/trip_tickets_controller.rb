@@ -4,9 +4,11 @@ class TripTicketsController < ApplicationController
 
   # GET /trip_tickets
   # GET /trip_tickets.json
-  def index    
+  def index
     params[:trip_ticket_filters].try(:each) do |filter,value|
-      if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
+      if filter.to_s == "seats_required" 
+        @trip_tickets = @trip_tickets.filter_by_seats_required(value) unless value.try(:[], "min").blank? && value.try(:[], "max").blank?
+      elsif !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
         @trip_tickets = @trip_tickets.send("filter_by_#{filter.to_s}", value)
       end
     end
