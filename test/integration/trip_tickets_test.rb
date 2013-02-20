@@ -474,7 +474,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6_2).approve!
       end
       
-      it "returns trip tickets accessible by the current user that have an approved claim" do
+      it "returns trip tickets accessible by the current user which have approved claims" do
         visit "/trip_tickets"
       
         within('#trip_ticket_filters') do
@@ -496,11 +496,11 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
       end
       
-      it "returns trip tickets accessible by the current user that have claims, but none approved" do
+      it "returns trip tickets accessible by the current user which have pending claims" do
         visit "/trip_tickets"
       
         within('#trip_ticket_filters') do
-          select "unapproved", :from => "Claim Status"
+          select "pending", :from => "Claim Status"
           click_button "Search"
         end        
         
@@ -508,7 +508,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t2_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t3_1)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t4_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
@@ -518,7 +518,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
       end
       
-      it "returns trip tickets accessible by the current user that have no claims on them" do
+      it "returns trip tickets accessible by the current user which have no claims on them or which have only declined claims" do
         visit "/trip_tickets"
       
         within('#trip_ticket_filters') do
@@ -530,7 +530,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t2_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t3_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4_1)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})

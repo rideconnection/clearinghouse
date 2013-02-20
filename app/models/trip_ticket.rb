@@ -87,7 +87,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def approved?
-    TripTicket.unscoped.joins(:trip_claims).select('1').where('trip_tickets.id = ? AND trip_claims.status = ?', self.id, TripClaim::STATUS[:approved]).count > 0
+    TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, TripClaim::STATUS[:approved]).count > 0
   end
   
   def claimable_by?(user)
@@ -99,21 +99,6 @@ class TripTicket < ActiveRecord::Base
   end
   
   class << self
-    def approved
-      approved_trip_ticket_ids = select_approved_trip_ticket_ids
-      where(:id => approved_trip_ticket_ids)
-    end
-    
-    def unclaimed
-      unclaimed_trip_ticket_ids = Array(TripTicket.unscoped.select('trip_tickets.id').joins('LEFT OUTER JOIN trip_claims ON trip_claims.trip_ticket_id = trip_tickets.id GROUP BY trip_tickets.id HAVING count(trip_claims.id) = 0').pluck('trip_tickets.id'))
-      where(:id => unclaimed_trip_ticket_ids)
-    end
-    
-    def unapproved
-      unapproved_trip_ticket_ids = Array(TripTicket.unscoped.select('trip_tickets.id').joins('LEFT OUTER JOIN trip_claims ON trip_claims.trip_ticket_id = trip_tickets.id GROUP BY trip_tickets.id HAVING count(trip_claims.id) > 0').pluck('trip_tickets.id')) - select_approved_trip_ticket_ids
-      where(:id => unapproved_trip_ticket_ids)
-    end
-    
     def filter_by_customer_name(customer_name)
       value = customer_name.strip.downcase
       sql, values = [], []
@@ -174,23 +159,26 @@ class TripTicket < ActiveRecord::Base
     end
   
     def filter_by_claiming_provider(claiming_providers)
-      joins(:trip_claims).joins('LEFT OUTER JOIN "providers" as "claimants" ON "claimants"."id" = trip_claims.claimant_provider_id').where('claimants.id IN (?)', Array(claiming_providers).map(&:to_i))
+      joins(:trip_claims).joins('LEFT OUTER JOIN "providers" as "claimants" ON "claimants"."id" = "trip_claims"."claimant_provider_id"').where('"claimants"."id" IN (?)', Array(claiming_providers).map(&:to_i))
     end
   
     def filter_by_claim_status(status)
       case status.to_sym
       when :unclaimed
-        unclaimed
+        # Tickets which have no claims on them or which have only declined claims
+        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', TripClaim::STATUS[:declined]).pluck('"trip_tickets"."id"')))
       when :approved
-        approved
-      when :unapproved
-        unapproved
+        # Tickets which have approved claims
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:approved]).pluck(:trip_ticket_id)))
+      when :pending
+        # Tickets which have pending claims
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:pending]).pluck(:trip_ticket_id)))
       end
     end
     
     def filter_by_seats_required(value_hash)
       range = [value_hash.try(:[], :min).to_i, value_hash.try(:[], :max).to_i].sort
-      where('(num_attendants + customer_seats_required + num_guests) BETWEEN ? AND ?', range[0], range[1])
+      where('("num_attendants" + "customer_seats_required" + "num_guests") BETWEEN ? AND ?', range[0], range[1])
     end
   
     def filter_by_scheduling_priority(scheduling_priority)
@@ -202,15 +190,11 @@ class TripTicket < ActiveRecord::Base
         begin; Time.parse(value_hash[:start]).strftime("%H:%M:00"); rescue; "00:00:00"; end,
         begin; Time.parse(value_hash[:end]).strftime("%H:%M:00"); rescue; "00:00:00"; end
       ].sort
-      where('(requested_pickup_time BETWEEN ? AND ?) OR (requested_drop_off_time BETWEEN ? AND ?)', range[0], range[1], range[0], range[1])
+      where('("requested_pickup_time" BETWEEN ? AND ?) OR ("requested_drop_off_time" BETWEEN ? AND ?)', range[0], range[1], range[0], range[1])
     end
   
     private
     
-    def select_approved_trip_ticket_ids
-      Array(TripTicket.unscoped.select('DISTINCT trip_tickets.id').joins(:trip_claims).where('trip_claims.status = ?', TripClaim::STATUS[:approved]).pluck('trip_tickets.id'))
-    end
-  
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE ? OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
