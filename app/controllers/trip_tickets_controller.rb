@@ -7,17 +7,21 @@ class TripTicketsController < ApplicationController
   def index
     init_trip_ticket_trip_time_filter_values
     
-    (params[:trip_ticket_filters] ||= Hash.new).each do |filter,value|
+    params[:trip_ticket_filters].try(:each) do |filter, value|
       case filter.to_sym
       when :seats_required
         @trip_tickets = @trip_tickets.filter_by_seats_required(value) unless value.try(:[], "min").blank? && value.try(:[], "max").blank?
       when :trip_time
-        unless value[:start][:hour].blank? && value[:start][:minute].blank? && value[:end][:hour].blank? && value[:end][:minute].blank?
-          start_hour   = value[:start][:hour].present?   ? value[:start][:hour]   : '00'
-          start_minute = value[:start][:minute].present? ? value[:start][:minute] : '00'
-          end_hour     = value[:end][:hour].present?     ? value[:end][:hour]     : '00'
-          end_minute   = value[:end][:minute].present?   ? value[:end][:minute]   : '00'
-          @trip_tickets = @trip_tickets.filter_by_trip_time({:start => "#{start_hour}:#{start_minute}", :end => "#{end_hour}:#{end_minute}"})
+        unless (
+          value[:start].try(:[], :month).blank? && value[:start].try(:[], :day).blank? && value[:start].try(:[], :year).blank? &&
+          value[:start].try(:[], :hour).blank? && value[:start].try(:[], :minute).blank? &&
+          value[:end].try(:[], :month).blank? && value[:end].try(:[], :day).blank? && value[:end].try(:[], :year).blank? &&
+          value[:start].try(:[], :end).blank? && value[:end].try(:[], :minute).blank?
+        )
+          @trip_tickets = @trip_tickets.filter_by_trip_time(
+            parse_trip_ticket_trip_time(value[:start], Time.zone.at(0)),
+            parse_trip_ticket_trip_time(value[:end], Time.zone.at(9_999_999_999))
+          )
         end
       else
         if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
@@ -114,6 +118,10 @@ class TripTicketsController < ApplicationController
     end
   end
   
+  def parse_trip_ticket_trip_time(datetime_array, default)
+    begin; Time.zone.parse("#{datetime_array[:year].to_i}-#{datetime_array[:month].to_i}-#{datetime_array[:day].to_i} #{datetime_array[:hour].to_i}:#{datetime_array[:minute].to_i}"); rescue; default; end
+  end
+  
   def init_trip_ticket_trip_time_filter_values
     params[:trip_ticket_filters]                     ||= Hash.new
     params[:trip_ticket_filters][:trip_time]         ||= Hash.new
@@ -122,25 +130,7 @@ class TripTicketsController < ApplicationController
   end
   
   def massage_trip_ticket_trip_time_filter_values_for_form
-    if params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start).try(:[], :hour).present?
-      params[:trip_ticket_filters][:trip_time][:start][:hour] = params[:trip_ticket_filters][:trip_time][:start][:hour].to_i
-    else
-      params[:trip_ticket_filters][:trip_time][:start][:hour] = nil
-    end
-    if params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start).try(:[], :minute).present?
-      params[:trip_ticket_filters][:trip_time][:start][:minute] = params[:trip_ticket_filters][:trip_time][:start][:minute].to_i
-    else
-      params[:trip_ticket_filters][:trip_time][:start][:minute] = nil
-    end
-    if params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end).try(:[], :hour).present?
-      params[:trip_ticket_filters][:trip_time][:end][:hour] = params[:trip_ticket_filters][:trip_time][:end][:hour].to_i
-    else
-      params[:trip_ticket_filters][:trip_time][:end][:hour] = nil
-    end
-    if params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end).try(:[], :minute).present?
-      params[:trip_ticket_filters][:trip_time][:end][:minute] = params[:trip_ticket_filters][:trip_time][:end][:minute].to_i
-    else
-      params[:trip_ticket_filters][:trip_time][:end][:minute] = nil
-    end
+    params[:trip_ticket_filters][:trip_time][:start] = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:start], nil)
+    params[:trip_ticket_filters][:trip_time][:end]   = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:end], nil)
   end
 end

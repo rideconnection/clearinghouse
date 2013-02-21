@@ -49,18 +49,11 @@
         <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99 %>
         to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99 %>
       </div>
-    
+          
       <div class="field">
         <%= label_tag :trip_ticket_filters_trip_time_start_hour, "Trip Time" %>:<br>
-        <%= 
-          select_hour params[:trip_ticket_filters][:trip_time][:start][:hour], :field_name => 'hour', :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start_hour, :ampm => true, :include_blank => true
-        %>:<%= 
-          select_minute params[:trip_ticket_filters][:trip_time][:start][:minute], :field_name => 'minute', :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start_minute, :minute_step => 15, :include_blank => true
-        %> to <%= 
-          select_hour params[:trip_ticket_filters][:trip_time][:end][:hour], :field_name => 'hour', :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end_hour, :ampm => true, :include_blank => true
-        %>:<%= 
-          select_minute params[:trip_ticket_filters][:trip_time][:end][:minute], :field_name => 'minute', :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end_minute, :minute_step => 15, :include_blank => true
-        %>
+        From: <%= select_datetime params[:trip_ticket_filters][:trip_time][:start], :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %><br>
+        To: <%= select_datetime params[:trip_ticket_filters][:trip_time][:end], :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %>
       </div>
     
       <div class="field">

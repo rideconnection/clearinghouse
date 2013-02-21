@@ -297,27 +297,24 @@ class TripTicketTest < ActiveSupport::TestCase
     end
 
     it "has a filter_by_trip_time method that matches on the the pickup OR drop-off times" do
-      t1 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('12:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
-      t2 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('12:00'))
-      t3 = FactoryGirl.create(:trip_ticket, :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+      t1 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+      t2 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('10:00'), :requested_drop_off_time => Time.zone.parse('23:00'))
+      t3 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-03-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+      t4 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-04-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
     
-      results = TripTicket.filter_by_trip_time({:start => '', :end => '05:00'})
+      results = TripTicket.filter_by_trip_time(Time.zone.parse('2012-01-01 11:00'), Time.zone.parse('2012-01-01 22:00'))
       
-      refute_includes results, t1
+      assert_includes results, t1
       refute_includes results, t2
       refute_includes results, t3
+      refute_includes results, t4
     
-      results = TripTicket.filter_by_trip_time({:start => '11:30', :end => '14:00'})
+      results = TripTicket.filter_by_trip_time(Time.zone.parse('2012-02-01 12:00'), Time.zone.parse('2012-03-01 21:00'))
     
-      assert_includes results, t1
-      assert_includes results, t2
-      refute_includes results, t3
-    
-      results = TripTicket.filter_by_trip_time({:start => '12:00', :end => '00:00'})
-    
-      assert_includes results, t1
-      assert_includes results, t2
+      refute_includes results, t1
+      refute_includes results, t2
       assert_includes results, t3
+      refute_includes results, t4
     end
 
     it "has a filter_by_customer_identifiers method that matches on hstore and string_array fields" do

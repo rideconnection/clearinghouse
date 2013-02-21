@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213212610) do
+ActiveRecord::Schema.define(:version => 20130221031929) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -267,7 +267,7 @@ ActiveRecord::Schema.define(:version => 20130213212610) do
     t.string_array "guest_or_attendant_assistive_devices", :limit => 255
     t.string_array "trip_funders",                         :limit => 255
     t.string       "customer_race"
-    t.datetime     "earliest_pick_up_time"
+    t.time         "earliest_pick_up_time"
     t.datetime     "appointment_time"
   end
 

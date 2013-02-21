@@ -185,12 +185,11 @@ class TripTicket < ActiveRecord::Base
       where(:scheduling_priority => scheduling_priority)
     end
 
-    def filter_by_trip_time(value_hash)
-      range = [
-        begin; Time.parse(value_hash[:start]).strftime("%H:%M:00"); rescue; "00:00:00"; end,
-        begin; Time.parse(value_hash[:end]).strftime("%H:%M:00"); rescue; "00:00:00"; end
-      ].sort
-      where('("requested_pickup_time" BETWEEN ? AND ?) OR ("requested_drop_off_time" BETWEEN ? AND ?)', range[0], range[1], range[0], range[1])
+    def filter_by_trip_time(datetime_start, datetime_end)
+      where([
+        '(TO_TIMESTAMP(CONCAT(CAST(DATE("appointment_time") as character varying(255)), \' \', CAST("requested_pickup_time" as character varying(255))), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)',
+        '(TO_TIMESTAMP(CONCAT(CAST(DATE("appointment_time") as character varying(255)), \' \', CAST("requested_drop_off_time" as character varying(255))), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)'
+      ].join(' OR '), datetime_start, datetime_end, datetime_start, datetime_end)
     end
   
     def filter_by_customer_identifiers(customer_identifier)
