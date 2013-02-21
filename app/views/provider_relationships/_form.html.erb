@@ -15,28 +15,31 @@
     <%= hidden_field_tag "provider_relationship[requesting_provider_id]", @provider.id %>
 
     <div class="field">
-      <%= f.label :cooperating_provider_id %><br />
+      <%= f.label :cooperating_provider_id %>
       <%= f.collection_select(:cooperating_provider_id, Provider.all, :id, :name, :prompt => 'Please select provider') %>
     </div>
   <% end %>
 
   <% unless @provider_relationship.new_record? %>
     <% if can? :edit, @provider_relationship.cooperating_provider %>
-      <div class="field">
-        <%= f.label :automatic_requester_approval, requester_approval_label_for(@provider_relationship) %><br />
+      <div class="field field-with-checkbox">
         <%= f.check_box :automatic_requester_approval %>
+        <%= f.label :automatic_requester_approval, requester_approval_label_for(@provider_relationship) %>
       </div>
     <% end %>
 
     <% if can? :edit, @provider_relationship.requesting_provider %>
-      <div class="field">
-        <%= f.label :automatic_cooperator_approval, cooperator_approval_label_for(@provider_relationship) %><br />
+      <div class="field field-with-checkbox">
         <%= f.check_box :automatic_cooperator_approval %>
+        <%= f.label :automatic_cooperator_approval, cooperator_approval_label_for(@provider_relationship) %>
       </div>
     <% end %>
   <% end %>
 
-  <div class="actions">
-    <%= f.submit "Submit" %>
+  <div class="buttons-holder">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :class => "button" %>
   </div>
 <% end %>

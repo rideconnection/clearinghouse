@@ -1,13 +1,18 @@
-<div id="trip-claim-edit">
-  <h2>Editing trip_claim</h2>
+<header>
+  <h2>Edit Trip Claim</h2>
+</header>
 
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <%= link_to 'Trip Claims', trip_claims_path %><br>
-  <%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_claim %>
+</section>
 
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_claim %>
-  </div>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Trip Claims', trip_claims_path %></li>
+    <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
+  </ul>
+<% end %>

@@ -1,5 +1,5 @@
-<div id="dashboard">
-  <div id="dashboard-column-1" class="dashboard-column">
+<section id="dashboard">
+  <section id="dashboard-column-1" class="dashboard-column">
     <div id="summary">
       <% if current_user.provider.nil? %>
         <h2>Home</h2>
@@ -21,14 +21,14 @@
       <h3>Recent Activity</h3>
       This is a recent activity list.
     </div>
-  </div>
-  <div id="dashboard-column-2" class="dashboard-column">
+  </section>
+  <section id="dashboard-column-2" class="dashboard-column">
     <%= link_to 'Ticket 1' %><br/><br/>
     <%= link_to 'Ticket 2' %><br/><br/>
     <%= link_to 'Ticket 3' %><br/><br/>
     <%= link_to 'Ticket 4' %><br/><br/>
-  </div>
-  <div id="dashboard-column-3" class="dashboard-column">
+  </section>
+  <section id="dashboard-column-3" class="dashboard-column">
     <h3>Detailed item view</h3>
     <div id="trip-ticket-map">Map view</div>
 
@@ -42,5 +42,5 @@
     Seats Required<br/>
     Assistive devices<br/>
     Service animals<br/>
-  </div>
-</div>
+  </section>
+</section>

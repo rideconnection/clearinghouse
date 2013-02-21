@@ -3,8 +3,9 @@
   // For modern browsers
   &:before,
   &:after {
-    content:" ";
+    content:"";
     display:table;
+    line-height: 0;
   }
 
   &:after {

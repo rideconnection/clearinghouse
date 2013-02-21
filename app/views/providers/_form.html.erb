@@ -12,19 +12,22 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :name %><br />
+    <%= f.label :name %>
     <%= f.text_field :name %>
   </div>
   <%= f.fields_for :address do |af| %>
     <%= render 'locations/address_form', :f => af %>
   <% end %>
-  <div>
-    <%= f.label :primary_contact_id %><br />
+  <div class="field">
+    <%= f.label :primary_contact_id %>
     <%= collection_select :provider, :primary_contact_id, User.all, :id, :name,
                           :prompt => true %>
   </div>
-  <br/>
-  <div class="actions">
-    <%= f.submit %>
+
+  <div class="buttons-holder">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :class => "button" %>
   </div>
 <% end %>

@@ -1,8 +1,11 @@
-<div id="users">
-<h1>Listing users</h1>
+<header>
+  <h2>Users</h2>
+</header>
 
 <%= render 'list', :users => @users, :show_provider => true %>
-<br />
 
-<%= link_to 'New User', new_user_path %>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'New User', new_user_path %></li>
+  </ul>
+<% end %>

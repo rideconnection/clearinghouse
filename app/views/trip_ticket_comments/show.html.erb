@@ -1,28 +1,32 @@
-<div id="trip-ticket-comment-show">
-  <p id="notice"><%= notice %></p>
+<header>
+  <h2>Trip Ticket Comment</h2>
+</header>
 
-  <p>
-    <b>Trip ticket:</b>
+<section class="form-holder">
+  <div class="field">
+    <label>Trip ticket:</label>
     <%= @trip_ticket.to_param %>
-  </p>
-
-  <p>
-    <b>User:</b>
-    <%= @trip_ticket_comment.user.display_name %>
-  </p>
-
-  <p>
-    <b>Body:</b><br>
-    <%= @trip_ticket_comment.body %>
-  </p>
-
-
-  <% if can?(:edit, @trip_ticket_comment) %><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, @trip_ticket_comment) %><br><% end %>
-  <%= link_to 'Comments', trip_ticket_trip_ticket_comments_path(@trip_ticket) %><br>
-  <%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
-
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
   </div>
-</div>
+
+  <div class="field">
+    <label>User:</label>
+    <%= @trip_ticket_comment.user.display_name %>
+  </div>
+
+  <div class="field">
+    <label>Body:</label><br>
+    <%= @trip_ticket_comment.body %>
+  </div>
+</section>
+
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
+</section>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <% if can?(:edit, @trip_ticket_comment) %><li><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, @trip_ticket_comment) %></li><% end %>
+    <li><%= link_to 'All Comments for Trip Ticket', trip_ticket_trip_ticket_comments_path(@trip_ticket) %></li>
+    <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
+  </ul>
+<% end %>

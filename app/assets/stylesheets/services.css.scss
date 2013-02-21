@@ -1,17 +1,22 @@
+// Place all the styles related to the Services controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+body[data-controller="services"] {}
+
 div#service_area {
   overflow: auto;
   width: 100%;
-}
-div#map-definition {
-  float: left;
-  width: 400px;
-  height: 300px;
-}
-div#map-help {
-  float: left;
-  margin-left: 1em;
+  div#map-definition {
+    float: left;
+    width: 400px;
+    height: 300px;
+  }
+  div#map-help {
+    float: left;
+    margin-left: 1em;
+  }
 }
 div.map-view {
   width: 350px;
   height: 200px;
-}
+}  

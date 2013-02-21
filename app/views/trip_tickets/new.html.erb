@@ -1,7 +1,13 @@
-<div id="trip-ticket-new">
+<header>
   <h2>New Trip Ticket</h2>
-  
-  <%= render 'form' %>
+</header>
 
-  <%= link_to 'Back', trip_tickets_path %>
-</div>
+<section class="form-holder">
+  <%= render 'form' %>
+</section>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Tickets', trip_tickets_path %></li>
+  </ul>
+<% end %>

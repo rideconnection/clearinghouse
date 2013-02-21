@@ -88,7 +88,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
     click_link "Microsoft" 
     click_link "Set Up New Provider Partnership"
     select "Google", :from => "provider_relationship_cooperating_provider_id"
-    click_button "Submit"
+    click_button "Create Provider relationship"
     assert page.has_content?("successfully created.")
     assert page.has_content?("Pending")
     logout
@@ -105,7 +105,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
     click_link "Edit Partnership"
     assert page.has_content? "Automatically approve Microsoft's claims on this provider's tickets?"
     check "provider_relationship_automatic_requester_approval"
-    click_button "Submit"
+    click_button "Update Provider relationship"
     assert page.has_content?("successfully updated")
     assert page.has_content?("Approved")
   end

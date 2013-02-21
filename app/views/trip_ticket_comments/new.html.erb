@@ -1,8 +1,14 @@
-<div id="trip-ticket-comment-new">
-  <h1>New Comment</h1>
+<header>
+  <h2>New Trip Ticket Comment</h2>
+</header>
 
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <%= link_to 'Comments', trip_ticket_trip_ticket_comments_path(@trip_ticket) %>
-  <%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Comments for Trip Ticket', trip_ticket_trip_ticket_comments_path(@trip_ticket) %></li>
+    <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
+  </ul>
+<% end %>

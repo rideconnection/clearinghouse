@@ -1,36 +1,43 @@
-<div id="trip-ticket-comments">
-  <h2>Comments</h2>
+<header>
+  <h2>Trip Ticket Comments</h2>
+</header>
 
-  <table>
+<table class="table table-striped">
+  <thead>
     <tr>
       <th>Author</th>
       <th>Body</th>
       <th>Date</th>
       <th></th>
     </tr>
+  </thead>
+  <tbody>
+    <% @trip_ticket_comments.try(:each) do |trip_ticket_comment| %>
+      <tr>
+        <td><%= trip_ticket_comment.user.display_name %></td>
+        <td><%= trip_ticket_comment.body.truncate(30) %></td>
+        <td><%= trip_ticket_comment.created_at.to_s(:long) %></td>
+        <td>
+          <ul>
+            <li><%= link_to 'View Comment', [@trip_ticket, trip_ticket_comment] %></li>
+            <% if can?(:edit, trip_ticket_comment) %>
+              <li><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %></li>
+            <% end %>
+            <% if can?(:destroy, trip_ticket_comment) %>
+              <li><%= link_to 'Destroy', [@trip_ticket, trip_ticket_comment], method: :delete, data: { confirm: 'Are you sure?' } %></li>
+            <% end %>
+          </ul>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-  <% @trip_ticket_comments.try(:each) do |trip_ticket_comment| %>
-    <tr>
-      <td><%= trip_ticket_comment.user.display_name %></td>
-      <td><%= trip_ticket_comment.body.truncate(30) %></td>
-      <td><%= trip_ticket_comment.created_at.to_s(:long) %></td>
-      <td>
-        <ul>
-          <li><%= link_to 'View Comment', [@trip_ticket, trip_ticket_comment] %></li>
-          <% if can?(:edit, trip_ticket_comment) %>
-            <li><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %></li>
-          <% end %>
-          <% if can?(:destroy, trip_ticket_comment) %>
-            <li><%= link_to 'Destroy', [@trip_ticket, trip_ticket_comment], method: :delete, data: { confirm: 'Are you sure?' } %></li>
-          <% end %>
-        </ul>
-      </td>
-    </tr>
-  <% end %>
-  </table>
-
-  <br />
-
-  <% if can? :create, @trip_ticket.trip_ticket_comments.build %><%= link_to 'New comment', new_trip_ticket_trip_ticket_comment_path(@trip_ticket) %><br><% end %>
-  <%= link_to 'View Ticket', trip_ticket_path(@trip_ticket) %>
-</div>
+<% content_for :sidebar do %>
+  <section>
+    <ul class="side-nav">
+      <% if can? :create, @trip_ticket.trip_ticket_comments.build %><li><%= link_to 'New comment', new_trip_ticket_trip_ticket_comment_path(@trip_ticket) %></li><% end %>
+      <li><%= link_to 'View Ticket', trip_ticket_path(@trip_ticket) %></li>
+    </ul>
+  </section>
+<% end %>

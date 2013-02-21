@@ -1,5 +1,15 @@
-<h2>Site Administration</h2>
-<ul>
-  <li><%= link_to 'Providers', providers_path %></li>
-  <li><%= link_to 'Users', users_path %></li>
-</ul>
+<header>
+  <h2>Site Administration</h2>
+</header>
+
+<p><strong>TBD</strong></p>
+
+<% content_for :sidebar do %>
+  <section>
+    <ul class="side-nav">
+      <li><%= link_to 'Providers', providers_path %></li>
+      <li><%= link_to 'Users', users_path %></li>
+    </ul>
+  </section>
+<% end %>
+

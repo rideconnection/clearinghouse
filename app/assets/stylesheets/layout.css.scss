@@ -1,0 +1,252 @@
+@import 'utilities';
+
+#main-header {
+  background:#ccc;
+  border-bottom:2px solid #707070;
+
+  .top-section {
+    background:#303030;
+    
+    .holder {
+      margin:0 auto;
+      padding:3px 0;
+      text-align:right;
+      width:1280px;
+    }
+    
+    .btn-logout,.btn-settings,.messages-count {
+      display:inline-block;
+      vertical-align:top;
+    }
+    
+    .nickname {
+      color:#e7e7e7;
+      line-height:14px;
+      text-transform:uppercase;
+    }
+    
+    .messages-count {
+      background:url(image-path("bg-messages-count.png")) no-repeat;
+      color:#303030;
+      font-size:11px;
+      font-weight:600;
+      line-height:13px;
+      margin:-1px 0 0 5px;
+      padding:1px 1px 2px;
+      text-align:center;
+      width:14px;
+    }
+    
+    .btn-settings {
+      background:url(image-path("sprite1.png")) no-repeat 0 -690px;
+      height:15px;
+      margin:0 0 0 17px;
+      overflow:hidden;
+      text-indent:9999px;
+      width:15px;
+    }
+    
+    .btn-logout {
+      background:url(image-path("sprite1.png")) no-repeat 0 -670px;
+      height:14px;
+      margin:0 0 0 14px;
+      overflow:hidden;
+      text-indent:9999px;
+      width:16px;
+    }
+  }
+  
+  .nav-holder {
+    margin:0 auto;
+    padding:16px 0 0 214px;
+    position:relative;
+    width:1066px;
+    
+    a {
+      text-decoration:none;
+    }
+
+    .logo {
+      bottom:-30px;
+      font-size:20px;
+      font-weight:300;
+      left:9px;
+      line-height:22px;
+      margin:0;
+      position:absolute;
+      
+      a {
+        color:#303030;
+      }
+    }
+    
+    #nav {
+      @include clearfix;
+      font-size:15px;
+      line-height:17px;
+      list-style:none;
+      margin:0 0 -2px;
+      padding:0;
+      
+      a {
+        background:url(image-path("bg-nav.png")) repeat-x 0 -100px;
+        color:#fff;
+        display:block;
+        margin:-3px 0 0;
+        padding:9px 32px 6px;
+        
+        &:hover {
+          background-position:0 -250px;
+          color:#000;
+          text-decoration:none;
+        }
+      }
+      
+      li {
+        border-left:1px solid #969595;
+        float:left;
+        
+        &.active a {
+          background-position:0 -250px;
+          color:#000;
+          text-decoration:none;
+        }
+
+        &:first-child {
+          border:0;
+          
+          a {
+            background-position:0 0;
+          }
+
+          a:hover,&.active a {
+            background-position:0 -150px;
+          }
+        }
+        
+        &.last a {
+          background-position:100% -50px;
+        }
+        
+        &.last.active a,&.last a:hover {
+          background-position:100% -200px;
+        }
+      }
+    }
+  }
+}
+
+#main {
+  margin:0 auto;
+  overflow:hidden;
+  width:1280px;
+}
+
+#content {
+  float:right;
+  width:1061px;
+  
+  heading {
+    margin:0 0 12px;
+    position:relative;
+    
+    img {
+      margin:0 0 0 8px;
+      vertical-align:middle;
+    }
+  
+    &.alt-heading {
+      margin-bottom:26px;
+    }
+  }
+  
+  section {
+    border-top:2px solid #707070;
+    margin-top:12px;
+    padding-top:12px;
+    
+    &:first-child {
+      border-top:0 none;
+      margin-top:0;
+      padding-top:0;
+    }
+  }
+  
+  nav {
+    margin:6px 0;
+    padding:6px 0;
+  }
+  
+  .alt-content {
+    background:#ededed;
+  }
+  
+  .scrollable-area-wrapper {
+    .vscrollbar {
+      width:10px;
+    }
+    
+    .vscroll-line {
+      background:#ccc;
+      width:10px;
+    }
+    
+    .vscroll-slider {
+      background:#f7f7f7;
+      border:1px solid #ccc;
+      width:8px;
+    }
+    
+    .vscroll-up,.vscroll-down {
+      display:none;
+    }
+  }
+  
+  .content-holder {
+    background:#fff;
+    float:right;
+    width:655px;
+  }
+  
+  .content-frame {
+    height:643px;
+    padding:8px 33px 20px 24px;
+  }
+}
+
+#sidebar {
+  float:left;
+  padding:46px 0 0 10px;
+  width:200px;
+  
+  .side-nav {
+    font-size:14px;
+    line-height:16px;
+    list-style:none;
+    margin:0 -9px 0 -10px;
+    padding:9px 0 0;
+    width:219px;
+    
+    li {
+      overflow:hidden;
+      padding:0 0 3px;
+      vertical-align:top;
+
+      a {
+        color:#303030;
+        display:block;
+        padding:11px 12px 12px;
+      }
+
+      &.active a,a:hover {
+        background:url(image-path("bg-side-nav.png")) repeat-x;
+        text-decoration:none;
+      }
+    }
+  }
+}
+
+footer {
+  background:#ccc;
+  border-top:2px solid #707070;
+}

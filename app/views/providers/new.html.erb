@@ -1,5 +1,13 @@
-<h1>Create Provider</h1>
+<header>
+  <h2>Create Provider</h2>
+</header>
 
-<%= render 'form' %>
+<section class="form-holder">
+  <%= render 'form' %>
+</section>
 
-<%= link_to 'Back', :back %>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Providers', providers_path %></li>
+  </ul>
+<% end %>

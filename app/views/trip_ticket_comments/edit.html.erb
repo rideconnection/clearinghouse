@@ -1,14 +1,19 @@
-<div id="trip-ticket-comment-edit">
-  <h2>Editing Comment</h2>
+<header>
+  <h2>Edit Trip Ticket Comment</h2>
+</header>
 
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <%= link_to 'Comment Details', [@trip_ticket, @trip_ticket_comment] %><br>
-  <%= link_to 'Comments', trip_ticket_trip_ticket_comments_path(@trip_ticket) %><br>
-  <%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %>
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
+</section>
 
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
-  </div>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Comment Details', [@trip_ticket, @trip_ticket_comment] %></li>
+    <li><%= link_to 'All Comments for Trip Ticket', trip_ticket_trip_ticket_comments_path(@trip_ticket) %></li>
+    <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>      
+  </ul>
+<% end %>

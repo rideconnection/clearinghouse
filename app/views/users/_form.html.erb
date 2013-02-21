@@ -12,37 +12,37 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :email %><br />
+    <%= f.label :email %>
     <%= f.text_field :email %>
   </div>
   <% if @user.new_record? %>
-    <div>
-      <%= f.label "Send activation link instead of setting password" %><br />
+    <div class="field field-with-checkbox">
       <%= check_box_tag "user[must_generate_password]" %>
+      <%= f.label "Send activation link instead of setting password" %>
     </div>
   <% end %>
-  <div>
-    <%= f.label :password %><br />
+  <div class="field">
+    <%= f.label :password %>
     <%= f.password_field :password %>
   </div>
-  <div>
-    <%= f.label :password_confirmation %><br />
+  <div class="field">
+    <%= f.label :password_confirmation %>
     <%= f.password_field :password_confirmation %>
   </div>
   <div class="field">
-    <%= f.label :name %><br />
+    <%= f.label :name %>
     <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%= f.label :title %><br />
+    <%= f.label :title %>
     <%= f.text_field :title %>
   </div>
   <div class="field">
-    <%= f.label :phone %><br />
+    <%= f.label :phone %>
     <%= f.text_field :phone %>
   </div>
   <div class="field">
-    <%= f.label :provider %><br/>
+    <%= f.label :provider %>
     <% if can? :set_provider, User %>
       <%= collection_select :user, :provider_id, Provider.all, :id, :name,
                             :include_blank => true %>
@@ -56,16 +56,20 @@
   </div>
   <% if can? :set_any_role, @user and @user != current_user %>
     <div class="field">
-      <%= f.label :role %><br />
+      <%= f.label :role %>
       <%= collection_select :user, :role_ids, Role.all, :id, :name %>
     </div>
   <% elsif can? :set_provider_role, @user and @user != current_user %>
     <div class="field">
-      <%= f.label :role %><br />
+      <%= f.label :role %>
       <%= collection_select :user, :role_ids, Role.provider_roles, :id, :name %>
     </div>
   <% end %>
-  <div class="actions">
-    <%= f.submit %>
+  
+  <div class="buttons-holder field-align">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :class => "button" %>
   </div>
 <% end %>
