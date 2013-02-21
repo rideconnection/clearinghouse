@@ -70,7 +70,7 @@ class Ability
         can [:create, :update, :destroy], TripTicket, :origin_provider_id => user.provider_id
         
         # Provider admins can update, and destroy trip ticket comments associated with trip tickets belonging to their own provider
-        can [:update, :destroy], TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
+        can [:update], TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
       end
       
       if user.has_any_role? [:scheduler, :provider_admin]        
@@ -90,6 +90,9 @@ class Ability
     
     # Users cannot destroy themselves
     cannot :destroy, User, :id => user.id
+    
+    # Nobody can delete trip ticket comments
+    cannot :destroy, TripTicketComment
 
     # If you're trying to check `can? :read_multiple, @my_resources` where 
     # @my_resources is a collection of objects from an ActiveRecord::Relation
