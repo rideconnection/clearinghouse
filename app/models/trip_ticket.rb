@@ -193,6 +193,19 @@ class TripTicket < ActiveRecord::Base
       where('("requested_pickup_time" BETWEEN ? AND ?) OR ("requested_drop_off_time" BETWEEN ? AND ?)', range[0], range[1], range[0], range[1])
     end
   
+    def filter_by_customer_identifiers(customer_identifier)
+      # There's no way to query for specific values in an hstore, only on 
+      # keys. So we convert it to an array and search it along with the rest 
+      # of the array fields. Also, this from the postgres docs: 
+      #   Tip: Arrays are not sets; searching for specific array elements can 
+      #   be a sign of database misdesign. Consider using a separate table
+      #   with a row for each item that would be an array element. This will 
+      #   be easier to search, and is likely to scale better for a large
+      #   number of elements.
+      array_concat = TripTicket::ARRAY_FIELD_NAMES.collect{|f| "ARRAY_CAT(\"#{f}\", " }.join('') + "CAST(%% \"customer_identifiers\" AS character varying[])" + (')' * TripTicket::ARRAY_FIELD_NAMES.size)
+      where("? = ANY(#{array_concat})", customer_identifier)
+    end
+  
     private
     
     def fuzzy_string_search(field, value)

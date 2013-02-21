@@ -680,6 +680,93 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
       end
     end
+
+    describe "customer identifiers filter" do
+      setup do
+        @t01 = FactoryGirl.create(:trip_ticket, :customer_identifiers                 => {'a' => 'b', 'c' => 'd'}, :originator => @provider)
+        @t02 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['a', 'b'], :originator => @provider)
+        @t03 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['b', 'c'])
+        @t04 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['c', 'a'], :originator => @provider)
+        @t05 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['a', 'b'])
+        @t06 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['b', 'c'], :originator => @provider)
+        @t07 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['c', 'a'])
+        @t08 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['a', 'b'], :originator => @provider)
+        @t09 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['b', 'c'])
+        @t10 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['c', 'a'], :originator => @provider)
+        @t11 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['a', 'b'])
+        @t12 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['b', 'c'], :originator => @provider)
+        @t13 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['c', 'a'])
+        @t14 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['a', 'b'], :originator => @provider)
+        @t15 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['b', 'c'])
+      end
+    
+      it "returns trip tickets accessible by the current user with a matching scheduling priority" do
+        visit "/trip_tickets"
+      
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_customer_identifiers", :with => "a"
+          click_button "Search"
+        end
+        
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t06)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t10)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t12)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t14)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
+      
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_customer_identifiers", :with => "b"
+          click_button "Search"
+        end
+
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t06)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t12)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t14)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
+      
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_customer_identifiers", :with => "d"
+          click_button "Search"
+        end
+
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t06)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t08)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t12)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t14)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
+      end
+    end
   end
 
   private
