@@ -474,13 +474,13 @@ class AbilityTest < ActiveSupport::TestCase
         assert @provider_admin.cannot?(:update, @trip_claim_6_1)
       end
     
-      it "can destroy trip claims belonging to their own provider" do
-        assert @provider_admin.can?(:destroy, @trip_claim_4_1)
+      it "can rescind trip claims belonging to their own provider" do
+        assert @provider_admin.can?(:rescind, @trip_claim_4_1)
     
-        assert @provider_admin.cannot?(:destroy, @trip_claim_1_1)
-        assert @provider_admin.cannot?(:destroy, @trip_claim_2_1)
-        assert @provider_admin.cannot?(:destroy, @trip_claim_4_2)
-        assert @provider_admin.cannot?(:destroy, @trip_claim_6_1)
+        assert @provider_admin.cannot?(:rescind, @trip_claim_1_1)
+        assert @provider_admin.cannot?(:rescind, @trip_claim_2_1)
+        assert @provider_admin.cannot?(:rescind, @trip_claim_4_2)
+        assert @provider_admin.cannot?(:rescind, @trip_claim_6_1)
       end
     
       it "can approve trip claims associated with trip tickets that belong to their own provider, but not trip claims belonging to their own provider" do
@@ -848,13 +848,13 @@ class AbilityTest < ActiveSupport::TestCase
         assert @scheduler.cannot?(:update, @trip_claim_6_1)
       end
     
-      it "can destroy trip claims belonging to their own provider" do
-        assert @scheduler.can?(:destroy, @trip_claim_4_1)
+      it "can rescind trip claims belonging to their own provider" do
+        assert @scheduler.can?(:rescind, @trip_claim_4_1)
     
-        assert @scheduler.cannot?(:destroy, @trip_claim_1_1)
-        assert @scheduler.cannot?(:destroy, @trip_claim_2_1)
-        assert @scheduler.cannot?(:destroy, @trip_claim_4_2)
-        assert @scheduler.cannot?(:destroy, @trip_claim_6_1)
+        assert @scheduler.cannot?(:rescind, @trip_claim_1_1)
+        assert @scheduler.cannot?(:rescind, @trip_claim_2_1)
+        assert @scheduler.cannot?(:rescind, @trip_claim_4_2)
+        assert @scheduler.cannot?(:rescind, @trip_claim_6_1)
       end
     
       it "cannot approve trip claims regardless of their provider" do
@@ -904,10 +904,10 @@ class AbilityTest < ActiveSupport::TestCase
         assert @scheduler.cannot?(:update, @trip_ticket_comment_5_1)
       end
     
-      it "cannot destroy trip claims regardless of their provider" do    
-        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_1_1)
-        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_3_1)
-        assert @scheduler.cannot?(:destroy, @trip_ticket_comment_5_1)
+      it "cannot rescind trip claims regardless of their provider" do    
+        assert @scheduler.cannot?(:rescind, @trip_ticket_comment_1_1)
+        assert @scheduler.cannot?(:rescind, @trip_ticket_comment_3_1)
+        assert @scheduler.cannot?(:rescind, @trip_ticket_comment_5_1)
       end
     end
     

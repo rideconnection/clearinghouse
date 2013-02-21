@@ -77,8 +77,8 @@ class Ability
         # Schedulers and provider admins can create trip claims belonging to their own provider, on trip tickets belonging to providers they have an approved relationship with, but not their own provider's trip tickets
         can :create, TripClaim, :claimant_provider_id => user.provider_id, :trip_ticket => { :origin_provider_id => ProviderRelationship.partner_ids_for_provider(user.provider) }
 
-        # Schedulers and provider admins can update or destroy (TODO: add rescind) trip claims belonging to their own provider
-        can [:update, :destroy], TripClaim, :claimant_provider_id => user.provider_id
+        # Schedulers and provider admins can update or rescind trip claims belonging to their own provider
+        can [:update, :rescind], TripClaim, :claimant_provider_id => user.provider_id
         
         # Schedulers and provider admins can create trip ticket comments associated with trip tickets belonging to their own provider
         can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
