@@ -187,8 +187,8 @@ class TripTicket < ActiveRecord::Base
 
     def filter_by_trip_time(datetime_start, datetime_end)
       where([
-        '(TO_TIMESTAMP(CONCAT(CAST(DATE("appointment_time") as character varying(255)), \' \', CAST("requested_pickup_time" as character varying(255))), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)',
-        '(TO_TIMESTAMP(CONCAT(CAST(DATE("appointment_time") as character varying(255)), \' \', CAST("requested_drop_off_time" as character varying(255))), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)'
+        '(TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_pickup_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)',
+        '(TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_drop_off_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)'
       ].join(' OR '), datetime_start, datetime_end, datetime_start, datetime_end)
     end
   
