@@ -3,9 +3,10 @@ class TripClaim < ActiveRecord::Base
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
   
   STATUS = {
-    :pending => 0,
-    :approved => 1,
-    :declined => -1
+    :pending    => 0,
+    :approved   => 1,
+    :declined   => -1,
+    :rescinded  => -2
   }
 
   attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
@@ -41,6 +42,11 @@ class TripClaim < ActiveRecord::Base
   
   def decline!
     self.status = STATUS[:declined]
+    save!
+  end
+  
+  def rescind!
+    self.status = STATUS[:rescinded]
     save!
   end
   

@@ -8,13 +8,13 @@
     <li><%= link_to 'Trip Claims', trip_claims_path %></li>
     <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
     <% if !@trip_ticket.approved? %>
-      <% if can?(:destroy, @trip_claim) && !@trip_ticket.approved? %>
-        <li><%= link_to 'Rescind', trip_ticket_trip_claim_path(@trip_ticket, @trip_claim), method: :delete, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %></li>
+      <% if can?(:rescind, @trip_claim) && @trip_claim.editable? %>
+        <li><%= link_to 'Rescind', rescind_trip_ticket_trip_claim_path(@trip_ticket, @trip_claim), method: :post, data: { confirm: 'Are you sure you want to RESCIND this claim?' } %></li>
       <% end %>
-      <% if can?(:approve, @trip_claim) && !@trip_ticket.approved? %>
+      <% if can?(:approve, @trip_claim) && @trip_claim.editable? %>
         <li><%= link_to 'Approve', approve_trip_ticket_trip_claim_path(@trip_ticket, @trip_claim), method: :post, data: { confirm: 'Are you sure you want to APPROVE this claim?' } %></li>
       <% end %>
-      <% if can?(:decline, @trip_claim) && !@trip_ticket.approved? %>
+      <% if can?(:decline, @trip_claim) && @trip_claim.editable? %>
         <li><%= link_to 'Decline', decline_trip_ticket_trip_claim_path(@trip_ticket, @trip_claim), method: :post, data: { confirm: 'Are you sure you want to DECLINE this claim?' } %></li>
       <% end %>
     <% end %>

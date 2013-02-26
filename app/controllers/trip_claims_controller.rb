@@ -64,10 +64,8 @@ class TripClaimsController < ApplicationController
     end
   end
 
-  # DELETE /trip_claims/1
-  # DELETE /trip_claims/1.json
-  def destroy
-    @trip_claim.destroy
+  def rescind
+    @trip_claim.rescind!
     
     respond_to do |format|
       format.html { redirect_to @trip_ticket, notice: 'Trip claim was successfully rescinded.' }

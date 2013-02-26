@@ -72,8 +72,18 @@ class TripClaimTest < ActiveSupport::TestCase
     t = FactoryGirl.create(:trip_ticket)
     p = FactoryGirl.create(:provider)
     c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
+
     c1.approve!
-    c1.status.must_equal TripClaim::STATUS[:approved]        
+    c1.status.must_equal TripClaim::STATUS[:approved]
+  end
+  
+  it "can be rescinded" do
+    t = FactoryGirl.create(:trip_ticket)
+    p = FactoryGirl.create(:provider)
+    c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
+
+    c1.rescind!
+    c1.status.must_equal TripClaim::STATUS[:rescinded]
   end
   
   it "can't be approved if the associated trip ticket already has an approved claim" do

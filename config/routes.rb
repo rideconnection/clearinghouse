@@ -31,6 +31,7 @@ Clearinghouse::Application.routes.draw do
       member do
         post 'approve'
         post 'decline'
+        post 'rescind'
       end
     end
     
