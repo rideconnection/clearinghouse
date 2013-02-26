@@ -201,7 +201,7 @@ class TripTicket < ActiveRecord::Base
       #   with a row for each item that would be an array element. This will 
       #   be easier to search, and is likely to scale better for a large
       #   number of elements.
-      array_concat = TripTicket::ARRAY_FIELD_NAMES.collect{|f| "ARRAY_CAT(\"#{f}\", " }.join('') + "CAST(%% \"customer_identifiers\" AS character varying[])" + (')' * TripTicket::ARRAY_FIELD_NAMES.size)
+      array_concat = TripTicket::ARRAY_FIELD_NAMES.collect{|f| "ARRAY_CAT(\"#{f}\", " }.join('') + "CAST(ARRAY_CAT(avals(\"customer_identifiers\"), akeys(\"customer_identifiers\")) AS character varying[])" + (")" * TripTicket::ARRAY_FIELD_NAMES.size)
       where("? = ANY(#{array_concat})", customer_identifier)
     end
   
