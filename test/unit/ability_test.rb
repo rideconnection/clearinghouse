@@ -201,10 +201,10 @@ class AbilityTest < ActiveSupport::TestCase
         assert @site_admin.can?(:update, @trip_ticket_comment_5_1)
       end
   
-      it "allows :destroy access to all regardless of originating provider or provider relationships" do
-        assert @site_admin.can?(:destroy, @trip_ticket_comment_1_1)
-        assert @site_admin.can?(:destroy, @trip_ticket_comment_3_1)
-        assert @site_admin.can?(:destroy, @trip_ticket_comment_5_1)
+      it "cannot :destroy trip tickets" do
+        assert @site_admin.cannot?(:destroy, @trip_ticket_comment_1_1)
+        assert @site_admin.cannot?(:destroy, @trip_ticket_comment_3_1)
+        assert @site_admin.cannot?(:destroy, @trip_ticket_comment_5_1)
       end
     end
   
@@ -533,9 +533,8 @@ class AbilityTest < ActiveSupport::TestCase
         assert @provider_admin.cannot?(:update, @trip_ticket_comment_5_1)
       end
     
-      it "can destroy trip ticket comments belonging to trip_tickets from their own provider" do
-        assert @provider_admin.can?(:destroy, @trip_ticket_comment_1_1)
-    
+      it "cannot destroy any trip ticket comments" do
+        assert @provider_admin.cannot?(:destroy, @trip_ticket_comment_1_1)
         assert @provider_admin.cannot?(:destroy, @trip_ticket_comment_3_1)
         assert @provider_admin.cannot?(:destroy, @trip_ticket_comment_5_1)
       end

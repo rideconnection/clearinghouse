@@ -51,12 +51,4 @@ class TripTicketCommentsControllerTest < ActionController::TestCase
     put :update, trip_ticket_id: @trip_ticket, id: @trip_ticket_comment, trip_ticket_comment: { body: @trip_ticket_comment.body }
     assert_redirected_to trip_ticket_trip_ticket_comment_path(assigns(:trip_ticket), assigns(:trip_ticket_comment))
   end
-
-  test "should destroy trip_ticket_comment" do
-    assert_difference('TripTicketComment.count', -1) do
-      delete :destroy, trip_ticket_id: @trip_ticket, id: @trip_ticket_comment
-    end
-
-    assert_redirected_to trip_ticket_trip_ticket_comments_path(assigns(:trip_ticket))
-  end
 end
