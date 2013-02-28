@@ -1,40 +1,28 @@
-<div id="trip-ticket-show">
+<header>
   <h2>Trip Ticket</h2>
+</header>
 
-  <p id="notice"><%= notice %></p>
-  
-  <p>
-    <a href="#trip_claims">Claims</a> |
-    <a href="#trip_ticket_comments">Comments</a> |
-    <a href="#audit_trail">Audit Trail</a>
-  </p>
-    
+<section class="form-holder">
   <%= render 'form' %>
-  
-  <br />
-  
-  <%= link_to 'Back', trip_tickets_path %>
-  
-  <hr />
-  <div id="trip_claims">
-    <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability) %>
+</section>
 
-    <% if can?(:create, @trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && @trip_ticket.claimable_by?(current_user) %>
-      <%= link_to "Submit Claim", new_trip_ticket_trip_claim_path(@trip_ticket) %><br />
-    <% end %>    
-  </div>
+<section id="trip_claims">
+  <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability) %>
+</section>
 
-  <hr />
-  <div id="trip_ticket_comments">
-    <%= render 'trip_ticket_comments', :trip_ticket_comments => @trip_ticket.trip_ticket_comments.accessible_by(current_ability) %>
+<section id="trip_ticket_comments">
+  <%= render 'trip_ticket_comments', :trip_ticket_comments => @trip_ticket.trip_ticket_comments.accessible_by(current_ability) %>
+</section>
 
-    <% if can?(:create, @trip_ticket.trip_ticket_comments.build) %>
-      <%= link_to "Add Comments", new_trip_ticket_trip_ticket_comment_path(@trip_ticket) %><br />
-    <% end %>    
-  </div>
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_ticket %>
+</section>
 
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_ticket %>
-  </div>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Tickets', trip_tickets_path %></li>
+    <li><a href="#trip_claims">Jump to Claims</a></li>
+    <li><a href="#trip_ticket_comments">Jump to Comments</a></li>
+    <li><a href="#audit_trail">Jump to Change History</a></li>
+  </ul>
+<% end %>

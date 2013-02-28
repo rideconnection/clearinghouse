@@ -15,21 +15,21 @@
     <legend>Originator</legend>
 
     <div class="field">
-      <%= f.label :origin_provider_id, "Provider" %>:
+      <%= f.label :origin_provider_id, "Provider" %>
       <% if @current_user.has_admin_role? && can?(:edit, @trip_ticket) %>
-        <br /><%= f.collection_select :origin_provider_id, Provider.all, :id, :name, :include_blank => true %>
+        <%= f.collection_select :origin_provider_id, Provider.all, :id, :name, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.originator.name %>
       <% end %>
     </div>
     <% if can? :edit, @trip_ticket %>
       <div class="field">
-        <%= f.label :origin_customer_id, "Customer ID" %>:
-        <br /><%= f.text_field :origin_customer_id %>
+        <%= f.label :origin_customer_id, "Customer ID" %>
+        <%= f.text_field :origin_customer_id %>
       </div>
       <div class="field">
-        <%= f.label :origin_trip_id, "Trip ID" %>:
-        <br /><%= f.text_field :origin_trip_id %>
+        <%= f.label :origin_trip_id, "Trip ID" %>
+        <%= f.text_field :origin_trip_id %>
       </div>
     <% end %>
   </fieldset>
@@ -38,17 +38,17 @@
     <legend>Claimant</legend>
 
     <div class="field">
-      <%= f.label :claimant_provider_id, "Provider" %>:
+      <%= f.label :claimant_provider_id, "Provider" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
+        <%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.claimant.name if @trip_ticket.claimant.present? %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :claimant_trip_id, "Trip ID" %>:
+      <%= f.label :claimant_trip_id, "Trip ID" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :claimant_trip_id, :readonly => true %>
+        <%= f.text_field :claimant_trip_id, :readonly => true %>
       <% else %>
         <%= @trip_ticket.claimant_trip_id %>
       <% end %>
@@ -58,33 +58,33 @@
   <fieldset id="customer" class="">
     <legend>Customer</legend>
     <div class="field">
-      <%= f.label :customer_first_name, "First Name" %>:
+      <%= f.label :customer_first_name, "First Name" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_first_name %>
+        <%= f.text_field :customer_first_name %>
       <% else %>
         <%= @trip_ticket.customer_first_name %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_middle_name, "Middle Name" %>:
+      <%= f.label :customer_middle_name, "Middle Name" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_middle_name %>
+        <%= f.text_field :customer_middle_name %>
       <% else %>
         <%= @trip_ticket.customer_middle_name %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_last_name, "Last Name" %>:
+      <%= f.label :customer_last_name, "Last Name" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_last_name %>
+        <%= f.text_field :customer_last_name %>
       <% else %>
         <%= @trip_ticket.customer_last_name %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_dob, "Date of Birth" %>:
+      <%= f.label :customer_dob, "Date of Birth" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.date_select(:customer_dob,
+        <%= f.date_select(:customer_dob,
                           :order => [:month, :day, :year],
                           :prompt => { :day => 'Select day', :month => 'Select month', :year => 'Select year' },
                           :start_year => Time.now.year - 100,
@@ -102,94 +102,100 @@
       <%= render 'locations/show_fields', :location => @trip_ticket.customer_address %>
     <% end %>
     <div class="field">
-      <%= f.label :customer_primary_phone, "Primary Phone Number" %>:
+      <%= f.label :customer_primary_phone, "Primary Phone Number" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.phone_field :customer_primary_phone %>
+        <%= f.phone_field :customer_primary_phone %>
       <% else %>
         <%= @trip_ticket.customer_primary_phone %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_emergency_phone, "Emergency Phone Number" %>:
+      <%= f.label :customer_emergency_phone, "Emergency Phone Number" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.phone_field :customer_emergency_phone %>
+        <%= f.phone_field :customer_emergency_phone %>
       <% else %>
         <%= @trip_ticket.customer_emergency_phone %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_primary_language, "Primary Language" %>:
+      <%= f.label :customer_primary_language, "Primary Language" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_primary_language %>
+        <%= f.text_field :customer_primary_language %>
       <% else %>
         <%= @trip_ticket.customer_primary_language %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_race, "Race" %>:
+      <%= f.label :customer_race, "Race" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= select_tag "race_selection", options_for_select(TripTicket::RACE_CHOICES), :include_blank => true  %>
-        <br /><%= f.text_field :customer_race, :placeholder => "Other Race" %>
+        <%= f.text_field :customer_race, :placeholder => "Other Race", :list => "customer_race_data" %>
+        <datalist id="customer_race_data">
+          <%= options_for_select(TripTicket::RACE_CHOICES) %>
+        </datalist>
       <% else %>
         <%= @trip_ticket.customer_ethnicity %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_ethnicity, "Ethnicity" %>:
+      <%= f.label :customer_ethnicity, "Ethnicity" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= select_tag "ethnicity_selection", options_for_select(TripTicket::ETHNICITY_CHOICES), :include_blank => true  %>
-        <br /><%= f.text_field :customer_ethnicity, :placeholder => "Other ethnicity" %>
+        <%= f.text_field :customer_ethnicity, :placeholder => "Other ethnicity", :list => "customer_ethnicity_data" %>
+        <datalist id="customer_ethnicity_data">
+          <%= options_for_select(TripTicket::ETHNICITY_CHOICES) %>
+        </datalist>
       <% else %>
         <%= @trip_ticket.customer_ethnicity %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_impairment_description, "Impairment Description" %>:
+      <%= f.label :customer_impairment_description, "Impairment Description" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :customer_impairment_description %>
+        <%= f.text_field :customer_impairment_description %>
       <% else %>
         <%= @trip_ticket.customer_impairment_description %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_information_withheld, "Information Withheld?" %>:
+      <%= f.label :customer_information_withheld, "Information Withheld?" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.select :customer_information_withheld, [["Yes", true], ["No", false]], :include_blank => true %>
+        <%= f.select :customer_information_withheld, [["Yes", true], ["No", false]], :include_blank => true %>
       <% else %>
         <%= @trip_ticket.customer_information_withheld %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_notes %>:
+      <%= f.label :customer_notes %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_area :customer_notes %>
+        <%= f.text_area :customer_notes %>
       <% else %>
         <%= @trip_ticket.customer_notes %>
       <% end %>
     </div>
-    <fieldset id="customer_identifiers" class="">
-      <legend>Customer Identifiers</legend>
+    <div class="field" id="customer_identifiers">
+      <label>Customer Identifiers</label>
       <% if can? :edit, @trip_ticket %>
-        <%= f.fields_for :customer_identifiers, @trip_ticket.customer_identifiers do |ci| %>
-          <% # TODO - Refactor this line to use an array constant of fields to ignore. Also, see if this is a bug for Rails or the Hstore gem %>
-          <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace]).try(:each) do |k,v| %>
-            <div class="field hstoreAttribute">
-              <%= text_field_tag k, k, :class => 'hstoreAttributeName' %>
-              <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue' %>
-              <a href="#" class='removeHstoreAttribute'>X</a>
-            </div>
-          <% end %>
+        <div class="field-array" style="display:inline-block">
+          <%= f.fields_for :customer_identifiers, @trip_ticket.customer_identifiers do |ci| %>
+            <% # TODO - Refactor this line to use an array constant of fields to ignore. Also, see if this is a bug for Rails or the Hstore gem %>
+            <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace]).try(:each) do |k,v| %>
+              <div class="field hstoreAttribute">
+                <%= text_field_tag k, k, :class => 'hstoreAttributeName', :size => 30 %>
+                <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue', :size => 30 %>
+                <a href="#" class='removeHstoreAttribute'>X</a>
+              </div>
+            <% end %>
           
-          <% 
-            customer_identifier_fields = '<div class="field hstoreAttribute">' + 
-                                         text_field_tag('', '', :name => '', :id => '', :placeholder => 'New Attribute name', :value => '', :class => "hstoreAttributeName") + ' ' +
-                                         text_field_tag('', '', :name => '', :id => '', :placeholder => 'value', :value => '', :class => 'hstoreAttributeValue') + 
-                                         '<a href="#" class="removeHstoreAttribute">X</a></div>'
-          %>
+            <% 
+              customer_identifier_fields = '<div class="field hstoreAttribute">' + 
+                                           text_field_tag('', '', :name => '', :id => '', :placeholder => 'New Attribute name', :value => '', :class => 'hstoreAttributeName', :size => 30) + ' ' +
+                                           text_field_tag('', '', :name => '', :id => '', :placeholder => 'value', :value => '', :class => 'hstoreAttributeValue', :size => 30) + 
+                                           '<a href="#" class="removeHstoreAttribute">X</a></div>'
+            %>
 
-          <%= raw(customer_identifier_fields) %>
+            <%= raw(customer_identifier_fields) %>
 
-          <a href="#" id="add_customer_identifier">Add Customer Identifier</a>
+            <div><a href="#" id="add_customer_identifier">Add Customer Identifier</a></div>
+          </div>
 
           <script type='text/javascript'>
             $(document).ready(function() {
@@ -210,7 +216,8 @@
 
               $('#add_customer_identifier').on('click', function(event){
                 event.preventDefault();
-                $(this).before('<%= j raw(customer_identifier_fields) %>');
+                $(this).parent().before('<%= j raw(customer_identifier_fields) %>');
+                $('#customer_identifiers .hstoreAttributeName:last').focus();
                 blankify_customer_identifiers();
               });
 
@@ -234,34 +241,36 @@
           <% end %>
         </ul>
       <% end %>
-    </fieldset>
+    </div>
     
     <% 
       field_indexes = {}
       TripTicket::ARRAY_FIELDS.each do |field_sym, legend| 
     %>
-      <fieldset id="<%= field_sym.to_s %>" class="">
-        <legend><%= legend.pluralize %></legend>
+      <div class="field" id="<%= field_sym.to_s %>">
+        <label><%= legend.pluralize %></label>
         <% if can? :edit, @trip_ticket %>
-          <% field_indexes[field_sym] = 0 %>
-          <% @trip_ticket.send(field_sym).try(:each_with_index) do |v,index| %>
-            <div class="field pgStringArray">
-              <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue" %>
-              <a href="#" class='removePgStringArray'>X</a>
-            </div>
-            <% field_indexes[field_sym] += 1 %>
-          <% end %>
+          <div class="field-array" style="display:inline-block">
+            <% field_indexes[field_sym] = 0 %>
+            <% @trip_ticket.send(field_sym).try(:each_with_index) do |v,index| %>
+              <div class="field pgStringArray">
+                <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue", :size => 30 %>
+                <a href="#" class='removePgStringArray'>X</a>
+              </div>
+              <% field_indexes[field_sym] += 1 %>
+            <% end %>
       
-          <%
-            field_html = '<div class="field pgStringArray">' + 
-                         text_field_tag("trip_ticket[#{field_sym.to_s}][]", '', :id => "trip_ticket_#{field_sym.to_s}_?", :placeholder => "New #{legend}", :class => "pgStringArrayValue") + ' ' +
-                         '<a href="#" class="removePgStringArray">X</a></div>'
-          %>
+            <%
+              field_html = '<div class="field pgStringArray">' + 
+                           text_field_tag("trip_ticket[#{field_sym.to_s}][]", '', :id => "trip_ticket_#{field_sym.to_s}_?", :placeholder => "New #{legend}", :class => "pgStringArrayValue", :size => 30) + ' ' +
+                           '<a href="#" class="removePgStringArray">X</a></div>'
+            %>
 
-          <%= raw(field_html.gsub('?', field_indexes[field_sym].to_s)) %>
+            <%= raw(field_html.gsub('?', field_indexes[field_sym].to_s)) %>
 
-          <a href="#" id="add_<%= field_sym.to_s %>">Add <%= legend %></a>
-
+            <div><a href="#" id="add_<%= field_sym.to_s %>">Add <%= legend %></a></div>
+          </div>
+          
           <script type='text/javascript'>
             window.field_indexes_<%= field_sym.to_s %> = <%= field_indexes[field_sym] %>
             $(document).ready(function() {
@@ -274,7 +283,8 @@
               $('#add_<%= field_sym.to_s %>').on('click', function(event){
                 event.preventDefault();
                 window.field_indexes_<%= field_sym.to_s %> += 1;
-                $(this).before('<%= j raw(field_html) %>'.replace('?', window.field_indexes_<%= field_sym.to_s %>));
+                $(this).parent().before('<%= j raw(field_html) %>'.replace('?', window.field_indexes_<%= field_sym.to_s %>));
+                $('#trip_ticket_<%= field_sym.to_s %>_?'.replace('?', window.field_indexes_<%= field_sym.to_s %>)).focus();
                 blankify_<%= field_sym.to_s %>();
               });
 
@@ -297,7 +307,7 @@
             <% end %>
           </ul>
         <% end %>
-      </fieldset>
+      </div>
     <% end %>
   </fieldset>
 
@@ -327,33 +337,33 @@
     <legend>Trip Information</legend>
 
     <div class="field">
-      <%= f.label :appointment_time %>:
+      <%= f.label :appointment_time %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.datetime_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <%= f.datetime_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.appointment_time %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :requested_pickup_time %>:
+      <%= f.label :requested_pickup_time %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.time_select :requested_pickup_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <%= f.time_select :requested_pickup_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.requested_pickup_time %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :requested_drop_off_time %>:
+      <%= f.label :requested_drop_off_time %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.time_select :requested_drop_off_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <%= f.time_select :requested_drop_off_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.requested_drop_off_time %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :earliest_pick_up_time %>:
+      <%= f.label :earliest_pick_up_time %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.time_select :earliest_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+        <%= f.time_select :earliest_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.earliest_pick_up_time %>
       <% end %>
@@ -361,7 +371,7 @@
     <div class="field">
       <%= f.label :allowed_time_variance %> (in minutes):
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.select :allowed_time_variance, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
+        <%= f.select :allowed_time_variance, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.allowed_time_variance %>
       <% end %>
@@ -369,7 +379,7 @@
     <div class="field">
       <%= f.label :customer_boarding_time, "Boarding time required" %> (in minutes):
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.number_field :customer_boarding_time, :min => 0, :max => 15 %>
+        <%= f.number_field :customer_boarding_time, :min => 0, :max => 15 %>
       <% else %>
         <%= @trip_ticket.customer_boarding_time %>
       <% end %>
@@ -377,55 +387,55 @@
     <div class="field">
       <%= f.label :customer_deboarding_time, "Deboarding time required" %> (in minutes):
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.number_field :customer_deboarding_time, :min => 0, :max => 15 %>
+        <%= f.number_field :customer_deboarding_time, :min => 0, :max => 15 %>
       <% else %>
         <%= @trip_ticket.customer_deboarding_time %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_seats_required, "Seats Required" %>:
+      <%= f.label :customer_seats_required, "Seats Required" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.number_field :customer_seats_required, :min => 0 %>
+        <%= f.number_field :customer_seats_required, :min => 0 %>
       <% else %>
         <%= @trip_ticket.customer_seats_required %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :num_attendants, "Number of Attendants" %>:
+      <%= f.label :num_attendants, "Number of Attendants" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.number_field :num_attendants, :min => 0 %>
+        <%= f.number_field :num_attendants, :min => 0 %>
       <% else %>
         <%= @trip_ticket.num_attendants %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :num_guests, "Number of Guests" %>:
+      <%= f.label :num_guests, "Number of Guests" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.number_field :num_guests, :min => 0 %>
+        <%= f.number_field :num_guests, :min => 0 %>
       <% else %>
         <%= @trip_ticket.num_guests %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :scheduling_priority %>:
+      <%= f.label :scheduling_priority %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.select :scheduling_priority, TripTicket::SCHEDULING_PRIORITY.invert, :include_blank => true %>
+        <%= f.select :scheduling_priority, TripTicket::SCHEDULING_PRIORITY.invert, :include_blank => true %>
       <% else %>
         <%= @trip_ticket.scheduling_priority %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :trip_purpose_description, "Trip Purpose" %>:
+      <%= f.label :trip_purpose_description, "Trip Purpose" %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_field :trip_purpose_description %>
+        <%= f.text_field :trip_purpose_description %>
       <% else %>
         <%= @trip_ticket.trip_purpose_description %>
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :trip_notes %>:
+      <%= f.label :trip_notes %>
       <% if can? :edit, @trip_ticket %>
-        <br /><%= f.text_area :trip_notes %>
+        <%= f.text_area :trip_notes %>
       <% else %>
         <%= @trip_ticket.trip_notes %>
       <% end %>
@@ -436,18 +446,21 @@
     <legend>Info</legend>
 
     <div class="field">
-      <%= f.label :created_at %>:
+      <%= f.label :created_at, "Created" %>
       <%= @trip_ticket.created_at %>
     </div>
     <div class="field">
-      <%= f.label :updated_at %>:
+      <%= f.label :updated_at, "Updated" %>
       <%= @trip_ticket.updated_at %>
     </div>
   </fieldset>
 
   <% if can? :edit, @trip_ticket %>
-    <div class="actions">
-      <%= f.submit %>
+    <div class="buttons-holder field-align">
+      <%= link_to (@trip_ticket.persisted? ? @trip_ticket : trip_tickets_path), :class => "button button-cancel" do %>
+        <span>Cancel</span>
+      <% end %>
+      <%= f.submit :class => "button" %>
     </div>
   <% end %>
 <% end %>

@@ -1,72 +1,9 @@
-<div id="trip-tickets">
+<header>
   <h2>Trip Tickets</h2>
-  
-  <fieldset id="trip_ticket_filters">
-    <label>Filters</label>
-    <%= form_tag trip_tickets_path, :method => :get do %>
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_customer_name, "Customer Name" %>:<br>
-        <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_customer_address_or_phone, "Customer Address or Phone" %>:<br>
-        <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_pick_up_location, "Pickup Address" %>:<br>
-        <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_drop_off_location, "Dropoff Address" %>:<br>
-        <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_originating_provider, "Originating Provider" %>:<br>
-        <%= select_tag 'trip_ticket_filters[originating_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :originating_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_originating_provider} %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_claiming_provider, "Claiming Provider" %>:<br>
-        <%= select_tag 'trip_ticket_filters[claiming_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :claiming_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_claiming_provider} %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_claim_status, "Claim Status" %>:<br>
-        <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :include_blank => true, :id => :trip_ticket_filters_claim_status %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_scheduling_priority, "Scheduling Priority" %>:<br>
-        <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :include_blank => true, :id => :trip_ticket_filters_scheduling_priority %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required" %>:<br>
-        <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99 %>
-        to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99 %>
-      </div>
-          
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_trip_time_start_hour, "Trip Time" %>:<br>
-        From: <%= select_datetime params[:trip_ticket_filters][:trip_time][:start], :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %><br>
-        To: <%= select_datetime params[:trip_ticket_filters][:trip_time][:end], :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %>
-      </div>
-    
-      <div class="field">
-        <%= label_tag :trip_ticket_filters_customer_identifiers, "Customer Identifiers" %>:<br>
-        <%= text_field_tag 'trip_ticket_filters[customer_identifiers]', params[:trip_ticket_filters].try(:[], :customer_identifiers), :id => :trip_ticket_filters_customer_identifiers %>
-      </div>
-    
-      <%= submit_tag 'Search', :name => '' %><br>
-      <%= link_to "Clear All Filters", trip_tickets_path %>
-    <% end %>
-  </fieldset>
+</header>
 
-  <table>
+<table class="table table-striped">
+  <thead>
     <tr>
       <th>Originator</th>
       <th>Status</th>
@@ -85,34 +22,113 @@
       <th></th>
       <th></th>
     </tr>
+  </thead>
+  <tbody>
+    <% @trip_tickets.each do |trip_ticket| %>
+      <tr>
+        <td><%= trip_ticket.originator.name %></td>
+        <td>TODO</td>
+        <td><%= trip_ticket.customer_full_name %></td>
+        <td><%= trip_ticket.customer_mobility_impairments.try(:join, ', ') %></td>
+        <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
+        <td><%= address_and_city trip_ticket.pick_up_location %></td>
+        <td><%= address_and_city trip_ticket.drop_off_location %></td>
+        <td><%= display_appointment_time trip_ticket %></td>
+        <td><%= trip_ticket.num_attendants.to_i %></td>
+        <td><%= trip_ticket.num_guests.to_i %></td>
+        <td>TODO</td>
+        <td>TODO</td>
+        <td><%= link_to 'Show', trip_ticket %></td>
+        <td><% if can?(:edit, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
+        <td><% if can?(:destroy, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
+        <td>
+          <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
+            <%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-  <% @trip_tickets.each do |trip_ticket| %>
-    <tr>
-      <td><%= trip_ticket.originator.name %></td>
-      <td>TODO</td>
-      <td><%= trip_ticket.customer_full_name %></td>
-      <td><%= trip_ticket.customer_mobility_impairments.try(:join, ', ') %></td>
-      <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
-      <td><%= address_and_city trip_ticket.pick_up_location %></td>
-      <td><%= address_and_city trip_ticket.drop_off_location %></td>
-      <td><%= display_appointment_time trip_ticket %></td>
-      <td><%= trip_ticket.num_attendants.to_i %></td>
-      <td><%= trip_ticket.num_guests.to_i %></td>
-      <td>TODO</td>
-      <td>TODO</td>
-      <td><%= link_to 'Show', trip_ticket %></td>
-      <td><% if can?(:edit, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
-      <td><% if can?(:destroy, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
-      <td>
-        <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
-          <%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %>
+<% content_for :sidebar do %>
+  <section>
+    <ul class="side-nav">
+      <% if can? :create, TripTicket %><li><%= link_to 'New Trip ticket', new_trip_ticket_path %></li><% end %>
+    </ul>
+  </section>
+  
+  <section id="trip_ticket_filters">
+    <header>
+      <h2>Ticket Filters</h2>
+    </header>
+
+    <%= form_tag trip_tickets_path, :method => :get, :html => { :class => "form-filter" } do %>
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_customer_name, "Customer Name" %><br>
+        <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_customer_address_or_phone, "Customer Address or Phone" %><br>
+        <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_pick_up_location, "Pickup Address" %><br>
+        <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_drop_off_location, "Dropoff Address" %><br>
+        <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_originating_provider, "Originating Provider" %><br>
+        <%= select_tag 'trip_ticket_filters[originating_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :originating_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_originating_provider} %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_claiming_provider, "Claiming Provider" %><br>
+        <%= select_tag 'trip_ticket_filters[claiming_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :claiming_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_claiming_provider} %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_claim_status, "Claim Status" %><br>
+        <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :include_blank => true, :id => :trip_ticket_filters_claim_status %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_scheduling_priority, "Scheduling Priority" %><br>
+        <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :include_blank => true, :id => :trip_ticket_filters_scheduling_priority %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required" %><br>
+        <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99 %>
+        to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99 %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_trip_time_start_hour, "Trip Time" %><br>
+        From: <%= select_datetime params[:trip_ticket_filters][:trip_time][:start], :prefix => 'trip_ticket_filters[trip_time][start]', :id => :trip_ticket_filters_trip_time_start, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %><br>
+        To: <%= select_datetime params[:trip_ticket_filters][:trip_time][:end], :prefix => 'trip_ticket_filters[trip_time][end]', :id => :trip_ticket_filters_trip_time_end, :ampm => true, :minute_step => 15, :include_blank => true, :order => [:month, :day, :year], :start_year => 2012, :end_year => Date.today.year %>
+      </div>
+
+      <div class="field">
+        <%= label_tag :trip_ticket_filters_customer_identifiers, "Customer Identifiers" %><br>
+        <%= text_field_tag 'trip_ticket_filters[customer_identifiers]', params[:trip_ticket_filters].try(:[], :customer_identifiers), :id => :trip_ticket_filters_customer_identifiers %>
+      </div>
+
+      <div class="buttons-holder">
+        <%= link_to trip_tickets_path, :class => "button button-cancel" do %>
+          <span>Clear</span>
         <% end %>
-      </td>
-    </tr>
-  <% end %>
-  </table>
-
-  <br />
-
-  <% if can? :create, TripTicket %><%= link_to 'New Trip ticket', new_trip_ticket_path %><% end %>
-</div>
+        <%= submit_tag 'Search', :name => '', :class => "button" %>
+      </div>
+    
+      <p></p>
+    <% end %>
+  </section>
+<% end %>

@@ -1,7 +1,13 @@
-<div id="trip-claim-new">
-  <h1>New Claim</h1>
+<header>
+  <h2>New Trip Claim</h2>
+</header>
 
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <%= link_to 'Back', trip_claims_path %>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Claims', trip_claims_path %></li>
+  </ul>
+<% end %>

@@ -1,5 +1,14 @@
-<h1>Edit Provider</h1>
+<header>
+  <h2>Edit Provider</h2>
+</header>
 
-<%= render 'form' %>
+<section class="form-holder">
+  <%= render 'form' %>
+</section>
 
-<%= link_to 'Back', :back %>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Providers', providers_path %></li>
+    <li><%= link_to 'View Provider', @provider %></li>
+  </ul>
+<% end %>

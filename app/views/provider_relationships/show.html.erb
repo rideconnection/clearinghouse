@@ -25,10 +25,13 @@
   <%= @provider_relationship.automatic_cooperator_approval %>
 </p>
 
-
-<% if can? :edit, @provider_relationship %><%= link_to 'Edit', edit_provider_relationship_path(@provider_relationship) %> |<% end %>
-<% if @current_user.provider.present? %>
-  <%= link_to 'Back', @current_user.provider %>
-<% else %>
-  <%= link_to 'Back', providers_path %>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <% if can? :edit, @provider_relationship %><li><%= link_to 'Edit Relationship', edit_provider_relationship_path(@provider_relationship) %></li><% end %>
+    <% if @current_user.provider.present? %>
+      <li><%= link_to 'Provider', @current_user.provider %></li>
+    <% else %>
+      <li><%= link_to 'All Providers', providers_path %></li>
+    <% end %>
+  </ul>
 <% end %>

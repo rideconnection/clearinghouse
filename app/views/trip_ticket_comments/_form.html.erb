@@ -23,7 +23,11 @@
     <%= f.label :body %><br />
     <%= f.text_area :body %>
   </div>
-  <div class="actions">
-    <%= f.submit %>
+
+  <div class="buttons-holder field-align">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :class => "button" %>
   </div>
 <% end %>

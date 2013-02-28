@@ -1,10 +1,18 @@
-<h1>Editing <%= @provider_relationship.name %></h1>
+<header>
+  <h2>Edit <%= @provider_relationship.name %></h2>
+</header>
 
-<%= render 'form' %>
+<section class="form-holder">
+  <%= render 'form' %>
+</section>
 
-<%= link_to 'Show', @provider_relationship %> |
-<% if @current_user.provider.present? %>
-  <%= link_to 'Back', @current_user.provider %>
-<% else %>
-  <%= link_to 'Back', providers_path %>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'View Relationship', @provider_relationship %></li>    
+    <% if @current_user.provider.present? %>
+      <li><%= link_to 'Provider', @current_user.provider %></li>
+    <% else %>
+      <li><%= link_to 'All Providers', providers_path %></li>
+    <% end %>
+  </ul>
 <% end %>

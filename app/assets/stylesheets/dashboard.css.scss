@@ -1,56 +1,46 @@
 @import 'utilities';
 
-#dashboard {
-  display: table;
-  margin-top: 1em;
-  @include clearfix;
-}
-.dashboard-column {
-  display: table-cell;
-  padding: 10px;
-}
-#dashboard-column-1 {
-  background-color: #c0c0c0;
-  width: 240px;
-}
-#dashboard-column-2 {
-  background-color: #e0e0e0;
-  width: 210px;
-}
-#dashboard-column-3 {
-  width: 430px;
-}
-#dashboard h2, h3 {
-  margin-top: 0;
-}
-#dashboard h4 {
-  margin-bottom: 0.3em;
-}
+body[data-controller="home"] {
+  &[data-action="dashboard"] {
+    /*
+    #dashboard {
+      display: table;
+      margin-top: 1em;
+      @include clearfix;
+    }
+    .dashboard-column {
+      display: table-cell;
+      padding: 10px;
+    }
+    #dashboard-column-1 {
+      background-color: #c0c0c0;
+      width: 240px;
+    }
+    #dashboard-column-2 {
+      background-color: #e0e0e0;
+      width: 210px;
+    }
+    #dashboard-column-3 {
+      width: 430px;
+    }
+    #dashboard h2, h3 {
+      margin-top: 0;
+    }
+    #dashboard h4 {
+      margin-bottom: 0.3em;
+    }
 
-#filters {
-  margin-top: 20px;
-}
-#filter-nav {
-  @include clearfix;
-}
-#filters h3 {
-  float: left;
-}
-#filters a {
-  float: right;
-}
-#filters select {
-  width: 150px;
-}
+    #activity {
+      margin-top: 20px;
+    }
 
-#activity {
-  margin-top: 20px;
-}
-
-#trip-ticket-map {
-  border: 1px dashed #000000;
-  background-color: #e0e0e0;
-  float: right;
-  width: 220px;
-  height: 160px;
+    #trip-ticket-map {
+      border: 1px dashed #000000;
+      background-color: #e0e0e0;
+      float: right;
+      width: 220px;
+      height: 160px;
+    }
+    */
+  }
 }

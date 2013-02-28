@@ -1,10 +1,17 @@
-<div id="trip-claim-show">
+<header>
+  <h2>Trip Claim</h2>
+</header>
 
-  <p id="notice"><%= notice %></p>
-
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <ul>
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_claim %>
+</section>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
     <li><%= link_to 'Trip Claims', trip_claims_path %></li>
     <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
     <% if !@trip_ticket.approved? %>
@@ -19,9 +26,4 @@
       <% end %>
     <% end %>
   </ul>
-
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_claim %>
-  </div>
-</div>
+<% end %>

@@ -8,6 +8,1088 @@
  * You're free to add application-wide styles to this file and they'll appear at the top of the
  * compiled file, but it's generally better to create a new file per style scope.
  *
+ *= require bootstrap
  *= require_self
  *= require_tree .
+ *= require jquery-ui-1.10.0.custom
+ *= require jcf
  */
+
+/* General Content */
+
+html {
+  min-width:1280px;
+}
+
+body {
+  -ms-text-size-adjust:100%;
+  -webkit-text-size-adjust:100%;
+  background:#dedede url(image-path("bg-body.gif")) repeat-y 50% 0;
+  color:#444;
+  font:12px/14px 'Open Sans', Arial, Helvetica, sans-serif;
+  margin:0;
+  min-width:1280px;
+  
+  &.alt-body {
+    background:#ededed url(image-path("bg-body2.gif")) repeat-y 50% 0;
+  }
+
+  a {
+    color:#444;
+    /* text-decoration:none; */
+
+    &:active {
+      background-color:transparent;
+    }
+
+    &:hover,&:focus {
+      /* text-decoration:underline; */
+    }
+  }
+
+  .image-holder img,.map-holder img {
+    vertical-align:top;
+  }
+}
+
+/* refactor out into specific stylesheets as needed */
+/*
+.content-frame .seats-info,.content-frame .activities-section {
+  @include clearfix;
+}
+
+.actions-list-holder {
+  background:#ededed;
+  overflow:hidden;
+  padding:9px 33px 4px;
+}
+
+.actions-list {
+  float:right;
+  font-weight:600;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.actions-list a {
+  background:url(image-path("sprite1.png")) no-repeat 0 -520px;
+  color:#666;
+  display:block;
+}
+
+.actions-list li:first-child a {
+  background-position:0 -470px;
+}
+
+.actions-list .last a {
+  background-position:100% -570px;
+}
+
+.actions-list a span {
+  background:url(image-path("separator03.gif")) no-repeat 0 1px;
+  display:block;
+  padding:7px 12px 11px 9px;
+}
+
+.actions-list li:first-child a span {
+  background:none;
+}
+
+.tickets-holder {
+  float:left;
+  margin:0 -3px 0 0;
+  width:409px;
+}
+
+.tickets-list {
+  float:left;
+  height:670px;
+  line-height:14px;
+  list-style:none;
+  margin:0;
+  padding:0;
+  width:398px;
+}
+
+.tickets-list li {
+  background:#e7eae7;
+  margin:0 0 4px;
+  min-height:70px;
+  overflow:hidden;
+  padding:6px 16px 4px 8px;
+  position:relative;
+  vertical-align:top;
+}
+
+.tickets-list .check {
+  background:#f1f4f1;
+}
+
+.tickets-list .column {
+  float:left;
+  margin:0 0 0 41px;
+  width:153px;
+}
+
+.tickets-list .column:first-child {
+  margin:0;
+  width:180px;
+}
+
+.tickets-list .title {
+  display:block;
+  font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin:0 0 8px;
+}
+
+.tickets-list .title .count {
+  padding:0 0 0 3px;
+}
+
+.tickets-list .date {
+  display:block;
+  font-style:normal;
+  margin:0 0 10px;
+}
+
+.tickets-list .date span {
+  background:url(image-path("separator02.gif")) no-repeat 0 3px;
+  margin:0 0 0 6px;
+  padding:0 5px 0 6px;
+}
+
+.tickets-list .icons-list,.add-info .icons-list {
+  font-size:0;
+  line-height:0;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.icons-list li {
+  background:none;
+  display:inline;
+  margin:0 10px 0 0;
+  padding:0;
+  vertical-align:middle;
+}
+
+.tickets-list .checked {
+  background:url(image-path("sprite1.png")) no-repeat 0 -625px;
+  bottom:8px;
+  display:none;
+  height:15px;
+  position:absolute;
+  right:6px;
+  width:16px;
+}
+
+.tickets-list .check .checked {
+  display:block;
+}
+
+.tickets-list p {
+  margin:0 0 8px;
+}
+
+.tickets-list .green {
+  background-image:url(image-path("arrow02.png"));
+  background-position:100% 0;
+  background-repeat:no-repeat;
+}
+
+.tickets-list .green2 {
+  background-image:url(image-path("arrow03.png"));
+  background-position:100% 0;
+  background-repeat:no-repeat;
+}
+*/
+
+/*
+.content-frame .seats-info {
+  margin:0 0 9px;
+}
+
+.content-frame .seats-info .column {
+  float:left;
+  margin:0 10px 0 0;
+  width:138px;
+}
+
+.content-frame .seats-info p {
+  margin:0 0 10px;
+}
+
+.seats-info dl {
+  margin:-5px 0 0;
+}
+
+.seats-info dl dt,.seats-info dl dd {
+  display:inline-block;
+  margin:0 0 8px;
+  vertical-align:bottom;
+}
+
+.seats-info dl dt {
+  text-align:right;
+  width:20px;
+}
+
+.seats-info dl dd {
+  padding:0 0 1px 7px;
+  width:105px;
+}
+
+.content-frame .map-holder {
+  margin:0 0 54px;
+}
+
+.content-frame .map-holder .description {
+  line-height:17px;
+  overflow:hidden;
+}
+
+.map-holder .event-section {
+  float:left;
+  padding:4px 10px 0 0;
+  width:141px;
+}
+
+.map-holder .date {
+  display:block;
+  font-style:normal;
+  font-weight:700;
+}
+
+.map-holder .date span {
+  background:url(image-path("separator04.gif")) no-repeat 0 4px;
+  margin:0 0 0 2px;
+  padding:0 0 0 7px;
+}
+
+.map-holder .description p {
+  margin:0;
+  overflow:hidden;
+}
+*/
+
+/*
+.activities-section .events-list {
+  float:left;
+  list-style:none;
+  margin:0;
+  padding:3px 0 0;
+}
+
+.activities-section .events-list li {
+  overflow:hidden;
+  padding:0 0 6px;
+  vertical-align:top;
+}
+
+.activities-section .events-list strong {
+  background:url(image-path("separator05.gif")) no-repeat 100% 4px;
+  font-weight:700;
+  margin:0 3px 0 0;
+  padding:0 7px 0 0;
+}
+
+.activities-section .form-holder {
+  float:right;
+  width:296px;
+}
+
+.description .form-holder {
+  margin:-2px 0 0;
+  overflow:hidden;
+  padding:2px 0 0;
+}
+
+.activities-section .form-holder heading {
+  margin:0 1px 10px 0;
+}
+*/
+
+/*
+#content .activities-section .form-holder h2,#content .description .form-holder h2 {
+  float:left;
+  font-size:14px;
+  line-height:16px;
+}
+
+.activities-section .form-holder .opener,.description .form-holder .opener {
+  background:url(image-path("bg-opener.png")) no-repeat;
+  float:right;
+  margin:-2px 0 0;
+  padding:1px 0 3px 22px;
+}
+
+.form-holder .activity-list {
+  list-style:none;
+  margin:0 0 0 -4px;
+  padding:0;
+}
+
+.form-holder .activity-list li {
+  overflow:hidden;
+  padding:0 0 4px;
+  vertical-align:top;
+}
+
+.form-holder .activity-list span {
+  background:url(image-path("separator02.gif")) no-repeat 100% 2px;
+  display:inline-block;
+  margin:0 3px 0 0;
+  padding:0 7px 0 0;
+  text-align:right;
+  vertical-align:top;
+  width:55px;
+}
+
+.form-comment {
+  padding:1px 0 11px;
+}
+
+.form-comment textarea {
+  background:none;
+  border:1px solid #ccc;
+  margin:0 0 7px;
+  max-height:56px;
+  max-width:292px;
+  min-height:56px;
+  min-width:292px;
+  overflow:auto;
+  padding:0;
+}
+
+.description .form-comment textarea {
+  max-width:281px;
+  min-width:281px;
+}
+
+.form-comment .buttons-holder,.form-submit-ticket .buttons-holder {
+  overflow:hidden;
+  padding:0 1px 0 0;
+  text-align:right;
+}
+
+.form-comment .btn-cancel,.form-submit-ticket .btn-cancel {
+  background:url(image-path("sprite1.png")) no-repeat 100% -376px;
+  color:#fff;
+  display:inline-block;
+  font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding:0 6px 0 0;
+  vertical-align:top;
+}
+
+.form-comment .btn-cancel span,.form-submit-ticket .btn-cancel span {
+  background:url(image-path("sprite1.png")) no-repeat 0 -350px;
+  float:left;
+  padding:4px 4px 6px 9px;
+}
+
+.form-comment input[type=submit],.form-submit-ticket input[type=submit] {
+  background:url(image-path("sprite1.png")) no-repeat 0 -310px;
+  border:0;
+  color:#fff;
+  height:26px;
+  line-height:26px;
+  margin:0 0 0 7px;
+  padding:0 0 2px;
+  width:63px;
+}
+
+.form-search {
+  background:url(image-path("sprite1.png")) no-repeat 0 -160px;
+  margin:0 0 27px;
+  overflow:hidden;
+  width:198px;
+}
+
+.form-search input[type=text] {
+  background:none;
+  border:0;
+  float:left;
+  height:17px;
+  line-height:17px;
+  margin:0;
+  padding:3px 5px;
+  width:170px;
+}
+
+.form-search input[type=submit] {
+  background:url(image-path("sprite1.png")) no-repeat 0 -650px;
+  border:0;
+  float:right;
+  font-size:0;
+  height:13px;
+  line-height:0;
+  margin:5px 4px 0 0;
+  padding:0;
+  width:13px;
+}
+
+.form-filter {
+  margin:0 0 23px;
+}
+
+.form-filter heading {
+  margin:0 0 18px;
+  overflow:hidden;
+  padding:0 2px;
+}
+
+.form-filter h2 {
+  color:#333;
+  float:left;
+  font-size:14px;
+  font-weight:700;
+  line-height:16px;
+  margin:0;
+}
+
+.form-filter .link-manage {
+  color:#0d6826;
+  float:right;
+  margin:-2px 0 0;
+  text-decoration:underline;
+}
+
+.form-filter .link-manage:hover {
+  text-decoration:none;
+}
+
+.form-filter input[type=checkbox] {
+  float:left;
+  height:15px;
+  margin:1px 8px 0 0;
+  padding:0;
+  width:16px;
+}
+*/
+
+/*
+-- JCF --
+
+.chk-area {
+  background:url(image-path("sprite1.png")) no-repeat 0 -610px;
+  float:left;
+  height:15px;
+  margin:1px 8px 0 0;
+  width:16px;
+}
+
+.chk-checked {
+  background-position:0 -625px;
+}
+
+.form-filter .select-holder {
+  overflow:hidden;
+  padding:15px 0 0;
+}
+
+.select-area {
+  background:url(image-path("sprite1.png")) no-repeat 0 -210px;
+  cursor:default;
+  float:left;
+  height:25px;
+  overflow:hidden;
+  position:relative;
+}
+
+.select-area .center {
+  float:left;
+  height:14px;
+  overflow:hidden;
+  padding:4px 10px 0 11px;
+  width:150px;
+}
+
+.select-area .select-opener {
+  background:url(image-path("bg-opener2.png")) no-repeat 50% 50%;
+  height:23px;
+  position:absolute;
+  right:6px;
+  top:0;
+  width:23px;
+}
+
+.select-options {
+  background:#fff;
+  overflow:hidden;
+  position:absolute;
+  z-index:2000;
+}
+
+.select-options .drop-holder {
+  border:1px solid #777;
+  height:1%;
+  overflow:hidden;
+}
+
+.select-options ul li {
+  float:left;
+  width:100%;
+}
+
+.select-options ul a {
+  color:#000;
+  cursor:default;
+  display:block;
+  height:1%;
+  padding:5px 10px;
+  text-decoration:none;
+}
+
+.select-options .item-selected a {
+  background:#007;
+  color:#fff;
+  text-decoration:none;
+}
+*/
+
+/*
+.widget {
+  margin:0 0 10px;
+  padding:0 0 0 2px;
+}
+
+.widget h2 {
+  color:#333;
+  font-size:14px;
+  font-weight:400;
+  line-height:16px;
+  margin:0 0 12px;
+}
+
+.widget ul li {
+  overflow:hidden;
+  padding:0 0 8px;
+  vertical-align:top;
+}
+
+.twocolumns {
+  overflow:hidden;
+}
+
+.twocolumns .add-info {
+  float:left;
+  padding:0 0 0 2px;
+  width:275px;
+}
+
+.twocolumns .add-info h3 {
+  font-size:14px;
+  font-weight:400;
+  line-height:16px;
+  margin:0 0 7px -2px;
+}
+
+.twocolumns .add-info .description {
+  float:none;
+  margin:0 0 -7px;
+  overflow:hidden;
+  padding:0;
+  width:auto;
+}
+
+.add-info .description .column {
+  float:left;
+  margin:-2px 0 0 10px;
+  width:121px;
+}
+
+.add-info .description .column p img {
+  display:inline-block;
+  margin:-4px 0 0 3px;
+  vertical-align:middle;
+}
+
+.add-info .icons-list {
+  padding:0 0 12px;
+}
+
+.add-info .dates-list {
+  line-height:14px;
+  list-style:none;
+  margin:0;
+  padding:0 0 18px;
+}
+
+.dates-list li {
+  overflow:hidden;
+  vertical-align:top;
+}
+
+.dates-list span {
+  background:url(image-path("separator02.gif")) no-repeat 0 3px;
+  padding:0 7px 0 3px;
+}
+
+.dates-list span:first-child {
+  background:none;
+  padding-left:0;
+}
+
+.dates-list .note {
+  background-position:0 1px;
+  font-size:9px;
+}
+
+.add-info address {
+  font-style:normal;
+  margin:0 0 4px;
+}
+
+.add-info .gps-data {
+  display:block;
+  padding:2px 0 16px;
+}
+
+.add-info p {
+  margin:0 0 15px;
+}
+
+.twocolumns .description {
+  float:right;
+  padding:16px 0 0;
+  width:285px;
+}
+
+.description .details-box {
+  padding:0 0 17px;
+}
+
+.description .details-box .opener {
+  background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+  font-size:14px;
+  line-height:16px;
+  padding:0 0 0 18px;
+}
+
+.description .details-box.active .opener {
+  background-position:-1px -86px;
+}
+
+.description .details-box .slide {
+  padding:20px 10px 16px 0;
+}
+
+.details-box .slide dl {
+  line-height:15px;
+  margin:0;
+  overflow:hidden;
+}
+
+.details-box .slide dl dt,.details-box .slide dl dd {
+  display:inline-block;
+  margin:0 0 13px;
+  vertical-align:top;
+}
+
+.details-box .slide dl dt {
+  padding:0 10px 0 0;
+  width:97px;
+}
+
+.details-box .slide dl dd {
+  width:154px;
+}
+
+.form-submit-ticket {
+  padding:9px 0 20px 2px;
+  width:595px;
+}
+
+.form-submit-ticket .ticket-section {
+  overflow:hidden;
+  padding:0 0 43px;
+}
+
+.form-submit-ticket heading {
+  margin:0 0 31px;
+  overflow:hidden;
+  padding:3px 0 0;
+}
+
+.form-submit-ticket heading .column {
+  float:left;
+  padding:0 10px 0 0;
+  width:213px;
+}
+
+#content .form-submit-ticket heading h2 {
+  font-size:14px;
+  font-weight:400;
+  line-height:16px;
+  margin:0 0 8px;
+}
+
+.form-submit-ticket heading .date {
+  display:block;
+  font-style:normal;
+  margin:0 0 9px;
+}
+
+.form-submit-ticket heading .date span {
+  background:url(image-path("separator02.gif")) no-repeat 0 4px;
+  margin:0 0 0 2px;
+  padding:0 0 0 7px;
+}
+
+.form-submit-ticket heading .btn-remove {
+  background:url(image-path("icon08.png")) no-repeat;
+  float:right;
+  margin:-3px 0 0;
+  padding:2px 0 2px 22px;
+}
+
+.form-submit-ticket .row {
+  overflow:hidden;
+  padding:0 0 10px;
+}
+
+.form-submit-ticket .textarea-holder {
+  padding-bottom:33px;
+}
+
+.form-submit-ticket label {
+  float:left;
+  padding:0 10px 0 0;
+  width:90px;
+}
+
+.form-submit-ticket input[type=text] {
+  background:none;
+  border:1px solid #ccc;
+  color:#666;
+  float:left;
+  font:12px/15px 'Open Sans', Arial, Helvetica, sans-serif;
+  height:15px;
+  margin:0;
+  padding:1px 4px 2px;
+  width:135px;
+}
+
+.form-submit-ticket textarea {
+  background:none;
+  border:1px solid #ccc;
+  color:#666;
+  float:left;
+  font:12px/15px 'Open Sans', Arial, Helvetica, sans-serif;
+  margin:0;
+  max-height:56px;
+  max-width:491px;
+  min-height:56px;
+  min-width:491px;
+  padding:0;
+}
+
+.form-submit-ticket .btn-details {
+  background:url(image-path("arrow01.png")) no-repeat 0 1px;
+  float:left;
+  padding:0 0 0 15px;
+}
+
+*/
+
+
+
+
+/*
+.ui-datepicker-trigger,.reports-list .datepicker {
+  background:url(image-path("sprite1.png")) no-repeat 0 -710px;
+  border:none;
+  cursor:pointer;
+  float:left;
+  height:16px;
+  margin:3px 27px 0 0;
+  overflow:hidden;
+  text-indent:-9999px;
+  width:16px;
+}
+
+.btn-print span {
+  background:url(image-path("sprite1.png")) no-repeat 0 -410px;
+  float:left;
+  padding:4px 11px 6px 17px;
+}
+
+.form-update {
+  font-size:14px;
+  line-height:16px;
+  padding:23px 37px;
+  width:544px;
+}
+
+#content .form-update h2 {
+  color:#303030;
+  font-weight:normal;
+  margin:0 0 20px;
+}
+
+.form-update .row {
+  overflow:hidden;
+  padding:0 0 17px;
+}
+
+.form-update label {
+  float:left;
+  padding:4px 10px 0 0;
+  width:288px;
+}
+
+.form-update input[type=text],.form-update input[type=password] {
+  background:#fff;
+  border:1px solid #ccc;
+  color:#666;
+  float:left;
+  font:12px/15px 'Open Sans', Arial, Helvetica, sans-serif;
+  height:15px;
+  margin:0;
+  padding:3px 5px;
+  width:233px;
+}
+
+.form-update .btn-holder {
+  background:url(image-path("sprite1.png")) no-repeat 100% -279px;
+  float:right;
+  margin:21px 0 0;
+  padding:0 6px 0 0;
+}
+
+.form-update .btn-frame {
+  background:url(image-path("sprite1.png")) no-repeat 0 -250px;
+  float:right;
+}
+
+.form-update input[type=submit] {
+  background:none;
+  border:0;
+  color:#fff;
+  float:left;
+  font:600 13px/29px 'Open Sans', Arial, Helvetica, sans-serif;
+  height:29px;
+  margin:0 -6px 0 0;
+  padding:0 0 6px;
+  width:135px;
+}
+
+input[type=checkbox] {
+  float:left;
+  height:15px;
+  margin:1px 8px 0 0;
+  padding:0;
+  width:16px;
+}
+
+.form-filter {
+  margin:0 0 23px;
+}
+
+.form-filter heading {
+  margin:0 0 18px;
+  overflow:hidden;
+  padding:0 2px;
+}
+
+.form-filter h2 {
+  color:#333;
+  float:left;
+  font-size:14px;
+  font-weight:700;
+  line-height:16px;
+  margin:0;
+}
+
+input[type=submit] {
+  background:url(image-path("sprite1.png")) no-repeat 0 -310px;
+  border:0;
+  color:#fff;
+  height:26px;
+  line-height:26px;
+  margin:0 0 0 7px;
+  padding:0 0 2px;
+  width:63px;
+}
+
+.btn-cancel span {
+  background:url(image-path("sprite1.png")) no-repeat 0 -350px;
+  float:left;
+  padding:4px 4px 6px 9px;
+}
+
+.btn-cancel {
+  background:url(image-path("sprite1.png")) no-repeat 100% -376px;
+  color:#fff;
+  display:inline-block;
+  font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding:0 6px 0 0;
+  vertical-align:top;
+}
+
+.buttons-holder {
+  overflow:hidden;
+  padding:0 1px 0 0;
+  text-align:right;
+}
+
+.form-comment textarea {
+  max-width:281px;
+  min-width:281px;
+}
+
+.form-holder .opener {
+  background:url(image-path("bg-opener.png")) no-repeat;
+  float:right;
+  margin:-2px 0 0;
+  padding:1px 0 3px 22px;
+}
+
+.form-holder heading {
+  margin:0 1px 10px 0;
+}
+
+.form-holder {
+  margin:-2px 0 0;
+  overflow:hidden;
+  padding:2px 0 0;
+}
+
+.form-holder {
+  float:right;
+  width:296px;
+}
+
+*/
+
+
+/*
+
+#content .manage-section {
+  padding:22px 34px 20px 36px;
+  
+  heading {
+    margin:0 0 12px;
+    overflow:hidden;
+  }
+  
+  h2 {
+    color:#303030;
+    float:left;
+    font-size:18px;
+    font-weight:normal;
+    line-height:20px;
+    margin:2px 0 0;
+  }  
+}
+
+
+
+.form-manage .user-section {
+  overflow:hidden;
+  padding:0 0 20px;
+}
+
+.form-manage .user-section .column {
+  float:left;
+  padding:2px 114px 0 0;
+  width:251px;
+}
+
+.form-manage .username {
+  float:left;
+  font-size:14px;
+  font-weight:normal;
+  line-height:16px;
+  margin:0 0 16px;
+}
+
+.form-manage .btn-edit {
+  background:url(image-path("sprite1.png")) no-repeat 0 -740px;
+  float:right;
+  height:11px;
+  margin:2px 0 0;
+  overflow:hidden;
+  text-indent:-9999px;
+  width:11px;
+}
+
+.form-manage .email {
+  line-height:16px;
+}
+
+.form-manage .select-area {
+  margin:-2px 0 0;
+}
+
+.manage-section .btn-holder {
+  margin:45px 0 0;
+}
+
+.actions-list li,.form-filter label {
+  float:left;
+}
+
+.tickets-list .active,.tickets-list.small-list .active {
+  background:#fff;
+}
+
+.tickets-list .description,.form-filter .row {
+  overflow:hidden;
+  padding:0 0 8px;
+}
+
+.tickets-list .title img,.tickets-list.small-list .description p img {
+  margin:0 0 0 11px;
+  vertical-align:middle;
+}
+
+.tickets-list address,.map-holder .event-section address,.form-submit-ticket heading address {
+  font-style:normal;
+}
+
+.tickets-list .date img,.icons-list li img {
+  vertical-align:middle;
+}
+
+.form-holder.active .opener,.select-options ul .default {
+  display:none;
+}
+
+.content-frame .map-holder .frame,.add-info .image-holder {
+  margin:0 0 14px;
+}
+
+.form-filter select,.form-manage select {
+  float:left;
+  width:200px;
+}
+
+.select-options ul,.widget ul {
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.add-info .description .column:first-child,.add-info .description .column p {
+  margin:0;
+}
+
+.dates-list .active em,.dates-list .note strong {
+  font-weight:700;
+}
+
+.add-info .customer-list-holder,.form-submit-ticket .buttons-holder {
+  padding:22px 0 0;
+}
+
+.twocolumns .description p,.content-frame .details-box p {
+  margin:0 0 18px;
+}
+
+.form-submit-ticket h2 .count,.tickets-list.small-list .description p .count {
+  padding:0 0 0 4px;
+}
+*/

@@ -1,13 +1,18 @@
-<div id="trip-ticket-edit">
+<header>
   <h2>Edit Trip Ticket</h2>
+</header>
 
+<section class="form-holder">
   <%= render 'form' %>
+</section>
 
-  <%= link_to 'Show', @trip_ticket %> |
-  <%= link_to 'Back', trip_tickets_path %>
+<section id="audit_trail">
+  <%= render 'shared/audit_trail', :record => @trip_ticket %>
+</section>
 
-  <hr />
-  <div id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_ticket %>
-  </div>
-</div>
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Tickets', trip_tickets_path %></li>
+    <li><%= link_to 'View Ticket', @trip_ticket %></li>
+  </ul>
+<% end %>

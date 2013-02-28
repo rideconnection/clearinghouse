@@ -1,4 +1,4 @@
-<div class="service_detail" style="margin-left: 1em">
+<section class="service_detail" style="margin-left: 1em">
   <h4 style="margin-bottom: 0.5em"><%= service.name %></h4>
   <% if can? :edit, service %>
     <%= link_to 'Edit Service',
@@ -9,7 +9,7 @@
     <div id="map-<%= service.id %>" class="map-view"></div>
     <br/>
     <h4>Hours</h4>
-    <table>
+    <table class="table table-striped">
     <% service.operating_hours.each do |h| %>
       <tr>
         <th><%= Date::DAYNAMES[h.day_of_week] %></th>
@@ -47,4 +47,4 @@
       services.create_map_view($("#map-<%= service.id %>")[0], points);
     });
   </script>
-</div>
+</section>

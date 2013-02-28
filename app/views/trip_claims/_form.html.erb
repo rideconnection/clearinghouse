@@ -12,54 +12,54 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :claimant_provider_id, "Provider" %>:
+    <%= f.label :claimant_provider_id, "Provider" %>
     <% if current_user.has_admin_role? %>
-      <br /><%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
+      <%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
     <% else %>
       <%= @trip_claim.claimant.name %>
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :claimant_customer_id, "Customer ID" %>:
+    <%= f.label :claimant_customer_id, "Customer ID" %>
     <% if can? :edit, @trip_claim %>
-      <br /><%= f.text_field :claimant_customer_id, :readonly => true %>
+      <%= f.text_field :claimant_customer_id, :readonly => true %>
     <% else %>
       <%= @trip_claim.claimant_customer_id %>
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :claimant_trip_id, "Trip ID" %>:
+    <%= f.label :claimant_trip_id, "Trip ID" %>
     <% if can? :edit, @trip_claim %>
-      <br /><%= f.text_field :claimant_trip_id, :readonly => true %>
+      <%= f.text_field :claimant_trip_id, :readonly => true %>
     <% else %>
       <%= @trip_claim.claimant_trip_id %>
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :status %>: <%= @trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[@trip_claim.status].to_s.humanize.titlecase %>
+    <%= f.label :status %> <%= @trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[@trip_claim.status].to_s.humanize.titlecase %>
   </div>
   <div class="field">
     <%= f.label :proposed_pickup_time %>
     <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
-      <br /><%= f.datetime_select(:proposed_pickup_time, 
-                                  :order => [:month, :day, :year, :hour, :minute],
-                                  :default => DateTime.current,
-                                  :ampm => true
+      <%= f.datetime_select(:proposed_pickup_time, 
+                            :order => [:month, :day, :year, :hour, :minute],
+                            :default => DateTime.current,
+                            :ampm => true
       ) %>
     <% else %>
       <%= @trip_claim.proposed_pickup_time %>
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :proposed_fare %>:
+    <%= f.label :proposed_fare %>
     <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
-      <br /><%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
+      <%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
     <% else %>
       <%= @trip_claim.proposed_fare %>
     <% end %>
   </div>
   <div class="field">
-    <%= f.label :notes %>:<br />
+    <%= f.label :notes %>
     <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
       <%= f.text_area :notes %>
     <% else %>
@@ -68,8 +68,11 @@
   </div>
 
   <% if can? :edit, @trip_claim %>
-    <div class="actions">
-      <%= f.submit %>
+    <div class="buttons-holder field-align">
+      <%= link_to :back, :class => "button button-cancel" do %>
+        <span>Cancel</span>
+      <% end %>
+      <%= f.submit :class => "button" %>
     </div>
   <% end %>
 <% end %>

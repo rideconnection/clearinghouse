@@ -1,9 +1,18 @@
-<% if @user == current_user %>
-<h2>Edit Profile</h2>
-<% else %>
-<h2>Editing user</h2>
+<header>
+  <% if @user == current_user %>
+  <h2>Edit Profile</h2>
+  <% else %>
+  <h2>Editing <%= @user.display_name %></h2>
+  <% end %>
+</header>
+
+<section class="form-holder">
+  <%= render 'form' %>
+</section>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Users', users_path %></li>
+    <li><%= link_to 'View User', @user %></li>
+  </ul>
 <% end %>
-
-<%= render 'form' %>
-
-<%= link_to 'Back', :back %>
