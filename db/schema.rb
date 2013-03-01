@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130221031929) do
+ActiveRecord::Schema.define(:version => 20130305222602) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -126,15 +126,6 @@ ActiveRecord::Schema.define(:version => 20130221031929) do
   end
 
   add_index "roles", ["name"], :name => "index_roles_on_name"
-
-  create_table "roles_users", :id => false, :force => true do |t|
-    t.integer "role_id"
-    t.integer "user_id"
-  end
-
-  add_index "roles_users", ["role_id", "user_id"], :name => "index_roles_users_on_role_id_and_user_id", :unique => true
-  add_index "roles_users", ["role_id"], :name => "index_roles_users_on_role_id"
-  add_index "roles_users", ["user_id"], :name => "index_roles_users_on_user_id"
 
   create_table "service_requests", :force => true do |t|
     t.integer  "trip_ticket_id"
@@ -298,6 +289,7 @@ ActiveRecord::Schema.define(:version => 20130221031929) do
     t.string   "current_sign_in_ip"
     t.string   "last_sign_in_ip"
     t.boolean  "active",                 :default => true, :null => false
+    t.integer  "role_id"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

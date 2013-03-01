@@ -57,12 +57,12 @@
   <% if can? :set_any_role, @user and @user != current_user %>
     <div class="field">
       <%= f.label :role %>
-      <%= collection_select :user, :role_ids, Role.all, :id, :name %>
+      <%= collection_select :user, :role_id, Role.all, :id, :name %>
     </div>
   <% elsif can? :set_provider_role, @user and @user != current_user %>
     <div class="field">
       <%= f.label :role %>
-      <%= collection_select :user, :role_ids, Role.provider_roles, :id, :name %>
+      <%= collection_select :user, :role_id, Role.provider_roles, :id, :name %>
     </div>
   <% end %>
   
