@@ -503,26 +503,26 @@ class AbilityTest < ActiveSupport::TestCase
     end
     
     describe "trip ticket comments" do
-      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider" do
+      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider or partners" do
         accessible = TripTicketComment.accessible_by(@provider_admin)
         accessible.must_include @trip_ticket_comment_1_1
+        accessible.must_include @trip_ticket_comment_3_1
 
-        accessible.wont_include @trip_ticket_comment_3_1
         accessible.wont_include @trip_ticket_comment_5_1
       end
     
       it "can create trip ticket comments on trip tickets belonging to their own provider" do
         assert @provider_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
+        assert @provider_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
     
         assert @provider_admin.cannot?(:create, TripTicketComment.new)
-        assert @provider_admin.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
         assert @provider_admin.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
       end
     
-      it "can read trip ticket comments belonging to trip_tickets from their own provider" do
+      it "can read trip ticket comments belonging to trip_tickets from their own provider or partners" do
         assert @provider_admin.can?(:read, @trip_ticket_comment_1_1)
-    
-        assert @provider_admin.cannot?(:read, @trip_ticket_comment_3_1)
+        assert @provider_admin.can?(:read, @trip_ticket_comment_3_1)
+
         assert @provider_admin.cannot?(:read, @trip_ticket_comment_5_1)
       end
     
@@ -874,26 +874,26 @@ class AbilityTest < ActiveSupport::TestCase
     end
     
     describe "trip ticket comments" do
-      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider" do
+      it "can use accessible_by to find trip ticket comments belonging to trip tickets from their own provider and partners" do
         accessible = TripTicketComment.accessible_by(@scheduler)
         accessible.must_include @trip_ticket_comment_1_1
+        accessible.must_include @trip_ticket_comment_3_1
 
-        accessible.wont_include @trip_ticket_comment_3_1
         accessible.wont_include @trip_ticket_comment_5_1
       end
     
-      it "can create trip ticket comments on trip tickets belonging to their own provider" do
+      it "can create trip ticket comments on trip tickets belonging to their own provider and partners" do
         assert @scheduler.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
-    
+        assert @scheduler.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
+
         assert @scheduler.cannot?(:create, TripTicketComment.new)
-        assert @scheduler.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
         assert @scheduler.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
       end
     
-      it "can read trip ticket comments belonging to trip_tickets from their own provider" do
+      it "can read trip ticket comments belonging to trip_tickets from their own provider or partners" do
         assert @scheduler.can?(:read, @trip_ticket_comment_1_1)
-    
-        assert @scheduler.cannot?(:read, @trip_ticket_comment_3_1)
+        assert @scheduler.can?(:read, @trip_ticket_comment_3_1)
+
         assert @scheduler.cannot?(:read, @trip_ticket_comment_5_1)
       end
     

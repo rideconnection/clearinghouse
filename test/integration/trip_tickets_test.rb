@@ -40,6 +40,15 @@ class TripTicketsTest < ActionController::IntegrationTest
     assert page.has_content?("Trip ticket was successfully created")
   end
 
+  test "provider admins can create trip ticket comments" do 
+    ticket = FactoryGirl.create(:trip_ticket, 
+      :origin_provider_id => @user.provider.id)
+    visit trip_ticket_path(ticket)
+    click_link "Add Comment"
+    fill_in :trip_ticket_comment_body, :with => "a comment!"
+    click_button "Create Trip ticket comment"
+    assert page.has_content?("Trip ticket comment was successfully created.")
+  end 
  
   TripTicket::ARRAY_FIELD_NAMES.each do |field_sym|
     describe "#{field_sym.to_s} string_array fields" do

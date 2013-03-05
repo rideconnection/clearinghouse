@@ -39,6 +39,11 @@ class User < ActiveRecord::Base
   # Temporary attribute for auto-generated password tokens
   attr_accessor :must_generate_password 
 
+  def partner_provider_ids_for_tickets
+    [self.provider_id] + 
+      ProviderRelationship.partner_ids_for_provider(self.provider)
+  end
+
   def has_role?(role_sym)
     roles.any? { |r| r.name.underscore.to_sym == role_sym }
   end

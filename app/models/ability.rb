@@ -18,7 +18,7 @@ class Ability
       can :manage, :all
     else
       # Users can read their own provider or providers they have an approved relationship with
-      can :read, Provider, :id => [user.provider_id] + ProviderRelationship.partner_ids_for_provider(user.provider)
+      can :read, Provider, :id => user.partner_provider_ids_for_tickets 
       
       # Users can read provider relationships that their own provider belongs to
       can :read, ProviderRelationship, ['cooperating_provider_id = ? OR requesting_provider_id = ?', user.provider_id, user.provider_id] do |pr|
@@ -34,10 +34,10 @@ class Ability
       end
 
       # Users can access a list trip ticket comments associated with trip tickets belonging to their own provider
-      can :read, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
+      can :read, TripTicketComment, :trip_ticket => {:origin_provider_id => user.partner_provider_ids_for_tickets}
 
       # Users can read trip tickets belonging to their own provider or providers they have an approved relationship with
-      can :read, TripTicket, :origin_provider_id => [user.provider_id] + ProviderRelationship.partner_ids_for_provider(user.provider)
+      can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets 
       
       # Users can read and update their own record
       can [:read, :update], User, :id => user.id
@@ -81,7 +81,7 @@ class Ability
         can [:update, :rescind], TripClaim, :claimant_provider_id => user.provider_id
         
         # Schedulers and provider admins can create trip ticket comments associated with trip tickets belonging to their own provider
-        can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
+        can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
       end
     end
 
