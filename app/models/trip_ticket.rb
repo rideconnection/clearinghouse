@@ -119,8 +119,8 @@ class TripTicket < ActiveRecord::Base
         sql << fuzzy_string_search(field, value)
         values.push "%#{value}%", value, value, value, value, value, value
       end
-      sql << "LOWER(customer_primary_phone) LIKE ?"
-      sql << "LOWER(customer_emergency_phone) LIKE ?"
+      sql << "LOWER(customer_primary_phone) LIKE LOWER(?)"
+      sql << "LOWER(customer_emergency_phone) LIKE LOWER(?)"
       values.push "%#{value}%", "%#{value}%"
       
       joins(join).where([sql.join(' OR '), *values])
@@ -201,14 +201,14 @@ class TripTicket < ActiveRecord::Base
       #   with a row for each item that would be an array element. This will 
       #   be easier to search, and is likely to scale better for a large
       #   number of elements.
-      array_concat = TripTicket::ARRAY_FIELD_NAMES.collect{|f| "ARRAY_CAT(\"#{f}\", " }.join('') + "CAST(ARRAY_CAT(avals(\"customer_identifiers\"), akeys(\"customer_identifiers\")) AS character varying[])" + (")" * TripTicket::ARRAY_FIELD_NAMES.size)
-      where("? = ANY(#{array_concat})", customer_identifier)
+      array_concat = (TripTicket::ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
+      where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
   
     private
     
     def fuzzy_string_search(field, value)
-      "(LOWER(%s) LIKE ? OR (
+      "(LOWER(%s) LIKE LOWER(?) OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
         dmetaphone(%s) = dmetaphone(?) OR 
         dmetaphone(%s) = dmetaphone_alt(?) OR
