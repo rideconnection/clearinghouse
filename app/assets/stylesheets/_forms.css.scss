@@ -119,7 +119,7 @@ fieldset {
 }
 
 .buttons-holder {
-  background: url("/assets/sprite1.png") no-repeat 100% -438px;
+  background: url(image-path("sprite1.png")) no-repeat 100% -438px;
   display: inline-block;
   padding:0 6px 0 0;
   overflow:hidden;
@@ -140,7 +140,7 @@ fieldset {
   }
   
   a.button {
-    background: url("/assets/sprite1.png") no-repeat 100% -439px;
+    background: url(image-path("sprite1.png")) no-repeat 100% -439px;
     color:#fff;
     display: inline-block;
     overflow:hidden;
