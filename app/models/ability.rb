@@ -33,8 +33,9 @@ class Ability
         tc.claimant_provider_id == user.provider_id || tc.trip_ticket.origin_provider_id == user.provider_id
       end
 
-      # Users can access a list trip ticket comments associated with trip tickets belonging to their own provider
-      can :read, TripTicketComment, :trip_ticket => {:origin_provider_id => user.partner_provider_ids_for_tickets}
+      # Users can view the list of ticket comments or create a new comment 
+      # associated with trip tickets belonging to their own provider or partners.
+      can [:read, :create], TripTicketComment, :trip_ticket => {:origin_provider_id => user.partner_provider_ids_for_tickets}
 
       # Users can read trip tickets belonging to their own provider or providers they have an approved relationship with
       can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets 
@@ -69,7 +70,7 @@ class Ability
         # Provider admins can create, update, and destroy trip tickets belonging to their own provider
         can [:create, :update, :destroy], TripTicket, :origin_provider_id => user.provider_id
         
-        # Provider admins can update, and destroy trip ticket comments associated with trip tickets belonging to their own provider
+        # Provider admins can update trip ticket comments associated with trip tickets belonging to their own provider
         can [:update], TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
       end
       
@@ -79,9 +80,6 @@ class Ability
 
         # Schedulers and provider admins can update or rescind trip claims belonging to their own provider
         can [:update, :rescind], TripClaim, :claimant_provider_id => user.provider_id
-        
-        # Schedulers and provider admins can create trip ticket comments associated with trip tickets belonging to their own provider
-        can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
       end
     end
 

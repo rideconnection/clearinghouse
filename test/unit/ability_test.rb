@@ -511,7 +511,7 @@ class AbilityTest < ActiveSupport::TestCase
         accessible.wont_include @trip_ticket_comment_5_1
       end
     
-      it "can create trip ticket comments on trip tickets belonging to their own provider" do
+      it "can create trip ticket comments on trip tickets belonging to their own provider or partners" do
         assert @provider_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
         assert @provider_admin.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
     
@@ -1108,11 +1108,21 @@ class AbilityTest < ActiveSupport::TestCase
   end
 
   describe "dispatcher role" do
-    setup do; end
+    setup do
+      @current_user = FactoryGirl.create(:user, :provider => @provider_1)
+      @current_user.roles = [@roles[:dispatcher]]
+      @dispatcher = Ability.new(@current_user)
+    end
 
     teardown do; end
 
-    # TODO - when we know what the dispatcher permissions are
+    it "can create trip ticket comments on trip tickets belonging to their own provider or partners" do
+      assert @dispatcher.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_1.id))
+      assert @dispatcher.can?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_3.id))
+  
+      assert @dispatcher.cannot?(:create, TripTicketComment.new)
+      assert @dispatcher.cannot?(:create, TripTicketComment.new(:trip_ticket_id => @trip_ticket_5.id))
+    end
   end
 
   describe "csr role" do
