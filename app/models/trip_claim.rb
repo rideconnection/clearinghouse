@@ -9,6 +9,8 @@ class TripClaim < ActiveRecord::Base
     :rescinded,
   ]
 
+  INACTIVE_STATUS_CODES = [STATUS[:declined], STATUS[:rescinded]]
+
   attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
     :claimant_trip_id, :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, 
     :notes

@@ -43,6 +43,23 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.includes_claim_from?(p).must_equal true
   end
   
+  it "should know it doesn't have a claim from a provider if the status is denied/rescinded" do
+    provider = FactoryGirl.create(:provider)
+    claim = FactoryGirl.create(:trip_claim, 
+      :trip_ticket  => @trip_ticket, 
+      :claimant     => provider
+    )
+    assert @trip_ticket.includes_claim_from?(provider)
+
+    claim.update_attributes!(:status => TripClaim::STATUS[:rescinded])
+    assert !@trip_ticket.includes_claim_from?(provider)
+    claim.update_attributes!(:status => TripClaim::STATUS[:declined])
+    assert !@trip_ticket.includes_claim_from?(provider)
+
+    claim.update_attributes!(:status => TripClaim::STATUS[:approved])
+    assert @trip_ticket.includes_claim_from?(provider)
+  end
+
   it "has an hstore field for customer_identifiers which returns a hash" do
     assert_equal({}, @trip_ticket.customer_identifiers)
     @trip_ticket.customer_identifiers = {
