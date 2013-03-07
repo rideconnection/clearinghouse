@@ -16,26 +16,26 @@ else
 
     # Open trip ticket from provider_1
     trip_ticket_1  = FactoryGirl.create(:trip_ticket, :originator => provider_1)
-    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_1, :claimant => provider_2, :status => TripClaim::STATUS[:pending])
+    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_1, :claimant => provider_2, :status => :pending)
 
     # Claimed trip ticket from provider_1
     trip_ticket_2  = FactoryGirl.create(:trip_ticket, :originator => provider_1)
-    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_2, :claimant => provider_2, :status => TripClaim::STATUS[:approved])
+    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_2, :claimant => provider_2, :status => :approved)
 
     # Open trip ticket from provider_2, no claims
     trip_ticket_3  = FactoryGirl.create(:trip_ticket, :originator => provider_2)
 
     # Claimed trip ticket from provider_2
     trip_ticket_4  = FactoryGirl.create(:trip_ticket, :originator => provider_2)
-    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_1, :status => TripClaim::STATUS[:declined])
-    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_3, :status => TripClaim::STATUS[:approved])
+    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_1, :status => :declined)
+    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_4, :claimant => provider_3, :status => :approved)
 
     # Open trip ticket from provider_3, no claims
     trip_ticket_5  = FactoryGirl.create(:trip_ticket, :originator => provider_3)
 
     # Claimed trip ticket from provider_3
     trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => provider_3)
-    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_6, :claimant => provider_2, :status => TripClaim::STATUS[:approved])
+    FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_6, :claimant => provider_2, :status => :approved)
   
     user_password = "password 1"
 

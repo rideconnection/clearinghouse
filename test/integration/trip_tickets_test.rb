@@ -444,43 +444,43 @@ class TripTicketsTest < ActionController::IntegrationTest
 
         # one claim, not approved
         @t2_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2_1)
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2_1)
         
         @t2_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2_2)
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2_2)
         
         @t3_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3_1)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3_1)
 
         @t3_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3_2)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3_2)
 
         # multiple claims, none approved
         @t4_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4_1)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4_1)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4_1)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4_1)
 
         @t4_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4_2)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4_2)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4_2)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4_2)
 
         # multiple claims, one approved
         @t5_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_1)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5_1)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_1).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_1)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5_1)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_1).approve!
 
         @t5_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_2)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5_2)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5_2).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_2)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5_2)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_2).approve!
 
         # one claim, approved
         @t6_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6_1).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6_1).approve!
 
         @t6_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6_2).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6_2).approve!
       end
       
       it "returns trip tickets accessible by the current user which have approved claims" do

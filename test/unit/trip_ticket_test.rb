@@ -28,10 +28,10 @@ class TripTicketTest < ActiveSupport::TestCase
   it "knows if it has an approved claim" do
     @trip_ticket.approved?.must_equal false
     
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @trip_ticket)
+    FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @trip_ticket)
     @trip_ticket.approved?.must_equal false
 
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => @trip_ticket)
+    FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
     @trip_ticket.approved?.must_equal true
   end
   
@@ -184,25 +184,25 @@ class TripTicketTest < ActiveSupport::TestCase
 
         # one claim, not approved
         @t2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2)
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2)
         
         @t3 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3)
 
         # multiple claims, pending and declined
         @t4 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4)
 
         # multiple claims, one approved
         @t5 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5).approve!
 
         # one claim, approved
         @t6 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6).approve!
       end
       
       it "has a filter_by_claim_status method" do

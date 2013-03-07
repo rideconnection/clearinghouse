@@ -17,7 +17,7 @@
   <tbody>      
     <% trip_claims.try(:each) do |trip_claim| %>
       <tr>
-        <td><%= trip_claim.status.blank? ? "" : TripClaim::STATUS.invert[trip_claim.status].to_s.humanize.titlecase %></td>
+        <td><%= trip_claim.status.to_s.humanize.titlecase %></td>
         <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
         <td><%= trip_claim.proposed_fare %></td>
         <td><%= link_to 'Details', trip_ticket_trip_claim_path(trip_claim.trip_ticket, trip_claim) %></td>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130305222602) do
+ActiveRecord::Schema.define(:version => 20130307142301) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -166,7 +166,6 @@ ActiveRecord::Schema.define(:version => 20130305222602) do
     t.integer  "origin_provider_id"
     t.integer  "claimant_provider_id"
     t.integer  "trip_ticket_id"
-    t.integer  "status"
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
     t.integer  "claimant_service_id"
@@ -175,9 +174,11 @@ ActiveRecord::Schema.define(:version => 20130305222602) do
     t.text     "notes"
     t.integer  "claimant_customer_id"
     t.integer  "claimant_trip_id"
+    t.string   "status"
   end
 
   add_index "trip_claims", ["claimant_provider_id"], :name => "index_trip_claims_on_claimant_provider_id"
+  add_index "trip_claims", ["status"], :name => "index_trip_claims_on_status"
   add_index "trip_claims", ["trip_ticket_id"], :name => "index_trip_claims_on_trip_ticket_id"
 
   create_table "trip_results", :force => true do |t|

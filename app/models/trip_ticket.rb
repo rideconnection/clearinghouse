@@ -87,7 +87,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def approved?
-    TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, TripClaim::STATUS[:approved]).count > 0
+    TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, :approved).count > 0
   end
   
   def claimable_by?(user)
@@ -166,13 +166,13 @@ class TripTicket < ActiveRecord::Base
       case status.to_sym
       when :unclaimed
         # Tickets which have no claims on them or which have only declined claims
-        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', TripClaim::STATUS[:declined]).pluck('"trip_tickets"."id"')))
+        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', :declined).pluck('"trip_tickets"."id"')))
       when :approved
         # Tickets which have approved claims
-        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:approved]).pluck(:trip_ticket_id)))
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', :approved).pluck(:trip_ticket_id)))
       when :pending
         # Tickets which have pending claims
-        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:pending]).pluck(:trip_ticket_id)))
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', :pending).pluck(:trip_ticket_id)))
       end
     end
     

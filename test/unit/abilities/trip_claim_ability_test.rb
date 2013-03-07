@@ -21,21 +21,21 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
     @provider_relationship_2.approve!
 
     @trip_ticket_1  = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
-    @trip_claim_1_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_1, :claimant => @provider_2, :status => TripClaim::STATUS[:pending])
+    @trip_claim_1_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_1, :claimant => @provider_2, :status => :pending)
 
     @trip_ticket_2  = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
-    @trip_claim_2_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_2, :claimant => @provider_2, :status => TripClaim::STATUS[:approved])
+    @trip_claim_2_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_2, :claimant => @provider_2, :status => :approved)
 
     @trip_ticket_3  = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
 
     @trip_ticket_4  = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
-    @trip_claim_4_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_4, :claimant => @provider_1, :status => TripClaim::STATUS[:pending])
-    @trip_claim_4_2 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_4, :claimant => @provider_3, :status => TripClaim::STATUS[:approved])
+    @trip_claim_4_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_4, :claimant => @provider_1, :status => :pending)
+    @trip_claim_4_2 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_4, :claimant => @provider_3, :status => :approved)
 
     @trip_ticket_5  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
 
     @trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
-    @trip_claim_6_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_6, :claimant => @provider_2, :status => TripClaim::STATUS[:approved])
+    @trip_claim_6_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_6, :claimant => @provider_2, :status => :approved)
 
     # All users can read trip ticket claims, results and comments that belong to trip tickets that belong to their own provider or providers they have an approved relationship with
     # Schedulers and above can create, rescind, and update trip claims belonging to their own provider, on trip tickets belonging to providers they have an approved relationship with, but not their own provider's trip tickets
