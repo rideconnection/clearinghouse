@@ -124,7 +124,7 @@ fieldset {
 .buttons-holder {
   background: url(image-path("sprite1.png")) no-repeat 100% -438px;
   display: inline-block;
-  padding:0 6px 0 0;
+  padding:1px 6px 0 0;
   overflow:hidden;
   /* text-align:right; */
 
@@ -136,10 +136,14 @@ fieldset {
     background:url(image-path("sprite1.png")) no-repeat 0 -410px;
     border:0;
     color:#fff;
-    height:26px;
+    height:27px;
     line-height:26px;
     margin:0 0 0 7px;
     padding:0 14px 2px 20px;
+    
+    &:first-child {
+      margin-left:0;
+    }
   }
   
   a.button {
