@@ -14,14 +14,14 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
       :password => @password, 
       :password_confirmation => @password, 
       :provider => @provider)
-    @user.roles = [Role.find_or_create_by_name!("provider_admin")]
+    @user.role = Role.find_or_create_by_name!("provider_admin")
     @user.save!
 
     @user_2 = FactoryGirl.create(:user, 
       :password => @password, 
       :password_confirmation => @password, 
       :provider => @provider_2)
-    @user_2.roles = [Role.find_or_create_by_name!("provider_admin")]
+    @user_2.role = Role.find_or_create_by_name!("provider_admin")
     @user_2.save!
 
     login_as @user, :scope => :user
@@ -34,7 +34,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
   end
 
   test "provider_admin can create users, triggering an email" do
-    @user.roles << Role.find_or_create_by_name!("site_admin")
+    @user.role = Role.find_or_create_by_name!("site_admin")
     visit '/'
     click_link "Admin"
   end
@@ -46,7 +46,8 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
   end
 
   test "non-provider_admin user cannot view keys" do
-    @user.roles.destroy_all
+    @user.role = FactoryGirl.create(:role, :name => "foo")
+    @user.save!
     visit "/providers/#{@user.provider.id}/keys"
     assert page.has_content?("You are not authorized to access that page.")
   end

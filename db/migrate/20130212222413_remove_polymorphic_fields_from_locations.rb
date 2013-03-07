@@ -1,4 +1,15 @@
 class RemovePolymorphicFieldsFromLocations < ActiveRecord::Migration
+
+  class Location < ActiveRecord::Base; end
+
+  class TripTicket < ActiveRecord::Base; end
+
+  class Provider < ActiveRecord::Base; end
+
+  class OpenCapacity < ActiveRecord::Base; end
+
+  class Waypoint < ActiveRecord::Base; end
+
   def up
     transaction do
       Location.all.each do |location|
@@ -76,13 +87,3 @@ class RemovePolymorphicFieldsFromLocations < ActiveRecord::Migration
     end
   end
 end
-
-class Location < ActiveRecord::Base; end
-
-class TripTicket < ActiveRecord::Base; end
-
-class Provider < ActiveRecord::Base; end
-
-class OpenCapacity < ActiveRecord::Base; end
-
-class Waypoint < ActiveRecord::Base; end

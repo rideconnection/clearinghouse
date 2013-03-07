@@ -33,7 +33,7 @@ class UsersController < ApplicationController
   # GET /users/new
   # GET /users/new.json
   def new
-    if !current_user.has_role?(:site_admin)
+    if !current_user.has_admin_role?
       @user.provider = current_user.provider
     end
     respond_to do |format|
@@ -50,11 +50,11 @@ class UsersController < ApplicationController
   # POST /users.json
   def create    
     # TODO: Factor into model
-    if !current_user.has_role?(:site_admin)
+    if !current_user.has_admin_role?
       @user.provider = current_user.provider
     end
-    if params[:user].has_key?(:role_ids)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_ids]))
+    if params[:user].has_key?(:role_id)
+      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, User
       else
         authorize! :set_any_role, User
@@ -64,7 +64,7 @@ class UsersController < ApplicationController
     respond_to do |format|
       if @user.save
         NewUserMailer.welcome(@user).deliver
-        destination = current_user.has_role?(:site_admin) ? users_path : provider_path(@user.provider)
+        destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
       else
@@ -80,8 +80,8 @@ class UsersController < ApplicationController
     if params[:user].has_key?(:provider_id)
       authorize! :set_provider, @user
     end
-    if params[:user].has_key?(:role_ids)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_ids]))
+    if params[:user].has_key?(:role_id)
+      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, @user
       else
         authorize! :set_any_role, @user

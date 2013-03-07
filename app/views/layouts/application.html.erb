@@ -32,7 +32,7 @@
 			<li><%= link_to 'Tickets', trip_tickets_path %></li>
 			<li><%= link_to 'Open Capacities', open_capacities_path %></li>
       <li><%= link_to 'Reports', reports_path %></li>
-      <% if current_user and current_user.has_role? :site_admin %>
+      <% if current_user and current_user.has_admin_role? %>
 			  <li><a href="#">Activities</a></li>
         <li class="last"><%= link_to 'Admin', admin_path %></li>
       <% else %>

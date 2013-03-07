@@ -4,12 +4,11 @@ class User < ActiveRecord::Base
   # :registerable, :timeoutable and :omniauthable
   devise :database_authenticatable, :recoverable, :trackable, :validatable
 
-  # Setup accessible (or protected) attributes for your model
   belongs_to :provider
-  has_and_belongs_to_many :roles
+  belongs_to :role
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :must_generate_password, :phone, :provider, :provider_id, :roles, :role_ids, 
+    :must_generate_password, :phone, :provider_id, :role_id, 
     :title
 
   validate do |user|
@@ -21,12 +20,9 @@ class User < ActiveRecord::Base
     if user.password_required? && (user.password.blank? || !(6..20).include?(user.password.length) || !user.password.match(/\d/) || !user.password.match(/[\W_&&[^\s] ]/))
       user.errors[:password] << "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
     end
-
-    # Non-administrative users must be assigned to a provider
-    if user.roles.any? && !user.has_admin_role? && !user.provider.present?
-      user.errors[:provider_id] << "is required for all non-administrative users"
-    end
   end
+  
+  validates_presence_of :provider, :role
 
   before_validation :generate_a_password, :on => :create
 
@@ -44,16 +40,12 @@ class User < ActiveRecord::Base
       ProviderRelationship.partner_ids_for_provider(self.provider)
   end
 
-  def has_role?(role_sym)
-    roles.any? { |r| r.name.underscore.to_sym == role_sym }
-  end
-
   def has_any_role?(role_syms)
-    role_syms.select{|role_sym| self.has_role?(role_sym)}.size > 0
+    self.role.present? && role_syms.include?(self.role.name.underscore.to_sym)
   end
   
   def has_admin_role?
-    roles.any? && roles.inject(true){|memo, role| memo && role.is_admin_role?}
+    self.role.is_admin_role?
   end
 
   def active_for_authentication?

@@ -7,7 +7,7 @@ class OpenCapacity < ActiveRecord::Base
 
   attr_accessible :arrival_location_id, :arrival_time, :departure_location_id,
     :departure_time, :notes, :scooter_spaces_open, :seats_open,
-    :wheelchair_spaces_open
+    :wheelchair_spaces_open, :service_id
 
   audited
 end
