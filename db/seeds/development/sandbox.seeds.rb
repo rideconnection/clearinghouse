@@ -39,8 +39,14 @@ else
   
     user_password = "password 1"
 
-    site_admin = FactoryGirl.create(:user, :provider => provider_1, :email => "site_admin@clearinghouse.org", :name => "Site Admin", :password => user_password, :password_confirmation => user_password)
-    site_admin.role = Role.find_by_name("site_admin")
+    site_admin_role = Role.find_by_name("site_admin")
+    site_admin = FactoryGirl.create(:user, 
+      :provider => provider_1, 
+      :email => "site_admin@clearinghouse.org", 
+      :name => "Site Admin", 
+      :password => user_password, 
+      :password_confirmation => user_password, 
+      :role => site_admin_role)
     puts "User site_admin@clearinghouse.org created with password '#{user_password}'"
     
     [provider_1, provider_2, provider_3].each_with_index do |provider,index|
@@ -51,8 +57,14 @@ else
         email = "#{role.name.underscore}_#{index + 1}@clearinghouse.org"
         name  = "Test #{role.name.titlecase} #{index + 1}"
 
-        user = FactoryGirl.create(:user, :provider => provider, :email => email, :name => name, :password => user_password, :password_confirmation => user_password)
-        user.role = role
+        user = FactoryGirl.create(:user, 
+          :provider => provider, 
+          :email => email, 
+          :name => name, 
+          :password => user_password, 
+          :password_confirmation => user_password, 
+          :role => role
+        )
         puts "User #{email} created with password '#{user_password}'"
       end
     end

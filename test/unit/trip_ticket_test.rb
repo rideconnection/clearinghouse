@@ -51,12 +51,12 @@ class TripTicketTest < ActiveSupport::TestCase
     )
     assert @trip_ticket.includes_claim_from?(provider)
 
-    claim.update_attributes!(:status => TripClaim::STATUS[:rescinded])
+    claim.update_attributes!(:status => :rescinded)
     assert !@trip_ticket.includes_claim_from?(provider)
-    claim.update_attributes!(:status => TripClaim::STATUS[:declined])
+    claim.update_attributes!(:status => :declined)
     assert !@trip_ticket.includes_claim_from?(provider)
 
-    claim.update_attributes!(:status => TripClaim::STATUS[:approved])
+    claim.update_attributes!(:status => :approved)
     assert @trip_ticket.includes_claim_from?(provider)
   end
 

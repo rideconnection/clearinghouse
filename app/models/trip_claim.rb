@@ -2,14 +2,17 @@ class TripClaim < ActiveRecord::Base
   belongs_to :trip_ticket
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
   
-  STATUS = [
+  ACTIVE_STATUS = [
     :pending,
-    :approved,
-    :declined,
-    :rescinded,
+    :approved
   ]
 
-  INACTIVE_STATUS_CODES = [STATUS[:declined], STATUS[:rescinded]]
+  INACTIVE_STATUS = [
+    :declined,
+    :rescinded
+  ]
+
+  STATUS = ACTIVE_STATUS + INACTIVE_STATUS
 
   attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
     :claimant_trip_id, :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, 

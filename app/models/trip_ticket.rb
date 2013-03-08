@@ -96,7 +96,7 @@ class TripTicket < ActiveRecord::Base
   
   def includes_claim_from?(provider)
     claims = self.trip_claims.where(:claimant_provider_id => provider.id)
-    active = claims.where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS_CODES])
+    active = claims.where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS])
     active.count > 0
   end
   
