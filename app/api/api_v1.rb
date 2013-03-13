@@ -8,6 +8,24 @@ module Clearinghouse
         get :hello do
           "Hello, originator!"
         end
+
+        namespace :trips do
+          desc "Get a list of trips that originated with the requesting provider"
+          get do
+            present current_provider.trip_tickets, with: Clearinghouse::Entities::V1::TripTicket
+          end
+
+          params do
+            requires :id, :type => Integer, :desc => 'Trip ID.'
+          end
+          scope :requires_id do
+            desc "Get a specific trip ticket"
+            get :show do
+              present current_provider.trip_tickets.find(params[:id]), with: Clearinghouse::Entities::V1::TripTicket
+            end
+          end
+
+        end # namespace :trips
       end
       
       namespace :claimant do
