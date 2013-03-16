@@ -2,6 +2,9 @@ require 'entities_v1'
 
 module Clearinghouse
   class API_v1 < Grape::API
+
+    helpers APIHelpers
+
     version 'v1', :using => :path, :vendor => 'Clearinghouse' do
       namespace :originator do
         desc "Says hello"
@@ -9,10 +12,13 @@ module Clearinghouse
           "Hello, originator!"
         end
 
+        params do
+          optional :filters, type: String, desc: "A user ID."
+        end
         namespace :trips do
           desc "Get a list of trips that originated with the requesting provider"
           get do
-            present current_provider.trip_tickets, with: Clearinghouse::Entities::V1::TripTicket
+            present trip_tickets_filter(current_provider.trip_tickets), with: Clearinghouse::Entities::V1::TripTicket
           end
 
           params do
