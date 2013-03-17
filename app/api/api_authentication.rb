@@ -14,6 +14,15 @@ module API_Authentication
     end
     
     api.helpers do
+      # allows use of CanCan accessible_by() using the same conventions as in controllers
+      def current_ability
+        @current_ability ||= ::Ability.new(current_user)
+      end
+
+      def current_user
+        @current_user ||= User.new(name: 'API', provider: current_provider, roles: [Role.new(name: 'api')])
+      end
+
       def current_provider
         @current_provider ||= authenticate_current_provider(params[:api_key])
       end

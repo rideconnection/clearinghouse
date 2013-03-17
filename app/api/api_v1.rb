@@ -6,6 +6,13 @@ module Clearinghouse
     helpers APIHelpers
 
     version 'v1', :using => :path, :vendor => 'Clearinghouse' do
+      desc "Who am I?"
+      get :whoami do
+        { name: current_user.name,
+          roles: current_user.roles.map {|r| r.name }.join(' '),
+          provider: current_user.provider.name }
+      end
+
       namespace :originator do
         desc "Says hello"
         get :hello do
@@ -13,12 +20,13 @@ module Clearinghouse
         end
 
         params do
-          optional :filters, type: String, desc: "A user ID."
+          # TODO add all available trip filters as optional params with descriptions so the API is self-documenting
         end
         namespace :trips do
           desc "Get a list of trips that originated with the requesting provider"
           get do
-            present trip_tickets_filter(current_provider.trip_tickets), with: Clearinghouse::Entities::V1::TripTicket
+            present trip_tickets_filter(current_provider.trip_tickets.accessible_by(current_ability)),
+                    with: Clearinghouse::Entities::V1::TripTicket
           end
 
           params do
@@ -27,7 +35,9 @@ module Clearinghouse
           scope :requires_id do
             desc "Get a specific trip ticket"
             get :show do
-              present current_provider.trip_tickets.find(params[:id]), with: Clearinghouse::Entities::V1::TripTicket
+              @trip_ticket = current_provider.trip_tickets.find(params[:id])
+              error! "Access Denied", 401 unless current_ability.can?(:show, @trip_ticket)
+              present @trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
             end
           end
 
