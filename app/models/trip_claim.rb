@@ -64,7 +64,7 @@ class TripClaim < ActiveRecord::Base
   end
   
   def can_be_auto_approved?
-    self.claimant.can_auto_approve_for?(self.trip_ticket.originator)
+    self.editable? && (self.claimant.can_auto_approve_for?(self.trip_ticket.originator) || Array(self.trip_ticket.provider_white_list).include?(self.claimant_provider_id))
   end
   
   private

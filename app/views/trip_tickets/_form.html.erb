@@ -245,7 +245,7 @@
     
     <% 
       field_indexes = {}
-      TripTicket::ARRAY_FIELDS.each do |field_sym, legend| 
+      TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.each do |field_sym, legend| 
     %>
       <div class="field" id="<%= field_sym.to_s %>">
         <label><%= legend.pluralize %></label>
@@ -309,6 +309,24 @@
         <% end %>
       </div>
     <% end %>
+
+    <div class="field">
+      <%= f.label :provider_white_list %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.collection_select :provider_white_list, @providers_for_lists, :id, :name, {}, {:multiple => true, :size => [10, @providers_for_lists.size].min} %>
+      <% else %>
+        <%= providers_from_white_black_list(@trip_ticket.provider_white_list) %>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <%= f.label :provider_black_list %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.collection_select :provider_black_list, @providers_for_lists, :id, :name, {}, {:multiple => true, :size => [10, @providers_for_lists.size].min} %>
+      <% else %>
+        <%= providers_from_white_black_list(@trip_ticket.provider_black_list) %>
+      <% end %>
+    </div>
   </fieldset>
 
   <fieldset id="drop_off_location" class="">

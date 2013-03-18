@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130307142301) do
+ActiveRecord::Schema.define(:version => 20130318221100) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -163,7 +163,6 @@ ActiveRecord::Schema.define(:version => 20130307142301) do
   end
 
   create_table "trip_claims", :force => true do |t|
-    t.integer  "origin_provider_id"
     t.integer  "claimant_provider_id"
     t.integer  "trip_ticket_id"
     t.datetime "created_at",           :null => false
@@ -217,50 +216,52 @@ ActiveRecord::Schema.define(:version => 20130307142301) do
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
   create_table "trip_tickets", :force => true do |t|
-    t.integer      "origin_provider_id"
-    t.string       "origin_customer_id"
-    t.integer      "claimant_provider_id"
-    t.boolean      "customer_information_withheld"
-    t.date         "customer_dob"
-    t.integer      "customer_address_id"
-    t.string       "customer_primary_phone"
-    t.string       "customer_emergency_phone"
-    t.text         "customer_impairment_description"
-    t.integer      "customer_boarding_time"
-    t.integer      "customer_deboarding_time"
-    t.integer      "customer_seats_required"
-    t.text         "customer_notes"
-    t.integer      "origin_trip_id"
-    t.integer      "claimant_trip_id"
-    t.integer      "pick_up_location_id"
-    t.integer      "drop_off_location_id"
-    t.string       "scheduling_priority"
-    t.integer      "allowed_time_variance"
-    t.integer      "num_attendants"
-    t.integer      "num_guests"
-    t.string       "trip_purpose_code"
-    t.string       "trip_purpose_description"
-    t.text         "trip_notes"
-    t.datetime     "created_at",                                          :null => false
-    t.datetime     "updated_at",                                          :null => false
-    t.string       "customer_primary_language"
-    t.string       "customer_first_name"
-    t.string       "customer_last_name"
-    t.string       "customer_middle_name"
-    t.time         "requested_pickup_time"
-    t.time         "requested_drop_off_time"
-    t.hstore       "customer_identifiers"
-    t.string_array "customer_mobility_impairments",        :limit => 255
-    t.string       "customer_ethnicity"
-    t.string_array "customer_eligibility_factors",         :limit => 255
-    t.string_array "customer_assistive_devices",           :limit => 255
-    t.string_array "customer_service_animals",             :limit => 255
-    t.string_array "guest_or_attendant_service_animals",   :limit => 255
-    t.string_array "guest_or_attendant_assistive_devices", :limit => 255
-    t.string_array "trip_funders",                         :limit => 255
-    t.string       "customer_race"
-    t.time         "earliest_pick_up_time"
-    t.datetime     "appointment_time"
+    t.string        "origin_customer_id"
+    t.integer       "claimant_provider_id"
+    t.boolean       "customer_information_withheld"
+    t.date          "customer_dob"
+    t.integer       "customer_address_id"
+    t.string        "customer_primary_phone"
+    t.string        "customer_emergency_phone"
+    t.text          "customer_impairment_description"
+    t.integer       "customer_boarding_time"
+    t.integer       "customer_deboarding_time"
+    t.integer       "customer_seats_required"
+    t.text          "customer_notes"
+    t.integer       "origin_trip_id"
+    t.integer       "claimant_trip_id"
+    t.integer       "pick_up_location_id"
+    t.integer       "drop_off_location_id"
+    t.string        "scheduling_priority"
+    t.integer       "allowed_time_variance"
+    t.integer       "num_attendants"
+    t.integer       "num_guests"
+    t.string        "trip_purpose_code"
+    t.string        "trip_purpose_description"
+    t.text          "trip_notes"
+    t.datetime      "created_at",                                          :null => false
+    t.datetime      "updated_at",                                          :null => false
+    t.string        "customer_primary_language"
+    t.string        "customer_first_name"
+    t.string        "customer_last_name"
+    t.string        "customer_middle_name"
+    t.time          "requested_pickup_time"
+    t.time          "requested_drop_off_time"
+    t.hstore        "customer_identifiers"
+    t.string_array  "customer_mobility_impairments",        :limit => 255
+    t.string        "customer_ethnicity"
+    t.string_array  "customer_eligibility_factors",         :limit => 255
+    t.string_array  "customer_assistive_devices",           :limit => 255
+    t.string_array  "customer_service_animals",             :limit => 255
+    t.string_array  "guest_or_attendant_service_animals",   :limit => 255
+    t.string_array  "guest_or_attendant_assistive_devices", :limit => 255
+    t.string_array  "trip_funders",                         :limit => 255
+    t.string        "customer_race"
+    t.time          "earliest_pick_up_time"
+    t.datetime      "appointment_time"
+    t.integer_array "provider_white_list"
+    t.integer_array "provider_black_list"
+    t.integer       "origin_provider_id"
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
@@ -270,7 +271,8 @@ ActiveRecord::Schema.define(:version => 20130307142301) do
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
   add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
   add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
-  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
+  add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
+  add_index "trip_tickets", ["provider_white_list"], :name => "provider_white_list"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"
 
   create_table "users", :force => true do |t|

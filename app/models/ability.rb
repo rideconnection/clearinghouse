@@ -135,8 +135,11 @@ class Ability
     # TODO - add appropriate tests once trip result functionality has been defined
     can :read, [TripClaim, TripResult, TripTicketComment], :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
 
-    # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with
-    can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets 
+    # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with,
+    # except if there's a black list on the trip ticket
+    can :read, TripTicket, ['origin_provider_id IN (?) AND (provider_black_list IS NULL OR ? <> ALL(provider_black_list))', user.partner_provider_ids_for_tickets, user.provider_id] do |tt|
+      user.partner_provider_ids_for_tickets.include?(tt.origin_provider_id) && !Array(tt.provider_black_list).include?(user.provider_id)
+    end
   
     # Per Feb 12, 2013 meeting minutes:
     #   If you can view a ticket you can comment on a ticket.

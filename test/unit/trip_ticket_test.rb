@@ -72,7 +72,7 @@ class TripTicketTest < ActiveSupport::TestCase
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
   
-  TripTicket::ARRAY_FIELD_NAMES.each do |field_sym|
+  TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)
       @trip_ticket.send("#{field_sym.to_s}=".to_sym, [
@@ -84,6 +84,76 @@ class TripTicketTest < ActiveSupport::TestCase
       @trip_ticket.reload
       # NOTE - Values are coerced to strings
       assert_equal ['a', 'B', '1'], @trip_ticket.send(field_sym)
+    end
+  end
+  
+  describe "white/black lists" do
+    it "has an integer_array field for provider_white_list which returns an array" do
+      assert_equal nil, @trip_ticket.provider_white_list
+      @trip_ticket.provider_white_list = [
+        '2',
+        1
+      ]
+      @trip_ticket.save!
+      @trip_ticket.reload
+      # NOTE - Values are coerced to integers
+      assert_equal [2, 1], @trip_ticket.provider_white_list
+    end
+
+    it "has an integer_array field for provider_black_list which returns an array" do
+      assert_equal nil, @trip_ticket.provider_black_list
+      @trip_ticket.provider_black_list = [
+        '2',
+        1
+      ]
+      @trip_ticket.save!
+      @trip_ticket.reload
+      # NOTE - Values are coerced to integers
+      assert_equal [2, 1], @trip_ticket.provider_black_list
+    end
+  
+    it "doesn't allow both white and black lists to be populated" do
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1]
+      @trip_ticket.provider_black_list = []
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = []
+      @trip_ticket.provider_black_list = [1]
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1]
+      @trip_ticket.provider_black_list = [1]
+      assert !@trip_ticket.valid?
+    end
+    
+    it "allows only integer values for provider_white_list" do
+      @trip_ticket.provider_white_list = []
+      assert @trip_ticket.valid?
+
+      @trip_ticket.provider_white_list = ['a']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [:'3']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1.3]
+      assert !@trip_ticket.valid?
+    end
+    
+    it "allows only integer values for provider_black_list" do
+      @trip_ticket.provider_black_list = []
+      assert @trip_ticket.valid?
+
+      @trip_ticket.provider_black_list = ['a']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_black_list = [:'3']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_black_list = [1.3]
+      assert !@trip_ticket.valid?
     end
   end
   

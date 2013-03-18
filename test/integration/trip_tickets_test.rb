@@ -50,7 +50,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     assert page.has_content?("Trip ticket comment was successfully created.")
   end 
  
-  TripTicket::ARRAY_FIELD_NAMES.each do |field_sym|
+  TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     describe "#{field_sym.to_s} string_array fields" do
       test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do
         click_link "Tickets"

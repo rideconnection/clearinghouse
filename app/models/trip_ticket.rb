@@ -29,7 +29,7 @@ class TripTicket < ActiveRecord::Base
     "White"
   ]
 
-  ARRAY_FIELDS = {
+  CUSTOMER_IDENTIFIER_ARRAY_FIELDS = {
     :customer_mobility_impairments => "Mobility Impairment",
     :customer_eligibility_factors => "Eligibility Factor",
     :customer_assistive_devices => "Assistive Device",
@@ -39,7 +39,7 @@ class TripTicket < ActiveRecord::Base
     :trip_funders => "Trip Funder",
   }
 
-  ARRAY_FIELD_NAMES = ARRAY_FIELDS.keys
+  CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
   
   attr_accessible :allowed_time_variance, :appointment_time,
     :claimant_provider_id, :claimant_trip_id, :customer_address_attributes, 
@@ -57,7 +57,8 @@ class TripTicket < ActiveRecord::Base
     :customer_identifiers, :customer_mobility_impairments, 
     :customer_eligibility_factors, :customer_assistive_devices, 
     :customer_service_animals, :guest_or_attendant_service_animals,
-    :guest_or_attendant_assistive_devices, :trip_funders
+    :guest_or_attendant_assistive_devices, :trip_funders,
+    :provider_white_list, :provider_black_list
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
 
@@ -69,6 +70,28 @@ class TripTicket < ActiveRecord::Base
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
+  
+  validate do |trip_ticket|
+    if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
+      trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"
+    end
+    
+    if trip_ticket.provider_white_list.try(:any?) && !trip_ticket.provider_white_list.inject(true){|bool,element| bool && element.is_integer? }
+      trip_ticket.errors[:provider_white_list] << "must be an array of integers"
+    end
+    
+    if trip_ticket.provider_black_list.try(:any?) && !trip_ticket.provider_black_list.inject(true){|bool,element| bool && element.is_integer? }
+      trip_ticket.errors[:provider_black_list] << "must be an array of integers"
+    end
+    
+    if trip_ticket.provider_white_list.try(:any?) && trip_ticket.provider_white_list.include?(trip_ticket.origin_provider_id)
+      trip_ticket.errors[:provider_white_list] << "cannot include the originating provider"
+    end
+    
+    if trip_ticket.provider_black_list.try(:any?) && trip_ticket.provider_black_list.include?(trip_ticket.origin_provider_id)
+      trip_ticket.errors[:provider_black_list] << "cannot include the originating provider"
+    end
+  end
   
   after_initialize do
     if self.new_record?
@@ -203,7 +226,7 @@ class TripTicket < ActiveRecord::Base
       #   with a row for each item that would be an array element. This will 
       #   be easier to search, and is likely to scale better for a large
       #   number of elements.
-      array_concat = (TripTicket::ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
+      array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
   

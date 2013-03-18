@@ -1,11 +1,15 @@
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
+  before_filter :compact_array_params, :only => [:create, :update]
+  before_filter :providers_for_lists, :except => [:destroy, :index]
   before_filter :setup_locations, :except => :index
 
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
     init_trip_ticket_trip_time_filter_values
+    
+    @providers_for_filters = Provider.accessible_by(current_ability)
     
     params[:trip_ticket_filters].try(:each) do |filter, value|
       case filter.to_sym
@@ -30,7 +34,6 @@ class TripTicketsController < ApplicationController
       end
     end
 
-    @providers_for_filters = Provider.accessible_by(current_ability)
     massage_trip_ticket_trip_time_filter_values_for_form    
     
     respond_to do |format|
@@ -61,8 +64,6 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets
   # POST /trip_tickets.json
   def create
-    compact_string_array_params
-
     @trip_ticket = TripTicket.new(params[:trip_ticket])
     @trip_ticket.originator = current_user.provider unless !@trip_ticket.origin_provider_id.blank?
     
@@ -80,8 +81,6 @@ class TripTicketsController < ApplicationController
   # PUT /trip_tickets/1
   # PUT /trip_tickets/1.json
   def update
-    compact_string_array_params
-
     respond_to do |format|
       if @trip_ticket.update_attributes(params[:trip_ticket])
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully updated.' }
@@ -112,10 +111,12 @@ class TripTicketsController < ApplicationController
     @trip_ticket.build_pick_up_location  unless @trip_ticket.pick_up_location
   end
   
-  def compact_string_array_params
-    TripTicket::ARRAY_FIELD_NAMES.each do |field_sym|
-      params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? } 
+  def compact_array_params
+    TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
+      params[:trip_ticket][field_sym].try(:reject!) {|v| v.blank? }
     end
+    params[:trip_ticket][:provider_white_list].try(:reject!) {|v| v.blank?}
+    params[:trip_ticket][:provider_black_list].try(:reject!) {|v| v.blank?}
   end
   
   def parse_trip_ticket_trip_time(datetime_array, default)
@@ -132,5 +133,9 @@ class TripTicketsController < ApplicationController
   def massage_trip_ticket_trip_time_filter_values_for_form
     params[:trip_ticket_filters][:trip_time][:start] = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:start], nil)
     params[:trip_ticket_filters][:trip_time][:end]   = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:end], nil)
+  end
+  
+  def providers_for_lists
+    @providers_for_lists = Provider.accessible_by(current_ability) - [current_user.provider]
   end
 end
