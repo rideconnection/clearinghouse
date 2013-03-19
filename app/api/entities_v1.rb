@@ -16,13 +16,6 @@ module Clearinghouse
       end
 
       class TripTicket < Grape::Entity
-        # TODO expose originator object? probably not, they know who they are
-        # TODO expose trip_claims (has_many), trip_ticket_comments (has_many), and trip_result (has_one)?
-        # TODO assuming anything in attr_accessible is fair game for the API to expose, but double-check
-        # TODO should collection version of TripTicket return summary details for listing to keep the data size lower?
-        #      seems silly to return the full detail in the collection, then have a SHOW action that gives the same detail
-        # TODO should the API be able to look up a ticket by the origin_customer_id or origin_trip_id? seems like adapter will need this
-
         expose :id,
           :origin_provider_id, :origin_customer_id, :origin_trip_id,
           :claimant_provider_id, :claimant_trip_id,
@@ -37,11 +30,6 @@ module Clearinghouse
           :num_attendants, :num_guests, :guest_or_attendant_service_animals, :guest_or_attendant_assistive_devices,
           :requested_pickup_time, :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
           :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority
-
-        expose :pick_up_location, :using => Clearinghouse::Entities::V1::Location
-        expose :drop_off_location, :using => Clearinghouse::Entities::V1::Location
-        expose :customer_address, :using => Clearinghouse::Entities::V1::Location
-        expose :claimant, :using => Clearinghouse::Entities::V1::Provider
       end
     end
   end
