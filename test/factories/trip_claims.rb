@@ -3,7 +3,7 @@
 FactoryGirl.define do
   factory :trip_claim do
     association :claimant, factory: :provider
-    status { TripClaim::STATUS[:pending] }
+    status :pending
     claimant_service_id 1
     trip_ticket
     proposed_pickup_time { DateTime.now }

@@ -49,7 +49,7 @@ Clearinghouse::Application.configure do
   # config.assets.precompile += %w( search.js )
   #
   config.action_mailer.default_url_options = {
-    :host => 'ridestage.panopticdev.com',
+    :host => 'ridestage.panopticdev.com/clearinghouse',
   }
 
   # Disable delivery errors, bad email addresses will be ignored

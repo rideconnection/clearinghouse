@@ -13,30 +13,28 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "Old Guy", user.display_name
   end
   
-  describe "user provider" do
+  describe "validations" do
     setup do
+      @user = FactoryGirl.create(:user)
       @provider = FactoryGirl.create(:provider)
-      @user = FactoryGirl.build(:user, :provider_id => nil)
-      @not_site_admin = FactoryGirl.create(:role, :name => "not_site_admin")
-      @site_admin = FactoryGirl.create(:role, :name => "site_admin")
+      @role = FactoryGirl.create(:role)
     end
     
-    teardown do
-      @site_admin.destroy
-      @provider.destroy
-    end
-    
-    it "should require a provider_id when a user has any roles but is not a site_admin" do
-      @user.roles << @not_site_admin
+    it "should require a provider" do  
+      @user.provider = nil
       @user.valid?.must_equal false
-      @user.errors[:provider_id].must_include "is required for all non-administrative users"
+      @user.errors[:provider].must_include "can't be blank"
       
       @user.provider = @provider
       @user.valid?.must_equal true
     end
   
-    it "should not require a provider when a user is a site_admin" do
-      @user.roles << @site_admin
+    it "should require a role" do
+      @user.role = nil
+      @user.valid?.must_equal false
+      @user.errors[:role].must_include "can't be blank"
+      
+      @user.role = @role
       @user.valid?.must_equal true
     end
   end

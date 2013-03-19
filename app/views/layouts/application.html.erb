@@ -19,7 +19,7 @@
 		<nav class="holder">
       <% if current_user %>
         <%= link_to current_user.display_name, edit_user_path(current_user), :class => "nickname" %>
-        <a href="#" class="messages-count">3</a>
+        <a href="#" class="messages-count">0</a>
         <a href="#" class="btn-settings">Settings</a>
         <%= link_to 'Logout', destroy_user_session_path, :method => :delete, :class => "btn-logout" %>
       <% end %>
@@ -32,7 +32,7 @@
 			<li><%= link_to 'Tickets', trip_tickets_path %></li>
 			<li><%= link_to 'Open Capacities', open_capacities_path %></li>
       <li><%= link_to 'Reports', reports_path %></li>
-      <% if current_user and current_user.has_role? :site_admin %>
+      <% if current_user and current_user.has_admin_role? %>
 			  <li><a href="#">Activities</a></li>
         <li class="last"><%= link_to 'Admin', admin_path %></li>
       <% else %>
@@ -51,11 +51,13 @@
     <%= yield :sidebar %>
 	</section>
 </section>
-<!--footer>
+<footer>
   <p>
-    <time datetime="<%= Time.zone.now.year %>-01-01">Copyright &copy;<%= Time.zone.now.year %></time> |
-    <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %>
+    &copy; <script type="text/javascript">
+      var theDate = new Date();
+      document.write(theDate.getFullYear());
+    </script> | <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %>
   </p>
-</footer-->
+</footer>
 </body>
 </html>

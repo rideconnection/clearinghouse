@@ -3,14 +3,17 @@
 $form_label–width: 225px;
 
 .field_with_errors {
-  padding: 2px;
-  background-color: red;
-  display: table;
+  background-color: #c00;
+  padding: 0 0 2px;
+  
+  label {
+    color: #fff;
+  }
 }
 
 #error_explanation {
   width: 450px;
-  border: 2px solid red;
+  border: 2px solid #c00;
   padding: 7px;
   padding-bottom: 0;
   margin-bottom: 20px;
@@ -121,7 +124,7 @@ fieldset {
 .buttons-holder {
   background: url(image-path("sprite1.png")) no-repeat 100% -438px;
   display: inline-block;
-  padding:0 6px 0 0;
+  padding:1px 6px 0 0;
   overflow:hidden;
   /* text-align:right; */
 
@@ -133,10 +136,15 @@ fieldset {
     background:url(image-path("sprite1.png")) no-repeat 0 -410px;
     border:0;
     color:#fff;
-    height:26px;
+    height:27px;
     line-height:26px;
+    vertical-align: top;
     margin:0 0 0 7px;
     padding:0 14px 2px 20px;
+    
+    &:first-child {
+      margin-left:0;
+    }
   }
   
   a.button {
@@ -396,4 +404,4 @@ input[type=submit] {
 .activities-section .form-holder heading {
   margin:0 1px 10px 0;
 }
-*/
+*/  

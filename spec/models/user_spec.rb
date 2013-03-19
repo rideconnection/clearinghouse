@@ -9,7 +9,7 @@ describe User do
       :password_confirmation => 'password 1',
     }
     @user = User.new params
-    Role.new({:name => :guest}).save!
+    @guest = FactoryGirl.create(:role, :name => "guest")
   end
 
   describe "email" do
@@ -41,14 +41,6 @@ describe User do
     it "is active by default" do
       @user.active.should be true
       @user.active_for_authentication?.should be true
-    end
-  end
-
-  describe '#has_role?' do
-    it "has an associated role" do
-      @user.has_role?(:guest).should be false
-      @user.roles << Role.find_by_name(:guest)
-      @user.has_role?(:guest).should be true
     end
   end
 end

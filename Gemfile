@@ -39,7 +39,7 @@ gem 'seedbank', '~> 0.2'
 gem 'time_of_day', '~> 0.1'
 
 # API web service
-gem 'grape', '~> 0.2'
+gem 'grape', '~> 0.2.0'
 
 # Javascript engine
 gem 'therubyracer', '~> 0.11'

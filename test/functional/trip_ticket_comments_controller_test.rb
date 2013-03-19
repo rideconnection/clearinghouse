@@ -8,7 +8,7 @@ class TripTicketCommentsControllerTest < ActionController::TestCase
     @provider = FactoryGirl.create(:provider)
     
     @user = FactoryGirl.create(:user, provider: @provider)
-    @user.roles << Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by_name!("provider_admin")
     @user.save!
 
     @request.env["devise.mapping"] = Devise.mappings[:user]

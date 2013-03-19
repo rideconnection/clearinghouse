@@ -177,7 +177,7 @@
         <div class="field-array" style="display:inline-block">
           <%= f.fields_for :customer_identifiers, @trip_ticket.customer_identifiers do |ci| %>
             <% # TODO - Refactor this line to use an array constant of fields to ignore. Also, see if this is a bug for Rails or the Hstore gem %>
-            <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace]).try(:each) do |k,v| %>
+            <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace, "builder", "parent_builder", "namespace"]).try(:each) do |k,v| %>
               <div class="field hstoreAttribute">
                 <%= text_field_tag k, k, :class => 'hstoreAttributeName', :size => 30 %>
                 <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue', :size => 30 %>
@@ -245,7 +245,7 @@
     
     <% 
       field_indexes = {}
-      TripTicket::ARRAY_FIELDS.each do |field_sym, legend| 
+      TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.each do |field_sym, legend| 
     %>
       <div class="field" id="<%= field_sym.to_s %>">
         <label><%= legend.pluralize %></label>
@@ -309,6 +309,24 @@
         <% end %>
       </div>
     <% end %>
+
+    <div class="field">
+      <%= f.label :provider_white_list %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.collection_select :provider_white_list, @providers_for_lists, :id, :name, {}, {:multiple => true, :size => [10, @providers_for_lists.size].min} %>
+      <% else %>
+        <%= providers_from_white_black_list(@trip_ticket.provider_white_list) %>
+      <% end %>
+    </div>
+
+    <div class="field">
+      <%= f.label :provider_black_list %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.collection_select :provider_black_list, @providers_for_lists, :id, :name, {}, {:multiple => true, :size => [10, @providers_for_lists.size].min} %>
+      <% else %>
+        <%= providers_from_white_black_list(@trip_ticket.provider_black_list) %>
+      <% end %>
+    </div>
   </fieldset>
 
   <fieldset id="drop_off_location" class="">

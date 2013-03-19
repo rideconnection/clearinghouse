@@ -29,7 +29,7 @@ class TripTicket < ActiveRecord::Base
     "White"
   ]
 
-  ARRAY_FIELDS = {
+  CUSTOMER_IDENTIFIER_ARRAY_FIELDS = {
     :customer_mobility_impairments => "Mobility Impairment",
     :customer_eligibility_factors => "Eligibility Factor",
     :customer_assistive_devices => "Assistive Device",
@@ -39,7 +39,7 @@ class TripTicket < ActiveRecord::Base
     :trip_funders => "Trip Funder",
   }
 
-  ARRAY_FIELD_NAMES = ARRAY_FIELDS.keys
+  CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
   
   attr_accessible :allowed_time_variance, :appointment_time,
     :claimant_provider_id, :claimant_trip_id, :customer_address_attributes, 
@@ -57,7 +57,8 @@ class TripTicket < ActiveRecord::Base
     :customer_identifiers, :customer_mobility_impairments, 
     :customer_eligibility_factors, :customer_assistive_devices, 
     :customer_service_animals, :guest_or_attendant_service_animals,
-    :guest_or_attendant_assistive_devices, :trip_funders
+    :guest_or_attendant_assistive_devices, :trip_funders,
+    :provider_white_list, :provider_black_list
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
 
@@ -69,6 +70,28 @@ class TripTicket < ActiveRecord::Base
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
+  
+  validate do |trip_ticket|
+    if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
+      trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"
+    end
+    
+    if trip_ticket.provider_white_list.try(:any?) && !trip_ticket.provider_white_list.inject(true){|bool,element| bool && element.is_integer? }
+      trip_ticket.errors[:provider_white_list] << "must be an array of integers"
+    end
+    
+    if trip_ticket.provider_black_list.try(:any?) && !trip_ticket.provider_black_list.inject(true){|bool,element| bool && element.is_integer? }
+      trip_ticket.errors[:provider_black_list] << "must be an array of integers"
+    end
+    
+    if trip_ticket.provider_white_list.try(:any?) && trip_ticket.provider_white_list.include?(trip_ticket.origin_provider_id)
+      trip_ticket.errors[:provider_white_list] << "cannot include the originating provider"
+    end
+    
+    if trip_ticket.provider_black_list.try(:any?) && trip_ticket.provider_black_list.include?(trip_ticket.origin_provider_id)
+      trip_ticket.errors[:provider_black_list] << "cannot include the originating provider"
+    end
+  end
   
   after_initialize do
     if self.new_record?
@@ -87,7 +110,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def approved?
-    TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, TripClaim::STATUS[:approved]).count > 0
+    TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, :approved).count > 0
   end
   
   def claimable_by?(user)
@@ -95,7 +118,9 @@ class TripTicket < ActiveRecord::Base
   end
   
   def includes_claim_from?(provider)
-    self.trip_claims.where(:claimant_provider_id => provider.id).count > 0
+    claims = self.trip_claims.where(:claimant_provider_id => provider.id)
+    active = claims.where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS])
+    active.count > 0
   end
   
   class << self
@@ -166,13 +191,13 @@ class TripTicket < ActiveRecord::Base
       case status.to_sym
       when :unclaimed
         # Tickets which have no claims on them or which have only declined claims
-        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', TripClaim::STATUS[:declined]).pluck('"trip_tickets"."id"')))
+        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', :declined).pluck('"trip_tickets"."id"')))
       when :approved
         # Tickets which have approved claims
-        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:approved]).pluck(:trip_ticket_id)))
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', :approved).pluck(:trip_ticket_id)))
       when :pending
         # Tickets which have pending claims
-        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', TripClaim::STATUS[:pending]).pluck(:trip_ticket_id)))
+        where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', :pending).pluck(:trip_ticket_id)))
       end
     end
     
@@ -201,7 +226,7 @@ class TripTicket < ActiveRecord::Base
       #   with a row for each item that would be an array element. This will 
       #   be easier to search, and is likely to scale better for a large
       #   number of elements.
-      array_concat = (TripTicket::ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
+      array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
   

@@ -1,40 +1,63 @@
 require 'test_helper'
 
 class TripClaimTest < ActiveSupport::TestCase
-  it "is valid" do
-    tc = TripClaim.new(
+  setup do
+    @valid_attributes = {
       :claimant_provider_id => 1, 
       :proposed_fare => "1.23", 
       :proposed_pickup_time => DateTime.now, 
-      :status => "Pending", 
+      :status => "pending", 
       :trip_ticket_id => 1,
-      :claimant_trip_id => "ABC123",
-    )
+      :claimant_trip_id => "ABC123"      
+    }
+  end
+  
+  it "is valid" do
+    tc = TripClaim.new(@valid_attributes)
     tc.valid?.must_equal true
+  end
+  
+  it "has a contant that defines possible status codes" do
+    assert_equal TripClaim::STATUS, [
+      :pending,
+      :approved,
+      :declined,
+      :rescinded,
+    ]
+  end
+  
+  it "requires status to be present and one of the pre-defined status codes" do
+    tc = TripClaim.new(@valid_attributes.except(:status))
+    tc.valid?.must_equal false
+    tc.errors[:status].must_include "can't be blank"
+    
+    tc.status = "foo"
+    tc.valid?.must_equal false
+    tc.errors[:status].must_include "is not included in the list"
   end
 
   it "knows if it's been approved" do
     tc = TripClaim.new
     tc.approved?.must_equal false
-    tc.status = TripClaim::STATUS[:pending]
+    tc.status = :pending
     tc.approved?.must_equal false
-    tc.status = TripClaim::STATUS[:approved]
+    tc.status = :approved
     tc.approved?.must_equal true
   end
   
   it "knows if it's editable" do
     tc = TripClaim.new
     tc.editable?.must_equal true
-    tc.status = TripClaim::STATUS[:pending]
+    tc.status = :pending
     tc.editable?.must_equal true
-    tc.status = TripClaim::STATUS[:approved]
+    tc.status = :approved
     tc.editable?.must_equal false
   end
   
   it "cannot be created or modified once the parent trip ticket has been claimed" do
     t = FactoryGirl.create(:trip_ticket)
     p = FactoryGirl.create(:provider)
-    c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p, :status => TripClaim::STATUS[:approved])
+    c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p, :status => :approved)
     c2 = FactoryGirl.build(:trip_claim, :trip_ticket => t, :claimant => p)
     c2.valid?.must_equal false
     c2.errors[:base].must_include "You cannot create or modify a claim on a trip ticket once it has an approved claim"
@@ -54,7 +77,7 @@ class TripClaimTest < ActiveSupport::TestCase
     p = FactoryGirl.create(:provider)
     c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
     c1.decline!
-    c1.status.must_equal TripClaim::STATUS[:declined]        
+    c1.status.must_equal :declined        
   end
   
   it "can't be declined if the associated trip ticket already has an approved claim" do
@@ -74,7 +97,7 @@ class TripClaimTest < ActiveSupport::TestCase
     c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
 
     c1.approve!
-    c1.status.must_equal TripClaim::STATUS[:approved]
+    c1.status.must_equal :approved
   end
   
   it "can be rescinded" do
@@ -83,7 +106,7 @@ class TripClaimTest < ActiveSupport::TestCase
     c1 = FactoryGirl.create(:trip_claim, :trip_ticket => t, :claimant => p)
 
     c1.rescind!
-    c1.status.must_equal TripClaim::STATUS[:rescinded]
+    c1.status.must_equal :rescinded
   end
   
   it "can't be approved if the associated trip ticket already has an approved claim" do
@@ -104,7 +127,7 @@ class TripClaimTest < ActiveSupport::TestCase
     c2 = FactoryGirl.create(:trip_claim, :trip_ticket => t)
     c1.approve!
     c2.reload
-    c2.status.must_equal TripClaim::STATUS[:declined]        
+    c2.status.must_equal :declined        
   end
   
   it "won't be automatically approved if the provider relationship does not allow" do

@@ -38,10 +38,13 @@ class TripClaimsController < ApplicationController
   # POST /trip_claims.json
   def create
     @trip_claim.claimant = current_user.provider unless current_user.has_admin_role?
-    @trip_claim.status = TripClaim::STATUS[:pending]
+    @trip_claim.status = :pending
     respond_to do |format|
       if @trip_claim.save
-        format.html { redirect_to @trip_ticket, notice: 'Trip claim was successfully created.' }
+        @trip_claim.reload
+        notice = 'Trip claim was successfully created.'
+        notice += ' Your claim has been automatically approved.' if @trip_claim.approved?
+        format.html { redirect_to @trip_ticket, notice: notice }
         format.json { render json: @trip_claim, status: :created, location: @trip_claim }
       else
         format.html { render action: "new" }

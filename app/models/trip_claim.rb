@@ -2,60 +2,69 @@ class TripClaim < ActiveRecord::Base
   belongs_to :trip_ticket
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
   
-  STATUS = {
-    :pending    => 0,
-    :approved   => 1,
-    :declined   => -1,
-    :rescinded  => -2
-  }
+  ACTIVE_STATUS = [
+    :pending,
+    :approved
+  ]
+
+  INACTIVE_STATUS = [
+    :declined,
+    :rescinded
+  ]
+
+  STATUS = ACTIVE_STATUS + INACTIVE_STATUS
 
   attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
     :claimant_trip_id, :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, 
     :notes
 
-  validates_presence_of :claimant_provider_id, :status, :trip_ticket_id, 
-    :proposed_pickup_time
+  validates_presence_of :claimant_provider_id, :trip_ticket_id, :proposed_pickup_time
+    
+  validates :status, :presence => true, :inclusion => { :in => STATUS }
     
   validate :trip_ticket_is_not_claimed, :one_claim_per_trip_ticket_per_claimant
 
   audited
   
-  after_initialize do
-    if self.new_record?
-      self.status = STATUS[:pending]
-    end
-  end
-  
   after_create do
     self.approve! if self.can_be_auto_approved?
   end
+  
+  def status
+    super.try(:to_sym)
+  end
+
+  def status=(value)
+    super(value.to_sym)
+    status
+  end
 
   def approve!
-    self.status = STATUS[:approved]
+    self.status = :approved
     save!
-    trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => STATUS[:declined])
+    trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => :declined)
   end
   
   def approved?
-    self.status == STATUS[:approved]
+    self.status == :approved
   end
   
   def decline!
-    self.status = STATUS[:declined]
+    self.status = :declined
     save!
   end
   
   def rescind!
-    self.status = STATUS[:rescinded]
+    self.status = :rescinded
     save!
   end
   
   def editable?
-    (self.status.blank? || self.status == STATUS[:pending]) && (!self.trip_ticket.present? || !self.trip_ticket.approved?)
+    (self.status.blank? || self.status == :pending) && (!self.trip_ticket.present? || !self.trip_ticket.approved?)
   end
   
   def can_be_auto_approved?
-    self.claimant.can_auto_approve_for?(self.trip_ticket.originator)
+    self.editable? && (self.claimant.can_auto_approve_for?(self.trip_ticket.originator) || Array(self.trip_ticket.provider_white_list).include?(self.claimant_provider_id))
   end
   
   private

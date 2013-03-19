@@ -1,9 +1,10 @@
 class Ability
   include CanCan::Ability
  
-  # Note: Latter ability rules override previous ones
+  # Note: Latter ability rules override previous ones. See also:
+  # https://github.com/ryanb/cancan/wiki/Ability-Precedence
 
-  # Available roles: :site_admin, :provider_admin, :scheduler, :dispatcher, :csr
+  # Available roles: :site_admin, :provider_admin, :scheduler, :dispatcher, :read_only, :api
   
   # In block definitions with 3 arguments, the last argument is used by 
   # accessible_by to find resources, while the block is used to validate 
@@ -12,102 +13,180 @@ class Ability
  
   def initialize(user)
     user ||= User.new # guest user
-
-    if user.has_role? :site_admin
-      # Site admins have free reign
-      can :manage, :all
-
-    elsif user.has_role? :api
-      # API user has the same trip ticket access as users -- own provider and providers with approved relationships
-      can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets
-
-      # API user can create, update, and cancel trip tickets belonging to their own provider
-      can [:create, :update, :cancel], TripTicket, :origin_provider_id => user.provider_id
-
-    else
-      # Users can read their own provider or providers they have an approved relationship with
-      can :read, Provider, :id => user.partner_provider_ids_for_tickets 
+    
+    if user.has_admin_role?
       
-      # Users can read provider relationships that their own provider belongs to
-      can :read, ProviderRelationship, ['cooperating_provider_id = ? OR requesting_provider_id = ?', user.provider_id, user.provider_id] do |pr|
-        pr.includes_user?(user)
-      end
-
-      # Users can read services belonging to their own provider
-      can :read, Service, :provider_id => user.provider_id
-
-      # Users can access a list trip claims belonging to their own provider, and can additionally read individual trip claims associated with trip_tickets that belong to their own provider
-      can :read, TripClaim, TripClaim.joins(:trip_ticket).where('trip_claims.claimant_provider_id = ? OR trip_tickets.origin_provider_id = ?', user.provider_id, user.provider_id) do |tc|
-        tc.claimant_provider_id == user.provider_id || tc.trip_ticket.origin_provider_id == user.provider_id
-      end
-
-      # Users can access a list trip ticket comments associated with trip tickets belonging to their own provider
-      can :read, TripTicketComment, :trip_ticket => {:origin_provider_id => user.partner_provider_ids_for_tickets}
-
-      # Users can read trip tickets belonging to their own provider or providers they have an approved relationship with
-      can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets 
+      can :manage, [User, Provider]
       
-      # Users can read and update their own record
-      can [:read, :update], User, :id => user.id
-
-      if user.has_role? :provider_admin
-        # Provider admins can update and work with the keys of their own provider
-        can [:update, :keys, :reset_keys], Provider, :id => user.provider_id
-
-        # Provider admins can update and destroy provider relationships that their own provider belongs to
-        can [:update, :destroy], ProviderRelationship do |pr|
-          pr.includes_user?(user)
-        end
-        
-        # Provider admins can activate (aka approve) provider relationships sent to their own provider
-        can :activate, ProviderRelationship, :cooperating_provider_id => user.provider_id
-        
-        # Provider admins can create provider relationships originating from their own provider
-        can :create, ProviderRelationship, :requesting_provider_id => user.provider_id
-      
-        # Provider admins can create and update services belonging to their own provider
-        can [:create, :update], Service, :provider_id => user.provider_id
-
-        # Provider admins can read, create, update, activate, deactivate, and set the role of users belonging to their own provider
-        can [:read, :create, :update, :activate, :deactivate, :set_provider_role], User, :provider_id => user.provider_id
-      
-        # Provider admins can approve and decline trip claims associated with trip tickets that belong to their own provider, but not trip claims belonging to their own provider
-        can [:approve, :decline], TripClaim, :trip_ticket => { :origin_provider_id => user.provider_id }
-
-        # Provider admins can create, update, and destroy trip tickets belonging to their own provider
-        can [:create, :update, :destroy], TripTicket, :origin_provider_id => user.provider_id
-        
-        # Provider admins can update, and destroy trip ticket comments associated with trip tickets belonging to their own provider
-        can [:update], TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
-      end
-      
-      if user.has_any_role? [:scheduler, :provider_admin]        
-        # Schedulers and provider admins can create trip claims belonging to their own provider, on trip tickets belonging to providers they have an approved relationship with, but not their own provider's trip tickets
-        can :create, TripClaim, :claimant_provider_id => user.provider_id, :trip_ticket => { :origin_provider_id => ProviderRelationship.partner_ids_for_provider(user.provider) }
-
-        # Schedulers and provider admins can update or rescind trip claims belonging to their own provider
-        can [:update, :rescind], TripClaim, :claimant_provider_id => user.provider_id
-        
-        # Schedulers and provider admins can create trip ticket comments associated with trip tickets belonging to their own provider
-        can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
-      end
     end
 
-    # Users cannot deactivate themselves
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :dispatcher, :api]
+      
+      # Per Feb 12, 2013 minutes: 
+      #   Site Admin must be associated with a provider and can only act on
+      #   tickets/claims/open capacity on behalf of his provider. If a site
+      #   admin needs to do anything on behalf of another provider he/she will
+      #   have to change his/her provider. (Only site admin can change his
+      #   provider)
+
+      # Dispatchers and above can edit/cancel open capacity belonging to their own provider
+      # TODO - add a :cancel, :rescind, or similar action for open capacities
+      can :update, OpenCapacity, :service => { :provider_id => user.provider_id }
+      
+      # Dispatchers and above can edit/cancel tickets belonging to their own provider
+      # TODO - add a :cancel, :rescind, or similar action for trip tickets
+      can :update, TripTicket, :origin_provider_id => user.provider_id
+      
+    end
+    
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :api]
+      
+      # Per Feb 12, 2013 minutes: 
+      #   Site Admin must be associated with a provider and can only act on
+      #   tickets/claims/open capacity on behalf of his provider. If a site
+      #   admin needs to do anything on behalf of another provider he/she will
+      #   have to change his/her provider. (Only site admin can change his
+      #   provider)
+
+      # Schedulers and above can create trip tickets belonging to their own provider
+      can :create, TripTicket, :origin_provider_id => user.provider_id
+      
+      # Schedulers and above can create, rescind, and update trip claims belonging to their own provider, on trip tickets belonging to providers they have an approved relationship with, but not their own provider's trip tickets
+      can [:create, :rescind, :update], TripClaim, :claimant_provider_id => user.provider_id, :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets - [user.provider_id] }
+
+      # Schedulers and above can approve and decline trip claims belonging to trip tickets that belong to their own provider
+      can [:approve, :decline], TripClaim, :trip_ticket => { :origin_provider_id => user.provider_id }
+
+      # Schedulers and above can create open capacities belonging to their own provider
+      can :create, OpenCapacity, :service => { :provider_id => user.provider_id }
+
+      # Schedulers and above can create, rescind, and update service requests belonging to their own provider, on open capacities belonging to providers they have an approved relationship with, but not their own provider's trip tickets
+      # TODO - add appropriate tests once service request functionality has been defined
+      can [:create, :rescind, :update], ServiceRequest, :provider_id => user.provider_id, :open_capacity => { :service => { :provider_id => user.partner_provider_ids_for_tickets - [user.provider_id] } }
+
+      # Schedulers and above can approve and decline service requests belonging to open capacities that belong to their own provider
+      # TODO - add appropriate tests once service request functionality has been defined
+      can [:approve, :decline], ServiceRequest, :open_capacity => { :service => { :provider_id => user.provider_id } }
+
+      # Schedulers and above can manage (create, update, cancel) open capacity routes belonging to their own provider
+      # TODO - add a :cancel, :rescind, or similar action for waypoints
+      # TODO - add appropriate tests once waypoint functionality has been better defined
+      can [:create, :read, :update], Waypoint, :open_capacity => { :service => { :provider_id => user.provider_id } }
+              
+    end
+
+    if user.has_any_role? [:api]
+
+      # per Clearinghouse User Ability Matrix doc, API has same abilities as Scheduler with these specific exceptions
+      cannot :rescind, ServiceRequest
+
+    end
+
+    if user.has_any_role? [:site_admin, :provider_admin]
+      
+      # Per ticket #1225:
+      #   Per the approved matrix site admins can:
+      #     * set up partnerships
+      #     * approve partnerships
+      #     * end partnerships 
+      #     * flag partner for as auto approve or unflag this.
+      #   Site admins can do this for their own provider. To do this for 
+      #   another provider they have to switch which provider he is 
+      #   representing.
+      
+      # Provider admins and above can create provider relationships originating from their own provider
+      can :create, ProviderRelationship, :requesting_provider_id => user.provider_id
+      
+      # Provider admins and above can update and destroy provider relationships that their own provider belongs to
+      can [:update, :destroy], ProviderRelationship do |pr|
+        pr.includes_user?(user)
+      end
+      
+      # Provider admins and above can activate (aka approve) provider relationships sent to their own provider
+      can :activate, ProviderRelationship, :cooperating_provider_id => user.provider_id
+            
+      # Provider admins and above can create, update and deactivate users belonging to their own provider
+      can [:create, :update, :activate, :deactivate, :set_provider_role], User, :provider_id => user.provider_id
+      
+      # Provider admins and above can update and work with the keys of their own provider
+      can [:update, :keys, :reset_keys], Provider, :id => user.provider_id
+
+      # Provider admins and above can create and update services belonging to their own provider
+      # TODO - add a :cancel, :rescind, or similar action for services
+      can [:create, :update], Service, :provider_id => user.provider_id
+              
+      # Provider admins and above can update trip ticket comments associated with trip tickets belonging to their own provider
+      can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
+      
+    end
+
+    # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with
+    can :read, OpenCapacity, :service => { :provider_id => user.partner_provider_ids_for_tickets }
+
+    # All users can read their own provider or providers they have an approved relationship with
+    can :read, Provider, :id => user.partner_provider_ids_for_tickets
+
+    # All users can read provider relationships that their own provider belongs to
+    can :read, ProviderRelationship, ['? IN (cooperating_provider_id, requesting_provider_id)', user.provider_id] do |pr|
+      pr.includes_user?(user)
+    end
+
+    # All users can read services belonging to their own provider or providers they have an approved relationship with
+    can :read, Service, :provider_id => user.partner_provider_ids_for_tickets
+
+    # All users can read services belonging to their own provider or providers they have an approved relationship with
+    # TODO - add appropriate tests once service request functionality has been defined
+    can :read, ServiceRequest, :open_capacity => { :service => { :provider_id => user.partner_provider_ids_for_tickets } }
+
+    # All users can read trip ticket claims, results and comments that belong to trip tickets that belong to their own provider or providers they have an approved relationship with
+    # TODO - add appropriate tests once trip result functionality has been defined
+    can :read, [TripClaim, TripResult, TripTicketComment], :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
+
+    # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with,
+    # except if there's a black list on the trip ticket
+    can :read, TripTicket, ['origin_provider_id IN (?) AND (provider_black_list IS NULL OR ? <> ALL(provider_black_list))', user.partner_provider_ids_for_tickets, user.provider_id] do |tt|
+      user.partner_provider_ids_for_tickets.include?(tt.origin_provider_id) && !Array(tt.provider_black_list).include?(user.provider_id)
+    end
+  
+    # Per Feb 12, 2013 meeting minutes:
+    #   If you can view a ticket you can comment on a ticket.
+    can :create, TripTicketComment, :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
+
+    # All users can read users belonging to their own provider
+    can :read, User, :provider_id => user.provider_id
+
+    # All users can update their own profile
+    can :update, User, :id => user.id
+
+    # No user can deactivate themselves
     cannot :deactivate, User, :id => user.id
     
-    # Users cannot destroy themselves
-    cannot :destroy, User, :id => user.id
+    # No user can destroy primary objects
+    cannot :destroy, [
+      OpenCapacity,
+      Provider,
+      Service,
+      ServiceRequest,
+      TripClaim,
+      TripResult,
+      TripTicket,
+      TripTicketComment,
+      User,
+    ]
     
-    # Nobody can delete trip ticket comments
-    cannot :destroy, TripTicketComment
+    # TODO - Verify destroy capabilities on remaining models
+    #   FundingSource
+    #   Location
+    #   OperatingHours
+    #   ProviderRelationship (Should we provide an option to deactivate a relationship rather than delete it?)
+    #   Waypoint
 
     # If you're trying to check `can? :read_multiple, @my_resources` where 
     # @my_resources is a collection of objects from an ActiveRecord::Relation
     # query, remember to use `@my_resources.all` instead to convert it to an 
     # Array otherwise this `can` definition won't be matched
     can :read_multiple, Array do |arr|
-      arr.empty? || arr.inject(true){|r, el| r && can?(:read, el)}
+      arr.empty? || arr.inject(true){|bool, resource| bool && can?(:read, resource)}
     end
   end
 end

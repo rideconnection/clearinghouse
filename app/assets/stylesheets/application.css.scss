@@ -19,6 +19,7 @@
 
 html {
   min-width:1280px;
+  height:100%;
 }
 
 body {
@@ -27,6 +28,7 @@ body {
   background:#dedede url(image-path("bg-body.gif")) repeat-y 50% 0;
   color:#444;
   font:12px/14px 'Open Sans', Arial, Helvetica, sans-serif;
+  height:100%;
   margin:0;
   min-width:1280px;
   

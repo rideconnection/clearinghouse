@@ -9,7 +9,7 @@ class AdminUserTest < ActionController::IntegrationTest
     @provider = FactoryGirl.create(:provider, :name => "Microsoft")
     @user = FactoryGirl.create(:user)
     @other_user = FactoryGirl.create(:user, :name => "Muffin Bon Visor")
-    @user.roles << Role.find_or_create_by_name!("site_admin")
+    @user.role = Role.find_or_create_by_name!("site_admin")
     login_as(@user, :scope => :user)
   end
 
@@ -103,7 +103,8 @@ class AdminUserTest < ActionController::IntegrationTest
     visit "/users"
     assert page.has_content?("Muffin Bon Visor")
     
-    @user.roles.destroy_all
+    @user.role = FactoryGirl.create(:role, :name => "foo")
+    @user.save!
     
     visit "/users"
     assert !page.has_content?("Muffin Bon Visor")

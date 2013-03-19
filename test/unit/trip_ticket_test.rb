@@ -28,10 +28,10 @@ class TripTicketTest < ActiveSupport::TestCase
   it "knows if it has an approved claim" do
     @trip_ticket.approved?.must_equal false
     
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @trip_ticket)
+    FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @trip_ticket)
     @trip_ticket.approved?.must_equal false
 
-    FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:approved], :trip_ticket => @trip_ticket)
+    FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
     @trip_ticket.approved?.must_equal true
   end
   
@@ -43,6 +43,23 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.includes_claim_from?(p).must_equal true
   end
   
+  it "should know it doesn't have a claim from a provider if the status is denied/rescinded" do
+    provider = FactoryGirl.create(:provider)
+    claim = FactoryGirl.create(:trip_claim, 
+      :trip_ticket  => @trip_ticket, 
+      :claimant     => provider
+    )
+    assert @trip_ticket.includes_claim_from?(provider)
+
+    claim.update_attributes!(:status => :rescinded)
+    assert !@trip_ticket.includes_claim_from?(provider)
+    claim.update_attributes!(:status => :declined)
+    assert !@trip_ticket.includes_claim_from?(provider)
+
+    claim.update_attributes!(:status => :approved)
+    assert @trip_ticket.includes_claim_from?(provider)
+  end
+
   it "has an hstore field for customer_identifiers which returns a hash" do
     assert_equal({}, @trip_ticket.customer_identifiers)
     @trip_ticket.customer_identifiers = {
@@ -55,7 +72,7 @@ class TripTicketTest < ActiveSupport::TestCase
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
   
-  TripTicket::ARRAY_FIELD_NAMES.each do |field_sym|
+  TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)
       @trip_ticket.send("#{field_sym.to_s}=".to_sym, [
@@ -67,6 +84,76 @@ class TripTicketTest < ActiveSupport::TestCase
       @trip_ticket.reload
       # NOTE - Values are coerced to strings
       assert_equal ['a', 'B', '1'], @trip_ticket.send(field_sym)
+    end
+  end
+  
+  describe "white/black lists" do
+    it "has an integer_array field for provider_white_list which returns an array" do
+      assert_equal nil, @trip_ticket.provider_white_list
+      @trip_ticket.provider_white_list = [
+        '2',
+        1
+      ]
+      @trip_ticket.save!
+      @trip_ticket.reload
+      # NOTE - Values are coerced to integers
+      assert_equal [2, 1], @trip_ticket.provider_white_list
+    end
+
+    it "has an integer_array field for provider_black_list which returns an array" do
+      assert_equal nil, @trip_ticket.provider_black_list
+      @trip_ticket.provider_black_list = [
+        '2',
+        1
+      ]
+      @trip_ticket.save!
+      @trip_ticket.reload
+      # NOTE - Values are coerced to integers
+      assert_equal [2, 1], @trip_ticket.provider_black_list
+    end
+  
+    it "doesn't allow both white and black lists to be populated" do
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1]
+      @trip_ticket.provider_black_list = []
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = []
+      @trip_ticket.provider_black_list = [1]
+      assert @trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1]
+      @trip_ticket.provider_black_list = [1]
+      assert !@trip_ticket.valid?
+    end
+    
+    it "allows only integer values for provider_white_list" do
+      @trip_ticket.provider_white_list = []
+      assert @trip_ticket.valid?
+
+      @trip_ticket.provider_white_list = ['a']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [:'3']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_white_list = [1.3]
+      assert !@trip_ticket.valid?
+    end
+    
+    it "allows only integer values for provider_black_list" do
+      @trip_ticket.provider_black_list = []
+      assert @trip_ticket.valid?
+
+      @trip_ticket.provider_black_list = ['a']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_black_list = [:'3']
+      assert !@trip_ticket.valid?
+      
+      @trip_ticket.provider_black_list = [1.3]
+      assert !@trip_ticket.valid?
     end
   end
   
@@ -184,25 +271,25 @@ class TripTicketTest < ActiveSupport::TestCase
 
         # one claim, not approved
         @t2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t2)
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2)
         
         @t3 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t3)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3)
 
         # multiple claims, pending and declined
         @t4 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t4)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t4)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4)
 
         # multiple claims, one approved
         @t5 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:declined], :trip_ticket => @t5)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending],  :trip_ticket => @t5).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5)
+        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5).approve!
 
         # one claim, approved
         @t6 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => TripClaim::STATUS[:pending], :trip_ticket => @t6).approve!
+        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6).approve!
       end
       
       it "has a filter_by_claim_status method" do
