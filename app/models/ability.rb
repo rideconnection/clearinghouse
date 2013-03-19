@@ -16,6 +16,14 @@ class Ability
     if user.has_role? :site_admin
       # Site admins have free reign
       can :manage, :all
+
+    elsif user.has_role? :api
+      # API user has the same trip ticket access as users -- own provider and providers with approved relationships
+      can :read, TripTicket, :origin_provider_id => user.partner_provider_ids_for_tickets
+
+      # API user can create, update, and cancel trip tickets belonging to their own provider
+      can [:create, :update, :cancel], TripTicket, :origin_provider_id => user.provider_id
+
     else
       # Users can read their own provider or providers they have an approved relationship with
       can :read, Provider, :id => user.partner_provider_ids_for_tickets 
