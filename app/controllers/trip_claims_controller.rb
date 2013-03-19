@@ -41,8 +41,10 @@ class TripClaimsController < ApplicationController
     @trip_claim.status = :pending
     respond_to do |format|
       if @trip_claim.save
-        @trip_claim.approve! if @trip_claim.can_be_auto_approved?
-        format.html { redirect_to @trip_ticket, notice: 'Trip claim was successfully created.' }
+        @trip_claim.reload
+        notice = 'Trip claim was successfully created.'
+        notice += ' Your claim has been automatically approved.' if @trip_claim.approved?
+        format.html { redirect_to @trip_ticket, notice: notice }
         format.json { render json: @trip_claim, status: :created, location: @trip_claim }
       else
         format.html { render action: "new" }
