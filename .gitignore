@@ -21,3 +21,6 @@
 
 config/database.yml
 erd.pdf
+
+# ignore JetBrains IDE config files
+/.idea
