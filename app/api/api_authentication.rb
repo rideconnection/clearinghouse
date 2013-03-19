@@ -20,7 +20,9 @@ module API_Authentication
       end
 
       def current_user
-        @current_user ||= User.new(name: 'API', provider: current_provider, roles: [Role.new(name: 'api')])
+        @current_user ||= current_provider.users.build(name: 'API')
+        @current_user.role ||= Role.new(name: 'api')
+        @current_user
       end
 
       def current_provider
