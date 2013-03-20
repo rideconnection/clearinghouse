@@ -20,14 +20,23 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
     @provider_relationship_1.approve!
     @provider_relationship_2.approve!
 
-    @trip_ticket_1  = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
-    @trip_ticket_2  = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
-    @trip_ticket_3  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
+    @trip_ticket_1 = FactoryGirl.create(:trip_ticket, :originator => @provider_1)
+    @trip_ticket_2 = FactoryGirl.create(:trip_ticket, :originator => @provider_2)
+    @trip_ticket_3 = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
 
     # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with
     # Dispatchers and above can edit/cancel tickets belonging to their own provider
     # Schedulers and above can create trip tickets belonging to their own provider
     # No user can destroy trip tickets
+
+    # TripTicket#provider_white_list and TripTicket.provider_black_list affect
+    # ticket visibility on a ticket-by-ticket basis. Only providers that have
+    # an approved relationship should appear in these lists, so the permissions
+    # should be XAND'd together.
+    @trip_ticket_4 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :provider_black_list => [@provider_1.id])
+    @trip_ticket_5 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :provider_black_list => [@provider_3.id])
+    @trip_ticket_6 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :provider_white_list => [@provider_1.id])
+    @trip_ticket_7 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :provider_white_list => [@provider_3.id])
   end
 
   describe "site_admin role" do
@@ -42,6 +51,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       accessible.must_include @trip_ticket_1
       accessible.must_include @trip_ticket_2
       accessible.wont_include @trip_ticket_3
+      accessible.wont_include @trip_ticket_4
+      accessible.must_include @trip_ticket_5
+      accessible.must_include @trip_ticket_6
+      accessible.wont_include @trip_ticket_7
     end
   
     it "can create trip tickets belonging to their own provider" do
@@ -51,10 +64,14 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @site_admin.cannot?(:create, TripTicket.new(:origin_provider_id => @provider_3.id))
     end
   
-    it "can read trip tickets regardless of provider" do
+    it "can read trip tickets belonging to their own provider or providers they have an approved relationship with" do
       assert @site_admin.can?(:read, @trip_ticket_1)
       assert @site_admin.can?(:read, @trip_ticket_2)
       assert @site_admin.cannot?(:read, @trip_ticket_3)
+      assert @site_admin.cannot?(:read, @trip_ticket_4)
+      assert @site_admin.can?(:read, @trip_ticket_5)
+      assert @site_admin.can?(:read, @trip_ticket_6)
+      assert @site_admin.cannot?(:read, @trip_ticket_7)
     end
   
     it "can update trip tickets belonging to their own provider" do
@@ -82,6 +99,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       accessible.must_include @trip_ticket_1
       accessible.must_include @trip_ticket_2
       accessible.wont_include @trip_ticket_3
+      accessible.wont_include @trip_ticket_4
+      accessible.must_include @trip_ticket_5
+      accessible.must_include @trip_ticket_6
+      accessible.wont_include @trip_ticket_7
     end
   
     it "can create trip tickets belonging to their own provider" do
@@ -95,6 +116,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @provider_admin.can?(:read, @trip_ticket_1)
       assert @provider_admin.can?(:read, @trip_ticket_2)
       assert @provider_admin.cannot?(:read, @trip_ticket_3)
+      assert @provider_admin.cannot?(:read, @trip_ticket_4)
+      assert @provider_admin.can?(:read, @trip_ticket_5)
+      assert @provider_admin.can?(:read, @trip_ticket_6)
+      assert @provider_admin.cannot?(:read, @trip_ticket_7)
     end
   
     it "can update trip tickets belonging to their own provider" do
@@ -122,6 +147,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       accessible.must_include @trip_ticket_1
       accessible.must_include @trip_ticket_2
       accessible.wont_include @trip_ticket_3
+      accessible.wont_include @trip_ticket_4
+      accessible.must_include @trip_ticket_5
+      accessible.must_include @trip_ticket_6
+      accessible.wont_include @trip_ticket_7
     end
 
     it "can create trip tickets belonging to their own provider" do
@@ -135,6 +164,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @scheduler.can?(:read, @trip_ticket_1)
       assert @scheduler.can?(:read, @trip_ticket_2)
       assert @scheduler.cannot?(:read, @trip_ticket_3)
+      assert @scheduler.cannot?(:read, @trip_ticket_4)
+      assert @scheduler.can?(:read, @trip_ticket_5)
+      assert @scheduler.can?(:read, @trip_ticket_6)
+      assert @scheduler.cannot?(:read, @trip_ticket_7)
     end
 
     it "can update trip tickets belonging to their own provider" do
@@ -162,6 +195,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       accessible.must_include @trip_ticket_1
       accessible.must_include @trip_ticket_2
       accessible.wont_include @trip_ticket_3
+      accessible.wont_include @trip_ticket_4
+      accessible.must_include @trip_ticket_5
+      accessible.must_include @trip_ticket_6
+      accessible.wont_include @trip_ticket_7
     end
 
     it "cannot create trip tickets regardless of provider" do
@@ -175,6 +212,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @dispatcher.can?(:read, @trip_ticket_1)
       assert @dispatcher.can?(:read, @trip_ticket_2)
       assert @dispatcher.cannot?(:read, @trip_ticket_3)
+      assert @dispatcher.cannot?(:read, @trip_ticket_4)
+      assert @dispatcher.can?(:read, @trip_ticket_5)
+      assert @dispatcher.can?(:read, @trip_ticket_6)
+      assert @dispatcher.cannot?(:read, @trip_ticket_7)
     end
 
     it "can update trip tickets belonging to their own provider" do
@@ -202,6 +243,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       accessible.must_include @trip_ticket_1
       accessible.must_include @trip_ticket_2
       accessible.wont_include @trip_ticket_3
+      accessible.wont_include @trip_ticket_4
+      accessible.must_include @trip_ticket_5
+      accessible.must_include @trip_ticket_6
+      accessible.wont_include @trip_ticket_7
     end
 
     it "cannot create trip tickets regardless of provider" do
@@ -215,6 +260,10 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @read_only.can?(:read, @trip_ticket_1)
       assert @read_only.can?(:read, @trip_ticket_2)
       assert @read_only.cannot?(:read, @trip_ticket_3)
+      assert @read_only.cannot?(:read, @trip_ticket_4)
+      assert @read_only.can?(:read, @trip_ticket_5)
+      assert @read_only.can?(:read, @trip_ticket_6)
+      assert @read_only.cannot?(:read, @trip_ticket_7)
     end
 
     it "cannot update trip tickets regardless of provider" do
