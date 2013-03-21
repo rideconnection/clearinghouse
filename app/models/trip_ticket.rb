@@ -105,6 +105,12 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
+  def can_record_a_result?
+    test_result = TripResult.new(:outcome => "Completed")
+    test_result.trip_ticket = self
+    test_result.valid?
+  end
+
   def customer_full_name
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end

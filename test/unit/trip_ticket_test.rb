@@ -35,6 +35,12 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.approved?.must_equal true
   end
   
+  it "knows if it can have a trip result" do
+    assert !@trip_ticket.can_record_a_result? 
+    FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
+    assert @trip_ticket.can_record_a_result? 
+  end
+
   it "knows if it has a claim from a specific provider" do
     p = FactoryGirl.create(:provider)
     FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
