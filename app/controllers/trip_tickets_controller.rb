@@ -90,6 +90,7 @@ class TripTicketsController < ApplicationController
     @trip_ticket.build_customer_address  unless @trip_ticket.customer_address
     @trip_ticket.build_drop_off_location unless @trip_ticket.drop_off_location
     @trip_ticket.build_pick_up_location  unless @trip_ticket.pick_up_location
+    @trip_ticket.build_trip_result if @trip_ticket.can_create_new_result?
   end
   
   def compact_array_params

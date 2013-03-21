@@ -207,6 +207,19 @@ class TripTicketsTest < ActionController::IntegrationTest
       assert page.has_selector?('.hstoreAttributeValue[value=\'Waste\']')
     end
 
+    test "authorized users can edit trip results on tickets with approved claims" do
+      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
+      trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
+      visit edit_trip_ticket_path(trip_ticket) 
+      select "Completed", :from => "trip_ticket_trip_result_attributes_outcome"
+      fill_in "trip_ticket_trip_result_attributes_fare", :with => 100
+
+      click_button "Update Trip ticket"
+
+      assert page.has_content?("Trip ticket was successfully updated")
+      assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
+    end
+
     test "users who cannot edit an existing trip ticket should see an unordered list of customer identifier attribute pairs" do
       provider_2 = FactoryGirl.create(:provider)
       relationship = ProviderRelationship.create!(

@@ -53,14 +53,14 @@ class TripTicket < ActiveRecord::Base
     :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,
     :origin_trip_id, :pick_up_location_attributes, :pick_up_location_id,
     :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
-    :trip_notes, :trip_purpose_description,
+    :trip_notes, :trip_purpose_description, :trip_result_attributes,
     :customer_identifiers, :customer_mobility_impairments, 
     :customer_eligibility_factors, :customer_assistive_devices, 
     :customer_service_animals, :guest_or_attendant_service_animals,
     :guest_or_attendant_assistive_devices, :trip_funders,
     :provider_white_list, :provider_black_list
   
-  accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location
+  accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
   audited
   
@@ -105,7 +105,11 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  def can_record_a_result?
+  def can_create_or_edit_result?
+    self.trip_result || can_create_new_result?
+  end
+
+  def can_create_new_result?
     test_result = TripResult.new(:outcome => "Completed")
     test_result.trip_ticket = self
     test_result.valid?

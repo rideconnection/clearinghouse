@@ -1,0 +1,48 @@
+  <div class="field">
+    <%= f.label :outcome %>
+    <%= f.select :outcome, TripResult::OUTCOMES %>
+  </div>
+  <div class="field">
+    <%= f.label :actual_pick_up_time %>
+    <%= f.time_select :actual_pick_up_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+  </div>
+  <div class="field">
+    <%= f.label :actual_drop_off_time %>
+    <%= f.time_select :actual_drop_off_time, :ampm => true, :minute_step => 15, :include_blank => true %>
+  </div>
+  <div class="field">
+    <%= f.label :rate %>
+    <%= f.number_field :rate, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :base_fare %>
+    <%= f.number_field :base_fare, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :fare %>
+    <%= f.number_field :fare, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :driver_id %>
+    <%= f.number_field :driver_id, :min => 0 %>
+  </div>
+  <div class="field">
+    <%= f.label :miles_traveled %>
+    <%= f.number_field :miles_traveled, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :odometer_start %>
+    <%= f.number_field :odometer_start, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :odometer_end %>
+    <%= f.number_field :odometer_end, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :billable_mileage %>
+    <%= f.number_field :billable_mileage, :min => 0, :max => 1000000 %>
+  </div>
+  <div class="field">
+    <%= f.label :extra_securement_count %>
+    <%= f.number_field :extra_securement_count, :min => 0 %>
+  </div>

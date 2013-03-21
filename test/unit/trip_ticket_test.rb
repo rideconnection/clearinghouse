@@ -36,9 +36,16 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   it "knows if it can have a trip result" do
-    assert !@trip_ticket.can_record_a_result? 
+    assert !@trip_ticket.can_create_new_result? 
+
     FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
-    assert @trip_ticket.can_record_a_result? 
+    assert @trip_ticket.can_create_new_result? 
+
+    result = TripResult.new(:outcome => "Completed")
+    result.trip_ticket = @trip_ticket
+    result.save!
+    assert !@trip_ticket.can_create_new_result? # already have a result now
+    assert @trip_ticket.can_create_or_edit_result? # but can edit existing result 
   end
 
   it "knows if it has a claim from a specific provider" do
