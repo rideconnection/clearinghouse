@@ -4,7 +4,7 @@ class Ability
   # Note: Latter ability rules override previous ones. See also:
   # https://github.com/ryanb/cancan/wiki/Ability-Precedence
 
-  # Available roles: :site_admin, :provider_admin, :scheduler, :dispatcher, :read_only
+  # Available roles: :site_admin, :provider_admin, :scheduler, :dispatcher, :read_only, :api
   
   # In block definitions with 3 arguments, the last argument is used by 
   # accessible_by to find resources, while the block is used to validate 
@@ -19,8 +19,8 @@ class Ability
       can :manage, [User, Provider]
       
     end
-    
-    if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :dispatcher]
+
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :dispatcher, :api]
       
       # Per Feb 12, 2013 minutes: 
       #   Site Admin must be associated with a provider and can only act on
@@ -39,7 +39,7 @@ class Ability
       
     end
     
-    if user.has_any_role? [:site_admin, :provider_admin, :scheduler]
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :api]
       
       # Per Feb 12, 2013 minutes: 
       #   Site Admin must be associated with a provider and can only act on
@@ -74,7 +74,14 @@ class Ability
       can [:create, :read, :update], Waypoint, :open_capacity => { :service => { :provider_id => user.provider_id } }
               
     end
-    
+
+    if user.has_any_role? [:api]
+
+      # per Clearinghouse User Ability Matrix doc, API has same abilities as Scheduler with these specific exceptions
+      cannot :rescind, ServiceRequest
+
+    end
+
     if user.has_any_role? [:site_admin, :provider_admin]
       
       # Per ticket #1225:
@@ -112,7 +119,7 @@ class Ability
       can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
       
     end
-    
+
     # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with
     can :read, OpenCapacity, :service => { :provider_id => user.partner_provider_ids_for_tickets }
 
