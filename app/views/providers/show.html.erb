@@ -16,8 +16,7 @@
 <section>
   <div class="field">
     <label>Primary Contact:</label>
-    <%= link_to @provider.primary_contact.name,
-                user_path(@provider.primary_contact) %>
+    <%= mail_to @provider.primary_contact_email %>
   </div>
 </section>
 

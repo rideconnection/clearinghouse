@@ -10,8 +10,7 @@ module Clearinghouse
       end
 
       class Provider < Grape::Entity
-        expose :name, :primary_contact_id
-        expose :primary_contact, :using => Clearinghouse::Entities::V1::User
+        expose :name, :primary_contact_email
         expose :address, :as => :foo, :using => Location
       end
 

@@ -19,9 +19,8 @@
     <%= render 'locations/address_form', :f => af %>
   <% end %>
   <div class="field">
-    <%= f.label :primary_contact_id %>
-    <%= collection_select :provider, :primary_contact_id, User.all, :id, :name,
-                          :prompt => true %>
+    <%= f.label :primary_contact_email %>
+    <%= f.text_field :primary_contact_email %>
   </div>
 
   <div class="buttons-holder">

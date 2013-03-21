@@ -3,21 +3,19 @@ class Provider < ActiveRecord::Base
   has_many :nonces
   has_many :users
   belongs_to :address, :class_name => :Location, :validate => true, :dependent => :destroy
-  belongs_to :primary_contact, :class_name => :User
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
   
   # :address_attributes is needed to support mass-assignment of nested attrs
   attr_accessible :active, :address, :address_attributes, :name,
-                  :primary_contact_id
+                  :primary_contact_email
   accepts_nested_attributes_for :address
   
   after_create :generate_initial_api_keys
-  after_save :update_user_provider
   
   validates :api_key, uniqueness: true, presence: {on: :update}
   validates :private_key, presence: {on: :update}
-  validates_presence_of :name, :address, :primary_contact_id
+  validates_presence_of :name, :address, :primary_contact_email
   
   def approved_partnerships
     partnerships = ProviderRelationship.where(
@@ -77,12 +75,4 @@ class Provider < ActiveRecord::Base
     generate_api_key! unless self.api_key.present?
     generate_private_key! unless self.private_key.present?
   end  
-
-  # If a user has been made primary contact of this provider, then the user
-  # should be a member of this provider.
-  def update_user_provider
-    self.primary_contact.provider = self
-    self.primary_contact.save!
-  end
-
 end

@@ -18,8 +18,7 @@
       <tr>
         <td><%= provider.id %></td>
         <td><%= link_to provider.name, provider_path(provider) %></td>
-        <td><%= link_to provider.primary_contact.name,
-                        user_path(provider.primary_contact) %></td>
+        <td><%= mail_to (provider.primary_contact_email) %></td>
         <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
         <% if provider.active? %>
           <td><%= link_to 'Deactivate', deactivate_provider_path(provider),
