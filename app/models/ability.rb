@@ -144,10 +144,12 @@ class Ability
 
     # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with,
     # except if there's a black list on the trip ticket
-    can :read, TripTicket, ['origin_provider_id IN (?) AND (provider_black_list IS NULL OR ARRAY_NDIMS(provider_black_list) = 0 OR ? <> ALL(provider_black_list)) AND (provider_white_list IS NULL OR ARRAY_NDIMS(provider_white_list) = 0 OR ? = ANY(provider_white_list))', user.partner_provider_ids_for_tickets, user.provider_id, user.provider_id] do |tt|
-      user.partner_provider_ids_for_tickets.include?(tt.origin_provider_id) && 
-        (tt.provider_black_list.blank? || !tt.provider_black_list.include?(user.provider_id)) && 
-        (tt.provider_white_list.blank? || tt.provider_white_list.include?(user.provider_id))
+    can :read, TripTicket, ['origin_provider_id = ? OR (origin_provider_id IN (?) AND (provider_black_list IS NULL OR ARRAY_NDIMS(provider_black_list) = 0 OR ? <> ALL(provider_black_list)) AND (provider_white_list IS NULL OR ARRAY_NDIMS(provider_white_list) = 0 OR ? = ANY(provider_white_list)))', user.provider_id, user.partner_provider_ids_for_tickets, user.provider_id, user.provider_id] do |tt|
+      tt.origin_provider_id == user.provider_id || (                                             # A user should always be able to see tickets belonging to their own provider
+        user.partner_provider_ids_for_tickets.include?(tt.origin_provider_id) &&                 # If it's not their ticket, then is it from an approved provider?
+        (tt.provider_black_list.blank? || !tt.provider_black_list.include?(user.provider_id)) && # If there's a blacklist, the user's provider MUST NOT be included
+        (tt.provider_white_list.blank? || tt.provider_white_list.include?(user.provider_id))     # If there's a whitelist, the user's provider MUST be included
+      )
     end
   
     # Per Feb 12, 2013 meeting minutes:
