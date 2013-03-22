@@ -102,22 +102,30 @@ module Clearinghouse
           present trip_tickets_filter(TripTicket.accessible_by(current_ability)), with: Clearinghouse::Entities::V1::TripTicket
         end
 
+        # TODO add all available parameters to create/update actions so API is self-documenting
+        #params do
+          #group :trip_ticket do
+            #requires :customer_dob, :customer_first_name, :customer_last_name,
+            #  :customer_primary_phone, :customer_seats_required, :origin_customer_id,
+            #  :requested_drop_off_time, :requested_pickup_time
+          #end
+        #end
+        desc "Create a trip ticket"
+        put :create do
+          trip_ticket = TripTicket.new(params[:trip_ticket])
+          trip_ticket.origin_provider_id ||= current_provider.id
+          error! "Access Denied", 401 unless current_ability.can?(:create, trip_ticket)
+          if trip_ticket.save
+            present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
+          else
+            error!({message: "Could not create trip ticket", errors: trip_ticket.errors}, status: :unprocessable_entity)
+          end
+        end
+
         params do
           requires :id, :type => Integer, :desc => 'Trip ticket ID.'
         end
         scope :requires_id do
-          desc "Create a trip ticket"
-          put :create do
-            trip_ticket = TripTicket.new(params[:trip_ticket])
-            trip_ticket.origin_provider_id ||= current_provider.id
-            error! "Access Denied", 401 unless current_ability.can?(:create, trip_ticket)
-            if trip_ticket.save
-              present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
-            else
-              error!({message: "Could not create trip ticket", errors: trip_ticket.errors}, status: :unprocessable_entity)
-            end
-          end
-
           desc "Get a specific trip ticket"
           get :show do
             # to allow CanCan abilities to fully control access to tickets, do not limit scope to provider's own trips
