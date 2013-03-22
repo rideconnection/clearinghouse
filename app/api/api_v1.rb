@@ -120,14 +120,15 @@ module Clearinghouse
 
           desc "Get a specific trip ticket"
           get :show do
-            trip_ticket = current_provider.trip_tickets.find(params[:id])
+            # to allow CanCan abilities to fully control access to tickets, do not limit scope to provider's own trips
+            trip_ticket = TripTicket.find(params[:id])
             error! "Access Denied", 401 unless current_ability.can?(:show, trip_ticket)
             present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
           end
 
           desc "Update a trip ticket"
           put :update do
-            trip_ticket = current_provider.trip_tickets.find(params[:id])
+            trip_ticket = TripTicket.find(params[:id])
             error! "Access Denied", 401 unless current_ability.can?(:update, trip_ticket)
             if trip_ticket.update_attributes(params[:trip_ticket])
               present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
@@ -139,7 +140,7 @@ module Clearinghouse
           # TODO pending implementation of a TripTicket#cancel method
           #desc "Cancel a trip ticket"
           #put :cancel do
-          #  trip_ticket = current_provider.trip_tickets.find(params[:id])
+          #  trip_ticket = TripTicket.find(params[:id])
           #  error! "Access Denied", 401 unless current_ability.can?(:cancel, trip_ticket)
           #  if trip_ticket.cancel
           #    present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
@@ -147,7 +148,7 @@ module Clearinghouse
           #    error!({message: "Could not cancel trip ticket", errors: trip_ticket.errors}, status: :unprocessable_entity)
           #  end
           #end
-        end
+        end # scope :requires_id
       end # namespace :trip_tickets
 
     end
