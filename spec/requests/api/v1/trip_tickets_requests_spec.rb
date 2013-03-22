@@ -34,7 +34,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "should not allow me to access a trip ticket originated by another provider" do
       get "/api/v1/trip_tickets/show", ApiParamFactory.authenticatable_params(@provider, {:id => @trip_ticket3.id})
-      response.status.should == 404
+      response.status.should == 401
       response.body.should_not include(%Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"})
     end
   end
@@ -52,7 +52,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "should not allow me to update a trip ticket originated by another provider" do
       put "/api/v1/trip_tickets/update", ApiParamFactory.authenticatable_params(@provider, {:id => @trip_ticket3.id, :trip_ticket => {:customer_first_name => "Ariadne"}})
-      response.status.should == 404
+      response.status.should == 401
       response.body.should_not include(%Q{"customer_first_name":"Ariadne"})
     end
   end
@@ -71,7 +71,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
   #
   #  it "should not allow me to cancel a trip ticket originated by another provider" do
   #    put "/api/v1/trip_ticket/cancel", ApiParamFactory.authenticatable_params(@provider, {:id => @trip_ticket3.id})
-  #    response.status.should == 404
+  #    response.status.should == 401
   #    response.body.should_not include(%Q{"canceled":true"})
   #  end
   #end
