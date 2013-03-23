@@ -35,7 +35,7 @@ class TripTicketsController < ApplicationController
   # GET /trip_tickets/new
   # GET /trip_tickets/new.json
   def new    
-    @trip_ticket.originator = current_user.provider unless current_user.has_admin_role?
+    @trip_ticket.originator = current_user.provider
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @trip_ticket }
@@ -46,7 +46,7 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets.json
   def create
     @trip_ticket = TripTicket.new(params[:trip_ticket])
-    @trip_ticket.originator = current_user.provider unless !@trip_ticket.origin_provider_id.blank?
+    @trip_ticket.originator = current_user.provider
     
     respond_to do |format|
       if @trip_ticket.save

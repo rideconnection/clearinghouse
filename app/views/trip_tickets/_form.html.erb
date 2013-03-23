@@ -16,11 +16,7 @@
 
     <div class="field">
       <%= f.label :origin_provider_id, "Provider" %>
-      <% if @current_user.has_admin_role? && can?(:edit, @trip_ticket) %>
-        <%= f.collection_select :origin_provider_id, Provider.all, :id, :name, :include_blank => true %>
-      <% else %>
-        <%= @trip_ticket.originator.name %>
-      <% end %>
+      <%= @trip_ticket.originator.name %>
     </div>
     <% if can? :edit, @trip_ticket %>
       <div class="field">
