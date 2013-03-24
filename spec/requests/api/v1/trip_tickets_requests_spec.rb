@@ -57,6 +57,30 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     end
   end
 
+  describe "POST /api/v1/trip_tickets/create" do
+    include_examples "requires authenticatable params"
+
+    let(:trip_params) {{
+      customer_information_withheld: false,
+      customer_dob: "2012-01-01",
+      customer_first_name: "First",
+      customer_last_name: "Last",
+      customer_primary_phone: "555-555-5555",
+      customer_seats_required: 1,
+      origin_customer_id: "newtrip123",
+      requested_drop_off_time: Time.now,
+      requested_pickup_time: Time.now,
+      scheduling_priority: "pickup"
+    }}
+
+    it "creates a trip ticket" do
+      post "/api/v1/trip_tickets/create/", ApiParamFactory.authenticatable_params(@provider, {trip_ticket: trip_params})
+      puts response.body
+      response.status.should == 201
+      response.body.should include(%Q{"origin_customer_id":"newtrip123"})
+    end
+  end
+
   # TODO pending implementation of a TripTicket#cancel method
   #describe "PUT /api/v1/trip_tickets/cancel" do
   #  include_examples "requires authenticatable params", :id => 1

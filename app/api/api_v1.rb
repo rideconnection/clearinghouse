@@ -47,7 +47,7 @@ module Clearinghouse
             if user.update_attributes(params[:user])
               present user, with: Clearinghouse::Entities::V1::User
             else
-              error!({message: "Could not update user", errors: user.errors}, :unprocessable_entity)
+              error!({message: "Could not update user", errors: user.errors}, 422)
             end
           end
         
@@ -58,7 +58,7 @@ module Clearinghouse
             if user.update_attribute(:active, true)
               present user, with: Clearinghouse::Entities::V1::User
             else
-              error!({message: "Could not activate user", errors: user.errors}, :unprocessable_entity)
+              error!({message: "Could not activate user", errors: user.errors}, 422)
             end
           end
         
@@ -69,7 +69,7 @@ module Clearinghouse
             if user.update_attribute(:active, false)
               present user, with: Clearinghouse::Entities::V1::User
             else
-              error!({message: "Could not deactivate user", errors: user.errors}, :unprocessable_entity)
+              error!({message: "Could not deactivate user", errors: user.errors}, 422)
             end
           end
         end
@@ -88,7 +88,7 @@ module Clearinghouse
           if current_provider.update_attributes(allowed_params)
             present current_provider, with: Clearinghouse::Entities::V1::Provider
           else
-            error!({message: "Could not update provider", errors: current_provider.errors}, :unprocessable_entity)
+            error!({message: "Could not update provider", errors: current_provider.errors}, 422)
           end
         end
       end
@@ -118,7 +118,7 @@ module Clearinghouse
           if trip_ticket.save
             present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
           else
-            error!({message: "Could not create trip ticket", errors: trip_ticket.errors}, :unprocessable_entity)
+            error!({message: "Could not create trip ticket", errors: trip_ticket.errors}, 422)
           end
         end
 
@@ -141,7 +141,7 @@ module Clearinghouse
             if trip_ticket.update_attributes(params[:trip_ticket])
               present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
             else
-              error!({message: "Could not update trip ticket", errors: trip_ticket.errors}, :unprocessable_entity)
+              error!({message: "Could not update trip ticket", errors: trip_ticket.errors}, 422)
             end
           end
 
@@ -153,7 +153,7 @@ module Clearinghouse
           #  if trip_ticket.cancel
           #    present trip_ticket, with: Clearinghouse::Entities::V1::TripTicket
           #  else
-          #    error!({message: "Could not cancel trip ticket", errors: trip_ticket.errors}, :unprocessable_entity)
+          #    error!({message: "Could not cancel trip ticket", errors: trip_ticket.errors}, 422)
           #  end
           #end
         end # scope :requires_id
@@ -179,7 +179,7 @@ module Clearinghouse
               if trip_claim.save
                 present trip_claim, with: Clearinghouse::Entities::V1::TripClaim
               else
-                error!({message: "Could not create trip claim", errors: trip_claim.errors}, :unprocessable_entity)
+                error!({message: "Could not create trip claim", errors: trip_claim.errors}, 422)
               end
             end
 
@@ -201,7 +201,7 @@ module Clearinghouse
                 if trip_claim.update_attributes(params[:trip_claim])
                   present trip_claim, with: Clearinghouse::Entities::V1::TripClaim
                 else
-                  error!({message: "Could not update trip claim", errors: trip_claim.errors}, :unprocessable_entity)
+                  error!({message: "Could not update trip claim", errors: trip_claim.errors}, 422)
                 end
               end
 
@@ -213,7 +213,7 @@ module Clearinghouse
                   if trip_claim.send("#{action}!")
                     present trip_claim, with: Clearinghouse::Entities::V1::TripClaim
                   else
-                    error!({message: "Could not #{action} trip claim", errors: trip_claim.errors}, :unprocessable_entity)
+                    error!({message: "Could not #{action} trip claim", errors: trip_claim.errors}, 422)
                   end
                 end
               end
