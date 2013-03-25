@@ -1,6 +1,6 @@
   <div class="field">
     <%= f.label :outcome %>
-    <%= f.select :outcome, TripResult::OUTCOMES %>
+    <%= f.select :outcome, TripResult::OUTCOMES, :include_blank => true %>
   </div>
   <div class="field">
     <%= f.label :actual_pick_up_time %>

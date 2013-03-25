@@ -457,12 +457,12 @@
   </fieldset>
 
   <fieldset id="trip_result" class="">
-    <% if can?(:edit, @trip_ticket) && @trip_ticket.can_create_or_edit_result? %>
+    <% if can?(:update, @result) && @trip_ticket.can_create_or_edit_result? %>
       <legend>Trip Result</legend>
       <%= f.fields_for :trip_result do |rf| %>
         <%= render 'trip_results/form', :f => rf %>
       <% end %>
-    <% elsif @result = @trip_ticket.trip_result %>
+    <% elsif @result %>
       <legend>Trip Result</legend>
       <%= render 'trip_results/show_fields', :result => @result %>
     <% end %>

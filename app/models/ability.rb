@@ -36,7 +36,10 @@ class Ability
       # Dispatchers and above can edit/cancel tickets belonging to their own provider
       # TODO - add a :cancel, :rescind, or similar action for trip tickets
       can :update, TripTicket, :origin_provider_id => user.provider_id
-      
+
+      can :update, TripResult do |result| 
+        result.can_be_edited_by?(user)
+      end
     end
     
     if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :api]

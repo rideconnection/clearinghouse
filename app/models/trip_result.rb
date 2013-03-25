@@ -19,6 +19,12 @@ class TripResult < ActiveRecord::Base
 
   validate :ensure_trip_ticket_is_approved
 
+  def can_be_edited_by?(user)
+    originator_id = trip_ticket.origin_provider_id 
+    claimer_id = trip_ticket.approved_claim.try(:claimant_provider_id)
+    [originator_id, claimer_id].include?(user.provider_id)
+  end
+
   private
 
   def ensure_trip_ticket_is_approved

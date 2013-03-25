@@ -119,6 +119,10 @@ class TripTicket < ActiveRecord::Base
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
   end
   
+  def approved_claim
+    trip_claims.detect{ |claim| claim.status == :approved}
+  end
+
   def approved?
     TripTicket.unscoped.joins(:trip_claims).select('1').where('"trip_tickets"."id" = ? AND "trip_claims"."status" = ?', self.id, :approved).count > 0
   end

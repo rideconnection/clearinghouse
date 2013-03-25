@@ -2,10 +2,14 @@ require 'test_helper'
 
 class TripTicketTest < ActiveSupport::TestCase
   setup do
-    @ticket = FactoryGirl.create(:trip_ticket)
+    @originator = FactoryGirl.create(:provider)
+    @claimant = FactoryGirl.create(:provider)
+    @third_party_provider = FactoryGirl.create(:provider)
+    @ticket = FactoryGirl.create(:trip_ticket, :originator => @originator)
     @claim = FactoryGirl.create(
       :trip_claim,
       :trip_ticket => @ticket,
+      :claimant => @claimant,
       :status => :pending)
     @ticket.trip_claims << @claim
     @result = TripResult.new(:outcome => "Completed")
@@ -29,5 +33,22 @@ class TripTicketTest < ActiveSupport::TestCase
     
     @another_result.trip_ticket = @ticket
     assert !@another_result.save 
+  end
+
+  it "can only be edited by users belonging to the claiming or originating provider" do
+    @claim.approve!
+    @result.trip_ticket = @ticket
+    @result.save!
+
+    user = FactoryGirl.create(:user)
+
+    user.provider = @claimant
+    assert @result.can_be_edited_by?(user)
+
+    user.provider = @originator
+    assert @result.can_be_edited_by?(user)
+
+    user.provider = @third_party_provider
+    assert !@result.can_be_edited_by?(user)
   end
 end
