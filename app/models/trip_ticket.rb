@@ -204,8 +204,8 @@ class TripTicket < ActiveRecord::Base
     def filter_by_claim_status(status)
       case status.to_sym
       when :unclaimed
-        # Tickets which have no claims on them or which have only declined claims
-        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END)', :declined).pluck('"trip_tickets"."id"')))
+        # Tickets which have no claims on them or which have only declined or rescinded claims
+        where(:id => Array(TripTicket.unscoped.select('"trip_tickets"."id"').joins('LEFT JOIN "trip_claims" ON "trip_claims"."trip_ticket_id" = "trip_tickets"."id"').group('"trip_tickets"."id"').having('COUNT("trip_claims"."id") = 0 OR COUNT("trip_claims"."id") = SUM(CASE "status" WHEN ? THEN 1 WHEN ? THEN 1 ELSE 0 END)', *TripClaim::INACTIVE_STATUS).pluck('"trip_tickets"."id"')))
       when :approved
         # Tickets which have approved claims
         where(:id => Array(TripClaim.unscoped.select(:trip_ticket_id).group(:trip_ticket_id).having('SUM(CASE "status" WHEN ? THEN 1 ELSE 0 END) > 0', :approved).pluck(:trip_ticket_id)))
