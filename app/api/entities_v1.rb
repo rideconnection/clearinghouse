@@ -30,6 +30,12 @@ module Clearinghouse
           :requested_pickup_time, :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
           :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority
       end
+
+      class TripClaim < Grape::Entity
+        expose :id,
+          :claimant_provider_id, :claimant_customer_id, :claimant_service_id, :claimant_trip_id,
+          :trip_ticket_id, :status, :proposed_pickup_time, :proposed_fare, :notes
+      end
     end
   end
 end
