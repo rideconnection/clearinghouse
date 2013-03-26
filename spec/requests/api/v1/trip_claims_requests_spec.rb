@@ -19,15 +19,39 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     @trip_claim2 = FactoryGirl.create(:trip_claim, trip_ticket: @trip_ticket2, claimant: @provider1, notes: "claim two")
     @trip_claim3 = FactoryGirl.create(:trip_claim, trip_ticket: @trip_ticket3, claimant: @provider2, notes: "claim three")
   end
-  
+
+  let(:trip_claim4) do
+    FactoryGirl.create(:provider_relationship, requesting_provider: @provider1, cooperating_provider: @provider3)
+    FactoryGirl.create(:trip_claim, trip_ticket: @trip_ticket1, claimant: @provider3, notes: "claim four")
+  end
+
   describe "GET /api/v1/trip_tickets/1/trip_claims" do
     include_examples "requires authenticatable params"
 
-    it "returns all trip claims belonging to the trip ticket" do
-      get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims", @minimum_request_params
-      response.status.should == 200
-      response.body.should include(%Q{"notes":"#{@trip_claim1.notes}"})
-      response.body.should_not include(%Q{"notes":"#{@trip_claim2.notes}"})
+    context "when ticket was originated by the provider" do
+      it "returns all trip claims belonging to the trip ticket" do
+        trip_claim4
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims", @minimum_request_params
+        response.status.should == 200
+        response.body.should include(%Q{"notes":"#{@trip_claim1.notes}"})
+        response.body.should include(%Q{"notes":"#{trip_claim4.notes}"})
+      end
+
+      it "does not return trip claims belonging to other trip tickets" do
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims", @minimum_request_params
+        response.status.should == 200
+        response.body.should_not include(%Q{"notes":"#{@trip_claim2.notes}"})
+      end
+    end
+
+    context "when ticket was originated by another provider" do
+      it "returns only trip claims belonging to the claimant" do
+        trip_claim4
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims", ApiParamFactory.authenticatable_params(@provider2)
+        response.status.should == 200
+        response.body.should include(%Q{"notes":"#{@trip_claim1.notes}"})
+        response.body.should_not include(%Q{"notes":"#{trip_claim4.notes}"})
+      end
     end
   end
 
@@ -36,44 +60,35 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
 
     context "when claim belongs to provider's own trip ticket" do
       it "returns the specified trip claim" do
-        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}",
-            ApiParamFactory.authenticatable_params(@provider1)
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}", @minimum_request_params
         response.status.should == 200
         response.body.should include(%Q{"notes":"#{@trip_claim1.notes}"})
       end
     end
 
-    context "when claim belongs related provider's trip ticket" do
-      it "returns the specified trip claim" do
-        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_claim2.id}",
-            ApiParamFactory.authenticatable_params(@provider1)
-        response.status.should == 200
-        response.body.should include(%Q{"notes":"#{@trip_claim2.notes}"})
-      end
-
-      context "when claimant is an unrelated provider" do
+    context "when claim belongs to a related provider's trip ticket" do
+      context "when claim was created by the provider" do
         it "returns the specified trip claim" do
-          get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_claim2.id}",
-              ApiParamFactory.authenticatable_params(@provider3)
+          get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}",
+              ApiParamFactory.authenticatable_params(@provider2)
           response.status.should == 200
-          response.body.should include(%Q{"notes":"#{@trip_claim2.notes}"})
+          response.body.should include(%Q{"notes":"#{@trip_claim1.notes}"})
         end
       end
-    end
 
-    context "when claim belongs to unrelated provider's trip ticket" do
-      it "returns a 401 access denied error" do
-        get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_claims/#{@trip_claim3.id}",
-            ApiParamFactory.authenticatable_params(@provider1)
-        response.status.should == 401
-        response.body.should_not include(%Q{"notes":"#{@trip_claim3.notes}"})
+      context "when claim was created by another provider" do
+        it "returns a 401 access denied error" do
+          get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{trip_claim4.id}",
+              ApiParamFactory.authenticatable_params(@provider2)
+          response.status.should == 401
+          response.body.should_not include(%Q{"notes":"#{trip_claim4.notes}"})
+        end
       end
     end
 
     context "when trip claim does not belong to specified trip ticket" do
       it "returns a 404 not found error" do
-        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_claim1.id}",
-            ApiParamFactory.authenticatable_params(@provider1)
+        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_claim1.id}", @minimum_request_params
         response.status.should == 404
         response.body.should_not include(%Q{"notes":"#{@trip_claim1.notes}"})
       end
@@ -130,8 +145,7 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     end
 
     it "does not allow rescinding a trip claim created by another provider" do
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/rescind",
-          ApiParamFactory.authenticatable_params(@provider1)
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/rescind", @minimum_request_params
       response.status.should == 401
       @trip_claim1.reload
       @trip_claim1.status.should eq(:pending)
@@ -142,8 +156,7 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     include_examples "requires authenticatable params"
 
     it "declines the specified trip claim" do
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/decline",
-          ApiParamFactory.authenticatable_params(@provider1)
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/decline", @minimum_request_params
       response.status.should == 200
       @trip_claim1.reload
       @trip_claim1.status.should eq(:declined)
@@ -170,8 +183,7 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     include_examples "requires authenticatable params"
 
     it "approves the specified trip claim" do
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/approve",
-          ApiParamFactory.authenticatable_params(@provider1)
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{@trip_claim1.id}/approve", @minimum_request_params
       response.status.should == 200
       @trip_claim1.reload
       @trip_claim1.status.should eq(:approved)
@@ -194,10 +206,7 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     end
 
     it "automatically declines other pending claims" do
-      FactoryGirl.create(:provider_relationship, requesting_provider: @provider1, cooperating_provider: @provider3)
-      trip_claim4 = FactoryGirl.create(:trip_claim, trip_ticket: @trip_ticket1, claimant: @provider3, notes: "claim four")
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{trip_claim4.id}/approve",
-          ApiParamFactory.authenticatable_params(@provider1)
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_claims/#{trip_claim4.id}/approve", @minimum_request_params
       @trip_claim1.reload
       @trip_claim1.status.should eq(:declined)
     end
