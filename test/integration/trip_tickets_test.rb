@@ -213,11 +213,12 @@ class TripTicketsTest < ActionController::IntegrationTest
       visit trip_ticket_path(trip_ticket) 
 
       select "Completed", :from => "trip_result_outcome"
-      fill_in "trip_result_fare", :with => 100
+      fill_in "trip_result_driver_id", :with => "Bob Smith"
       click_button "Update Trip Result"
 
       assert page.has_content?("Trip result was successfully created")
       assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
+      assert_equal trip_ticket.reload.trip_result.driver_id, "Bob Smith"
 
       select "No-Show", :from => "trip_result_outcome"
       click_button "Update Trip Result"
