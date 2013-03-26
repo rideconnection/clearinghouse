@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130326215838) do
+ActiveRecord::Schema.define(:version => 20130330044733) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -52,9 +52,9 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.spatial  "position",   :limit => {:no_constraints=>true}
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
 
   create_table "nonces", :force => true do |t|
@@ -143,12 +143,12 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
+    t.datetime "created_at",                                                    :null => false
+    t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:no_constraints=>true}
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
@@ -216,7 +216,6 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
   create_table "trip_tickets", :force => true do |t|
-    t.integer       "origin_provider_id"
     t.string        "origin_customer_id"
     t.integer       "claimant_provider_id"
     t.boolean       "customer_information_withheld"
@@ -262,6 +261,7 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
+    t.integer       "origin_provider_id"
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
@@ -271,7 +271,6 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
   add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
   add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
-  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
   add_index "trip_tickets", ["provider_white_list"], :name => "provider_white_list"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"

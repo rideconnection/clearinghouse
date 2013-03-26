@@ -29,6 +29,7 @@ class TripTicketsController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @trip_ticket }
+      format.js
     end
   end
 
@@ -102,8 +103,8 @@ class TripTicketsController < ApplicationController
   end
 
   def massage_trip_ticket_trip_time_filter_values_for_form
-    params[:trip_ticket_filters][:trip_time][:start] = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:start], nil)
-    params[:trip_ticket_filters][:trip_time][:end]   = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:end], nil)
+    params[:trip_ticket_filters][:trip_time][:start] = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:start], nil).try(:strftime, "%Y-%m-%d %I:%M %P")
+    params[:trip_ticket_filters][:trip_time][:end]   = parse_trip_ticket_trip_time(params[:trip_ticket_filters][:trip_time][:end], nil).try(:strftime, "%Y-%m-%d %I:%M %P")
   end
   
   def providers_for_lists

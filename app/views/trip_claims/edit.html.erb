@@ -1,14 +1,16 @@
-<header>
-  <h2>Edit Trip Claim</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Edit Trip Claim</h2>
+  </header>
 
-<section class="form-holder">
-  <%= render 'form' %>
-</section>
+  <section class="form-holder">
+    <%= render 'form' %>
+  </section>
 
-<section id="audit_trail">
-  <%= render 'shared/audit_trail', :record => @trip_claim %>
-</section>
+  <section id="audit_trail">
+    <%= render 'shared/audit_trail', :record => @trip_claim %>
+  </section>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

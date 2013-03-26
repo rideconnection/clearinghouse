@@ -1,20 +1,22 @@
-<header>
-  <h2>Resend confirmation instructions</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Resend confirmation instructions</h2>
+  </header>
   
-<section class="form-holder">
-  <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post }) do |f| %>
-    <%= devise_error_messages! %>
+  <section class="form-holder">
+    <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post }) do |f| %>
+      <%= devise_error_messages! %>
 
-    <div class="field">
-      <%= f.label :email %>
-      <%= f.email_field :email %>
-    </div>
+      <div class="field">
+        <%= f.label :email %>
+        <%= f.email_field :email %>
+      </div>
 
-    <div class="buttons-holder">
-      <%= f.submit "Resend confirmation instructions", :class => "button" %>
-    </div>
-  <% end %>
-</section>
+      <div class="buttons-holder">
+        <%= f.submit "Resend confirmation instructions", :class => "button" %>
+      </div>
+    <% end %>
+  </section>
+</div>
 
 <%= render "devise/shared/links" %>

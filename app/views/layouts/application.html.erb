@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <title>Clearinghouse</title>
   <%= csrf_meta_tags %>
-	<meta name="viewport" content="width=1280" />
-	<meta name="MobileOptimized" content="1280" />
+  <meta name="viewport" content="width=1280" />
+  <meta name="MobileOptimized" content="1280" />
   <%= favicon_link_tag %>  
   <!--[if lt IE 9]><%= javascript_include_tag 'https://html5shiv.googlecode.com/svn/trunk/html5.js' %><![endif]-->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700" rel="stylesheet" type="text/css">
@@ -14,42 +14,42 @@
   <%= yield :head %>
 </head>
 <body data-controller="<%= params[:controller] %>" data-action="<%= params[:action] %>">
-<header id="main-header">
-	<section class="top-section">
-		<nav class="holder">
+<header id="header">
+  <section class="top-section">
+    <nav class="holder">
       <% if current_user %>
         <%= link_to current_user.display_name, edit_user_path(current_user), :class => "nickname" %>
         <a href="#" class="messages-count">0</a>
         <a href="#" class="btn-settings">Settings</a>
         <%= link_to 'Logout', destroy_user_session_path, :method => :delete, :class => "btn-logout" %>
       <% end %>
-		</nav>
-	</section>
-	<nav class="nav-holder">
-		<h1 class="logo"><%= link_to "Ride Connection", root_path %></h1>
-		<ul id="nav">
-			<li class="active"><%= link_to 'Dashboard', root_path %></li>
-			<li><%= link_to 'Tickets', trip_tickets_path %></li>
-			<li><%= link_to 'Open Capacities', open_capacities_path %></li>
+    </nav>
+  </section>
+  <nav class="nav-holder">
+    <h1 class="logo"><%= link_to "Ride Connection", root_path %></h1>
+    <ul id="nav">
+      <li class="active"><%= link_to 'Dashboard', root_path %></li>
+      <li><%= link_to 'Tickets', trip_tickets_path %></li>
+      <li><%= link_to 'Open Capacities', open_capacities_path %></li>
       <li><%= link_to 'Reports', reports_path %></li>
       <% if current_user and current_user.has_admin_role? %>
-			  <li><a href="#">Activities</a></li>
+        <li><a href="#">Activities</a></li>
         <li class="last"><%= link_to 'Admin', admin_path %></li>
       <% else %>
-			  <li class="last"><a href="#">Activities</a></li>
+        <li class="last"><a href="#">Activities</a></li>
       <% end %>
-		</ul>
-	</nav>
+    </ul>
+  </nav>
 </header>
 <section id="main">
-	<section id="content">
-    <% if notice %><p class="notice"><%= notice %></p><% end %>
-    <% if alert %><p class="error"><%= alert %></p><% end %>
+  <section id="content">
+    <% if notice %><p class="notice padded"><%= notice %></p><% end %>
+    <% if alert %><p class="error padded"><%= alert %></p><% end %>
     <%= yield %>
-	</section>
-	<section id="sidebar">
+  </section>
+  <section id="sidebar">
     <%= yield :sidebar %>
-	</section>
+  </section>
 </section>
 <footer>
   <p>

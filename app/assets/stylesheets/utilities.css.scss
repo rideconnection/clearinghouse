@@ -17,3 +17,104 @@
     *zoom:1;
   }
 }
+
+@mixin form-holder {
+  .form-holder {
+    float:right;
+    width:296px;
+
+    .heading {
+      margin:0 1px 10px 0;
+      @include clearfix;
+
+      h2 {
+        float:left;
+        font-size:14px;
+        line-height:16px;
+      }
+    }
+
+    .opener {
+      background:url(image-path("bg-opener.png")) no-repeat;
+      float:right;
+      margin:-2px 0 0;
+      padding:1px 0 3px 22px;
+    }
+
+    &.active .opener {
+      background-position:-1px -86px;
+    }
+
+    .form-comment {
+      padding:1px 0 11px;
+
+      textarea {
+        background:none;
+        border:1px solid #ccc;
+        margin:0 0 7px;
+        max-height:56px;
+        min-height:56px;
+        max-width:292px;
+        min-width:292px;
+        overflow:auto;
+        padding:0;
+      }
+
+      .buttons-holder {
+        overflow:hidden;
+        padding:0 1px 0 0;
+        text-align:right;
+
+        .btn-cancel {
+          background:url(image-path("sprite1.png")) no-repeat 100% -379px;
+          display:inline-block;
+          color:#fff;
+          font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+          padding:0 6px 0 0;
+          vertical-align:top;
+
+          span {
+            background:url(image-path("sprite1.png")) no-repeat 0 -350px;
+            float:left;
+            padding:4px 4px 6px 9px;
+          }
+        }
+      }
+
+      input[type=submit] {
+        background:url(image-path("sprite1.png")) no-repeat 0 -309px;
+        border:0;
+        color:#fff;
+        height:26px;
+        line-height:26px;
+        margin:0 0 0 7px;
+        padding:0 0 2px;
+        width:63px;
+      }
+    }
+  }
+}
+
+@mixin icons-list {
+  .icons-list {
+    font-size:0;
+    line-height:0;
+    list-style:none;
+    margin:0;
+    padding:0;
+    
+    @include clearfix;
+
+    li {
+      background:none;
+      display:inline;
+      margin:0 10px 0 0;
+      padding:0;
+      vertical-align:middle;
+    
+      img {
+        vertical-align:middle;
+      }
+    }
+  }
+}

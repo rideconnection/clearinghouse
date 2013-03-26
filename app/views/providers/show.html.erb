@@ -1,94 +1,96 @@
 <% content_for :head do %>
-<script src="https://maps-api-ssl.google.com/maps/api/js?v=3.10&sensor=false"
+  <script src="https://maps-api-ssl.google.com/maps/api/js?v=3.10&sensor=false"
         type="text/javascript" charset="utf-8"></script>
 <% end %>
 
-<header>
-  <h2>
-    <%= @provider.name %>
-  </h2>
-</header>
-
-<section>
-  <%= render 'locations/show_fields', :location => @provider.address %>
-</section>
-
-<section>
-  <div class="field">
-    <label>Primary Contact:</label>
-    <%= mail_to @provider.primary_contact_email %>
-  </div>
-</section>
-
-<section>
+<div class="padded">
   <header>
-    <h3><%= @provider.name %> Partners</h3>
+    <h2>
+      <%= @provider.name %>
+    </h2>
   </header>
 
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Provider Name</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @provider.approved_partnerships.each do |partnership| %>
-        <tr>
-          <td><%= partnership.partner_for_provider(@provider).name %></td>
-          <td>Approved</td>
-          <td><%= link_to 'Edit Partnership', edit_provider_relationship_path(partnership) %></td>
-          <td><%= button_to 'End Partnership', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
-          </td>
-        </tr>
-      <% end %>
-      <% @provider.partnerships_awaiting_its_approval.each do |partnership| %>
-        <tr>
-          <td><%= partnership.requesting_provider.name %></td>
-          <td>Pending</td>
-          <td><%= button_to 'Approve', provider_relationship_activate_path(partnership), :method => :post %></td>
-          <td><%= button_to 'Deny', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
-        </tr>
-      <% end %>
-      <% @provider.pending_partnerships_initiated_by_it.each do |partnership| %>
-        <tr>
-          <td><%= partnership.cooperating_provider.name %></td>
-          <td>Pending approval</td>
-          <td><%= button_to 'Cancel', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <section>
+    <%= render 'locations/show_fields', :location => @provider.address %>
+  </section>
 
-  <% if can? :create, ProviderRelationship %>
-    <%= link_to 'Set Up New Provider Partnership', new_provider_relationship_path(:provider_id => @provider) %><br/>
-  <% end %>
-</section>
+  <section>
+    <div class="field">
+      <label>Primary Contact:</label>
+      <%= mail_to @provider.primary_contact_email %>
+    </div>
+  </section>
 
-<section>
-  <h3><%= @provider.name %> Services</h3>
+  <section>
+    <header>
+      <h3><%= @provider.name %> Partners</h3>
+    </header>
 
-  <% if @provider.services.any? %>
-    <% @provider.services.each do |service| %>
-      <%= render 'services/detail', :service => service %>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Provider Name</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @provider.approved_partnerships.each do |partnership| %>
+          <tr>
+            <td><%= partnership.partner_for_provider(@provider).name %></td>
+            <td>Approved</td>
+            <td><%= link_to 'Edit Partnership', edit_provider_relationship_path(partnership) %></td>
+            <td><%= button_to 'End Partnership', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+            </td>
+          </tr>
+        <% end %>
+        <% @provider.partnerships_awaiting_its_approval.each do |partnership| %>
+          <tr>
+            <td><%= partnership.requesting_provider.name %></td>
+            <td>Pending</td>
+            <td><%= button_to 'Approve', provider_relationship_activate_path(partnership), :method => :post %></td>
+            <td><%= button_to 'Deny', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+          </tr>
+        <% end %>
+        <% @provider.pending_partnerships_initiated_by_it.each do |partnership| %>
+          <tr>
+            <td><%= partnership.cooperating_provider.name %></td>
+            <td>Pending approval</td>
+            <td><%= button_to 'Cancel', provider_relationship_path(partnership), :confirm => "Are you sure?", :method => :delete %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if can? :create, ProviderRelationship %>
+      <%= link_to 'Set Up New Provider Partnership', new_provider_relationship_path(:provider_id => @provider) %><br/>
     <% end %>
-  <% else %>
-    <p>No services defined.</p>
-  <% end %>
-  <% if can? :create, Service %>
-    <%= link_to 'Create New Service', new_provider_service_path(@provider) %><br/>
-  <% end %>
-</section>
+  </section>
 
-<section>
-  <h3><%= @provider.name %> Members</h3>
-  <%= render 'users/list', :users => @provider.users %>
-  <br/>
-  <% if can? :create, User %>
-    <%= link_to 'Create New User', new_user_path %><br/>
-  <% end %>
-</section>
+  <section>
+    <h3><%= @provider.name %> Services</h3>
+
+    <% if @provider.services.any? %>
+      <% @provider.services.each do |service| %>
+        <%= render 'services/detail', :service => service %>
+      <% end %>
+    <% else %>
+      <p>No services defined.</p>
+    <% end %>
+    <% if can? :create, Service %>
+      <%= link_to 'Create New Service', new_provider_service_path(@provider) %><br/>
+    <% end %>
+  </section>
+
+  <section>
+    <h3><%= @provider.name %> Members</h3>
+    <%= render 'users/list', :users => @provider.users %>
+    <br/>
+    <% if can? :create, User %>
+      <%= link_to 'Create New User', new_user_path %><br/>
+    <% end %>
+  </section>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

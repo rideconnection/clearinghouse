@@ -85,6 +85,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       origin_customer_id: "newtrip123",
       requested_drop_off_time: Time.now,
       requested_pickup_time: Time.now,
+      appointment_time: Time.now,
       scheduling_priority: "pickup"
     }}}
 

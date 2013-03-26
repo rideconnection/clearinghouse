@@ -1,6 +1,7 @@
 @import 'utilities';
 
-$form_label–width: 225px;
+$form_label_width: 225px;
+$form_label_padding_right: 10px;
 
 .field_with_errors {
   background-color: #c00;
@@ -38,6 +39,17 @@ $form_label–width: 225px;
 
 .row_with_errors {
   border: 2px solid red;
+}
+
+.ui-datepicker-trigger {
+  background:url(image-path("sprite1.png")) no-repeat 0 -710px;
+  height:16px;
+  margin:0 0 3px 0;
+  overflow:hidden;
+  text-indent:-9999px;
+  width:16px;
+  border:none;
+  cursor:pointer;
 }
 
 form {
@@ -108,8 +120,8 @@ fieldset {
   
   label {
     float:left;
-    padding:4px 10px 0 0;
-    width:$form_label–width;
+    padding:4px $form_label_padding_right 0 0;
+    width:$form_label_width;
   }
   
   &.field-with-checkbox {    
@@ -129,7 +141,7 @@ fieldset {
   /* text-align:right; */
 
   &.field-align {
-    margin-left:$form_label–width;
+    margin-left:$form_label_width + $form_label_padding_right;
   }
 
   input[type=button].button,input[type=submit].button,a.button span {

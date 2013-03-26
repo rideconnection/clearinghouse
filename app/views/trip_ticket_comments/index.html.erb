@@ -1,37 +1,39 @@
-<header>
-  <h2>Trip Ticket Comments</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Trip Ticket Comments</h2>
+  </header>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Author</th>
-      <th>Body</th>
-      <th>Date</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @trip_ticket_comments.try(:each) do |trip_ticket_comment| %>
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= trip_ticket_comment.user.display_name %></td>
-        <td><%= trip_ticket_comment.body.truncate(30) %></td>
-        <td><%= trip_ticket_comment.created_at.to_s(:long) %></td>
-        <td>
-          <ul>
-            <li><%= link_to 'View Comment', [@trip_ticket, trip_ticket_comment] %></li>
-            <% if can?(:edit, trip_ticket_comment) %>
-              <li><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %></li>
-            <% end %>
-            <% if can?(:destroy, trip_ticket_comment) %>
-              <li><%= link_to 'Destroy', [@trip_ticket, trip_ticket_comment], method: :delete, data: { confirm: 'Are you sure?' } %></li>
-            <% end %>
-          </ul>
-        </td>
+        <th>Author</th>
+        <th>Body</th>
+        <th>Date</th>
+        <th></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% @trip_ticket_comments.try(:each) do |trip_ticket_comment| %>
+        <tr>
+          <td><%= trip_ticket_comment.user.display_name %></td>
+          <td><%= trip_ticket_comment.body.truncate(30) %></td>
+          <td><%= trip_ticket_comment.created_at.to_s(:long) %></td>
+          <td>
+            <ul>
+              <li><%= link_to 'View Comment', [@trip_ticket, trip_ticket_comment] %></li>
+              <% if can?(:edit, trip_ticket_comment) %>
+                <li><%= link_to 'Edit', edit_trip_ticket_trip_ticket_comment_path(@trip_ticket, trip_ticket_comment) %></li>
+              <% end %>
+              <% if can?(:destroy, trip_ticket_comment) %>
+                <li><%= link_to 'Destroy', [@trip_ticket, trip_ticket_comment], method: :delete, data: { confirm: 'Are you sure?' } %></li>
+              <% end %>
+            </ul>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
 
 <% content_for :sidebar do %>
   <section>

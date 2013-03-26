@@ -18,56 +18,58 @@
   </script>
 <% end %>
 
-<header>
-  <h2><%= @provider.name %> Keys</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2><%= @provider.name %> Keys</h2>
+  </header>
 
-<section>
-  <p>These keys are used by your CH Adapter to authenticate to the Clearinghouse API. <strong>These keys should be kept private.</strong></p>
-  
-  <div class="field">
-    <label>Public API Key:</label>
-    <%= @provider.api_key %>
-  </div>
-
-  <div class="field">
-    <label>Private API Key:</label>
-    <%= @provider.private_key %>
-  </div>
-</section>
-
-<% if can? :reset_keys, @provider %>
   <section>
-    <h3>Reset API Keys</h3>
-    <p class="warning">Your CH Adapter will be unable to connect to the API after reseting your keys until you update the configuration with the new keys! Do this only if you think your API keys have been compromised.</p>
+    <p>These keys are used by your CH Adapter to authenticate to the Clearinghouse API. <strong>These keys should be kept private.</strong></p>
+  
+    <div class="field">
+      <label>Public API Key:</label>
+      <%= @provider.api_key %>
+    </div>
 
-    <% if @provider.errors.any? %>
-      <div id="error_explanation">
-        <h2><%= pluralize(@provider.errors.count, "error") %> prohibited the API keys from being reset:</h2>
-
-        <ul>
-        <% @provider.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <%= form_tag reset_keys_provider_path(@provider), :method => :post do -%>
-      <div class="field field-with-checkbox" id="reset_keys_accept_field">
-        <%= check_box_tag 'reset_keys[accept]' %>
-        <%= label_tag 'reset_keys[accept]', "I understand the risks and still want to reset my API keys" %>
-      </div>
-      <div class="field" id="reset_keys_password_field">
-        <%= label_tag 'reset_keys[password]', "Confirm Your Password" %>
-        <%= password_field_tag 'reset_keys[password]' %>
-      </div>
-      <div class="buttons-holder field-align" id="reset_keys_submit_field">
-        <%= submit_tag "Reset API Keys", :name => 'reset_keys[submit]', :disable_with => 'Reseting your keys...', :class => "button" %>
-      </div>      
-    <% end -%>
+    <div class="field">
+      <label>Private API Key:</label>
+      <%= @provider.private_key %>
+    </div>
   </section>
-<% end %>
+
+  <% if can? :reset_keys, @provider %>
+    <section>
+      <h3>Reset API Keys</h3>
+      <p class="warning">Your CH Adapter will be unable to connect to the API after reseting your keys until you update the configuration with the new keys! Do this only if you think your API keys have been compromised.</p>
+
+      <% if @provider.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@provider.errors.count, "error") %> prohibited the API keys from being reset:</h2>
+
+          <ul>
+          <% @provider.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_tag reset_keys_provider_path(@provider), :method => :post do -%>
+        <div class="field field-with-checkbox" id="reset_keys_accept_field">
+          <%= check_box_tag 'reset_keys[accept]' %>
+          <%= label_tag 'reset_keys[accept]', "I understand the risks and still want to reset my API keys" %>
+        </div>
+        <div class="field" id="reset_keys_password_field">
+          <%= label_tag 'reset_keys[password]', "Confirm Your Password" %>
+          <%= password_field_tag 'reset_keys[password]' %>
+        </div>
+        <div class="buttons-holder field-align" id="reset_keys_submit_field">
+          <%= submit_tag "Reset API Keys", :name => 'reset_keys[submit]', :disable_with => 'Reseting your keys...', :class => "button" %>
+        </div>      
+      <% end -%>
+    </section>
+  <% end %>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

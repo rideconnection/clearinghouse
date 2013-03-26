@@ -9,8 +9,9 @@ FactoryGirl.define do
     customer_primary_phone "555-555-5555"
     customer_seats_required 1
     origin_customer_id "ABC123"
-    requested_drop_off_time { Time.now }
-    requested_pickup_time { Time.now }
+    requested_drop_off_time { Time.current - 5.minutes }
+    requested_pickup_time { Time.current - 30.minutes }
+    appointment_time { Time.current }
     scheduling_priority "pickup"
     association :originator, :factory => :provider
     association :customer_address, :factory => :location

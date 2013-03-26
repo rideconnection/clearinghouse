@@ -1,40 +1,41 @@
-<header>
-  <h2>Providers</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Providers</h2>
+  </header>
 
-<% if not @providers.empty? %>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Id</th>
-      <th>Name</th>
-      <th>Contact</th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @providers.each do |provider| %>
+  <% if not @providers.empty? %>
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= provider.id %></td>
-        <td><%= link_to provider.name, provider_path(provider) %></td>
-        <td><%= mail_to (provider.primary_contact_email) %></td>
-        <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
-        <% if provider.active? %>
-          <td><%= link_to 'Deactivate', deactivate_provider_path(provider),
-                          :method=>:post %></td>
-        <% else %>
-          <td><%= link_to 'Activate', activate_provider_path(provider),
-                          :method=>:post %></td>
-        <% end %>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Contact</th>
+        <th></th>
+        <th></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
-<% else %>
-<p>No providers in the system.</p>
-<% end %>
-
+    </thead>
+    <tbody>
+      <% @providers.each do |provider| %>
+        <tr>
+          <td><%= provider.id %></td>
+          <td><%= link_to provider.name, provider_path(provider) %></td>
+          <td><%= mail_to (provider.primary_contact_email) %></td>
+          <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
+          <% if provider.active? %>
+            <td><%= link_to 'Deactivate', deactivate_provider_path(provider),
+                            :method=>:post %></td>
+          <% else %>
+            <td><%= link_to 'Activate', activate_provider_path(provider),
+                            :method=>:post %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% else %>
+  <p>No providers in the system.</p>
+  <% end %>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

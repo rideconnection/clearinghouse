@@ -1,49 +1,48 @@
 .jcf-hidden {
-	display: block !important;
-	position: absolute !important;
-	left: -9999px !important;
+  display: block !important;
+  position: absolute !important;
+  left: -9999px !important;
 }
-/* 
+
 .scrollable-area-wrapper {
-	position: relative;
-	overflow: hidden;
-	width: 100%;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
 }
 .scrollable-area-wrapper .hscrollbar,
 .scrollable-area-wrapper .vscrollbar {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 20px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
 }
 .scrollable-area-wrapper .hscroll-left,
 .scrollable-area-wrapper .vscroll-up,
 .scrollable-area-wrapper .hscroll-right,
 .scrollable-area-wrapper .vscroll-down {
-	background: #777;
-	width: 20px;
-	height: 20px;
-	float: left;
+  background: #777;
+  width: 20px;
+  height: 20px;
+  float: left;
 }
 .scrollable-area-wrapper .hscroll-line,
 .scrollable-area-wrapper .vscroll-line {
-	background: #eee;
-	width: 20px;
-	float: left;
+  background: #eee;
+  width: 20px;
+  float: left;
 }
 .scrollable-area-wrapper .hscroll-slider,
 .scrollable-area-wrapper .vscroll-slider {
-	background: #ccc;
-	width: 20px;
-	height: 20px;
+  background: #ccc;
+  width: 20px;
+  height: 20px;
 }
 .scrollable-area-wrapper .hscrollbar {
-	position: static;
-	height: 20px;
-	top: auto;
+  position: static;
+  height: 20px;
+  top: auto;
 }
 .scrollable-area-wrapper .hscroll-line {
-	height: 20px;
-	width: auto;
+  height: 20px;
+  width: auto;
 }
-*/

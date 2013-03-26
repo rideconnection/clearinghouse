@@ -1,28 +1,30 @@
-<header>
-  <h2><%= @user.display_name %></h2>
-</header>
+<div class="padded">
+  <header>
+    <h2><%= @user.display_name %></h2>
+  </header>
 
-<section class="form-holder">
-  <div class="field">
-    <label>Provider:</label>
-    <% unless @user.title.blank? %><%= link_to @user.provider.name, provider_path(@user.provider) %><% end %>
-  </div>
+  <section class="form-holder">
+    <div class="field">
+      <label>Provider:</label>
+      <% unless @user.title.blank? %><%= link_to @user.provider.name, provider_path(@user.provider) %><% end %>
+    </div>
 
-  <div class="field">
-    <label>Title:</label>
-    <%= @user.title %>
-  </div>
+    <div class="field">
+      <label>Title:</label>
+      <%= @user.title %>
+    </div>
 
-  <div class="field">
-    <label>Email:</label>
-    <%= link_to_unless @user.email.blank?, @user.email, "mailto:#{@user.email}" %>
-  </div>
+    <div class="field">
+      <label>Email:</label>
+      <%= link_to_unless @user.email.blank?, @user.email, "mailto:#{@user.email}" %>
+    </div>
 
-  <div class="field">
-    <label>Phone:</label><br>
-    <%= @user.phone %>
-  </div>
-</section>
+    <div class="field">
+      <label>Phone:</label><br>
+      <%= @user.phone %>
+    </div>
+  </section>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

@@ -12,6 +12,7 @@
  *= require_self
  *= require_tree .
  *= require jquery-ui-1.10.0.custom
+ *= require jquery-ui-timepicker-addon
  *= require jcf
  */
 
@@ -38,19 +39,24 @@ body {
 
   a {
     color:#444;
-    /* text-decoration:none; */
+    text-decoration:none;
 
     &:active {
       background-color:transparent;
     }
 
     &:hover,&:focus {
-      /* text-decoration:underline; */
+      text-decoration:underline;
     }
   }
 
   .image-holder img,.map-holder img {
     vertical-align:top;
+  }
+  
+  .padded {
+    padding-left:10px;
+    padding-right:10px;
   }
 }
 
@@ -104,108 +110,7 @@ body {
   width:409px;
 }
 
-.tickets-list {
-  float:left;
-  height:670px;
-  line-height:14px;
-  list-style:none;
-  margin:0;
-  padding:0;
-  width:398px;
-}
 
-.tickets-list li {
-  background:#e7eae7;
-  margin:0 0 4px;
-  min-height:70px;
-  overflow:hidden;
-  padding:6px 16px 4px 8px;
-  position:relative;
-  vertical-align:top;
-}
-
-.tickets-list .check {
-  background:#f1f4f1;
-}
-
-.tickets-list .column {
-  float:left;
-  margin:0 0 0 41px;
-  width:153px;
-}
-
-.tickets-list .column:first-child {
-  margin:0;
-  width:180px;
-}
-
-.tickets-list .title {
-  display:block;
-  font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin:0 0 8px;
-}
-
-.tickets-list .title .count {
-  padding:0 0 0 3px;
-}
-
-.tickets-list .date {
-  display:block;
-  font-style:normal;
-  margin:0 0 10px;
-}
-
-.tickets-list .date span {
-  background:url(image-path("separator02.gif")) no-repeat 0 3px;
-  margin:0 0 0 6px;
-  padding:0 5px 0 6px;
-}
-
-.tickets-list .icons-list,.add-info .icons-list {
-  font-size:0;
-  line-height:0;
-  list-style:none;
-  margin:0;
-  padding:0;
-}
-
-.icons-list li {
-  background:none;
-  display:inline;
-  margin:0 10px 0 0;
-  padding:0;
-  vertical-align:middle;
-}
-
-.tickets-list .checked {
-  background:url(image-path("sprite1.png")) no-repeat 0 -625px;
-  bottom:8px;
-  display:none;
-  height:15px;
-  position:absolute;
-  right:6px;
-  width:16px;
-}
-
-.tickets-list .check .checked {
-  display:block;
-}
-
-.tickets-list p {
-  margin:0 0 8px;
-}
-
-.tickets-list .green {
-  background-image:url(image-path("arrow02.png"));
-  background-position:100% 0;
-  background-repeat:no-repeat;
-}
-
-.tickets-list .green2 {
-  background-image:url(image-path("arrow03.png"));
-  background-position:100% 0;
-  background-repeat:no-repeat;
-}
 */
 
 /*
