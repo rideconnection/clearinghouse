@@ -141,9 +141,13 @@ class Ability
     # TODO - add appropriate tests once service request functionality has been defined
     can :read, ServiceRequest, :open_capacity => { :service => { :provider_id => user.partner_provider_ids_for_tickets } }
 
-    # All users can read trip ticket claims, results and comments that belong to trip tickets that belong to their own provider or providers they have an approved relationship with
+    # All users can read trip ticket results and comments that belong to trip tickets that belong to their own provider or providers they have an approved relationship with
     # TODO - add appropriate tests once trip result functionality has been defined
-    can :read, [TripClaim, TripResult, TripTicketComment], :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
+    can :read, [TripResult, TripTicketComment], :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
+
+    # All users can see claims where their own provider is the claimant or where their own provider is the trip ticket originator
+    can :read, TripClaim, :claimant_provider_id => user.provider_id
+    can :read, TripClaim, :trip_ticket => { :origin_provider_id => user.provider_id }
 
     # All users can read (search, filter, etc.) trip tickets belonging to their own provider or providers they have an approved relationship with,
     # except if there's a black list on the trip ticket
