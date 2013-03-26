@@ -105,6 +105,10 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
+  def make_result_for_form
+    can_create_new_result? ? build_trip_result : self.trip_result
+  end
+  
   def can_create_or_edit_result?
     self.trip_result || can_create_new_result?
   end
