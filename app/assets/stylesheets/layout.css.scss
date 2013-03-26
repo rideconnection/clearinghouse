@@ -256,3 +256,15 @@ footer {
   padding:10px;
   text-align:center;
 }
+
+p.error {
+  color: red;
+  font-weight: bold;
+  font-size: 120%;
+}
+
+p.notice {
+  color: green;
+  font-weight: bold;
+  font-size: 120%;
+}

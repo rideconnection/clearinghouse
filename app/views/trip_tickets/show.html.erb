@@ -10,6 +10,34 @@
   <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability) %>
 </section>
 
+<section id="trip_ticket_results">
+  <header>
+    <h2>Trip Results</h2>
+  </header>
+  <fieldset id="trip_result" class="">
+    <% if can?(:update, @result) && @trip_ticket.can_create_or_edit_result? %>
+      <%= form_for(@result) do |form| %>
+        <%= form.fields_for :trip_result do |rf| %>
+          <%= render 'trip_results/form', :f => form %>
+          <div class="buttons-holder">
+            <%= form.submit "Update Trip Result", :class => "button" %>
+          </div>
+        <% end %>
+      <% end %>
+    <% elsif @result %>
+      <%= render 'trip_results/show_fields', :result => @result %>
+    <% else %>
+      No results available yet.
+    <% end %>
+  </fieldset>
+
+  
+  <% if @trip_ticket.trip_result %>
+    <%= render 'shared/audit_trail', :record => @result %>
+  <% end %>
+
+</section>
+
 <section id="trip_ticket_comments">
   <%= render 'trip_ticket_comments', :trip_ticket_comments => @trip_ticket.trip_ticket_comments.accessible_by(current_ability) %>
 </section>
@@ -22,6 +50,7 @@
   <ul class="side-nav">
     <li><%= link_to 'All Tickets', trip_tickets_path %></li>
     <li><a href="#trip_claims">Jump to Claims</a></li>
+    <li><a href="#trip_ticket_results">Jump to Results</a></li>
     <li><a href="#trip_ticket_comments">Jump to Comments</a></li>
     <li><a href="#audit_trail">Jump to Change History</a></li>
   </ul>

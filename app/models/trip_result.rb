@@ -1,6 +1,8 @@
 class TripResult < ActiveRecord::Base
   OUTCOMES = ["Completed", "No-Show", "Cancelled"]
 
+  audited
+
   belongs_to :trip_ticket
   has_one :trip_claim
 

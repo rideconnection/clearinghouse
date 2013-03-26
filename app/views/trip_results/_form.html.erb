@@ -1,3 +1,5 @@
+  
+  <%= f.hidden_field :trip_ticket_id, :value => @trip_ticket.id %>
   <div class="field">
     <%= f.label :outcome %>
     <%= f.select :outcome, TripResult::OUTCOMES, :include_blank => true %>

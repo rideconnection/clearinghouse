@@ -210,20 +210,19 @@ class TripTicketsTest < ActionController::IntegrationTest
     test "authorized users can edit trip results on tickets with approved claims repeatedly" do
       trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
       trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
-      visit edit_trip_ticket_path(trip_ticket) 
-      select "Completed", :from => "trip_ticket_trip_result_attributes_outcome"
-      fill_in "trip_ticket_trip_result_attributes_fare", :with => 100
+      visit trip_ticket_path(trip_ticket) 
 
-      click_button "Update Trip ticket"
+      select "Completed", :from => "trip_result_outcome"
+      fill_in "trip_result_fare", :with => 100
+      click_button "Update Trip Result"
 
-      assert page.has_content?("Trip ticket was successfully updated")
+      assert page.has_content?("Trip result was successfully created")
       assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
 
-      select "No-Show", :from => "trip_ticket_trip_result_attributes_outcome"
+      select "No-Show", :from => "trip_result_outcome"
+      click_button "Update Trip Result"
 
-      click_button "Update Trip ticket"
-
-      assert page.has_content?("Trip ticket was successfully updated")
+      assert page.has_content?("Trip result was successfully updated")
       assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
     end
 

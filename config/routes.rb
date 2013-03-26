@@ -24,6 +24,8 @@ Clearinghouse::Application.routes.draw do
 
   resources :trip_claims, :only => :index
   
+  resources :trip_results
+
   resources :trip_tickets do
     post 'search', :on => :collection
 
