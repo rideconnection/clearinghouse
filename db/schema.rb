@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130321172555) do
+ActiveRecord::Schema.define(:version => 20130326215838) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -188,7 +188,7 @@ ActiveRecord::Schema.define(:version => 20130321172555) do
     t.time     "actual_drop_off_time"
     t.integer  "rate_type"
     t.integer  "rate"
-    t.integer  "driver_id"
+    t.string   "driver_id"
     t.integer  "vehicle_type"
     t.integer  "vehicle_id"
     t.integer  "fare_type"
