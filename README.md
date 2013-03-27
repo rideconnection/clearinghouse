@@ -74,9 +74,7 @@ used to create new databases with these extensions already installed.
 
 4. Create your development and test databases: rake db:setup
 
-5. Ensure the test suite passes: 
-    bundle exec rake spec
-    bundle exec rake test:integration
+5. Ensure the test suite passes.  See "Testing" below. 
 
 Seeding your development database
 ---------------------------------
@@ -100,42 +98,43 @@ which will produce a file called 'erd.pdf' in the current directory.
 Testing
 -------
 
-We currently have two test suites, you can run them with the commands:
+We currently have two test suites implemented in rspec and minitest.  Run them all by 
 
     bundle exec rspec spec
-    bundle exec rake test:integration
+    bundle exec rake minitest:all
 
-(This task is defined in lib/tasks/alltests.rake)
+To run an individual minitest test, run:
+
+    cd <project root directory>
+    ruby -Itest path/to/test_file.rb
 
 Speeding up your tests
 ----------------------
 
-The spork gem has been included and preconfigured in order to help speed up the 
+The spork gem has also been included and preconfigured in order to help speed up the 
 execution of tests. If you are only going to be running the test suite once or 
 need to setup a CI server, you won't want to use spork. But if you will be
 running tests frequently, while developing a new feature or refactoring, etc., 
 then preloading your test environment into spork will save you a few seconds 
 or minutes per test execution.
 
-You'll need two instances of spork for the two test suites:
+You'll need two instances of spork for the two test suites. It's easiest to 
+just run them in the background window of a terminal:
 
-    bundle exec spork rspec    (in terminal one)
-    bundle exec spork minitest (in terminal two)
-
-Or:
     bundle exec spork rspec& bundle exec spork minitest&
 
-You can then run the test suites with the commands:
+And then you can run the test suites with the command:
+
+    bundle exec rake test:all (defined in lib/tasks)
+
+Or:
 
     bundle exec rspec spec
     find test -name "*_test.rb" -type f | xargs bundle exec testdrb
 
-Or:
-    bundle exec rake test:all
+To run individual minitest test using spork, run:
 
-RSpec will use the DRb server by default. The minitest tests need to be run
-with the "testdrb" command.  There is a rake task called "test:all" that will
-run both of these for you.
+    testdrb path/to/test_file.rb
 
 Deployment
 ==========
