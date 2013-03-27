@@ -37,7 +37,7 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
     @trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => @provider_3)
     @trip_claim_6_1 = FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket_6, :claimant => @provider_2, :status => :approved)
 
-    # All users can read trip ticket claims, results and comments that belong to trip tickets that belong to their own provider or providers they have an approved relationship with
+    # All users can read trip ticket claims that belong to their own provider or belong to trip tickets that belong to their own provider
     # Schedulers and above can create, rescind, and update trip claims belonging to their own provider, on trip tickets belonging to providers they have an approved relationship with, but not their own provider's trip tickets
     # Schedulers and above can approve and decline trip claims belonging to trip tickets that belong to their own provider
     # No user can destroy trip claims
@@ -50,12 +50,12 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       @site_admin = Ability.new(@current_user)
     end
 
-    it "can use accessible_by to find trip claims that belong to trip tickets that belong to their own provider or providers they have an approved relationship with" do
+    it "can use accessible_by to find trip claims that belong to their own provider or belong to trip tickets that belong to their own provider" do
       accessible = TripClaim.accessible_by(@site_admin)
       accessible.must_include @trip_claim_1_1
       accessible.must_include @trip_claim_2_1
       accessible.must_include @trip_claim_4_1
-      accessible.must_include @trip_claim_4_2
+      accessible.wont_include @trip_claim_4_2
       accessible.wont_include @trip_claim_6_1
     end
     
@@ -68,11 +68,11 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       assert @site_admin.cannot?(:create, TripClaim.new(:claimant_provider_id => @provider_2.id, :trip_ticket_id => @trip_ticket_3.id))
     end
     
-    it "can read trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
+    it "can read trip claims belonging to their own provider or belonging to trip_tickets that belong to their own provider" do
       assert @site_admin.can?(:read, @trip_claim_1_1)
       assert @site_admin.can?(:read, @trip_claim_2_1)
       assert @site_admin.can?(:read, @trip_claim_4_1)    
-      assert @site_admin.can?(:read, @trip_claim_4_2)
+      assert @site_admin.cannot?(:read, @trip_claim_4_2)
       assert @site_admin.cannot?(:read, @trip_claim_6_1)
     end
     
@@ -124,12 +124,12 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       @provider_admin = Ability.new(@current_user)
     end
 
-    it "can use accessible_by to find trip claims that belong to trip tickets that belong to their own provider or providers they have an approved relationship with" do
+    it "can use accessible_by to find trip claims that belong to their own provider or belong to trip tickets that belong to their own provider" do
       accessible = TripClaim.accessible_by(@provider_admin)
       accessible.must_include @trip_claim_1_1
       accessible.must_include @trip_claim_2_1
       accessible.must_include @trip_claim_4_1
-      accessible.must_include @trip_claim_4_2
+      accessible.wont_include @trip_claim_4_2
       accessible.wont_include @trip_claim_6_1
     end
     
@@ -142,11 +142,11 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       assert @provider_admin.cannot?(:create, TripClaim.new(:claimant_provider_id => @provider_2.id, :trip_ticket_id => @trip_ticket_3.id))
     end
     
-    it "can read trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
+    it "can read trip claims belonging to their own provider or belonging to trip_tickets that belong to their own provider" do
       assert @provider_admin.can?(:read, @trip_claim_1_1)
       assert @provider_admin.can?(:read, @trip_claim_2_1)
       assert @provider_admin.can?(:read, @trip_claim_4_1)    
-      assert @provider_admin.can?(:read, @trip_claim_4_2)
+      assert @provider_admin.cannot?(:read, @trip_claim_4_2)
       assert @provider_admin.cannot?(:read, @trip_claim_6_1)
     end
     
@@ -198,12 +198,12 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       @scheduler = Ability.new(@current_user)
     end
 
-    it "can use accessible_by to find trip claims that belong to trip tickets that belong to their own provider or providers they have an approved relationship with" do
+    it "can use accessible_by to find trip claims that belong to their own provider or belong to trip tickets that belong to their own provider" do
       accessible = TripClaim.accessible_by(@scheduler)
       accessible.must_include @trip_claim_1_1
       accessible.must_include @trip_claim_2_1
       accessible.must_include @trip_claim_4_1
-      accessible.must_include @trip_claim_4_2
+      accessible.wont_include @trip_claim_4_2
       accessible.wont_include @trip_claim_6_1
     end
     
@@ -216,11 +216,11 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       assert @scheduler.cannot?(:create, TripClaim.new(:claimant_provider_id => @provider_2.id, :trip_ticket_id => @trip_ticket_3.id))
     end
     
-    it "can read trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
+    it "can read trip claims belonging to their own provider or belonging to trip_tickets that belong to their own provider" do
       assert @scheduler.can?(:read, @trip_claim_1_1)
       assert @scheduler.can?(:read, @trip_claim_2_1)
       assert @scheduler.can?(:read, @trip_claim_4_1)    
-      assert @scheduler.can?(:read, @trip_claim_4_2)
+      assert @scheduler.cannot?(:read, @trip_claim_4_2)
       assert @scheduler.cannot?(:read, @trip_claim_6_1)
     end
     
@@ -272,12 +272,12 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       @dispatcher = Ability.new(@current_user)
     end
 
-    it "can use accessible_by to find trip claims that belong to trip tickets that belong to their own provider or providers they have an approved relationship with" do
+    it "can use accessible_by to find trip claims that belong to their own provider or belong to trip tickets that belong to their own provider" do
       accessible = TripClaim.accessible_by(@dispatcher)
       accessible.must_include @trip_claim_1_1
       accessible.must_include @trip_claim_2_1
       accessible.must_include @trip_claim_4_1
-      accessible.must_include @trip_claim_4_2
+      accessible.wont_include @trip_claim_4_2
       accessible.wont_include @trip_claim_6_1
     end
     
@@ -290,11 +290,11 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       assert @dispatcher.cannot?(:create, TripClaim.new(:claimant_provider_id => @provider_2.id, :trip_ticket_id => @trip_ticket_3.id))
     end
     
-    it "can read trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
+    it "can read trip claims belonging to their own provider or belonging to trip_tickets that belong to their own provider" do
       assert @dispatcher.can?(:read, @trip_claim_1_1)
       assert @dispatcher.can?(:read, @trip_claim_2_1)
       assert @dispatcher.can?(:read, @trip_claim_4_1)    
-      assert @dispatcher.can?(:read, @trip_claim_4_2)
+      assert @dispatcher.cannot?(:read, @trip_claim_4_2)
       assert @dispatcher.cannot?(:read, @trip_claim_6_1)
     end
     
@@ -346,12 +346,12 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       @read_only = Ability.new(@current_user)
     end
 
-    it "can use accessible_by to find trip claims that belong to trip tickets that belong to their own provider or providers they have an approved relationship with" do
+    it "can use accessible_by to find trip claims that belong to their own provider or belong to trip tickets that belong to their own provider" do
       accessible = TripClaim.accessible_by(@read_only)
       accessible.must_include @trip_claim_1_1
       accessible.must_include @trip_claim_2_1
       accessible.must_include @trip_claim_4_1
-      accessible.must_include @trip_claim_4_2
+      accessible.wont_include @trip_claim_4_2
       accessible.wont_include @trip_claim_6_1
     end
     
@@ -364,11 +364,11 @@ class TripClaimAbilityTest < ActiveSupport::TestCase
       assert @read_only.cannot?(:create, TripClaim.new(:claimant_provider_id => @provider_2.id, :trip_ticket_id => @trip_ticket_3.id))
     end
     
-    it "can read trip claims belonging to their own provider or associated with trip_tickets that belong to their own provider" do
+    it "can read trip claims belonging to their own provider or belonging to trip_tickets that belong to their own provider" do
       assert @read_only.can?(:read, @trip_claim_1_1)
       assert @read_only.can?(:read, @trip_claim_2_1)
       assert @read_only.can?(:read, @trip_claim_4_1)    
-      assert @read_only.can?(:read, @trip_claim_4_2)
+      assert @read_only.cannot?(:read, @trip_claim_4_2)
       assert @read_only.cannot?(:read, @trip_claim_6_1)
     end
     

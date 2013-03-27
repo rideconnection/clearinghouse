@@ -11,7 +11,7 @@ module Clearinghouse
 
       class Provider < Grape::Entity
         expose :name, :primary_contact_email
-        expose :address, :as => :foo, :using => Location
+        expose :address, :using => Location
       end
 
       class TripTicket < Grape::Entity

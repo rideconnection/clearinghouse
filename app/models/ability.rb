@@ -145,7 +145,7 @@ class Ability
     # TODO - add appropriate tests once trip result functionality has been defined
     can :read, [TripResult, TripTicketComment], :trip_ticket => { :origin_provider_id => user.partner_provider_ids_for_tickets }
 
-    # All users can see claims where their own provider is the claimant or where their own provider is the trip ticket originator
+    # All users can read trip ticket claims that belong to their own provider or belong to trip tickets that belong to their own provider
     can :read, TripClaim, :claimant_provider_id => user.provider_id
     can :read, TripClaim, :trip_ticket => { :origin_provider_id => user.provider_id }
 
