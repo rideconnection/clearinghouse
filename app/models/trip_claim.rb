@@ -42,7 +42,7 @@ class TripClaim < ActiveRecord::Base
   def approve!
     self.status = :approved
     save!
-    trip_ticket.trip_claims.where('id != ?', self.id).update_all(:status => :declined)
+    trip_ticket.trip_claims.where('id != ? AND status NOT IN (?)', self.id, INACTIVE_STATUS.map(&:to_s)).update_all(:status => :declined)
   end
   
   def approved?
