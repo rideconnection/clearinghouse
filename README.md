@@ -98,12 +98,11 @@ which will produce a file called 'erd.pdf' in the current directory.
 Testing
 -------
 
-We currently have two test suites implemented in rspec and minitest.  Run them all by 
+All tests are implemented with minitest.  Run them all with:
 
-    bundle exec rspec spec
     bundle exec rake minitest:all
 
-To run an individual minitest test, run:
+To run an individual minitest test:
 
     cd <project root directory>
     ruby -Itest path/to/test_file.rb
@@ -111,28 +110,33 @@ To run an individual minitest test, run:
 Speeding up your tests
 ----------------------
 
-The spork gem has also been included and preconfigured in order to help speed up the 
-execution of tests. If you are only going to be running the test suite once or 
-need to setup a CI server, you won't want to use spork. But if you will be
+The spork gem has also been included and preconfigured in order to help speed up
+the execution of tests. If you are only going to be running the test suite once
+or need to setup a CI server, you won't want to use spork. But if you will be
 running tests frequently, while developing a new feature or refactoring, etc., 
 then preloading your test environment into spork will save you a few seconds 
 or minutes per test execution.
 
-You'll need two instances of spork for the two test suites. It's easiest to 
-just run them in the background window of a terminal:
+It's easiest to just run the spork server in the background window of a terminal:
 
-    bundle exec spork rspec& bundle exec spork minitest&
+    bundle exec spork minitest&
 
-And then you can run the test suites with the command:
+You can then run the test suites through Spork with typical rake test commands
+(defined in lib/tasks):
 
-    bundle exec rake test:all (defined in lib/tasks)
+    bundle exec rake test:all          (run all tests)
+    bundle exec rake test:functionals  (run tests found in test/functional)
+    bundle exec rake test:integration  (run tests found in test/integration)
+    bundle exec rake test:units        (run tests found in test/unit)
 
-Or:
+Or by manually invoking testdrb which is provided by the spork-minitest gem:
 
-    bundle exec rspec spec
     find test -name "*_test.rb" -type f | xargs bundle exec testdrb
+    find test/functional -name "*_test.rb" -type f | xargs bundle exec testdrb
+    find test/integration -name "*_test.rb" -type f | xargs bundle exec testdrb
+    find test/unit -name "*_test.rb" -type f | xargs bundle exec testdrb
 
-To run individual minitest test using spork, run:
+To run an individual test using Spork:
 
     testdrb path/to/test_file.rb
 
