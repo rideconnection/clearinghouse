@@ -42,16 +42,31 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
   describe "PUT /api/v1/trip_tickets/1" do
     include_examples "requires authenticatable params"
 
+    let(:trip_params) {{ trip_ticket: {
+      customer_first_name: "Ariadne"
+    }}}
+
     it "should update the specified trip ticket and return the trip ticket as JSON" do
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, {:trip_ticket => {:customer_first_name => "Ariadne"}})
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
       response.status.should == 200
       response.body.should include(%Q{"customer_first_name":"Ariadne"})
       @trip_ticket1.reload
       @trip_ticket1.customer_first_name.should eq("Ariadne")
     end
 
+    it "updates a nested location" do
+      trip_params[:trip_ticket][:pick_up_location_attributes] = {
+        address_1: '456 New Rd', city: 'Boston', state: 'MA', zip: '02134'
+      }
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
+      response.status.should == 200
+      response.body.should include(%Q{"address_1":"456 New Rd"})
+      @trip_ticket1.reload
+      @trip_ticket1.pick_up_location.address_1.should eq("456 New Rd")
+    end
+
     it "should not allow me to update a trip ticket originated by another provider" do
-      put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, {:trip_ticket => {:customer_first_name => "Ariadne"}})
+      put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
       response.status.should == 401
       response.body.should_not include(%Q{"customer_first_name":"Ariadne"})
     end
@@ -60,7 +75,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
   describe "POST /api/v1/trip_tickets" do
     include_examples "requires authenticatable params"
 
-    let(:trip_params) {{
+    let(:trip_params) {{ trip_ticket: {
       customer_information_withheld: false,
       customer_dob: "2012-01-01",
       customer_first_name: "First",
@@ -71,12 +86,21 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       requested_drop_off_time: Time.now,
       requested_pickup_time: Time.now,
       scheduling_priority: "pickup"
-    }}
+    }}}
 
     it "creates a trip ticket" do
-      post "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, {trip_ticket: trip_params})
+      post "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, trip_params)
       response.status.should == 201
       response.body.should include(%Q{"origin_customer_id":"newtrip123"})
+    end
+
+    it "creates a nested location" do
+      trip_params[:trip_ticket][:pick_up_location_attributes] = {
+        address_1: '456 New Rd', city: 'Boston', state: 'MA', zip: '02134'
+      }
+      post "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, trip_params)
+      response.status.should == 201
+      response.body.should include(%Q{"address_1":"456 New Rd"})
     end
   end
 
