@@ -32,10 +32,16 @@ Spork.prefork do
     end
   end
 
+  # test descriptions including Clearinghouse::API will be handled as integration tests
+  # so they can use the http methods get/post/put/delete
+  MiniTest::Spec.register_spec_type(/Clearinghouse::API/, ActionDispatch::IntegrationTest)
+
   DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
   MiniTest::Rails.override_testunit!
   Turn.config.format = :pretty
   Turn.config.trace = 30
+
+  Dir[Rails.root.join("test/support/**/*.rb")].each {|f| require f}
 end
 
 Spork.each_run do
