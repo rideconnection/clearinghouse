@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 require 'api_param_factory'
 
 describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
@@ -29,30 +29,30 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     context "when trip ticket was originated by the provider" do
       it "returns all trip comments belonging to the trip ticket" do
         get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", @minimum_request_params
-        response.status.should == 200
-        response.body.should include(%Q{"body":"#{@trip_comment1.body}"})
+        response.status.must_equal 200
+        response.body.must_include %Q{"body":"#{@trip_comment1.body}"}
       end
 
       it "does not return trip comments belonging to other trip tickets" do
         get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", @minimum_request_params
-        response.status.should == 200
-        response.body.should_not include(%Q{"body":"#{@trip_comment2.body}"})
+        response.status.must_equal 200
+        response.body.wont_include %Q{"body":"#{@trip_comment2.body}"}
       end
     end
 
     context "when trip ticket was originated by a related provider" do
       it "returns all trip comments belonging to the trip ticket" do
         get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments", @minimum_request_params
-        response.status.should == 200
-        response.body.should include(%Q{"body":"#{@trip_comment2.body}"})
+        response.status.must_equal 200
+        response.body.must_include %Q{"body":"#{@trip_comment2.body}"}
       end
     end
 
     context "when trip ticket was originated by an unrelated provider" do
       it "returns a 401 access denied error" do
         get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments", @minimum_request_params
-        response.status.should == 401
-        response.body.should_not include(%Q{"body":"#{@trip_comment3.body}"})
+        response.status.must_equal 401
+        response.body.wont_include %Q{"body":"#{@trip_comment3.body}"}
       end
     end
   end
@@ -63,32 +63,32 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     context "when trip ticket was originated by the provider" do
       it "returns the specified trip comment" do
         get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments/#{@trip_comment1.id}", @minimum_request_params
-        response.status.should == 200
-        response.body.should include(%Q{"body":"#{@trip_comment1.body}"})
+        response.status.must_equal 200
+        response.body.must_include %Q{"body":"#{@trip_comment1.body}"}
       end
     end
 
     context "when trip ticket was originated by a related provider" do
       it "returns the specified trip comment" do
         get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments/#{@trip_comment2.id}", @minimum_request_params
-        response.status.should == 200
-        response.body.should include(%Q{"body":"#{@trip_comment2.body}"})
+        response.status.must_equal 200
+        response.body.must_include %Q{"body":"#{@trip_comment2.body}"}
       end
     end
 
     context "when trip ticket was originated by an unrelated provider" do
       it "returns a 401 access denied error" do
         get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments/#{@trip_comment3.id}", @minimum_request_params
-        response.status.should == 401
-        response.body.should_not include(%Q{"body":"#{@trip_comment3.body}"})
+        response.status.must_equal 401
+        response.body.wont_include %Q{"body":"#{@trip_comment3.body}"}
       end
     end
 
     context "when trip comment does not belong to specified trip ticket" do
       it "returns a 404 not found error" do
         get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_comment1.id}", @minimum_request_params
-        response.status.should == 404
-        response.body.should_not include(%Q{"body":"#{@trip_comment1.body}"})
+        response.status.must_equal 404
+        response.body.wont_include %Q{"body":"#{@trip_comment1.body}"}
       end
     end
   end
@@ -105,8 +105,8 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
       it "creates a trip comment" do
         post "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments",
              ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
-        response.status.should == 201
-        response.body.should include(%Q{"body":"new comment"})
+        response.status.must_equal 201
+        response.body.must_include %Q{"body":"new comment"}
       end
     end
 
@@ -114,8 +114,8 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
       it "creates a trip comment" do
         post "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments",
              ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
-        response.status.should == 201
-        response.body.should include(%Q{"body":"new comment"})
+        response.status.must_equal 201
+        response.body.must_include %Q{"body":"new comment"}
       end
     end
 
@@ -123,8 +123,8 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
       it "returns a 401 access denied error" do
         post "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments",
              ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
-        response.status.should == 401
-        response.body.should_not include(%Q{"body":"new comment"})
+        response.status.must_equal 401
+        response.body.wont_include %Q{"body":"new comment"}
       end
     end
   end
@@ -135,7 +135,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     it "does not allow the API to update trip comments" do
       put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments/#{@trip_comment1.id}",
           ApiParamFactory.authenticatable_params(@provider1, {:trip_ticket_comment => {:body => "updated comment"}})
-      response.status.should == 401
+      response.status.must_equal 401
     end
   end
 end

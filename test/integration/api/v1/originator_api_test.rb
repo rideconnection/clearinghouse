@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 require 'api_param_factory'
 
 describe "Clearinghouse::API_v1 originator endpoints" do
@@ -12,8 +12,8 @@ describe "Clearinghouse::API_v1 originator endpoints" do
     
     it "should say hello" do
       get "/api/v1/originator/hello", @minimum_request_params
-      response.status.should == 200
-      response.body.should == "Hello, originator!"
+      response.status.must_equal 200
+      response.body.must_equal "Hello, originator!"
     end
   end
 end

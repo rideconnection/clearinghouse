@@ -1,6 +1,6 @@
-require 'spec_helper'
+require 'test_helper'
 
-describe Nonce do
+class NonceTest < ActiveSupport::TestCase
   before do
     @provider = FactoryGirl.create(:provider)
     @nonce = FactoryGirl.build(:nonce)
@@ -14,21 +14,21 @@ describe Nonce do
       end
       
       it "should be defined" do
-        Nonce.should respond_to(:cleanup)
+        Nonce.must_respond_to :cleanup
       end
       
       it "should destroy all nonces more than 30 days old" do
-        Nonce.all.should include(@nonce_01, @nonce_31)
-        Nonce.cleanup.should be_true
-        Nonce.all.should_not include(@nonce_31)
+        Nonce.all.must_include @nonce_01, @nonce_31
+        Nonce.cleanup.must_equal [@nonce_31]
+        Nonce.all.wont_include @nonce_31
       end
     end
   end
   
   it "should have an association to a provider" do
-    @nonce.should respond_to(:provider)
+    @nonce.must_respond_to :provider
     @nonce.provider = @provider
-    @nonce.provider.should == @provider
+    @nonce.provider.must_equal @provider
   end
   
   describe "nonce" do
@@ -39,12 +39,12 @@ describe Nonce do
       @nonce.save
       
       nonce2 = FactoryGirl.build(:nonce, nonce: nonce, provider: @provider)
-      nonce2.valid?.should be_false
-      nonce2.errors.keys.should include(:nonce)
+      nonce2.valid?.must_equal false
+      nonce2.errors.keys.must_include :nonce
 
       provider2 = FactoryGirl.build(:provider)
       nonce2.provider = provider2
-      nonce2.valid?.should be_true
+      nonce2.valid?.must_equal true
     end
   end
 end
