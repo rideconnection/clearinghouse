@@ -66,7 +66,8 @@ class TripTicket < ActiveRecord::Base
   
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
-    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time
+    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time, 
+    :appointment_time
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
@@ -120,7 +121,24 @@ class TripTicket < ActiveRecord::Base
   end
 
   def customer_full_name
-    [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).join(" ")
+    [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).map(&:strip).join(" ")
+  end
+  
+  def seats_required
+    "+ #{[num_attendants, customer_seats_required, num_guests].reject(&:blank?).sum}"
+  end
+  
+  def ethnicity_and_race
+    vals = [customer_race, customer_ethnicity].reject(&:blank?)
+    
+    case vals.size
+    when 2
+      "#{vals[0]} (#{vals[1]})"
+    when 1
+      vals[0]
+    else
+      ""
+    end
   end
   
   def approved_claim

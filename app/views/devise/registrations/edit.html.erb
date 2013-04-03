@@ -1,39 +1,41 @@
-<header>
-  <% if resource == current_user %>
-  <h2>My Account</h2>
-  <% else %>
-  <h2>Edit <%= resource_name.to_s.humanize %></h2>
-  <% end %>
-</header>
+<div class="padded">
+  <header>
+    <% if resource == current_user %>
+    <h2>My Account</h2>
+    <% else %>
+    <h2>Edit <%= resource_name.to_s.humanize %></h2>
+    <% end %>
+  </header>
 
-<section class="form-holder">
-  <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put }) do |f| %>
-    <%= devise_error_messages! %>
+  <section class="form-holder">
+    <%= form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put }) do |f| %>
+      <%= devise_error_messages! %>
 
-    <div class="field">
-      <%= f.label :email %>
-      <%= f.email_field :email %>
-    </div>
+      <div class="field">
+        <%= f.label :email %>
+        <%= f.email_field :email %>
+      </div>
 
-    <h3>Change password</h3>
+      <h3>Change password</h3>
 
-    <div class="field">
-      <%= f.label :current_password %><br /><i>(we need your current password to confirm your changes)</i>
-      <%= f.password_field :current_password %>
-    </div>
+      <div class="field">
+        <%= f.label :current_password %><br /><i>(we need your current password to confirm your changes)</i>
+        <%= f.password_field :current_password %>
+      </div>
 
-    <div class="field">
-      <%= f.label :password %><br /><i>(leave blank if you don't want to change it)</i>
-      <%= f.password_field :password, :autocomplete => "off" %>
-    </div>
+      <div class="field">
+        <%= f.label :password %><br /><i>(leave blank if you don't want to change it)</i>
+        <%= f.password_field :password, :autocomplete => "off" %>
+      </div>
 
-    <div class="field">
-      <%= f.label :password_confirmation %>
-      <%= f.password_field :password_confirmation %>
-    </div>
+      <div class="field">
+        <%= f.label :password_confirmation %>
+        <%= f.password_field :password_confirmation %>
+      </div>
 
-    <div class="buttons-holder">
-      <%= f.submit "Update", :class => "button" %>
-    </div>
-  <% end %>
-</section>
+      <div class="buttons-holder">
+        <%= f.submit "Update", :class => "button" %>
+      </div>
+    <% end %>
+  </section>
+</div>

@@ -1,7 +1,13 @@
 module ApplicationHelper
-  def address_and_city(location)
+  def formatted_address_and_city(location)
     unless location.blank?
-      simple_format location.address_and_city
+      raw location.address_and_city('<br/>')
+    end
+  end
+  
+  def formatted_address_city_and_zip(location)
+    unless location.blank?
+      raw location.address_city_and_zip('<br/>')
     end
   end
   

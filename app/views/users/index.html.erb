@@ -1,8 +1,10 @@
-<header>
-  <h2>Users</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Users</h2>
+  </header>
 
-<%= render 'list', :users => @users, :show_provider => true %>
+  <%= render 'list', :users => @users, :show_provider => true %>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

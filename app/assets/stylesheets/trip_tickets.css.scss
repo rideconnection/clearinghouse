@@ -1,4 +1,535 @@
+@import 'utilities';
+
 body[data-controller="trip_tickets"] {
+  #trip_ticket_filters {
+    input.form-input {
+      width:184px;
+    }
+
+    select.form-input {
+      width:198px;
+    }
+
+    #trip_ticket_filters_trip_time_start,
+    #trip_ticket_filters_trip_time_end {
+      width:157px;
+      margin-right:10px;
+      margin-bottom:3px;
+    }
+  }
+  
+  &[data-action="index"] {
+    #content {
+      &>header {
+        display:none;
+      }
+    
+      .actions-list-holder {
+        background:#ededed;
+        overflow:hidden;
+        padding:9px 33px 4px;
+
+        .actions-list {
+          float:right;
+          font-weight:600;
+          list-style:none;
+          margin:0;
+          padding:0;
+
+          li {
+            float:left;
+
+            a {
+              background:url(image-path("sprite1.png")) no-repeat 0 -520px;
+              color:#666;
+              display:block;
+        
+              span {
+                background:url(image-path("separator03.gif")) no-repeat 0 1px;
+                display:block;
+                padding:7px 12px 11px 9px;
+              }
+            }
+        
+            &:first-child a {
+              background-position:0 -470px;
+            }
+        
+            &.last a {
+              background-position:100% -570px;
+            }
+        
+            &:first-child a span {
+              background:none;
+            }
+          }
+        }
+      }
+        
+      .tickets-holder {
+        float:left;
+        margin:0 -3px 0 0;
+        padding:0;
+        width:409px;
+      
+        .tickets-list {
+          float:left;
+          height:670px;
+          line-height:14px;
+          list-style:none;
+          margin:0;
+          min-height:670px;
+          padding:0;
+          width:398px;
+
+          li {
+            background:#e7eae7;
+            margin:0 0 4px;
+            min-height:70px;
+            overflow:hidden;
+            padding:6px 16px 4px 8px;
+            position:relative;
+            vertical-align:top;
+          }
+
+          @include icons-list;
+
+          .check {
+            background:#f1f4f1;
+          }
+
+          .active {
+            background:#fff;
+          }
+        
+          .description{
+            overflow:hidden;
+            padding:0 0 8px;
+          }
+
+          .column {
+            float:left;
+            margin:0 0 0 41px;
+            width:153px;
+
+            &:first-child {
+              margin:0;
+              width:180px;
+            }
+          }
+
+          .title {
+            display:block;
+            font:14px/16px "Helvetica Neue", Helvetica, Arial, sans-serif;
+            margin:0 0 8px;
+
+            .count {
+              padding:0 0 0 3px;
+            }
+
+            img {
+              margin:0 0 0 11px;
+              vertical-align:middle;
+            }
+          }
+        
+          address {
+            font-style:normal;
+          }
+
+          .date {
+            display:block;
+            font-style:normal;
+            margin:0 0 10px;
+
+            span {
+              background:url(image-path("separator02.gif")) no-repeat 0 3px;
+              margin:0 0 0 6px;
+              padding:0 5px 0 6px;
+            }
+          
+            img {
+              vertical-align:middle;
+            }
+          }
+
+          .checked {
+            background:url(image-path("sprite1.png")) no-repeat 0 -625px;
+            bottom:8px;
+            display:none;
+            height:15px;
+            position:absolute;
+            right:6px;
+            width:16px;
+          }
+
+          .check .checked {
+            display:block;
+          }
+
+          p {
+            margin:0 0 8px;
+          }
+
+          .green {
+            background-image:url(image-path("arrow02.png"));
+            background-position:100% 0;
+            background-repeat:no-repeat;
+          }
+
+          .green2 {
+            background-image:url(image-path("arrow03.png"));
+            background-position:100% 0;
+            background-repeat:no-repeat;
+          }
+        }
+      }
+  
+      .content-holder {
+        background:#fff;
+        float:right;
+        width:655px;
+      
+        .content-frame {
+          height:643px;
+          min-height:643px;
+          padding:8px 33px 20px 24px;
+
+          .heading {
+            margin:0 0 12px;
+            position:relative;
+
+            &.alt-heading {
+              margin-bottom:26px;
+            }
+
+            h2 {
+              font-size:16px;
+              font-weight:700;
+              line-height:18px;
+              margin:0;
+            }
+
+            /* Open Capacity */
+            .btn-request {
+              background:url(image-path("sprite1.png")) no-repeat 100% -282px;
+              color:#fff;
+              font-size:13px;
+              font-weight:700;
+              line-height:15px;
+              padding:0 6px 0 0;
+              position:absolute;
+              right:1px;
+              top:6px;
+
+              span {
+                background:url(image-path("sprite1.png")) no-repeat 0 -250px;
+                float:left;
+                padding:5px 11px 9px 19px;
+              }
+            }
+
+            /* Trip Ticket */
+            img {
+              margin:0 0 0 8px;
+              vertical-align:middle;
+            }
+          }
+                        
+          /* Trip Ticket */
+          .twocolumns {
+            overflow:hidden;
+            
+            .add-info {
+              float:left;
+              padding:0 0 0 2px;
+              width:275px;
+              
+              h3 {
+                font-size:14px;
+                font-weight:400;
+                line-height:16px;
+                margin:0 0 7px -2px;
+              }
+              
+              .description {
+                float:none;
+                margin:0 0 -7px;
+                overflow:hidden;
+                padding:0;
+                width:auto;
+
+                .column {
+                  float:left;
+                  margin:-2px 0 0 10px;
+                  width:121px;
+
+                  &:first-child {
+                    margin:0;
+                  }
+
+                  p {
+                    line-height:17px;
+                    margin:0;
+
+                    img {
+                      display:inline-block;
+                      margin:-4px 0 0 3px;
+                      vertical-align:middle;
+                    }
+                  }
+                }
+              }
+              
+              @include icons-list;
+
+              .icons-list {
+                padding:0 0 12px;
+              }
+              
+              .image-holder {
+                margin:0 0 14px;
+              }
+              
+              .dates-list {
+                line-height:14px;
+                list-style:none;
+                margin:0;
+                padding:0 0 18px;
+
+                li {
+                  overflow:hidden;
+                  vertical-align:top;
+                  
+                  &.active em {
+                    font-weight:700;
+                  }
+                  
+                  span {
+                    background:url(image-path("separator02.gif")) no-repeat 0 3px;
+                    padding:0 7px 0 3px;
+
+                    &:first-child {
+                      background:none;
+                      padding-left:0;
+                    }
+                  }
+                  
+                  .note {
+                    background-position:0 1px;
+                    font-size:9px;
+
+                    strong {
+                      font-weight:700;
+                    }
+                  }
+                }
+              }
+
+              address {
+                font-style:normal;
+                margin:0 0 4px;
+              }
+              
+              .gps-data {
+                display:block;
+                padding:2px 0 16px;
+              }
+              
+              p {
+                margin:0 0 15px;
+              }
+            }
+            
+            .description {
+              float:right;
+              padding:16px 0 0;
+              width:285px;
+                
+              @include form-holder;
+
+              p {
+                margin:0 0 18px;
+              }
+              
+              .details-box {
+                padding:0 0 17px;
+                
+                .opener {
+                  background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+                  font-size:14px;
+                  line-height:16px;
+                  padding:0 0 0 18px;
+                }
+                
+                &.active .opener {
+                  background-position:-1px -86px;
+                }
+
+                .slide {
+                  padding:20px 10px 16px 0;
+
+                  dl {
+                    line-height:15px;
+                    margin:0;
+                    overflow:hidden;
+
+                    dt,dd {
+                      display:inline-block;
+                      margin:0 0 13px;
+                      vertical-align:top;
+                    }
+
+                    dt {
+                      padding:0 10px 0 0;
+                      width:97px;
+                    }
+                    
+                    dd {
+                      width:154px;
+                    }
+                  }
+                }
+                
+                p {
+                  margin:0 0 18px;
+                }
+              }
+            }
+          }
+          
+          /* Open Capacity */
+          .seats-info {
+            margin:0 0 9px;
+            @include clearfix;
+
+            .column {
+              float:left;
+              margin:0 10px 0 0;
+              width:138px;
+            }
+
+            p {
+              margin:0 0 10px;
+            }
+            
+            dl {
+              margin:-5px 0 0;
+            }
+            
+            dl {
+              dt,dd {
+                display:inline-block;
+                margin:0 0 8px;
+                vertical-align:bottom;
+              }
+
+              dt {
+                text-align:right;
+                width:20px;
+              }
+            
+              dd {
+                padding:0 0 1px 7px;
+                width:105px;
+              }
+            }
+          }
+          
+          /* Open Capacity */
+          .map-holder {
+            margin:0 0 54px;
+
+            .frame {
+              margin:0 0 14px;
+            }
+
+            .description {
+              line-height:17px;
+              overflow:hidden;
+
+              p {
+                margin:0;
+                overflow:hidden;
+              }
+
+              .event-section {
+                float:left;
+                padding:4px 10px 0 0;
+                width:141px;
+              
+                address {
+                  font-style:normal;
+                }
+
+                .date {
+                  display:block;
+                  font-style:normal;
+                  font-weight:700;
+
+                  span {
+                    background:url(image-path("separator04.gif")) no-repeat 0 4px;
+                    margin:0 0 0 2px;
+                    padding:0 0 0 7px;
+                  }
+                }
+              }
+            }
+          }
+
+          /* Open Capacity */
+          .activities-section {
+            @include clearfix;
+
+            @include form-holder;
+            
+            .events-list {
+              float:left;
+              list-style:none;
+              margin:0;
+              padding:3px 0 0;
+
+              li {
+                overflow:hidden;
+                padding:0 0 6px;
+                vertical-align:top;
+              }
+
+              strong {
+                background:url(image-path("separator05.gif")) no-repeat 100% 4px;
+                font-weight:700;
+                margin:0 3px 0 0;
+                padding:0 7px 0 0;
+              }
+            }
+            
+            .activity-list {
+              list-style:none;
+              margin:0 0 0 -4px;
+              padding:0;
+
+              li {
+                overflow:hidden;
+                padding:0 0 4px;
+                vertical-align:top;
+              }
+              
+              span {
+                background:url(image-path("separator02.gif")) no-repeat 100% 2px;
+                display:inline-block;
+                margin:0 3px 0 0;
+                padding:0 7px 0 0;
+                text-align:right;
+                vertical-align:top;
+                width:55px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
   /*
   .tickets-list.small-list li {
     background:#f8f8f8;

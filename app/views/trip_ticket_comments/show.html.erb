@@ -1,27 +1,29 @@
-<header>
-  <h2>Trip Ticket Comment</h2>
-</header>
+<div class="padded">
+  <header>
+    <h2>Trip Ticket Comment</h2>
+  </header>
 
-<section class="form-holder">
-  <div class="field">
-    <label>Trip ticket:</label>
-    <%= @trip_ticket.to_param %>
-  </div>
+  <section class="form-holder">
+    <div class="field">
+      <label>Trip ticket:</label>
+      <%= @trip_ticket.to_param %>
+    </div>
 
-  <div class="field">
-    <label>User:</label>
-    <%= @trip_ticket_comment.user.display_name %>
-  </div>
+    <div class="field">
+      <label>User:</label>
+      <%= @trip_ticket_comment.user.display_name %>
+    </div>
 
-  <div class="field">
-    <label>Body:</label><br>
-    <%= @trip_ticket_comment.body %>
-  </div>
-</section>
+    <div class="field">
+      <label>Body:</label><br>
+      <%= @trip_ticket_comment.body %>
+    </div>
+  </section>
 
-<section id="audit_trail">
-  <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
-</section>
+  <section id="audit_trail">
+    <%= render 'shared/audit_trail', :record => @trip_ticket_comment %>
+  </section>
+</div>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

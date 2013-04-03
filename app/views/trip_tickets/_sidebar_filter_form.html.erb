@@ -1,0 +1,120 @@
+<ul class="side-nav">
+  <% if can? :create, TripTicket %><li><%= link_to 'New Trip ticket', new_trip_ticket_path %></li><% end %>
+</ul>
+
+<section id="trip_ticket_filters" class="padded">
+  <header>
+    <h2>Ticket Filters</h2>
+  </header>
+
+  <%= form_tag trip_tickets_path, :method => :get, :class => "form-filter" do %>
+    <div class="field">
+      <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone, :placeholder => "Customer Address or Phone", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location, :placeholder => "Pickup Address", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location, :placeholder => "Dropoff Address", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= text_field_tag 'trip_ticket_filters[customer_identifiers]', params[:trip_ticket_filters].try(:[], :customer_identifiers), :id => :trip_ticket_filters_customer_identifiers, :placeholder => "Customer Identifiers", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= label_tag :trip_ticket_filters_originating_provider, "Originating Provider:" %><br>
+      <%= select_tag 'trip_ticket_filters[originating_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :originating_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_originating_provider, :class => "form-input"} %>
+    </div>
+
+    <div class="field">
+      <%= label_tag :trip_ticket_filters_claiming_provider, "Claiming Provider:" %><br>
+      <%= select_tag 'trip_ticket_filters[claiming_provider][]', options_from_collection_for_select(@providers_for_filters, :id, :name, params[:trip_ticket_filters].try(:[], :claiming_provider)), {:multiple => true, :size => [10, @providers_for_filters.size].min, :id => :trip_ticket_filters_claiming_provider, :class => "form-input"} %>
+    </div>
+
+    <div class="field">
+      <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :id => :trip_ticket_filters_claim_status, :prompt => "Claim Status", :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :prompt => "Scheduling Priority", :id => :trip_ticket_filters_scheduling_priority, :class => "form-input" %>
+    </div>
+
+    <div class="field">
+      <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required:" %><br>
+      <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99, :size => 5, :placeholder => "Min" %>
+      to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99, :size => 5, :placeholder => "Max" %>
+    </div>
+
+    <div class="field">
+      <%= label_tag :trip_ticket_filters_trip_time_start, "Trip Time:" %><br>
+      <%= text_field_tag 'trip_ticket_filters[trip_time][start]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start), :id => :trip_ticket_filters_trip_time_start, :placeholder => "From: yyyy-mm-dd hh:mm am", :class => "form-input" %><br>
+      <%= text_field_tag 'trip_ticket_filters[trip_time][end]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end), :id => :trip_ticket_filters_trip_time_end, :placeholder => "To: yyyy-mm-dd hh:mm am", :class => "form-input" %>
+    </div>
+
+    <div class="buttons-holder">
+      <%= link_to trip_tickets_path, :class => "button button-cancel" do %>
+        <span>Clear</span>
+      <% end %>
+      <%= submit_tag 'Search', :name => '', :class => "button" %>
+    </div>
+  
+    <p></p>
+  <% end %>
+</section>
+
+<script type="text/javascript">
+var startDateTextBox, endDateTextBox;
+$(document).ready(function() {
+  startDateTextBox = $('#trip_ticket_filters_trip_time_start');
+  endDateTextBox = $('#trip_ticket_filters_trip_time_end');
+  startDateTextBox.datetimepicker({ 
+    onClose: function(dateText, inst) {
+      if (endDateTextBox.val() != '') {
+        var testStartDate = startDateTextBox.datetimepicker('getDate');
+        var testEndDate = endDateTextBox.datetimepicker('getDate');
+        if (testStartDate > testEndDate) endDateTextBox.datetimepicker('setDate', testStartDate);
+      }
+      else {
+        endDateTextBox.val(dateText);
+      }
+    },
+    onSelect: function (selectedDateTime) {
+      endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate') );
+    },
+    changeMonth: false,
+    dateFormat: "yy-mm-dd",
+    numberOfMonths: 1,
+    showOn: "both",
+    stepMinute: 15,
+    timeFormat: 'hh:mm tt',
+  });
+  endDateTextBox.datetimepicker({ 
+    onClose: function(dateText, inst) {
+      if (startDateTextBox.val() != '') {
+        var testStartDate = startDateTextBox.datetimepicker('getDate');
+        var testEndDate = endDateTextBox.datetimepicker('getDate');
+        if (testStartDate > testEndDate) startDateTextBox.datetimepicker('setDate', testEndDate);
+      }
+      else {
+        startDateTextBox.val(dateText);
+      }
+    },
+    onSelect: function (selectedDateTime) {
+      startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+    },
+    changeMonth: false,
+    dateFormat: "yy-mm-dd",
+    numberOfMonths: 1,
+    showOn: "both",
+    stepMinute: 15,
+    timeFormat: 'hh:mm tt',
+  });
+});
+</script>

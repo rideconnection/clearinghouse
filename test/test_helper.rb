@@ -23,6 +23,10 @@ Spork.prefork do
     # Add more helper methods to be used by all tests here...
   end
 
+  class ActionController::TestCase
+    include Devise::TestHelpers
+  end
+
   # Integration tests
   require "capybara/rails"
 

@@ -1,0 +1,138 @@
+<div class="heading">
+  <h2>
+    <%= link_to trip_ticket do %>
+      <%= trip_ticket.customer_full_name %>
+    <% end %>
+    <span class="count"><%= trip_ticket.seats_required %></span>
+    <!--img src="/assets/icon01.png" width="16" height="14" alt="" /-->
+  </h2>
+  <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
+    <%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "btn-claim" do %>
+      <span>Claim</span>
+    <% end %>
+  <% end %>
+</div>
+<div class="twocolumns">
+  <div class="add-info">
+    <h3><%= trip_ticket.originator.name %></h3>
+    <div class="description">
+      <div class="column">
+        <p><%= trip_ticket.customer_primary_phone %></p>
+        <% unless trip_ticket.customer_emergency_phone.blank? %>
+          <p><%= trip_ticket.customer_emergency_phone %></p>
+        <% end %>
+      </div>
+      <div class="column info">
+        <% unless trip_ticket.customer_primary_language.blank? %>
+          <p>Language: <%= trip_ticket.customer_primary_language %></p>
+        <% end %>
+        <% unless trip_ticket.customer_boarding_time.blank? %>
+          <p>Board: <%= trip_ticket.customer_boarding_time %>m <%= load_time_warning(trip_ticket.customer_boarding_time) %></p>
+        <% end %>
+        <% unless trip_ticket.customer_deboarding_time.blank? %>
+          <p>De-board: <%= trip_ticket.customer_deboarding_time %>m <%= unload_time_warning(trip_ticket.customer_deboarding_time) %></p>
+        <% end %>
+      </div>
+    </div>
+    <ul class="icons-list">
+      <li><!--img src="/assets/icon03.png" width="13" height="18" alt="" /--></li>
+      <li><!--img src="/assets/icon04.png" width="7" height="23" alt="" /--></li>
+      <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
+    </ul>
+    <div class="image-holder">
+      <img src="/assets/img01.png" width="275" height="201" alt="" />
+    </div>
+    <ul class="dates-list">
+      <% unless trip_ticket.requested_pickup_time.blank? %>
+        <li class="active"><span><%= trip_ticket.requested_pickup_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>PU</strong><%= formatted_allowed_time_variance(trip_ticket.allowed_time_variance) %></span></li>
+      <% end %>
+      <% unless trip_ticket.requested_drop_off_time.blank? %>
+        <li><span><%= trip_ticket.requested_drop_off_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>DO</strong><%= formatted_allowed_time_variance(trip_ticket.allowed_time_variance) %></span></li>
+      <% end %>
+      <% unless trip_ticket.earliest_pick_up_time.blank? %>
+        <li><span><%= trip_ticket.earliest_pick_up_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>Earliest PU</strong></span></li>
+      <% end %>
+      <li><span><%= trip_ticket.appointment_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>Appt</strong></span></li>
+    </ul>
+    <address><%= trip_ticket.pick_up_location.address_city_and_zip(', ') %></address>
+    <address><%= trip_ticket.drop_off_location.address_city_and_zip(', ') %></address>
+    <span class="gps-data">GPS Coordinates</span>
+    <% unless trip_ticket.trip_purpose_description.blank? %>
+      <p>Purpose: <%= trip_ticket.trip_purpose_description %></p>
+    <% end %>
+    <% unless trip_ticket.trip_notes.blank? %>
+      <p><%= trip_ticket.trip_notes %></p>
+    <% end %>
+  </div>
+  <div class="description">
+    <% unless trip_ticket.customer_impairment_description.blank? %>
+      <p><%= trip_ticket.customer_impairment_description %></p>
+    <% end %>
+    <div class="details-box">
+      <a class="opener" href="#">Customer Details</a>
+      <div class="slide">
+        <dl>
+          <dt>Address:</dt>
+          <dd><%= formatted_address_city_and_zip trip_ticket.customer_address %></dd>
+        
+          <% unless trip_ticket.customer_eligibility_factors.blank? %>
+            <dt>Eligibility:</dt>
+            <dd><%= formatted_customer_identifiers trip_ticket.customer_eligibility_factors %></dd>
+          <% end %>
+        
+          <% trip_ticket.customer_identifiers.try(:each) do |k,v| %>
+            <dt><%= k %></dt>
+            <dd><%= v %></dd>
+          <% end %>
+        
+          <% unless trip_ticket.customer_race.blank? && trip_ticket.customer_ethnicity.blank? %>
+            <dt>Ethnicity:</dt>
+            <dd><%= trip_ticket.ethnicity_and_race %></dd>
+          <% end %>
+        
+          <dt>Age:</dt>
+          <dd><%= customer_age trip_ticket.customer_dob %></dd>
+        
+          <dt>DOB:</dt>
+          <dd><%= trip_ticket.customer_dob.strftime("%m/%d/%Y") %></dd>
+        </dl>
+      </div>
+    </div>
+    <div class="details-box active">
+      <a class="opener" href="#">Trip Details</a>
+      <div class="slide">
+        <% unless trip_ticket.trip_funders.blank? %>
+          <p>Trip Funders: <%= formatted_customer_identifiers trip_ticket.trip_funders %></p>
+        <% end %>
+        <% unless trip_ticket.provider_white_list.blank? %>
+          <p>Trip Whitelist: <%= providers_from_white_black_list trip_ticket.provider_white_list %></p>
+        <% end %>
+        <% unless trip_ticket.provider_black_list.blank? %>
+          <p>Trip Blacklist: <%= providers_from_white_black_list trip_ticket.provider_black_list %></p>
+        <% end %>
+      </div>
+    </div>
+    <div class="form-holder">
+      <div class="heading">
+        <h2>Activity</h2>
+        <a class="opener" href="#">Comment</a>
+      </div>
+      <div class="slide">
+        <form action="#" class="form-comment">
+          <fieldset>
+            <textarea cols="35" rows="2">I don't work yet</textarea>
+            <div class="buttons-holder">
+              <a href="#" class="btn-cancel"><span>Cancel</span></a>
+              <input type="submit" value="Submit" />
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <ul class="activity-list">
+        <li><a href="#"><span>2:33 PM</span> Comment (Placeholder)</a></li>
+        <li><a href="#"><span>12:20 PM</span> Claim Submitted (Placeholder)</a></li>
+        <li><a href="#"><span>11:00 AM</span> Claim Submitted (Placeholder)</a></li>
+      </ul>
+    </div>
+  </div>
+</div>

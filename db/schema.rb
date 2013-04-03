@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130326215838) do
+ActiveRecord::Schema.define(:version => 20130330044733) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -52,9 +52,9 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.spatial  "position",   :limit => {:no_constraints=>true}
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
 
   create_table "nonces", :force => true do |t|
@@ -143,12 +143,12 @@ ActiveRecord::Schema.define(:version => 20130326215838) do
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
+    t.datetime "created_at",                                                    :null => false
+    t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:no_constraints=>true}
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
