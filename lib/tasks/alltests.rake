@@ -1,5 +1,9 @@
 if Rails.env == 'development'
-  Rake::Task[:test].clear
+
+  ['test', 'test:all', 'test:functionals', 'test:integration', 'test:units'].each do |t|
+    Rake::Task[t].clear if Rake::Task.task_defined?(t)
+  end
+
   desc "Run all tests (unit, functional, integration) using Spork."
   task :test do
     sh 'find test -name "*_test.rb" -type f | xargs bundle exec testdrb'
@@ -13,12 +17,12 @@ if Rails.env == 'development'
 
     desc "Run tests in test/functional using Spork."
     task :functionals do
-      sh 'find test -name "*_test.rb" -type f | xargs bundle exec testdrb'
+      sh 'find test/functional -name "*_test.rb" -type f | xargs bundle exec testdrb'
     end
 
     desc "Run tests in test/integration using Spork."
     task :integration do
-      sh 'find test -name "*_test.rb" -type f | xargs bundle exec testdrb'
+      sh 'find test/integration -name "*_test.rb" -type f | xargs bundle exec testdrb'
     end
 
     desc "Run tests in test/unit using Spork."
