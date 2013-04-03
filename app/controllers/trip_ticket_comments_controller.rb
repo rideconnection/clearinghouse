@@ -44,6 +44,7 @@ class TripTicketCommentsController < ApplicationController
       if @trip_ticket_comment.save
         format.html { redirect_to [@trip_ticket, @trip_ticket_comment], notice: 'Trip ticket comment was successfully created.' }
         format.json { render json: @trip_ticket_comment, status: :created, location: @trip_ticket_comment }
+        format.js
       else
         format.html { render action: "new" }
         format.json { render json: @trip_ticket_comment.errors, status: :unprocessable_entity }

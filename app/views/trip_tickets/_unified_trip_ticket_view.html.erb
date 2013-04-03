@@ -118,18 +118,20 @@
         <a class="opener" href="#">Comment</a>
       </div>
       <div class="slide">
-        <form action="#" class="form-comment">
+        <%= form_for [trip_ticket, TripTicketComment.new], remote: true, html: { class: 'form-comment' } do |f| %>
           <fieldset>
-            <textarea cols="35" rows="2">I don't work yet</textarea>
+            <%= f.text_area :body, cols: 35, rows: 2 %>
             <div class="buttons-holder">
               <a href="#" class="btn-cancel"><span>Cancel</span></a>
               <input type="submit" value="Submit" />
             </div>
           </fieldset>
-        </form>
+        <% end %>
       </div>
       <ul class="activity-list">
-        <li><a href="#"><span>2:33 PM</span> Comment (Placeholder)</a></li>
+        <% trip_ticket.trip_ticket_comments.each do |comment| %>
+          <%= render 'unified_trip_ticket_view_comment', :comment => comment %>
+        <% end %>
         <li><a href="#"><span>12:20 PM</span> Claim Submitted (Placeholder)</a></li>
         <li><a href="#"><span>11:00 AM</span> Claim Submitted (Placeholder)</a></li>
       </ul>

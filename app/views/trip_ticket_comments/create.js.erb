@@ -1,0 +1,3 @@
+$('.activity-list').append('<%= escape_javascript(render("trip_tickets/unified_trip_ticket_view_comment", :comment => @trip_ticket_comment)) %>');
+$('.activity-list').closest('.form-holder').find('form')[0].reset();
+$('.activity-list').closest('.form-holder').find('.opener').trigger('click');
