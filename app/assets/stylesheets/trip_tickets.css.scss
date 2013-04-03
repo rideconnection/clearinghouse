@@ -235,7 +235,29 @@ body[data-controller="trip_tickets"] {
               vertical-align:middle;
             }
           }
-                        
+          
+          .activity-list {
+            list-style:none;
+            margin:0 0 0 -4px;
+            padding:0;
+
+            li {
+              overflow:hidden;
+              padding:0 0 4px;
+              vertical-align:top;
+            
+              span {
+                background:url(image-path("separator02.gif")) no-repeat 100% 2px;
+                display:inline-block;
+                margin:0 3px 0 0;
+                padding:0 7px 0 0;
+                text-align:right;
+                vertical-align:top;
+                width:55px;
+              }
+            }
+          }
+
           /* Trip Ticket */
           .twocolumns {
             overflow:hidden;
@@ -500,28 +522,6 @@ body[data-controller="trip_tickets"] {
                 font-weight:700;
                 margin:0 3px 0 0;
                 padding:0 7px 0 0;
-              }
-            }
-            
-            .activity-list {
-              list-style:none;
-              margin:0 0 0 -4px;
-              padding:0;
-
-              li {
-                overflow:hidden;
-                padding:0 0 4px;
-                vertical-align:top;
-              }
-              
-              span {
-                background:url(image-path("separator02.gif")) no-repeat 100% 2px;
-                display:inline-block;
-                margin:0 3px 0 0;
-                padding:0 7px 0 0;
-                text-align:right;
-                vertical-align:top;
-                width:55px;
               }
             }
           }
