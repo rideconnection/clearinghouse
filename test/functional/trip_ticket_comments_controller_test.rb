@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TripTicketCommentsControllerTest < ActionController::TestCase
   
-  #include Devise::TestHelpers
+  include Devise::TestHelpers
 
   setup do
     @provider = FactoryGirl.create(:provider)
