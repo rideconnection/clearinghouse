@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 require 'api_param_factory'
 
 describe "Clearinghouse::API_v1 trip result endpoints" do

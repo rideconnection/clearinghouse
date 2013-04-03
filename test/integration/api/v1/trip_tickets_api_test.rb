@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'test_helper'
 require 'api_param_factory'
 
 describe "Clearinghouse::API_v1 trip tickets endpoints" do
@@ -16,10 +16,10 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "should return all trip tickets originated by the provider as JSON" do
       get "/api/v1/trip_tickets", @minimum_request_params
-      response.status.should == 200
-      response.body.should include(%Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"})
-      response.body.should include(%Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"})
-      response.body.should_not include(%Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"})
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
     end
   end
 
@@ -28,14 +28,14 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "should return the specified trip ticket as JSON" do
       get "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider)
-      response.status.should == 200
-      response.body.should include(%Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"})
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
     end
 
     it "should not allow me to access a trip ticket originated by another provider" do
       get "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider)
-      response.status.should == 401
-      response.body.should_not include(%Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"})
+      response.status.must_equal 401
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
     end
   end
 
@@ -48,10 +48,10 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "should update the specified trip ticket and return the trip ticket as JSON" do
       put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
-      response.status.should == 200
-      response.body.should include(%Q{"customer_first_name":"Ariadne"})
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"Ariadne"}
       @trip_ticket1.reload
-      @trip_ticket1.customer_first_name.should eq("Ariadne")
+      @trip_ticket1.customer_first_name.must_equal "Ariadne"
     end
 
     it "updates a nested location" do
@@ -59,16 +59,16 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
         address_1: '456 New Rd', city: 'Boston', state: 'MA', zip: '02134'
       }
       put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
-      response.status.should == 200
-      response.body.should include(%Q{"address_1":"456 New Rd"})
+      response.status.must_equal 200
+      response.body.must_include %Q{"address_1":"456 New Rd"}
       @trip_ticket1.reload
-      @trip_ticket1.pick_up_location.address_1.should eq("456 New Rd")
+      @trip_ticket1.pick_up_location.address_1.must_equal "456 New Rd"
     end
 
     it "should not allow me to update a trip ticket originated by another provider" do
-      put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
-      response.status.should == 401
-      response.body.should_not include(%Q{"customer_first_name":"Ariadne"})
+      put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, {:trip_ticket => {:customer_first_name => "Ariadne"}})
+      response.status.must_equal 401
+      response.body.wont_include %Q{"customer_first_name":"Ariadne"}
     end
   end
 
@@ -91,8 +91,8 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
 
     it "creates a trip ticket" do
       post "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, trip_params)
-      response.status.should == 201
-      response.body.should include(%Q{"origin_customer_id":"newtrip123"})
+      response.status.must_equal 201
+      response.body.must_include %Q{"origin_customer_id":"newtrip123"}
     end
 
     it "creates a nested location" do
@@ -100,8 +100,8 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
         address_1: '456 New Rd', city: 'Boston', state: 'MA', zip: '02134'
       }
       post "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, trip_params)
-      response.status.should == 201
-      response.body.should include(%Q{"address_1":"456 New Rd"})
+      response.status.must_equal 201
+      response.body.must_include %Q{"address_1":"456 New Rd"}
     end
   end
 
@@ -111,16 +111,16 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
   #
   #  it "should cancel the specified trip ticket and return the trip ticket as JSON" do
   #    put "/api/v1/trip_tickets/#{@trip_ticket1.id}/cancel", ApiParamFactory.authenticatable_params(@provider)
-  #    response.status.should == 200
-  #    response.body.should include(%Q{"canceled":true})
+  #    response.status.must_equal 200
+  #    response.body.must_include %Q{"canceled":true}
   #    @trip_ticket1.reload
-  #    @trip_ticket1.canceled.should be_true
+  #    @trip_ticket1.canceled.must_equal true
   #  end
   #
   #  it "should not allow me to cancel a trip ticket originated by another provider" do
   #    put "/api/v1/trip_tickets/#{@trip_ticket3.id}/cancel", ApiParamFactory.authenticatable_params(@provider)
-  #    response.status.should == 401
-  #    response.body.should_not include(%Q{"canceled":true"})
+  #    response.status.must_equal 401
+  #    response.body.wont_include %Q{"canceled":true"}
   #  end
   #end
 end

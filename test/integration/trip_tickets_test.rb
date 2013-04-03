@@ -842,7 +842,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     field = options[:from].to_s
     select datetime.strftime("%Y"), :from => "#{field}_1i"
     select datetime.strftime("%B"), :from => "#{field}_2i"
-    select datetime.strftime("%e"), :from => "#{field}_3i"
+    select datetime.strftime("%-d"), :from => "#{field}_3i"
   end
 
   def select_time(datetime, options = {})  

@@ -50,11 +50,9 @@ group :development do
 end
 
 group :test do
-  gem 'accept_values_for'
   gem 'capybara'
   gem 'database_cleaner'
   gem 'launchy'
-  gem 'rspec-rails'
 end
 
 group :test, :development do
@@ -63,7 +61,6 @@ group :test, :development do
   gem 'minitest-rails', git: 'git://github.com/blowmage/minitest-rails.git'
   gem 'minitest-rails-capybara',
     git: 'git://github.com/blowmage/minitest-rails-capybara.git'
-  gem 'rspec-rails'
   gem 'spork-rails'
   gem 'spork-testunit', git: 'git://github.com/sporkrb/spork-testunit.git'
   gem 'spork-minitest', git: 'git://github.com/semaperepelitsa/spork-minitest.git'
