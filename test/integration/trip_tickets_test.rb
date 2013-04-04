@@ -27,7 +27,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   
   test "provider admins can create new trip tickets" do
     click_link "Tickets"
-    click_link "New Trip ticket"
+    click_link "Add New"
     
     fill_in_minimum_required_trip_ticket_fields
 
@@ -54,7 +54,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     describe "#{field_sym.to_s} string_array fields" do
       test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do
         click_link "Tickets"
-        click_link "New Trip ticket"
+        click_link "Add New"
       
         fill_in_minimum_required_trip_ticket_fields
       
@@ -144,7 +144,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     #   # vv- here be unexercised tests -vv
     #   
     #   click_link "Tickets"
-    #   click_link "New Trip ticket"
+    #   click_link "Add New"
     #
     #   fill_in_minimum_required_trip_ticket_fields
     #   
@@ -172,7 +172,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     
     test "provider admins should see a single pair of customer identifier attribute fields when creating a trip ticket (but cannot save them without javascript)" do
       click_link "Tickets"
-      click_link "New Trip ticket"
+      click_link "Add New"
       
       within('#customer_identifiers') do
         assert_equal 1, all('.hstoreAttributeName').size
