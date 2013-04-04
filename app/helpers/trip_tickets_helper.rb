@@ -16,19 +16,19 @@ module TripTicketsHelper
   
   def load_time_warning(customer_boarding_time)
     if customer_boarding_time > 3
-      raw %Q(<img src="/assets/icon02.png" width="13" height="13" alt="" />)
+      raw image_tag('icon02.png', width: 13, height: 13, alt: '')
     end
   end
   
   def unload_time_warning(customer_deboarding_time)
     if customer_deboarding_time > 3
-      raw %Q(<img src="/assets/icon02.png" width="13" height="13" alt="" />)
+      raw image_tag('icon02.png', width: 13, height: 13, alt: '')
     end
   end
   
   def load_unload_time_warning(customer_boarding_time, customer_deboarding_time)
     if customer_boarding_time > 3 || customer_deboarding_time > 3
-      raw %Q(<img src="/assets/icon02.png" width="13" height="13" alt="" />)
+      raw image_tag('icon02.png', width: 13, height: 13, alt: '')
     end
   end
   

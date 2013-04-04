@@ -40,7 +40,7 @@
       <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
     </ul>
     <div class="image-holder">
-      <img src="/assets/img01.png" width="275" height="201" alt="" />
+      <%= image_tag 'img01.png', width: 275, height: 201, alt: 'new' %>
     </div>
     <ul class="dates-list">
       <% unless trip_ticket.requested_pickup_time.blank? %>
