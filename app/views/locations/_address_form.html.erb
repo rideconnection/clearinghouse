@@ -1,5 +1,5 @@
 <div class="field">
-  <%= f.label :address_1, "Address Line 1" %>
+  <%= f.label :address_1, "Address Line 1", class: (required_fields ? "required" : "") %>
   <%= f.text_field :address_1 %>
 </div>
 <div class="field">
@@ -7,14 +7,14 @@
   <%= f.text_field :address_2 %>
 </div>
 <div class="field">
-  <%= f.label :city %>
+  <%= f.label :city, class: (required_fields ? "required" : "") %>
   <%= f.text_field :city %>
 </div>
 <div class="field">
-  <%= f.label :state %>
+  <%= f.label :state, class: (required_fields ? "required" : "") %>
   <%= f.text_field :state %>
 </div>
 <div class="field">
-  <%= f.label :zip, "Postal Code" %>
+  <%= f.label :zip, "Postal Code", class: (required_fields ? "required" : "") %>
   <%= f.text_field :zip %>
 </div>

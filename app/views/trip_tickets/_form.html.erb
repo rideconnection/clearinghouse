@@ -20,7 +20,7 @@
     </div>
     <% if can? :edit, @trip_ticket %>
       <div class="field">
-        <%= f.label :origin_customer_id, "Customer ID" %>
+        <%= f.label :origin_customer_id, "Customer ID", class: "required" %>
         <%= f.text_field :origin_customer_id %>
       </div>
       <div class="field">
@@ -54,7 +54,7 @@
   <fieldset id="customer" class="">
     <legend>Customer</legend>
     <div class="field">
-      <%= f.label :customer_first_name, "First Name" %>
+      <%= f.label :customer_first_name, "First Name", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.text_field :customer_first_name %>
       <% else %>
@@ -70,7 +70,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_last_name, "Last Name" %>
+      <%= f.label :customer_last_name, "Last Name", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.text_field :customer_last_name %>
       <% else %>
@@ -78,7 +78,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_dob, "Date of Birth" %>
+      <%= f.label :customer_dob, "Date of Birth", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.date_select(:customer_dob,
                           :order => [:month, :day, :year],
@@ -92,13 +92,13 @@
     </div>
     <% if can? :edit, @trip_ticket %>
       <%= f.fields_for :customer_address do |af| %>
-        <%= render 'locations/address_form', :f => af %>
+        <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>
     <% else %>
       <%= render 'locations/show_fields', :location => @trip_ticket.customer_address %>
     <% end %>
     <div class="field">
-      <%= f.label :customer_primary_phone, "Primary Phone Number" %>
+      <%= f.label :customer_primary_phone, "Primary Phone Number", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.phone_field :customer_primary_phone %>
       <% else %>
@@ -152,7 +152,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_information_withheld, "Information Withheld?" %>
+      <%= f.label :customer_information_withheld, "Information Withheld?", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.select :customer_information_withheld, [["Yes", true], ["No", false]], :include_blank => true %>
       <% else %>
@@ -329,7 +329,7 @@
     <legend>Drop Off Location</legend>
     <% if can? :edit, @trip_ticket %>
       <%= f.fields_for :drop_off_location do |af| %>
-        <%= render 'locations/address_form', :f => af %>
+        <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>
     <% else %>
       <%= render 'locations/show_fields', :location => @trip_ticket.drop_off_location %>
@@ -340,7 +340,7 @@
     <legend>Pick Up Location</legend>
     <% if can? :edit, @trip_ticket %>
       <%= f.fields_for :pick_up_location do |af| %>
-        <%= render 'locations/address_form', :f => af %>
+        <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>
     <% else %>
       <%= render 'locations/show_fields', :location => @trip_ticket.pick_up_location %>
@@ -351,7 +351,7 @@
     <legend>Trip Information</legend>
 
     <div class="field">
-      <%= f.label :appointment_time %>
+      <%= f.label :appointment_time, class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.datetime_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
@@ -359,7 +359,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :requested_pickup_time %>
+      <%= f.label :requested_pickup_time, class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.time_select :requested_pickup_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
@@ -367,7 +367,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :requested_drop_off_time %>
+      <%= f.label :requested_drop_off_time, class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.time_select :requested_drop_off_time, :ampm => true, :minute_step => 15, :include_blank => true %>
       <% else %>
@@ -407,7 +407,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :customer_seats_required, "Seats Required" %>
+      <%= f.label :customer_seats_required, "Seats Required", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.number_field :customer_seats_required, :min => 0 %>
       <% else %>
@@ -431,7 +431,7 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :scheduling_priority %>
+      <%= f.label :scheduling_priority, class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.select :scheduling_priority, TripTicket::SCHEDULING_PRIORITY.invert, :include_blank => true %>
       <% else %>

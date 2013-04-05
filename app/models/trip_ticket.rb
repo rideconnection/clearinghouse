@@ -96,13 +96,13 @@ class TripTicket < ActiveRecord::Base
   
   after_initialize do
     if self.new_record?
-      self.allowed_time_variance = -1
-      self.customer_boarding_time = 0
-      self.customer_deboarding_time = 0
-      self.customer_seats_required = 1
-      self.num_attendants = 0
-      self.num_guests = 0
-      self.customer_identifiers = {}
+      self.allowed_time_variance = -1   if self.allowed_time_variance.nil?
+      self.customer_boarding_time = 0   if self.customer_boarding_time.nil?
+      self.customer_deboarding_time = 0 if self.customer_deboarding_time.nil?
+      self.customer_seats_required = 1  if self.customer_seats_required.nil?
+      self.num_attendants = 0           if self.num_attendants.nil?
+      self.num_guests = 0               if self.num_guests.nil?
+      self.customer_identifiers = {}    if self.customer_identifiers.nil?
     end
   end
   

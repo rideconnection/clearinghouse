@@ -8,7 +8,7 @@ $form_label_padding_right: 10px;
   padding: 0 0 2px;
   
   label {
-    color: #fff;
+    color: #fff !important;
   }
 }
 
@@ -122,6 +122,10 @@ fieldset {
     float:left;
     padding:4px $form_label_padding_right 0 0;
     width:$form_label_width;
+    
+    &.required {
+      color: #c00;
+    }
   }
   
   &.field-with-checkbox {    
