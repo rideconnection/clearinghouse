@@ -16,7 +16,7 @@
     <%= f.text_field :name %>
   </div>
   <%= f.fields_for :address do |af| %>
-    <%= render 'locations/address_form', :f => af %>
+    <%= render 'locations/address_form', { :f => af, required_fields: true } %>
   <% end %>
   <div class="field">
     <%= f.label :primary_contact_email %>
