@@ -1,0 +1,149 @@
+* Chef-solo
+Find cookbooks http://community.opscode.com/cookbooks
+
+  Bootstrapping files for creating a Ruby on Rails server on an 
+  Tested on Ubuntu 12.04 server, with Ruby on Rails 3.2.7 and Ruby 1.9.3-p125
+
+** Requirements
+
+Blank Ubuntu 12.04 server machine with SSH access
+
+Make sure on your machine which you are running the chef commands from that you have ruby, chef & knife-solo installed
+
+: gem install chef knife-solo
+
+** Prepare server
+
+Create a new node
+: cd nodes
+: cp ../node-templates/webserver.json <Server IP>.json
+
+Edit <Server IP>.json file and change  username and password to anything you like and remove or add cookbooks if you want.
+
+NOTE: Your 'dbuser' should be the same as your 'linuxuser'.
+
+Prepare the server, ie: bootstap & install chef.
+: knife prepare <user>@<Server IP>
+
+** Running
+
+Optional: install ssh-copy-id for passwordless ssh setup to your server
+: ssh-copy-id <user>@<Server IP>
+
+
+Run chef-solo on server
+: knife cook <user>@<Server IP>
+
+NOTE: Sometimes I've had to re-run the prepare again for the cook to work properly.
+
+*** After system is built
+
+This part maybe handled by using passenger_apache2.
+
+**** Server side
+
+Edit /etc/apache2/sites-enabled/rails_project, and follow the example
+
+You may have to restart apache2 on the server
+: sudo service apache2 restart
+
+**** Dev box
+
+Restarting apache2 from your DEV box.
+: cap passenger:restart
+
+**** Passenger
+
+Max pool size should be set to '2' for VPS's with 256MB RAM. Default is 6. This is set in the /etc/apache2/sites-enabled/rails_project.
+
+**** Add your new server to your github.
+
+ssh into your server and do
+: ssh-keygen -t rsa -C "your_email@youremail.com"
+: cat .ssh/id_rsa.pub
+
+Testing with
+: git clone git@github.com:map7/venuebat.git
+
+
+Copy the .ssh/id_rsa.pub file into your github profile.
+
+
+**** Capistrano
+[[http://railscasts.com/episodes/133-capistrano-tasks/][Capistrano Railscast]]
+
+The next step after your machine is setup is to setup capistrano for deployment.
+
+Use capistrano to deploy your app.
+<config deploy.rb>
+
+: cap deploy:setup
+: cap deploy:cold
+
+ssh into server and do the following
+: cd /srv/<project>/shared
+: mkdir config
+
+Assuming you have a database.yml.example file you could do 
+: mkdir /srv/<project>/shared/config
+: cp /srv/<project>/current/config/database.yml.example /srv/<project>/shared/config/database.yml
+
+Now edit your database.yml file so that it has only the production database details in it.
+
+You can now create and seed the database
+: cap deploy:cold
+: cap deploy:seed
+: cap deploy:restart
+
+
+**** Troubleshooting
+
+***** Gems not updating on server
+If you want to update a Gem make sure you explicitly state the version number in the Gemfile before deploying.
+
+EG:
+gem 'gmaps4rails', '1.5.2'
+
+gems are placed in the shared/bundle directory and will not show up with 'gem list' on the server.
+
+***** Passenger: Unexpected end-of-file
+
+If you are getting the following error
+	  
+Passenger encountered the following error:
+The application spawner server exited unexpectedly: Unexpected end-of-file detected. 
+
+Upgrade passenger to 3.0.14 
+: sudo gem update passenger
+: passenger-install-apache2-module
+
+** Mythtv server requirements
+   
+Setup your server using the mythbuntu 11.04 or higher distro.
+
+During the install
+ - Select to download codecs etc
+ - Setup drives like so:
+| mount point              | type | size |
+| /                        | ext4 | 20GB |
+| /home                    | ext4 | 30GB |
+| /var/lib/mythtv/overlays | ext4 | 10GB |
+| /var/lib/mythtv          | xfs  | *    |
+ - Select all services
+ - Setup as a frontend & backend.
+ - Select your remote control
+
+: ./deploy.sh <user>@<host> mythtv.json
+
+
+*** Notes
+
+I typically put my video drives in /storage? (where ? is the number of the drive)
+
+If you want to share a /storage? directory then look at /etc/samba/smb.conf
+** Installing Gems
+
+You must have a ruby installed in the system otherwise chef will install your gem into the embedded area (/opt/chef/embedded/bin/)
+
+gem_package = Installs into the system area
+chef_gem = Installs into embedded area for use in chef scripts.

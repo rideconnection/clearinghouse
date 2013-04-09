@@ -1,19 +1,41 @@
 #!/bin/bash
 
-# This runs as root on the server
+json="${1}"
 
-chef_binary=/var/lib/gems/1.9.1/bin/chef-solo
+logfile="/root/chef-solo.log"
+
+# This runs as root on the server
+chef_binary="/usr/local/bin/chef-solo"
+
 
 # Are we on a vanilla system?
 if ! test -f "$chef_binary"; then
-    export DEBIAN_FRONTEND=noninteractive
-    # Upgrade headlessly (this is only safe-ish on vanilla systems)
-    aptitude update &&
-    apt-get -o Dpkg::Options::="--force-confnew" \
-        --force-yes -fuy dist-upgrade &&
-    # Install Ruby and Chef
-    aptitude install -y ruby1.9.1 ruby1.9.1-dev make &&
-    sudo gem1.9.1 install --no-rdoc --no-ri chef --version 0.10.0
-fi &&
 
-"$chef_binary" -c solo.rb -j solo.json
+     export DEBIAN_FRONTEND=noninteractive
+
+     # Upgrade headlessly (this is only safe-ish on vanilla systems)
+     apt-get update -o Acquire::http::No-Cache=True
+     apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy dist-upgrade
+
+     apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-gplv2-dev libyaml-dev git-core bzip2
+
+	 # Download ruby 1.9.3-p125
+	 cd /tmp
+	 wget ftp://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p125.tar.gz
+	 tar -xvzf ruby-1.9.3-p125.tar.gz
+
+	 # Install
+	 cd ruby-1.9.3-p125/
+	 ./configure --prefix=/usr/local
+	 make
+	 make install
+     
+     # Install chef
+     gem install chef ruby-shadow --no-rdoc --no-ri
+
+	 # Return to the chef directory
+	 cd ~/chef
+fi
+
+# Run chef-solo on server
+"$chef_binary" --config solo.rb --json-attributes "$json"
