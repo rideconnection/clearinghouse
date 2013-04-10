@@ -1,6 +1,6 @@
 {
 	"linuxuser": "deployer",
-	"dbuser": "deployer",
+	"dbuser": "clearinghouse",
 	"dbpass": "clearinghouse",
   "site_url": "ch.clearinghouse.org",
   "public_directory": "/srv/clearinghouse/current/public",
