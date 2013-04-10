@@ -16,3 +16,10 @@ test:
   <<: *common
   database: clearinghouse_test
 
+staging:
+  <<: *common
+  database: clearinghouse_staging
+
+production:
+  <<: *common
+  database: clearinghouse_production
