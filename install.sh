@@ -38,7 +38,7 @@ if ! test -f "$chef_binary"; then
 	 cd ~/chef
 fi
 
-apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-gplv2-dev libyaml-dev git-core bzip2
+apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev git-core bzip2 libgdbm-dev libtool libffi-dev
 
 # Run chef-solo on server
 "$chef_binary" --config solo.rb --json-attributes "$json"
