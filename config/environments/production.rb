@@ -28,7 +28,8 @@ Clearinghouse::Application.configure do
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for nginx
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  # TODO: Change this to true once we have an ssl cert for production and implement it.
+  config.force_ssl = false
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
