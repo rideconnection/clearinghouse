@@ -7,7 +7,6 @@ require 'capistrano/ext/multistage'
 
 set :application, "Clearinghouse"
 set :repository,  "http://github.com/rideconnection/clearinghouse.git"
-set :deploy_to, "/home/deployer/rails/clearinghouse"
 
 set :scm, :git
 set :deploy_via, :remote_cache
