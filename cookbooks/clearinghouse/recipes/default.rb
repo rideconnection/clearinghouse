@@ -110,6 +110,47 @@ ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAudJPsL+XVdzFozj9dOt93feOR1IWT5uvaIDEAvub5kcu
 " 
 end 
 
+file "/home/#{node[:linuxuser]}/.ssh/id_rsa" do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+  content "-----BEGIN RSA PRIVATE KEY-----
+MIIEoQIBAAKCAQEA0NSSsUtVRWVJz95ZW5+iDSXsd5Io/Lf/dU7mEFqfkhtAnsLy
+dKjyo/1b731CQvvsHydMlaViRzJ0/B7z9K1LWgPCeZ4BM3/3JzOnCsP/+3cQ4JGP
+shQfEoDMh9fx3x/fMTHmkrKAWJiXHOjihHHsrQJQm/aDHqC29D4fT6SRNWw4Pt/F
+Za8/BKM0uXRpV3ZXCQThiwpRVQsUI8o4zVHK4W49C0M35+L5A+3TlsN5YHEH7sbK
+mMu3MigJ4qhX94Qx8v6kHbS7d/gTqVvQz1hY4PnjQ2NgfRdWpVmB89P3NejBqgid
+ylGw5/H82njDs3MhBdvy+C7fbXRZp1QJO2NLIwIBIwKCAQBrZgJMjSSKFtWA2MA9
+v8+u/Y+N82WJSK9DpOtY3iYt4iE7tLc0rqisG+YjZP2BiN/VgezfPxyZpOu03Lf6
+LTyx804SqQfumZUM2LxOrfFcwOQbuJMLIEp+i2Hfdl8iSufQKEqx2CS/2XJJYdOU
+klx2O7Rtd3aiCYKpfwjJ35siyQMyrLiytZZmgQ1YJySjRP6t47hcll/D85aG6X+0
+rFynPqvJ6kQa281OJAlxkFrAbTLbwyLaGA+h7HOp//7UOAqkw43H3qtMpwh71Q/V
+fIcNF0SYvztNe4NG1zNpeSmqAzysBfaX+QqFAo5eqKUOOp90OkyN6lCSH8WmtZvA
+IVxbAoGBAOpQQuJvSAQBxu6O1QeoZdHvYmXFjqjY2NDDbyJ4+FcUIg9FW/ZqvT1n
+7UCZHC+avrwCzI6RQa658GqdFGDNbGbleYI+pewtvaTc0daQFcs2zSmFLVIP5F+v
+rMQ0GtMLEsDQRo50bb1BamTvhBZWgJuTc1vajzjSDAXfpeJTt0A3AoGBAOQohe2a
+6bMCqHNUjCiqfCQc2XjYkCcp2J6vXCw8Jr+kizUSn70QCI/11vJn8ieIbDAkN7Em
+lCL2QTAlsGs4HJnplxxopPP8Svq/Tz8Ds/jX1NDOF4zkws0IX6Dkaf3SCJkZfZNn
+RtD5O4MWc94zDsEs2slfArSbuMU8aXgOh551AoGAfzLieuvz5OsFl3Ib35XuIYHz
+llVNcZpJ0GoXwkGrYnikxnYb+sw62DEaZOVnEoc0V2872F17bXrhmPYvokOhPywd
+Y/YfjtcAjLJjSJdcSb6p41bst4T4UTN7C2y+Gst/NXhg0P1gJOj/Phufedcv321N
+QH31+kYjyKyb4UNjeqECgYEAle6+aPDFdaKpNdh5XI1KQ53t/vS2gCLQLcOxmWlb
+SryV/k4RMxkqMrd+n0ufIUsFRDUOp50CQtxWuT1WrNu7Bg6H33f3XoE4liXyP1o0
+cFNRVgPGVUXfGQWAq47JTwZda+wt8yacQC7AtTqj6cnH3geIdbN2znT1w3DXmAmM
+Ui8CgYAy7oFPL8UJZYfbO3vHZIexf68oRg8/rZXPzagiK+Gz3rISGzTvDP74sQM4
+4pVZcz2FiOnaGrIfoy9u+lJ06cpmOiAjAD0koOKJq/L/ZFux/XiGZ6Hq8d4QBDzf
+ebrumip6fQfnZMk4OB5BJ9MtvP3WBljPgw0SMkYFnuZpVk/QOA==
+-----END RSA PRIVATE KEY-----" 
+end 
+
+file "/home/#{node[:linuxuser]}/.ssh/id_rsa.pub" do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+  content "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA0NSSsUtVRWVJz95ZW5+iDSXsd5Io/Lf/dU7mEFqfkhtAnsLydKjyo/1b731CQvvsHydMlaViRzJ0/B7z9K1LWgPCeZ4BM3/3JzOnCsP/+3cQ4JGPshQfEoDMh9fx3x/fMTHmkrKAWJiXHOjihHHsrQJQm/aDHqC29D4fT6SRNWw4Pt/FZa8/BKM0uXRpV3ZXCQThiwpRVQsUI8o4zVHK4W49C0M35+L5A+3TlsN5YHEH7sbKmMu3MigJ4qhX94Qx8v6kHbS7d/gTqVvQz1hY4PnjQ2NgfRdWpVmB89P3NejBqgidylGw5/H82njDs3MhBdvy+C7fbXRZp1QJO2NLIw== admin@rideconnection.org"
+end
 
 # Setup gem sources
 # execute "Add gem sources" do
