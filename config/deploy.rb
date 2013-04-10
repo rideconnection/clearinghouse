@@ -1,6 +1,5 @@
 # Bundler and RVM integrations
 require 'bundler/capistrano'
-require "rvm/capistrano"
 
 set :stages, %w(staging production)
 require 'capistrano/ext/multistage'

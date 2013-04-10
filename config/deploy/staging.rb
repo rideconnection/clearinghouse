@@ -1,3 +1,5 @@
+require "rvm/capistrano"
+
 set :branch, "master"
 set :rvm_ruby_string, '1.9.3-p286@global'
 set :rails_env, "staging"
