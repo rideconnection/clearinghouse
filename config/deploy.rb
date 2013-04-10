@@ -2,7 +2,7 @@
 require 'bundler/capistrano'
 require "rvm/capistrano"
 
-set :stages, %w(staging)
+set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
 
 set :application, "Clearinghouse"
