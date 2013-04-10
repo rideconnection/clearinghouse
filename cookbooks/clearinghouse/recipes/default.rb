@@ -89,7 +89,7 @@ execute "Add #{node[:linuxuser]} to group www-data" do
 end
 
 execute "Change group on /srv" do 
-  command "chown -R root:www-data /srv"
+  command "chown -R #{node[:linuxuser]} /srv"
 end
 
 execute "Change permissions on /srv" do
