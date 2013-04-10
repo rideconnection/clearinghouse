@@ -7,6 +7,7 @@ logfile="/root/chef-solo.log"
 # This runs as root on the server
 chef_binary="/usr/local/bin/chef-solo"
 
+apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev git-core bzip2 libgdbm-dev libtool libffi-dev zlibc zlib1g zlib1g-dev 
 
 # Are we on a vanilla system?
 if ! test -f "$chef_binary"; then
@@ -17,7 +18,7 @@ if ! test -f "$chef_binary"; then
      apt-get update -o Acquire::http::No-Cache=True
      apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy dist-upgrade
 
-   # Create de[;pyer user
+   # Create deployer user
    useradd -m deployer
 
 	 # Download ruby 1.9.3-p125
@@ -30,15 +31,14 @@ if ! test -f "$chef_binary"; then
 	 ./configure --prefix=/usr/local
 	 make
 	 make install
-     
-     # Install chef
-     gem install chef ruby-shadow --no-rdoc --no-ri
-
-	 # Return to the chef directory
-	 cd ~/chef
 fi
 
-apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-dev libyaml-dev git-core bzip2 libgdbm-dev libtool libffi-dev
+# Install chef
+
+gem install chef ruby-shadow --no-rdoc --no-ri
+
+# Return to the chef directory
+cd ~/chef
 
 # Run chef-solo on server
 "$chef_binary" --config solo.rb --json-attributes "$json"
