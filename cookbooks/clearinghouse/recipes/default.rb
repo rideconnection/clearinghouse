@@ -158,7 +158,6 @@ end
 #   not_if "gem sources -l | grep http://gems.github.com"
 # end
 
-
 # Setup postgres user
 # sudo -u postgres createuser -sw map7
 # Set dbuser in your solo.json file.
@@ -175,23 +174,7 @@ end
 package 'libxslt1-dev'
 package 'libxml2-dev'
 
-# Install ruby-debug
-# gem_package "ruby-debug19" do
-#   action :install
-# end
+package "postgresql-contrib" 
+package "postgresql-contrib-8.4"
 
-# Install readline
-# execute "Install readline" do
-#   command "cd $rvm_path/src/$(rvm tools strings)/ext/readline;sudo ruby extconf.rb; sudo make; sudo make install"
-# end
-
-# RefineryCMS requirements
 package "imagemagick"
-
-# Check if passenger_apache2 is working
-# Otherwise run this:
-#
-# execute "passenger_module" do
-#   command 'echo -en "\n\n\n\n" | passenger-install-apache2-module'
-#   creates node[:passenger][:module_path]
-# end
