@@ -17,7 +17,8 @@ if ! test -f "$chef_binary"; then
      apt-get update -o Acquire::http::No-Cache=True
      apt-get -o Dpkg::Options::="--force-confnew" --force-yes -fuy dist-upgrade
 
-     apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-gplv2-dev libyaml-dev git-core bzip2
+   # Create de[;pyer user
+   useradd -m deployer
 
 	 # Download ruby 1.9.3-p125
 	 cd /tmp
@@ -36,6 +37,8 @@ if ! test -f "$chef_binary"; then
 	 # Return to the chef directory
 	 cd ~/chef
 fi
+
+apt-get install -y curl build-essential zlib1g-dev libssl-dev libreadline-gplv2-dev libyaml-dev git-core bzip2
 
 # Run chef-solo on server
 "$chef_binary" --config solo.rb --json-attributes "$json"

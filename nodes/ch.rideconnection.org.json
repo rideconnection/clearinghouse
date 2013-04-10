@@ -20,7 +20,7 @@
 		"role[web_server]",
 		"recipe[sqlite]",
 		"recipe[postgresql::server]",
-		"recipe[pope::default]"
+		"recipe[clearinghouse::default]"
 	]
 
 }

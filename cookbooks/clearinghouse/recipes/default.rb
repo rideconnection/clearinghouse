@@ -96,6 +96,21 @@ execute "Change permissions on /srv" do
   command "chmod -R 775 /srv"
 end
 
+execute "Create ssh directory" do
+  command "mkdir -p /home/#{node[:linuxuser]}/.ssh"
+end
+
+file "/home/#{node[:linuxuser]}/.ssh/authorized_keys" do
+  owner "root"
+  group "root"
+  mode "0644"
+  action :create
+  content "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAy8wqEnpZ8QxXLlpKLdI1Yjo7pegWlIodcVGp8bM92j1pqZrqq9dvyOjAe2m2fTATh8iOfowKXptfEKt3hEfxZrv55f4YTEb2ky6UOrW6L1NrJDSTrtgYQYX0QQ9ZEB02Im26ssBgOGrBSMDOuAp6wemRigyvFV2e2bnT1uzY7bgbf/OLaQTPPD64y3KSS8xd+CwrtmHUl/pIqqyZB1L7EvoDjP3JGGxtQhhLdnu3QeV3BtMQNhhHeLI7j7fZDnODFEjKlnAvMQenBHWY/7IJ+v9o/vENbLv4aAWOXlemN6nSw85HBjaknjp1iahYXdYQUfs6GkFS14NDAfdaCaNQqQ== mleone@tokyo.localdomain
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAudJPsL+XVdzFozj9dOt93feOR1IWT5uvaIDEAvub5kcu/z1v5kimXgFC7/KEK/HoDPLsjrQ4fHRkocWEW7uyF4Q+etE3wQT83E6EpPUEpRe4x7JRs2WmT5SVVy1t2lR+dWBFJLWmZh3ZSAnXgJbXFrwTqFB08BucBTGh2d1Mjo/Xi7lcsy9EIQnlRedLMTbB1o8XuML0AtAGkrZX5Z1uJ96j96GOdaVJYqskgbCZVejQUhNvZNSwYoB6GSBVy9PvwE5+RxGb89E/8hzLFastZKrkSn5ZTPirMOHEvdGnxPlCUyxoboohcqKy1A4Mt0Zb2lVm2E6BkmtfsCcFBMBYUw== chrisbloom7@gmail.com
+" 
+end 
+
+
 # Setup gem sources
 # execute "Add gem sources" do
 #   command "gem sources -a http://gems.github.com"
