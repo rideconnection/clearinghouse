@@ -26,6 +26,7 @@ echo 'copy chef dir & run install.sh'
 tar cj . | ssh -o 'StrictHostKeyChecking no' "$host" "
 sudo rm -rf ~/chef &&
 mkdir ~/chef &&
+mkdir -p /srv/clearinghouse
 cd ~/chef &&
 tar xj &&
 sudo bash install.sh $json"

@@ -52,17 +52,17 @@ PassengerMaxPoolSize #{node[:passenger][:max_pool_size]}
 #
 # Single project
 #
-# <VirtualHost *:80>
-#    ServerName www.yourhost.com
-#    # !!! Be sure to point DocumentRoot to 'public'!
-#    DocumentRoot /srv/project/current/public    
-#    <Directory /srv/project/current/public>
-#       # This relaxes Apache security settings.
-#       AllowOverride all
-#       # MultiViews must be turned off.
-#       Options -MultiViews
-#    </Directory>
-# </VirtualHost>
+<VirtualHost *:80>
+   ServerName ch.rideconnection.org
+   # !!! Be sure to point DocumentRoot to 'public'!
+   DocumentRoot #{node[:public_directory]}
+   <Directory #{node[:public_directory]}>
+      # This relaxes Apache security settings.
+      AllowOverride all
+      # MultiViews must be turned off.
+      Options -MultiViews
+   </Directory>
+</VirtualHost>
 #
 # Multiple projects 
 #

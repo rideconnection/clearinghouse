@@ -2,6 +2,8 @@
 	"linuxuser": "deployer",
 	"dbuser": "deployer",
 	"dbpass": "clearinghouse",
+  "site_url": "ch.clearinghouse.org",
+  "public_directory": "/srv/clearinghouse/current/public",
 	
 	"postgresql":{"password":{"postgres":"password"}},
 	"passenger":{"version":"3.0.14", "max_pool_size":"2"},
