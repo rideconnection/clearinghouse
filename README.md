@@ -166,3 +166,7 @@ Run cap -T for more command documentation.
 Remember to push your changes to the main repository first, since the deploy
 process pulls from there.  
 
+Known Issues
+============
+
+Current known issues can be found [[here|https://github.com/rideconnection/clearinghouse/wiki/Known-Issues]].
