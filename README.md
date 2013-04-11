@@ -169,4 +169,4 @@ process pulls from there.
 Known Issues
 ============
 
-Current known issues can be found [[here|https://github.com/rideconnection/clearinghouse/wiki/Known-Issues]].
+Current known issues can be found at https://github.com/rideconnection/clearinghouse/wiki/Known-Issues.
