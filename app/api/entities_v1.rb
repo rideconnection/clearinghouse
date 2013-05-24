@@ -11,20 +11,20 @@ module Clearinghouse
       end
 
       class Location < Grape::Entity
-        expose :address_1, :address_2, :city, :position, :state, :zip
+        expose :id, :address_1, :address_2, :city, :position, :state, :zip
       end
 
       class Provider < Grape::Entity
-        expose :name, :primary_contact_email
+        expose :id, :name, :primary_contact_email
         expose :address, :using => Location
       end
 
       class TripTicketComment < Grape::Entity
-        expose :body, :trip_ticket_id, :user_id
+        expose :id, :body, :trip_ticket_id, :user_id
       end
 
       class TripResult < Grape::Entity
-        expose :actual_drop_off_time, :actual_pick_up_time, :base_fare,
+        expose :id, :actual_drop_off_time, :actual_pick_up_time, :base_fare,
           :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
           :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
           :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type
