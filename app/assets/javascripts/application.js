@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require jquery-ui-1.10.0
 //= require jquery-ui-timepicker-addon
+//= require jquery.placeholder.min
 //= require jcf
 //= require_tree .
 
@@ -245,6 +246,11 @@ function initOpenClose() {
     });
   };
 }(jQuery));
+
+/*
+ * jQuery Placeholder plugin, adds placeholder support for browsers that don't support it natively
+ */
+$('input, textarea').placeholder();
 
 // // placeholder class
 // (function(){
