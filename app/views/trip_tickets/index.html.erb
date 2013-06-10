@@ -42,11 +42,11 @@
               <%= link_to tt, :remote => true do %>
                 <strong class="title"><%= tt.customer_full_name %> <span class="count"><%= tt.seats_required %></span> <!--img src="/assets/icon01.png" width="16" height="14" alt="" /--></strong>
               <% end %>
-              <address><%= tt.pick_up_location.address_and_city(', ') %></address>
+              <address><%= tt.pick_up_location.try(:address_and_city, ', ') %></address>
             </div>
             <div class="column">
               <em class="date"><%= tt.appointment_time.strftime "%I:%M %p" %><span><%= tt.appointment_time.strftime "%b %d" %></span> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></em>
-              <address><%= tt.drop_off_location.address_and_city(', ') %></address>
+              <address><%= tt.drop_off_location.try(:address_and_city, ', ') %></address>
             </div>
           </div>
           <ul class="icons-list">
