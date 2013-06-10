@@ -24,6 +24,8 @@ jQuery(function(){
   initOpenClose();
   // initInputs();
   // initDatePicker();
+  // jQuery Placeholder plugin, adds placeholder support for browsers that don't support it natively
+  $('input, textarea').placeholder();
 });
 
 // open-close init
@@ -246,11 +248,6 @@ function initOpenClose() {
     });
   };
 }(jQuery));
-
-/*
- * jQuery Placeholder plugin, adds placeholder support for browsers that don't support it natively
- */
-$('input, textarea').placeholder();
 
 // // placeholder class
 // (function(){
