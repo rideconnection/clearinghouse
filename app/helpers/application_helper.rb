@@ -22,4 +22,10 @@ module ApplicationHelper
       ""
     end
   end
+
+  def main_nav_helper(title, path)
+    link_to_unless_current(title, path) do
+      link_to(title, path, :class => "active")
+    end
+  end
 end

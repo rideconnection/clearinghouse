@@ -102,7 +102,7 @@
         border-left:1px solid #969595;
         float:left;
         
-        &.active a {
+        a.active {
           background-position:0 -250px;
           color:#000;
           text-decoration:none;
@@ -115,7 +115,7 @@
             background-position:0 0;
           }
 
-          a:hover,&.active a {
+          a:hover, a.active {
             background-position:0 -150px;
           }
         }
@@ -124,7 +124,7 @@
           background-position:100% -50px;
         }
         
-        &.last.active a,&.last a:hover {
+        &.last a.active,&.last a:hover {
           background-position:100% -200px;
         }
       }
