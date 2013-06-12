@@ -84,7 +84,34 @@ class TripTicketTest < ActiveSupport::TestCase
     # NOTE - Keys and values are coerced to strings
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
   end
-  
+
+  it "should allow a trip to be rescinded" do
+    @trip_ticket.rescind!
+    @trip_ticket.rescinded.must_equal true
+  end
+
+  it "should not allow a trip with results to be rescinded" do
+    result = TripResult.new(:outcome => "Completed")
+    result.trip_ticket = @trip_ticket
+    result.save!
+    proc { @trip_ticket.rescind! }.must_raise(ActiveRecord::RecordInvalid)
+  end
+
+  it "should rescind pending trip claims if it is rescinded" do
+    trip_claim = FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @trip_ticket)
+    @trip_ticket.rescind!
+    trip_claim.reload
+    trip_claim.status.must_equal :rescinded
+  end
+
+  it "should create a canceled result for approved trip claims if it is rescinded" do
+    trip_claim = FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
+    @trip_ticket.rescind!
+    @trip_ticket.reload
+    @trip_ticket.trip_result.wont_be_nil
+    @trip_ticket.trip_result.outcome.must_equal "Cancelled"
+  end
+
   TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)

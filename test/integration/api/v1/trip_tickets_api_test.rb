@@ -105,22 +105,21 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     end
   end
 
-  # TODO pending implementation of a TripTicket#cancel method
-  #describe "PUT /api/v1/trip_tickets/1/cancel" do
-  #  include_examples "requires authenticatable params"
-  #
-  #  it "should cancel the specified trip ticket and return the trip ticket as JSON" do
-  #    put "/api/v1/trip_tickets/#{@trip_ticket1.id}/cancel", ApiParamFactory.authenticatable_params(@provider)
-  #    response.status.must_equal 200
-  #    response.body.must_include %Q{"canceled":true}
-  #    @trip_ticket1.reload
-  #    @trip_ticket1.canceled.must_equal true
-  #  end
-  #
-  #  it "should not allow me to cancel a trip ticket originated by another provider" do
-  #    put "/api/v1/trip_tickets/#{@trip_ticket3.id}/cancel", ApiParamFactory.authenticatable_params(@provider)
-  #    response.status.must_equal 401
-  #    response.body.wont_include %Q{"canceled":true"}
-  #  end
-  #end
+  describe "PUT /api/v1/trip_tickets/1/rescind" do
+    include_examples "requires authenticatable params"
+
+    it "should rescind the specified trip ticket and return the trip ticket as JSON" do
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/rescind", ApiParamFactory.authenticatable_params(@provider)
+      response.status.must_equal 200
+      response.body.must_include %Q{"rescinded":true}
+      @trip_ticket1.reload
+      @trip_ticket1.rescinded.must_equal true
+    end
+
+    it "should not allow me to rescind a trip ticket originated by another provider" do
+      put "/api/v1/trip_tickets/#{@trip_ticket3.id}/rescind", ApiParamFactory.authenticatable_params(@provider)
+      response.status.must_equal 401
+      response.body.wont_include %Q{"rescinded":true"}
+    end
+  end
 end

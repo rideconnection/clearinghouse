@@ -34,8 +34,7 @@ class Ability
       can :update, OpenCapacity, :service => { :provider_id => user.provider_id }
       
       # Dispatchers and above can edit/cancel tickets belonging to their own provider
-      # TODO - add a :cancel, :rescind, or similar action for trip tickets
-      can :update, TripTicket, :origin_provider_id => user.provider_id
+      can [:update, :rescind], TripTicket, :origin_provider_id => user.provider_id
 
       can :update, TripResult do |result| 
         result.can_be_edited_by?(user)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130330044733) do
+ActiveRecord::Schema.define(:version => 20130611185909) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -262,6 +262,7 @@ ActiveRecord::Schema.define(:version => 20130330044733) do
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
+    t.boolean       "rescinded"
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"

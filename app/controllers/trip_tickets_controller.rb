@@ -84,7 +84,16 @@ class TripTicketsController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
+
+  def rescind
+    @trip_ticket.rescind!
+
+    respond_to do |format|
+      format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully rescinded.' }
+      format.json { head :no_content }
+    end
+  end
+
   private
   
   def setup_locations

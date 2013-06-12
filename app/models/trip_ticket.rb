@@ -71,7 +71,8 @@ class TripTicket < ActiveRecord::Base
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
-  
+  validate :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
+
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
       trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"
@@ -160,7 +161,30 @@ class TripTicket < ActiveRecord::Base
     active = claims.where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS])
     active.count > 0
   end
-  
+
+  def rescind!
+    transaction do
+      self.rescinded = true
+      save!
+      # rescind or cancel outstanding claims
+      trip_claims.each do |claim|
+        if claim.status == :pending
+          claim.rescind!
+        elsif claim.status == :approved
+          trip_ticket.create_trip_result(outcome: "Cancelled", trip_claim_id: claim.id)
+        end
+      end
+    end
+  end
+
+  protected
+
+  def can_be_rescinded
+    errors.add(:rescinded, "status may not be changed on resolved trip tickets") unless trip_result.nil?
+  end
+
+  public
+
   class << self
     def filter_by_customer_name(customer_name)
       value = customer_name.strip.downcase

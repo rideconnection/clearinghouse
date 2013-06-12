@@ -97,6 +97,14 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @site_admin.cannot?(:destroy, @trip_ticket_8)
       assert @site_admin.cannot?(:destroy, @trip_ticket_9)
     end
+
+    it "can rescind trip tickets belonging to their own provider" do
+      assert @site_admin.can?(:rescind, @trip_ticket_1)
+      assert @site_admin.cannot?(:rescind, @trip_ticket_2)
+      assert @site_admin.cannot?(:rescind, @trip_ticket_3)
+      assert @site_admin.can?(:rescind, @trip_ticket_8)
+      assert @site_admin.can?(:rescind, @trip_ticket_9)
+    end
   end
 
   describe "provider_admin role" do
@@ -152,6 +160,14 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @provider_admin.cannot?(:destroy, @trip_ticket_3)
       assert @provider_admin.cannot?(:destroy, @trip_ticket_8)
       assert @provider_admin.cannot?(:destroy, @trip_ticket_9)
+    end
+
+    it "can rescind trip tickets belonging to their own provider" do
+      assert @provider_admin.can?(:rescind, @trip_ticket_1)
+      assert @provider_admin.cannot?(:rescind, @trip_ticket_2)
+      assert @provider_admin.cannot?(:rescind, @trip_ticket_3)
+      assert @provider_admin.can?(:rescind, @trip_ticket_8)
+      assert @provider_admin.can?(:rescind, @trip_ticket_9)
     end
   end
   
@@ -209,6 +225,14 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @scheduler.cannot?(:destroy, @trip_ticket_8)
       assert @scheduler.cannot?(:destroy, @trip_ticket_9)
     end
+
+    it "can rescind trip tickets belonging to their own provider" do
+      assert @scheduler.can?(:rescind, @trip_ticket_1)
+      assert @scheduler.cannot?(:rescind, @trip_ticket_2)
+      assert @scheduler.cannot?(:rescind, @trip_ticket_3)
+      assert @scheduler.can?(:rescind, @trip_ticket_8)
+      assert @scheduler.can?(:rescind, @trip_ticket_9)
+    end
   end
   
   describe "dispatcher role" do
@@ -264,6 +288,14 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @dispatcher.cannot?(:destroy, @trip_ticket_3)
       assert @dispatcher.cannot?(:destroy, @trip_ticket_8)
       assert @dispatcher.cannot?(:destroy, @trip_ticket_9)
+    end
+
+    it "can rescind trip tickets belonging to their own provider" do
+      assert @dispatcher.can?(:rescind, @trip_ticket_1)
+      assert @dispatcher.cannot?(:rescind, @trip_ticket_2)
+      assert @dispatcher.cannot?(:rescind, @trip_ticket_3)
+      assert @dispatcher.can?(:rescind, @trip_ticket_8)
+      assert @dispatcher.can?(:rescind, @trip_ticket_9)
     end
   end
 
@@ -321,5 +353,13 @@ class TripTicketAbilityTest < ActiveSupport::TestCase
       assert @read_only.cannot?(:destroy, @trip_ticket_8)
       assert @read_only.cannot?(:destroy, @trip_ticket_9)
     end
-  end  
+
+    it "cannot rescind trip tickets regardless of provider" do
+      assert @read_only.cannot?(:rescind, @trip_ticket_1)
+      assert @read_only.cannot?(:rescind, @trip_ticket_2)
+      assert @read_only.cannot?(:rescind, @trip_ticket_3)
+      assert @read_only.cannot?(:rescind, @trip_ticket_8)
+      assert @read_only.cannot?(:rescind, @trip_ticket_9)
+    end
+  end
 end

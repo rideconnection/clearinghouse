@@ -28,6 +28,9 @@ Clearinghouse::Application.routes.draw do
 
   resources :trip_tickets do
     post 'search', :on => :collection
+    member do
+      post 'rescind'
+    end
 
     resources :trip_claims, :except => [:index] do
       member do

@@ -55,17 +55,16 @@ module Clearinghouse
             end
           end
 
-          # TODO pending implementation of a TripTicket#cancel method
-          #desc "Cancel a trip ticket"
-          #put ':id/cancel' do
-          #  trip_ticket = TripTicket.find(params[:id])
-          #  error! "Access Denied", 401 unless current_ability.can?(:cancel, trip_ticket)
-          #  if trip_ticket.cancel
-          #    present trip_ticket, with: Clearinghouse::Entities::V1::TripTicketDetailed
-          #  else
-          #    error!({message: "Could not cancel trip ticket", errors: trip_ticket.errors}, 422)
-          #  end
-          #end
+          desc "Rescind a trip ticket"
+          put ':id/rescind' do
+            trip_ticket = TripTicket.find(params[:id])
+            error! "Access Denied", 401 unless current_ability.can?(:rescind, trip_ticket)
+            if trip_ticket.rescind!
+              present trip_ticket, with: Clearinghouse::Entities::V1::TripTicketDetailed
+            else
+              error!({message: "Could not rescind trip ticket", errors: trip_ticket.errors}, 422)
+            end
+          end
         end # scope :requires_id
       end # namespace :trip_tickets
 
