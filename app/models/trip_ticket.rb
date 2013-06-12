@@ -171,7 +171,7 @@ class TripTicket < ActiveRecord::Base
         if claim.status == :pending
           claim.rescind!
         elsif claim.status == :approved
-          trip_ticket.create_trip_result(outcome: "Cancelled", trip_claim_id: claim.id)
+          self.create_trip_result(outcome: "Cancelled", trip_claim_id: claim.id)
         end
       end
     end

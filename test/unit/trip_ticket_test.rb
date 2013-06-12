@@ -91,6 +91,7 @@ class TripTicketTest < ActiveSupport::TestCase
   end
 
   it "should not allow a trip with results to be rescinded" do
+    trip_claim = FactoryGirl.create(:trip_claim, :status => :approved, :trip_ticket => @trip_ticket)
     result = TripResult.new(:outcome => "Completed")
     result.trip_ticket = @trip_ticket
     result.save!

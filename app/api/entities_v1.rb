@@ -31,7 +31,7 @@ module Clearinghouse
       end
 
       class TripTicket < Grape::Entity
-        expose :id,
+        expose :id, :rescinded,
           :origin_provider_id, :origin_customer_id, :origin_trip_id,
           :claimant_provider_id, :claimant_trip_id,
           :pick_up_location_id, :drop_off_location_id, :customer_address_id,
