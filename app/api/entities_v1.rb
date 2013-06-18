@@ -11,7 +11,7 @@ module Clearinghouse
       end
 
       class Location < Grape::Entity
-        expose :id, :address_1, :address_2, :city, :position, :state, :zip
+        expose :id, :address_1, :address_2, :city, :position, :state, :zip, :created_at, :updated_at
       end
 
       class Provider < Grape::Entity
@@ -20,14 +20,32 @@ module Clearinghouse
       end
 
       class TripTicketComment < Grape::Entity
-        expose :id, :body, :trip_ticket_id, :user_id
+        expose :id, :body, :trip_ticket_id, :created_at, :updated_at
+        expose :user_name do |comment, options|
+          comment.user.name
+        end
       end
 
       class TripResult < Grape::Entity
         expose :id, :actual_drop_off_time, :actual_pick_up_time, :base_fare,
           :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
           :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
-          :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type
+          :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type,
+          :created_at, :updated_at
+      end
+
+      class TripClaim < Grape::Entity
+        expose :id,
+          :claimant_provider_id, :claimant_customer_id, :claimant_service_id, :claimant_trip_id,
+          :trip_ticket_id, :status, :proposed_pickup_time, :proposed_fare, :notes, :created_at, :updated_at
+        # indicates if current provider is the creator of the claim
+        expose :is_claimant, unless: { current_provider: nil }  do |claim, options|
+          claim.claimant_provider_id == options[:current_provider].id
+        end
+      end
+
+      class TripClaimDetailed < TripClaim
+        expose :claimant, :using => Provider
       end
 
       class TripTicket < Grape::Entity
@@ -44,7 +62,12 @@ module Clearinghouse
           :customer_service_animals, :customer_eligibility_factors,
           :num_attendants, :num_guests, :guest_or_attendant_service_animals, :guest_or_attendant_assistive_devices,
           :requested_pickup_time, :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
-          :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority
+          :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority,
+          :created_at, :updated_at
+        # indicates if current provider is the originator of the trip
+        expose :is_originator, unless: { current_provider: nil } do |trip, options|
+          trip.origin_provider_id == options[:current_provider].id
+        end
       end
 
       class TripTicketDetailed < TripTicket
@@ -54,17 +77,10 @@ module Clearinghouse
         expose :pick_up_location,  :using => Location
         expose :drop_off_location, :using => Location
         expose :trip_result, :using => TripResult
+        expose :trip_claims, :using => TripClaim
+        expose :trip_ticket_comments, :using => TripTicketComment
       end
 
-      class TripClaim < Grape::Entity
-        expose :id,
-          :claimant_provider_id, :claimant_customer_id, :claimant_service_id, :claimant_trip_id,
-          :trip_ticket_id, :status, :proposed_pickup_time, :proposed_fare, :notes
-      end
-
-      class TripClaimDetailed < TripClaim
-        expose :claimant, :using => Provider
-      end
     end
   end
 end
