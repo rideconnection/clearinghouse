@@ -49,6 +49,8 @@ module Clearinghouse
       end
 
       class TripTicket < Grape::Entity
+        format_with(:precise_timestamp) {|dt| dt.strftime("%Y-%m-%d %H:%M:%S.%6N") }
+
         expose :id, :rescinded,
           :origin_provider_id, :origin_customer_id, :origin_trip_id,
           :claimant_provider_id, :claimant_trip_id,
@@ -62,8 +64,11 @@ module Clearinghouse
           :customer_service_animals, :customer_eligibility_factors,
           :num_attendants, :num_guests, :guest_or_attendant_service_animals, :guest_or_attendant_assistive_devices,
           :requested_pickup_time, :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
-          :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority,
-          :created_at, :updated_at
+          :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority
+
+        expose :created_at, :format_with => :precise_timestamp
+        expose :updated_at, :format_with => :precise_timestamp
+
         # indicates if current provider is the originator of the trip
         expose :is_originator, unless: { current_provider: nil } do |trip, options|
           trip.origin_provider_id == options[:current_provider].id
