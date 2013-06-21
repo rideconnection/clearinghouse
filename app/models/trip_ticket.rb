@@ -129,6 +129,10 @@ class TripTicket < ActiveRecord::Base
     test_result.valid?
   end
 
+  def status
+    rescinded? ? 'Rescinded' : 'Active'
+  end
+
   def customer_full_name
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).map(&:strip).join(" ")
   end
@@ -168,10 +172,14 @@ class TripTicket < ActiveRecord::Base
     active.count > 0
   end
 
+  def rescindable?
+    # any trip that does not have a result can be rescinded (if customer cancels, claims and approvals are irrelevant)
+    trip_result.nil?
+  end
+
   def rescind!
     transaction do
-      self.rescinded = true
-      save!
+      update_attribute(:rescinded, true)
       # rescind or cancel outstanding claims
       trip_claims.each do |claim|
         if claim.status == :pending
@@ -186,7 +194,7 @@ class TripTicket < ActiveRecord::Base
   protected
 
   def can_be_rescinded
-    errors.add(:rescinded, "status may not be changed on resolved trip tickets") unless trip_result.nil?
+    errors.add(:rescinded, "status may not be changed on resolved trip tickets") unless rescindable?
   end
 
   public
@@ -254,7 +262,16 @@ class TripTicket < ActiveRecord::Base
     def filter_by_claiming_provider(claiming_providers)
       joins(:trip_claims).joins('LEFT OUTER JOIN "providers" as "claimants" ON "claimants"."id" = "trip_claims"."claimant_provider_id"').where('"claimants"."id" IN (?)', Array(claiming_providers).map(&:to_i))
     end
-  
+
+    def filter_by_rescinded(filter)
+      # anything except :only_rescinded results in the default of hiding rescinded
+      if filter.present? && filter.to_sym == :only_rescinded
+        where(rescinded: true)
+      else
+        where(rescinded: false)
+      end
+    end
+
     def filter_by_claim_status(status)
       case status.to_sym
       when :unclaimed

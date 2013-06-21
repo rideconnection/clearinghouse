@@ -36,7 +36,7 @@
   <div class="scrollable-area">
     <ul class="tickets-list">
       <% @trip_tickets.each_with_index do |tt,index| %>
-        <li class="<%= (index == 0) ? "check" : "" %>">
+        <li class="<%= (index == 0) ? "check" : "" %> status_<%= tt.status.downcase %>">
           <div class="description">
             <div class="column">
               <%= link_to tt, :remote => true do %>
@@ -48,6 +48,7 @@
               <em class="date"><%= tt.appointment_time.strftime "%I:%M %p" %><span><%= tt.appointment_time.strftime "%b %d" %></span> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></em>
               <address><%= tt.drop_off_location.try(:address_and_city, ', ') %></address>
             </div>
+            <div class="status <%= tt.status.downcase %>"><%= tt.status unless tt.status == 'Active' %></div>
           </div>
           <ul class="icons-list">
             <li><!--img src="/assets/icon03.png" width="13" height="18" alt="" /--></li>

@@ -4,6 +4,9 @@ module TripTicketsFilter
     collection ||= TripTicket.all
     init_trip_ticket_trip_time_filter_values
 
+    # apply rescinded filter at the end so we can apply default if not specified
+    rescinded_filter = nil
+
     params[:trip_ticket_filters].try(:each) do |filter, value|
       case filter.to_sym
       when :seats_required
@@ -22,12 +25,18 @@ module TripTicketsFilter
             parse_trip_ticket_trip_time(value[:end], Time.zone.at(9_999_999_999))
           )
         end
+      when :rescinded
+        rescinded_filter = value
       else
         if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
           collection = collection.send("filter_by_#{filter.to_s}", value)
         end
       end
     end
+
+    # expects 'include_rescinded', 'only_rescinded', or 'exclude_rescinded'/nil (default)
+    # 'include_rescinded' basically means to not filter so does nothing
+    collection = collection.filter_by_rescinded(rescinded_filter) unless rescinded_filter == 'include_rescinded'
 
     collection
   end
