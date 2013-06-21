@@ -113,6 +113,17 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.trip_result.outcome.must_equal "Cancelled"
   end
 
+  it "has an originated_or_claimed_by method that returns trips originated or claimed by a provider" do
+    originator = @trip_ticket.originator
+    claimant = FactoryGirl.create(:provider)
+    random_provider = FactoryGirl.create(:provider)
+    FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => claimant)
+
+    assert_includes TripTicket.originated_or_claimed_by(originator), @trip_ticket
+    assert_includes TripTicket.originated_or_claimed_by(claimant), @trip_ticket
+    refute_includes TripTicket.originated_or_claimed_by(random_provider), @trip_ticket
+  end
+
   TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     it "has an string_array field for #{field_sym.to_s} which returns an array" do
       assert_equal nil, @trip_ticket.send(field_sym)
@@ -127,7 +138,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_equal ['a', 'B', '1'], @trip_ticket.send(field_sym)
     end
   end
-  
+
   describe "white/black lists" do
     it "has an integer_array field for provider_white_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_white_list
@@ -443,6 +454,27 @@ class TripTicketTest < ActiveSupport::TestCase
       refute_includes results, t2
       assert_includes results, t3
       refute_includes results, t4
+    end
+
+    it "has a filter_by_updated_at method that matches on the updated_at field and is inclusive on end date" do
+      t1 = FactoryGirl.create(:trip_ticket, :updated_at => Time.zone.parse('2012-01-01 00:00'))
+      t2 = FactoryGirl.create(:trip_ticket, :updated_at => Time.zone.parse('2012-02-01 00:00'))
+      t3 = FactoryGirl.create(:trip_ticket, :updated_at => Time.zone.parse('2012-03-01 00:00'))
+
+      results = TripTicket.filter_by_updated_at(Time.zone.parse('2012-01-01 00:00'), nil)
+      refute_includes results, t1
+      assert_includes results, t2
+      assert_includes results, t3
+
+      results = TripTicket.filter_by_updated_at(nil, Time.zone.parse('2012-02-01 00:00'))
+      assert_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+
+      results = TripTicket.filter_by_updated_at(Time.zone.parse('2012-01-01 00:00'), Time.zone.parse('2012-02-01 00:00'))
+      refute_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
     end
 
     it "has a filter_by_customer_identifiers method that matches on hstore and string_array fields" do

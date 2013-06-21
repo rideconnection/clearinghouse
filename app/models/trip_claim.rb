@@ -1,5 +1,5 @@
 class TripClaim < ActiveRecord::Base
-  belongs_to :trip_ticket
+  belongs_to :trip_ticket, :touch => true
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
   
   ACTIVE_STATUS = [
