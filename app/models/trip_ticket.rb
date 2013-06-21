@@ -108,7 +108,13 @@ class TripTicket < ActiveRecord::Base
   end
   
   default_scope order('appointment_time ASC')
-  
+
+  scope :originated_or_claimed_by, ->(provider) do
+    subquery = TripClaim.unscoped.select(:trip_ticket_id).where(claimant_provider_id: provider.id).uniq.to_sql
+    where('"trip_tickets"."origin_provider_id" = ? OR "trip_tickets"."id" IN (' << subquery << ')', provider.id)
+      .reorder('')
+  end
+
   def make_result_for_form
     can_create_new_result? ? build_trip_result : self.trip_result
   end
@@ -278,7 +284,14 @@ class TripTicket < ActiveRecord::Base
         '(TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_drop_off_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)'
       ].join(' OR '), datetime_start, datetime_end, datetime_start, datetime_end)
     end
-  
+
+    def filter_by_updated_at(datetime_start, datetime_end)
+      query = TripTicket
+      query = query.where('"trip_tickets"."updated_at" > ?', datetime_start) unless datetime_start.nil?
+      query = query.where('"trip_tickets"."updated_at" <= ?', datetime_end) unless datetime_end.nil?
+      query
+    end
+
     def filter_by_customer_identifiers(customer_identifier)
       # There's no way to query for specific values in an hstore, only on 
       # keys. So we convert it to an array and search it along with the rest 
@@ -291,7 +304,7 @@ class TripTicket < ActiveRecord::Base
       array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
-  
+
     private
     
     def fuzzy_string_search(field, value)

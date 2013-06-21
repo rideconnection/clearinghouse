@@ -3,7 +3,7 @@ class TripResult < ActiveRecord::Base
 
   audited
 
-  belongs_to :trip_ticket
+  belongs_to :trip_ticket, :touch => true
   has_one :trip_claim
 
   attr_accessible :actual_drop_off_time, :actual_pick_up_time, :base_fare,

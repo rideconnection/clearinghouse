@@ -15,6 +15,13 @@ module TripTicketsFilter
             parse_trip_ticket_trip_time(value[:end], Time.zone.at(9_999_999_999))
           )
         end
+      when :updated_at
+        unless value[:start].blank? && value[:end].blank?
+          collection = collection.filter_by_updated_at(
+            parse_trip_ticket_trip_time(value[:start], Time.zone.at(0)),
+            parse_trip_ticket_trip_time(value[:end], Time.zone.at(9_999_999_999))
+          )
+        end
       else
         if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
           collection = collection.send("filter_by_#{filter.to_s}", value)
@@ -34,6 +41,9 @@ module TripTicketsFilter
   def init_trip_ticket_trip_time_filter_values
     params[:trip_ticket_filters]                     ||= Hash.new
     params[:trip_ticket_filters][:trip_time]         ||= Hash.new
+    params[:trip_ticket_filters][:trip_time][:start] ||= nil
+    params[:trip_ticket_filters][:trip_time][:end]   ||= nil
+
     params[:trip_ticket_filters][:trip_time][:start] ||= nil
     params[:trip_ticket_filters][:trip_time][:end]   ||= nil
   end
