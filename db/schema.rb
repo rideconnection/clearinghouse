@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130611185909) do
+ActiveRecord::Schema.define(:version => 20130621202208) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -240,8 +240,8 @@ ActiveRecord::Schema.define(:version => 20130611185909) do
     t.string        "trip_purpose_code"
     t.string        "trip_purpose_description"
     t.text          "trip_notes"
-    t.datetime      "created_at",                                          :null => false
-    t.datetime      "updated_at",                                          :null => false
+    t.datetime      "created_at",                                                             :null => false
+    t.datetime      "updated_at",                                                             :null => false
     t.string        "customer_primary_language"
     t.string        "customer_first_name"
     t.string        "customer_last_name"
@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(:version => 20130611185909) do
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
-    t.boolean       "rescinded"
+    t.boolean       "rescinded",                                           :default => false, :null => false
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
