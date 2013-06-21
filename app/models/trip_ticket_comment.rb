@@ -1,5 +1,5 @@
 class TripTicketComment < ActiveRecord::Base
-  belongs_to :trip_ticket
+  belongs_to :trip_ticket, :touch => true
   belongs_to :user
   
   audited

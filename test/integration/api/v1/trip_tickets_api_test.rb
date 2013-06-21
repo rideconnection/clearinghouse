@@ -6,9 +6,9 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     @provider = FactoryGirl.create(:provider)
     @minimum_request_params = ApiParamFactory.authenticatable_params(@provider)
 
-    @trip_ticket1 = FactoryGirl.create(:trip_ticket, customer_first_name: "Dom", originator: @provider)
-    @trip_ticket2 = FactoryGirl.create(:trip_ticket, customer_first_name: "Arthur", originator: @provider)
-    @trip_ticket3 = FactoryGirl.create(:trip_ticket, customer_first_name: "Mal", originator: FactoryGirl.create(:provider))
+    @trip_ticket1 = FactoryGirl.create(:trip_ticket, customer_first_name: "Dom", originator: @provider, updated_at: Time.zone.parse("2013-01-01 00:00"))
+    @trip_ticket2 = FactoryGirl.create(:trip_ticket, customer_first_name: "Arthur", originator: @provider, updated_at: Time.zone.parse("2013-01-01 12:00"))
+    @trip_ticket3 = FactoryGirl.create(:trip_ticket, customer_first_name: "Mal", originator: FactoryGirl.create(:provider), updated_at: Time.zone.parse("2013-01-01 23:00"))
   end
   
   describe "GET /api/v1/trip_tickets" do
@@ -21,19 +21,81 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
       response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
     end
+
+    it "should support trip ticket filters" do
+      filter_params = { trip_ticket_filters: { customer_name: "Arthur" }}
+      get "/api/v1/trip_tickets", ApiParamFactory.authenticatable_params(@provider, filter_params)
+      response.status.must_equal 200
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
+    end
+  end
+
+  describe "GET /api/v1/trip_tickets/sync" do
+    include_examples "requires authenticatable params"
+
+    it "should return all trip tickets originated or claimed by the provider as JSON" do
+      FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket3, :claimant => @provider)
+      get "/api/v1/trip_tickets/sync", @minimum_request_params
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
+    end
+
+    it "should return detailed trip tickets with associated objects nested" do
+      FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket3, :claimant => @provider)
+      user = FactoryGirl.create(:user, provider: @provider)
+      FactoryGirl.create(:trip_ticket_comment, trip_ticket: @trip_ticket1, user: user, body: "a comment")
+
+      get "/api/v1/trip_tickets/sync", @minimum_request_params
+      response.status.must_equal 200
+      response.body.must_include %Q("originator":{)
+      response.body.must_include %Q("customer_address":{)
+      response.body.must_include %Q("pick_up_location":{)
+      response.body.must_include %Q("drop_off_location":{)
+      response.body.must_include %Q("trip_result":null)
+      response.body.must_include %Q("trip_claims":[)
+      response.body.must_include %Q("trip_ticket_comments":[)
+    end
+
+    it "should include a field indicating which trips are originated by the requesting provider" do
+      get "/api/v1/trip_tickets/sync", @minimum_request_params
+      response.status.must_equal 200
+      response.body.must_include %Q("is_originator":true)
+    end
+
+    it "should accept an updated_since parameter to filter by date" do
+      filter_params = { updated_since: Time.zone.parse("2013-01-01 00:01") }
+      get "/api/v1/trip_tickets/sync", ApiParamFactory.authenticatable_params(@provider, filter_params)
+      response.status.must_equal 200
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
+    end
+
+    it "should support normal trip ticket filters" do
+      filter_params = { trip_ticket_filters: { customer_name: "Arthur" }}
+      get "/api/v1/trip_tickets/sync", ApiParamFactory.authenticatable_params(@provider, filter_params)
+      response.status.must_equal 200
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
+      response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
+      response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
+    end
   end
 
   describe "GET /api/v1/trip_tickets/1" do
     include_examples "requires authenticatable params"
 
     it "should return the specified trip ticket as JSON" do
-      get "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider)
+      get "/api/v1/trip_tickets/#{@trip_ticket1.id}", @minimum_request_params
       response.status.must_equal 200
       response.body.must_include %Q{"customer_first_name":"#{@trip_ticket1.customer_first_name}"}
     end
 
     it "should not allow me to access a trip ticket originated by another provider" do
-      get "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider)
+      get "/api/v1/trip_tickets/#{@trip_ticket3.id}", @minimum_request_params
       response.status.must_equal 401
       response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
     end
@@ -109,7 +171,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     include_examples "requires authenticatable params"
 
     it "should rescind the specified trip ticket and return the trip ticket as JSON" do
-      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/rescind", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}/rescind", @minimum_request_params
       response.status.must_equal 200
       response.body.must_include %Q{"rescinded":true}
       @trip_ticket1.reload
@@ -117,7 +179,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     end
 
     it "should not allow me to rescind a trip ticket originated by another provider" do
-      put "/api/v1/trip_tickets/#{@trip_ticket3.id}/rescind", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/trip_tickets/#{@trip_ticket3.id}/rescind", @minimum_request_params
       response.status.must_equal 401
       response.body.wont_include %Q{"rescinded":true"}
     end
