@@ -65,6 +65,17 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       @trip_ticket1.pick_up_location.address_1.must_equal "456 New Rd"
     end
 
+    it "updates a nested result" do
+      FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket1, :status => 'approved')
+      trip_params[:trip_ticket][:trip_result_attributes] = { trip_ticket_id: @trip_ticket1.id, outcome: "Completed" }
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
+      response.status.must_equal 200
+      response.body.must_include %Q{"outcome":"Completed"}
+      @trip_ticket1.reload
+      @trip_ticket1.trip_result.wont_be_nil
+      @trip_ticket1.trip_result.outcome.must_equal "Completed"
+    end
+
     it "should not allow me to update a trip ticket originated by another provider" do
       put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, {:trip_ticket => {:customer_first_name => "Ariadne"}})
       response.status.must_equal 401
