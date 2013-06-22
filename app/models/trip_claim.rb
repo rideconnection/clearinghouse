@@ -24,6 +24,8 @@ class TripClaim < ActiveRecord::Base
     
   validate :trip_ticket_is_not_claimed, :one_claim_per_trip_ticket_per_claimant
 
+  validate :trip_ticket_is_not_rescinded, :on => :create
+
   audited
   
   after_create do
@@ -72,6 +74,12 @@ class TripClaim < ActiveRecord::Base
   def trip_ticket_is_not_claimed
     if self.trip_ticket && self.trip_ticket.approved?
       errors.add(:base, "You cannot create or modify a claim on a trip ticket once it has an approved claim")
+    end
+  end
+
+  def trip_ticket_is_not_rescinded
+    if self.trip_ticket && self.trip_ticket.rescinded?
+      errors.add(:base, "You cannot submit a claim on a trip ticket that has been rescinded")
     end
   end
 

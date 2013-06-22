@@ -130,7 +130,7 @@ class TripTicket < ActiveRecord::Base
   end
 
   def status
-    rescinded? ? 'Rescinded' : 'Active'
+    new_record? ? 'New' : (rescinded? ? 'Rescinded' : 'Active')
   end
 
   def customer_full_name
@@ -163,7 +163,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def claimable_by?(user)
-    !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
+    !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
   
   def includes_claim_from?(provider)
@@ -174,7 +174,7 @@ class TripTicket < ActiveRecord::Base
 
   def rescindable?
     # any trip that does not have a result can be rescinded (if customer cancels, claims and approvals are irrelevant)
-    trip_result.nil?
+    trip_result.nil? || trip_result.new_record?
   end
 
   def rescind!

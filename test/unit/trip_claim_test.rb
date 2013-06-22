@@ -62,7 +62,15 @@ class TripClaimTest < ActiveSupport::TestCase
     c2.valid?.must_equal false
     c2.errors[:base].must_include "You cannot create or modify a claim on a trip ticket once it has an approved claim"
   end
-  
+
+  it "cannot be created if the parent trip ticket has been rescinded" do
+    t = FactoryGirl.create(:trip_ticket, :rescinded => true)
+    p = FactoryGirl.create(:provider)
+    c = FactoryGirl.build(:trip_claim, :trip_ticket => t, :claimant => p)
+    c.valid?.must_equal false
+    c.errors[:base].must_include "You cannot submit a claim on a trip ticket that has been rescinded"
+  end
+
   it "can only belong to one ticket per provider" do
     t = FactoryGirl.create(:trip_ticket)
     p = FactoryGirl.create(:provider)

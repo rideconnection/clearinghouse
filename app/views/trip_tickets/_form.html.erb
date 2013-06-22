@@ -11,13 +11,15 @@
     </div>
   <% end %>
 
-  <fieldset id="status" class="">
-    <legend>Status</legend>
-    <div class="field">
-      <%= f.label :status, "Status" %>
-      <%= @trip_ticket.status %>
-    </div>
-  </fieldset>
+  <% unless @trip_ticket.new_record? %>
+    <fieldset id="status" class="">
+      <legend>Status</legend>
+      <div class="field">
+        <%= f.label :status, "Status" %>
+        <%= @trip_ticket.status %>
+      </div>
+    </fieldset>
+  <% end %>
 
   <fieldset id="originator" class="">
     <legend>Originator</legend>
@@ -489,7 +491,7 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <% if @trip_ticket.persisted? && (can?(:rescind, @trip_ticket) && @trip_ticket.rescindable?) %>
+    <% if @trip_ticket.persisted? && can?(:rescind, @trip_ticket) && @trip_ticket.rescindable? %>
       <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
     <% end %>
   </ul>
