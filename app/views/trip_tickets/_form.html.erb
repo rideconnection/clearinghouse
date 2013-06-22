@@ -489,8 +489,8 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <% if true || (can?(:rescind, @trip_ticket) && @trip_ticket.rescindable?) %>
-      <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
+    <% if @trip_ticket.persisted? && (can?(:rescind, @trip_ticket) && @trip_ticket.rescindable?) %>
+      <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
     <% end %>
   </ul>
 <% end %>

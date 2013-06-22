@@ -315,7 +315,35 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_includes results, t2
       refute_includes results, t3
     end
-    
+
+    it "all filters out rescinded trip tickets by default" do
+      t1 = FactoryGirl.create(:trip_ticket)
+      t2 = FactoryGirl.create(:trip_ticket, :rescinded => true)
+      t3 = FactoryGirl.create(:trip_ticket)
+
+      results = TripTicket.filter_by_rescinded(nil)
+
+      assert_includes results, t1
+      refute_includes results, t2
+      assert_includes results, t3
+    end
+
+    it "has a filter_by_rescinded method that can limit results by trip rescinded field" do
+      t1 = FactoryGirl.create(:trip_ticket)
+      t2 = FactoryGirl.create(:trip_ticket, :rescinded => true)
+      t3 = FactoryGirl.create(:trip_ticket)
+
+      results = TripTicket.filter_by_rescinded(:only_rescinded)
+      refute_includes results, t1
+      assert_includes results, t2
+      refute_includes results, t3
+
+      results = TripTicket.filter_by_rescinded(:exclude_rescinded)
+      assert_includes results, t1
+      refute_includes results, t2
+      assert_includes results, t3
+    end
+
     describe "filter_by_claim_status" do
       before do
         # unclaimed

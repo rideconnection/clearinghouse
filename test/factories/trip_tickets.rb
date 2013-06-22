@@ -2,6 +2,7 @@
 
 FactoryGirl.define do
   factory :trip_ticket do
+    rescinded false
     customer_dob "2012-01-01"
     customer_information_withheld false
     customer_first_name "First"

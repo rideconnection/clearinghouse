@@ -179,7 +179,8 @@ class TripTicket < ActiveRecord::Base
 
   def rescind!
     transaction do
-      update_attribute(:rescinded, true)
+      self.rescinded = true
+      save!
       # rescind or cancel outstanding claims
       trip_claims.each do |claim|
         if claim.status == :pending
