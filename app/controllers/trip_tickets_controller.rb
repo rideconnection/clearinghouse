@@ -11,10 +11,9 @@ class TripTicketsController < ApplicationController
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
+    restore_or_save_last_used_filters
     @providers_for_filters = Provider.accessible_by(current_ability)
-
     @trip_tickets = trip_tickets_filter(@trip_tickets)
-
     massage_trip_ticket_trip_time_filter_values_for_form
 
     respond_to do |format|
@@ -109,6 +108,30 @@ class TripTicketsController < ApplicationController
     end
     params[:trip_ticket][:provider_white_list].try(:reject!) {|v| v.blank?}
     params[:trip_ticket][:provider_black_list].try(:reject!) {|v| v.blank?}
+  end
+
+  def restore_or_save_last_used_filters
+    if params[:trip_ticket_filters].present?
+      if params[:trip_ticket_filters] == 'clear'
+        logger.debug "Clearing last_used_filters cookie"
+        cookies.delete(:last_used_filters)
+        params[:trip_ticket_filters] = nil
+      elsif params[:trip_ticket_filters].is_a?(Hash)
+        logger.debug "Saving current parameters in last_used_filters cookie: #{params[:trip_ticket_filters] || 'nil'}"
+        cookies[:last_used_filters] = { value: params[:trip_ticket_filters].to_json }
+      else
+        logger.debug "Format of params[:trip_ticket_filters] not recognized, last_used_filters cookie not saved"
+      end
+    else
+      filters = cookies[:last_used_filters]
+      logger.debug "Retrieved value of last_used_filters cookie: #{filters || 'nil'}"
+      begin
+        params[:trip_ticket_filters] = JSON.parse(filters).with_indifferent_access if filters.present?
+      rescue
+        logger.error "Ignoring invalid last_used_filters cookie: #{filters || 'nil'}, class #{filters.class}"
+        cookies.delete(:last_used_filters)
+      end
+    end
   end
 
   def massage_trip_ticket_trip_time_filter_values_for_form

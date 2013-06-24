@@ -59,7 +59,7 @@
     </div>
 
     <div class="buttons-holder">
-      <%= link_to trip_tickets_path, :class => "button button-cancel" do %>
+      <%= link_to trip_tickets_path(:trip_ticket_filters => 'clear'), :class => "button button-cancel" do %>
         <span>Clear</span>
       <% end %>
       <%= submit_tag 'Search', :name => '', :class => "button" %>
