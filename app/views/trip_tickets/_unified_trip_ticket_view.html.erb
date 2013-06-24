@@ -55,8 +55,8 @@
       <% end %>
       <li><span><%= trip_ticket.appointment_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>Appt</strong></span></li>
     </ul>
-    <address><%= trip_ticket.pick_up_location.address_city_and_zip(', ') %></address>
-    <address><%= trip_ticket.drop_off_location.address_city_and_zip(', ') %></address>
+    <address><%= trip_ticket.pick_up_location.try(:address_city_and_zip, ', ') %></address>
+    <address><%= trip_ticket.drop_off_location.try(:address_city_and_zip, ', ') %></address>
     <span class="gps-data">GPS Coordinates</span>
     <% unless trip_ticket.trip_purpose_description.blank? %>
       <p>Purpose: <%= trip_ticket.trip_purpose_description %></p>
