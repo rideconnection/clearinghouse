@@ -125,26 +125,38 @@ class TripTicketsController < ApplicationController
   end
 
   def restore_or_save_last_used_filters
-    if params[:trip_ticket_filters].present?
-      if params[:trip_ticket_filters] == 'clear'
-        logger.debug "Clearing last_used_filters cookie"
-        cookies.delete(:last_used_filters)
-        params[:trip_ticket_filters] = nil
-      elsif params[:trip_ticket_filters].is_a?(Hash)
-        logger.debug "Saving current parameters in last_used_filters cookie: #{params[:trip_ticket_filters] || 'nil'}"
-        cookies[:last_used_filters] = { value: params[:trip_ticket_filters].to_json }
-      else
-        logger.debug "Format of params[:trip_ticket_filters] not recognized, last_used_filters cookie not saved"
-      end
+    if params[:trip_ticket_filters].present? || params[:saved_filter].present?
+      save_last_used_filters
     else
-      filters = cookies[:last_used_filters]
-      logger.debug "Retrieved value of last_used_filters cookie: #{filters || 'nil'}"
-      begin
-        params[:trip_ticket_filters] = JSON.parse(filters).with_indifferent_access if filters.present?
-      rescue
-        logger.error "Ignoring invalid last_used_filters cookie: #{filters || 'nil'}, class #{filters.class}"
-        cookies.delete(:last_used_filters)
-      end
+      restore_last_used_filters
+      apply_requested_saved_filter
+    end
+  end
+
+  def save_last_used_filters
+    if params[:trip_ticket_filters] == 'clear'
+      logger.debug "Clearing last_used_filters cookie"
+      cookies.delete(:last_used_filters)
+      params[:trip_ticket_filters] = nil
+    else
+      values = {}
+      values[:trip_ticket_filters] = params[:trip_ticket_filters] if params[:trip_ticket_filters].present?
+      values[:saved_filter] = params[:saved_filter] if params[:saved_filter].present?
+      logger.debug "Saving current parameters in last_used_filters cookie: #{values}"
+      cookies[:last_used_filters] = { value: values.to_json }
+    end
+  end
+
+  def restore_last_used_filters
+    filters = cookies[:last_used_filters]
+    logger.debug "Retrieved value of last_used_filters cookie: #{filters || 'nil'}"
+    begin
+      new_params = JSON.parse(filters).with_indifferent_access
+      params[:saved_filter] = new_params[:saved_filter] if new_params[:saved_filter].present?
+      params[:trip_ticket_filters] = new_params[:trip_ticket_filters] if new_params[:trip_ticket_filters].present?
+    rescue
+      logger.error "Ignoring invalid last_used_filters cookie: #{filters || 'nil'}, class #{filters.class}"
+      cookies.delete(:last_used_filters)
     end
   end
 
