@@ -1,10 +1,5 @@
-require 'flatten_hash'
-
 class FiltersController < ApplicationController
   load_and_authorize_resource
-
-  include FlattenHash
-  helper_method :flatten_hash
 
   def index
   end

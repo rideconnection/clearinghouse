@@ -1,5 +1,4 @@
 require 'trip_tickets_filter'
-require 'flatten_hash'
 
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
@@ -8,9 +7,8 @@ class TripTicketsController < ApplicationController
   before_filter :setup_locations, :except => :index
 
   include TripTicketsFilter
-  include FlattenHash
 
-  helper_method :trip_ticket_filters_present?, :flatten_hash
+  helper_method :trip_ticket_filters_present?
 
   # GET /trip_tickets
   # GET /trip_tickets.json
