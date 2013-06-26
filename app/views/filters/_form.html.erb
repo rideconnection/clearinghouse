@@ -11,12 +11,6 @@
     </div>
   <% end %>
 
-  <% if @filter.data.is_a?(Hash) %>
-    <%= filter_params_to_hidden_fields(@filter.data, 'filter[data]') %>
-  <% end %>
-
-  <%= hidden_field_tag :return_to, return_to if defined?(return_to) %>
-
   <div class="field">
     <%= f.text_field :name, :placeholder => "Filter Name", :class => "form-input" %>
   </div>
@@ -30,4 +24,9 @@
     <%= f.submit 'Save', :class => "button" %>
   </div>
 
+  <%= hidden_field_tag :return_to, return_to if defined?(return_to) %>
+
+  <% if @filter.data.is_a?(Hash) %>
+    <%= filter_params_to_hidden_fields(@filter.data, 'filter[data]') %>
+  <% end %>
 <% end %>

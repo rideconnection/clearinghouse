@@ -6,16 +6,12 @@ module FiltersHelper
     <a class="opener" href="#">#{msg}</a>
     <div class="slide">
       #{ render 'filters/form', return_to: controller_name }
-      <div id="saved-filter-message"></div>
     </div>
     <hr>
     EOS
   end
 
-  # when we save a named filter, we save the contents of the trip_ticket_filters hash
-  # e.g. { 'customer_name' => 'foo', 'claiming_provider[]' => '2', 'trip_time[start]' => 'somedate' }
-  #
-  # in our saved filter form, we must re-wrap the field names and to end up inside the filter[data] hash
+  # in our saved filter form, we must re-wrap the field names to end up inside the filter[data] hash
   # for example (note the bracket placement):
   #
   # customer_name        --> filter[data][customer_name]
