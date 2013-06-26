@@ -3,6 +3,25 @@
     <h2>Ticket Filters</h2>
   </header>
 
+  <div class="saved-filters">
+    <% if (collection = Filter.accessible_by(current_ability).order(:name)).length > 0 %>
+      <%= form_tag trip_tickets_path, :method => :get, :class => "apply-filter" do %>
+        <%= select_tag 'saved_filter', options_from_collection_for_select(collection, :name, :name, @filter.try(:name)), :id => :saved_filter, :prompt => "Saved Filters:", :class => "form-input" %>
+        <%= submit_tag 'Apply', :name => '', :class => "button" %>
+      <% end %>
+      <% if @filter.present? && can?(:destroy, @filter) %>
+        <%= button_to 'X', filter_path(@filter, return_to: controller_name), method: :delete, form_class: 'delete-filter', class: :destroy, title: "Delete currently selected saved filter", confirm: "Are you sure?" %>
+      <% end %>
+    <% end %>
+    <div class="new-filter-form">
+      <% if @filter.present? %>
+        <%= filter_mini_form('Update saved filter') %>
+      <% elsif trip_ticket_filters_present? %>
+        <%= filter_mini_form('Save current filters') %>
+      <% end %>
+    </div>
+  </div>
+
   <%= form_tag trip_tickets_path, :method => :get, :class => "form-filter" do %>
     <div class="field">
       <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>

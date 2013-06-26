@@ -1,0 +1,29 @@
+<div class="padded">
+  <header>
+    <h2>Saved Filters</h2>
+  </header>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @filters.each do |filter| %>
+        <tr>
+          <td><%= filter.name %></td>
+          <td>
+            <ul>
+              <li><%= link_to 'View Details', filter_path(filter) %></li>
+              <% if can?(:edit, filter) %>
+                <li><%= link_to 'Edit', edit_filter_path(filter) %></li>
+              <% end %>
+            </ul>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

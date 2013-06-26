@@ -1,0 +1,35 @@
+<div class="padded">
+  <header>
+    <h2>Saved Filter</h2>
+  </header>
+
+  <div class="field">
+    <h3>Filter Name</h3>
+    <%= @filter.name %>
+  </div>
+
+  <div class="field">
+    <h3>Filter Conditions</h3>
+    <% if @filter.data.is_a?(Hash) %>
+      <% flatten_hash(@filter.data).each do |key, value| %>
+        <p>
+          <%= label_tag "#{key}" %>
+          <%= value.blank? ? '[blank]' : value %>
+        </p>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if can?(:destroy, @filter) %>
+  <%= button_to "Delete Filter", @filter, method: :delete, class: :destroy, confirm: "Are you sure?" %>
+  <% end %>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Saved Filters', filters_path %></li>
+    <% if can?(:edit, @filter) %>
+      <li><%= link_to 'Edit Filter', edit_filter_path(@filter) %></li>
+    <% end %>
+  </ul>
+<% end %>

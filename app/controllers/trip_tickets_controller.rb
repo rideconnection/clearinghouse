@@ -1,4 +1,5 @@
 require 'trip_tickets_filter'
+require 'flatten_hash'
 
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
@@ -7,11 +8,16 @@ class TripTicketsController < ApplicationController
   before_filter :setup_locations, :except => :index
 
   include TripTicketsFilter
+  include FlattenHash
+
+  helper_method :trip_ticket_filters_present?, :flatten_hash
 
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
+    apply_requested_saved_filter
     restore_or_save_last_used_filters
+
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
     massage_trip_ticket_trip_time_filter_values_for_form
@@ -108,6 +114,16 @@ class TripTicketsController < ApplicationController
     end
     params[:trip_ticket][:provider_white_list].try(:reject!) {|v| v.blank?}
     params[:trip_ticket][:provider_black_list].try(:reject!) {|v| v.blank?}
+  end
+
+  def apply_requested_saved_filter
+    @filter = Filter.find_by_name(params[:saved_filter]) if params[:saved_filter].present?
+    if @filter
+      new_params = @filter.data
+      # support combining a named filter with ad-hoc filters
+      new_params.merge!(params[:trip_ticket_filters]) if trip_ticket_filters_present?
+      params[:trip_ticket_filters] = new_params
+    end
   end
 
   def restore_or_save_last_used_filters

@@ -170,6 +170,9 @@ class Ability
 
     # No user can deactivate themselves
     cannot :deactivate, User, :id => user.id
+
+    # All users can manage their personal saved filters
+    can :manage, Filter, :user_id => user.id
     
     # No user can destroy primary objects
     cannot :destroy, [

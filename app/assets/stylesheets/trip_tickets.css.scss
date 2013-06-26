@@ -16,6 +16,63 @@ body[data-controller="trip_tickets"] {
       margin-right:4px;
       margin-bottom:3px;
     }
+
+    div.saved-filters {
+      margin-bottom: 12px;
+      position: relative;
+
+      form.apply-filter {
+        margin-bottom: 12px;
+
+        select {
+          width: 176px;
+        }
+      }
+
+      form.delete-filter {
+        position: absolute;
+        top: px;
+        right: 0;
+
+        .destroy {
+          background:url(image-path("sprite1.png")) no-repeat scroll 0 -751px transparent;
+          height: 16px;
+          width: 16px;
+          border: medium none;
+          cursor: pointer;
+          margin: 0;
+          overflow: hidden;
+          text-indent: -9999px;
+        }
+      }
+    }
+
+    .new-filter-form {
+      .buttons-holder {
+        &.field-align {
+          margin-left: 0;
+        }
+      }
+      .opener {
+        background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+        font-size:14px;
+        line-height:16px;
+        padding:0 0 0 18px;
+      }
+      &.active .opener {
+        background-position:-1px -86px;
+      }
+      .slide {
+        padding: 4px;
+
+        form.new_filter, form.edit_filter {
+          .field {
+            padding: 6px 0;
+          }
+        }
+      }
+    }
+
   }
 
   &[data-action="index"] {
@@ -442,7 +499,7 @@ body[data-controller="trip_tickets"] {
               }
             }
           }
-          
+
           /* Open Capacity */
           .seats-info {
             margin:0 0 9px;

@@ -45,14 +45,25 @@ module TripTicketsFilter
     Time.zone.parse(datetime_value) rescue default
   end
 
+  # trip_ticket_filters_present? returns true if any non-blank trip ticket filters are contained in the params.
+  # this is needed because the filtering code inserts placeholders for certain filters that are logically blank (see
+  # init_trip_ticket_trip_time_filter_values). this needs to be kept up-to-date when similar placeholders are added.
+  def trip_ticket_filters_present?
+    filters = params[:trip_ticket_filters].try(:clone) || {}
+    trip_time = filters.delete(:trip_time)
+    seats_required = filters.delete(:seats_required)
+    filters.present? ||
+      trip_time.try(:[], :start).present? ||
+      trip_time.try(:[], :end).present? ||
+      seats_required.try(:[], :min).present? ||
+      seats_required.try(:[], :max).present?
+  end
+
   private
 
   def init_trip_ticket_trip_time_filter_values
     params[:trip_ticket_filters]                     ||= Hash.new
     params[:trip_ticket_filters][:trip_time]         ||= Hash.new
-    params[:trip_ticket_filters][:trip_time][:start] ||= nil
-    params[:trip_ticket_filters][:trip_time][:end]   ||= nil
-
     params[:trip_ticket_filters][:trip_time][:start] ||= nil
     params[:trip_ticket_filters][:trip_time][:end]   ||= nil
   end

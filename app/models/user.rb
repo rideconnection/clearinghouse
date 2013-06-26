@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
 
   belongs_to :provider
   belongs_to :role
+  has_many :filters
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider_id, :role_id, 

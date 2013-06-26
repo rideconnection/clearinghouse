@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130621202208) do
+ActiveRecord::Schema.define(:version => 20130624182706) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -39,6 +39,14 @@ ActiveRecord::Schema.define(:version => 20130621202208) do
   add_index "audits", ["auditable_id", "auditable_type"], :name => "auditable_index"
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
+
+  create_table "filters", :force => true do |t|
+    t.integer  "user_id"
+    t.string   "name"
+    t.text     "data"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "funding_sources", :force => true do |t|
     t.string   "name"

@@ -1,0 +1,35 @@
+<%= form_for(@filter) do |f| %>
+
+  <% if @filter.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@filter.errors.count, "error") %> prohibited this filter from being saved:</h2>
+      <ul>
+      <% @filter.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @filter.data.is_a?(Hash) %>
+    <% flatten_hash(@filter.data).each do |key, value| %>
+      <%= hidden_field_tag("filter[data][#{key}]", value, id: nil) unless value.blank? %>
+    <% end %>
+  <% end %>
+
+  <%= hidden_field_tag :return_to, return_to if defined?(return_to) %>
+
+  <div class="field">
+    <%= f.text_field :name, :placeholder => "Filter Name", :class => "form-input" %>
+  </div>
+
+  <div class="buttons-holder field-align">
+    <% if controller_name == 'filters' %>
+      <%= link_to :back, :class => "button button-cancel" do %>
+        <span>Cancel</span>
+      <% end %>
+    <% end %>
+    <%= f.submit 'Save', :class => "button" %>
+  </div>
+
+<% end %>

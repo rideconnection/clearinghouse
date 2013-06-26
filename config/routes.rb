@@ -48,6 +48,8 @@ Clearinghouse::Application.routes.draw do
     post 'deactivate', :on => :member
   end
 
+  resources :filters
+
   match 'admin', :controller => :admin, :action => :index
   match 'reports', :controller => :reports, :action => :index
 
