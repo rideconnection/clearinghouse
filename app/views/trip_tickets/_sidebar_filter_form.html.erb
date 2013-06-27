@@ -10,7 +10,7 @@
         <%= submit_tag 'Apply', :name => '', :class => "button" %>
       <% end %>
       <% if @filter.present? && can?(:destroy, @filter) %>
-        <%= button_to 'X', filter_path(@filter, return_to: controller_name), method: :delete, form_class: 'delete-filter', class: :destroy, title: "Delete currently selected saved filter", confirm: "Are you sure?" %>
+        <%= button_to 'X', filter_path(@filter, return_to: controller_name), method: :delete, form_class: 'delete-filter', id: :delete_filter, class: :destroy, title: "Delete currently selected saved filter", confirm: "Are you sure?" %>
       <% end %>
     <% end %>
     <div class="new-filter-form">
