@@ -28,6 +28,8 @@ class TripClaim < ActiveRecord::Base
 
   audited
   
+  default_scope order('created_at ASC')
+  
   after_create do
     self.approve! if self.can_be_auto_approved?
   end

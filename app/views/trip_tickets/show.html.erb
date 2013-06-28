@@ -9,6 +9,13 @@
 
   <section id="trip_claims">
     <%= render 'trip_claims', :trip_claims => @trip_ticket.trip_claims.accessible_by(current_ability) %>
+    <nav>
+      <% if can?(:create, @trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && @trip_ticket.claimable_by?(current_user) %>
+        <%= link_to new_trip_ticket_trip_claim_path(@trip_ticket), :class => "button" do %>
+          <span>Submit Claim</span>
+        <% end %>
+      <% end %>
+    </nav>
   </section>
 
   <section id="trip_ticket_results">
@@ -17,7 +24,7 @@
     </header>
     <fieldset id="trip_result" class="">
       <% if can?(:update, @result) && @trip_ticket.can_create_or_edit_result? %>
-        <%= form_for(@result) do |form| %>
+        <%= form_for(@result, url: trip_ticket_trip_result_path(@trip_ticket)) do |form| %>
           <%= form.fields_for :trip_result do |rf| %>
             <%= render 'trip_results/form', :f => form %>
             <div class="buttons-holder">
@@ -39,6 +46,13 @@
 
   <section id="trip_ticket_comments">
     <%= render 'trip_ticket_comments', :trip_ticket_comments => @trip_ticket.trip_ticket_comments.accessible_by(current_ability) %>
+    <nav>
+      <% if can?(:create, @trip_ticket.trip_ticket_comments.build) %>
+        <%= link_to new_trip_ticket_trip_ticket_comment_path(@trip_ticket), :class => "button" do %>
+          <span>Add Comment</span>
+        <% end %>
+      <% end %>    
+    </nav>
   </section>
 
   <section id="audit_trail">

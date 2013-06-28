@@ -11,7 +11,7 @@
     <%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "btn-request" do %>
       <span>Claim</span>
     <% end %>
-    <% end %>
+  <% end %>
 </div>
 <div class="twocolumns">
   <div class="add-info">
@@ -130,12 +130,11 @@
         <% end %>
       </div>
       <ul class="activity-list">
-        <% trip_ticket.trip_ticket_comments.each do |comment| %>
-          <%= render 'unified_trip_ticket_view_comment', :comment => comment %>
+        <% trip_ticket.activities.each do |activity| %>
+          <%= render 'unified_trip_ticket_view_activity', :activity => activity %>
         <% end %>
-        <li><a href="#"><span>12:20 PM</span> Claim Submitted (Placeholder)</a></li>
-        <li><a href="#"><span>11:00 AM</span> Claim Submitted (Placeholder)</a></li>
       </ul>
     </div>
   </div>
 </div>
+<div id="activities-dialog"></div>

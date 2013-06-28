@@ -9,6 +9,16 @@
           $(this).find('a')[0].click();
         });
       });
+      $('.content-frame .activity-list').delegate('a', 'click', function(event){
+        event.preventDefault();
+        $this = $(this);
+        if ($this.data('activity-type') == 'trip_result') {
+          url = $this.attr('href');
+        } else {
+          url = $this.attr('href').replace(/\/\d+$/, '');
+        }
+        $.getScript(url);
+      });
     });
   </script>
 <% end %>
@@ -70,57 +80,6 @@
       <% end %>
     </div>
   </div>
-</div>
-
-<div class="padded" style="display:none">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Originator</th>
-        <th>Status</th>
-        <th>Customer</th>
-        <th>Mobility Impairments</th>
-        <th>Deboarding time</th>
-        <th>Pick up loc.</th>
-        <th>Drop off loc.</th>
-        <th>Appointment</th>
-        <th>Attendants</th>
-        <th>Guests</th>
-        <th>Assistive devices</th>
-        <th>Service animals</th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @trip_tickets.each do |trip_ticket| %>
-        <tr>
-          <td><%= trip_ticket.originator.name %></td>
-          <td>TODO</td>
-          <td><%= trip_ticket.customer_full_name %></td>
-          <td><%= trip_ticket.customer_mobility_impairments.try(:join, ', ') %></td>
-          <td><%= trip_ticket.customer_deboarding_time.to_i %></td>
-          <td><%= formatted_address_and_city trip_ticket.pick_up_location %></td>
-          <td><%= formatted_address_and_city trip_ticket.drop_off_location %></td>
-          <td><%= display_appointment_time trip_ticket %></td>
-          <td><%= trip_ticket.num_attendants.to_i %></td>
-          <td><%= trip_ticket.num_guests.to_i %></td>
-          <td>TODO</td>
-          <td>TODO</td>
-          <td><%= link_to 'Show', trip_ticket %></td>
-          <td><% if can?(:edit, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Edit', edit_trip_ticket_path(trip_ticket) %><% end %></td>
-          <td><% if can?(:destroy, trip_ticket) && !trip_ticket.approved? %><%= link_to 'Destroy', trip_ticket, method: :delete, data: { confirm: 'Are you sure?' } %><% end %></td>
-          <td>
-            <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
-              <%= link_to 'Claim', new_trip_ticket_trip_claim_path(trip_ticket) %>
-            <% end %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
 </div>
 
 <% content_for :sidebar do %>

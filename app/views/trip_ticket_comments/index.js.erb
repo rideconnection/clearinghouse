@@ -1,0 +1,11 @@
+$("#activities-dialog").html('<%= escape_javascript(render("trip_tickets/trip_ticket_comments", :trip_ticket_comments => @trip_ticket_comments)) %>');
+$("#activities-dialog").dialog({
+  title: "Comments",
+  width: 1062,
+  modal: true,
+  buttons: {
+    Cancel: function() {
+      $( this ).dialog( "close" );
+    }
+  }
+});

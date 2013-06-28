@@ -1,7 +1,7 @@
 class TripClaimsController < ApplicationController
-  load_and_authorize_resource :trip_claim, :only => :index
-  load_and_authorize_resource :trip_ticket, :except => :index
-  load_and_authorize_resource :trip_claim, :through => :trip_ticket, :except => :index
+  load_and_authorize_resource :trip_claim, :only => :dashboard
+  load_and_authorize_resource :trip_ticket, :except => :dashboard
+  load_and_authorize_resource :trip_claim, :through => :trip_ticket, :except => :dashboard
   
   # GET /trip_claims
   # GET /trip_claims.json
@@ -9,6 +9,7 @@ class TripClaimsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @trip_claims }
+      format.js
     end
   end
 
@@ -95,4 +96,6 @@ class TripClaimsController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  def dashboard; end
 end

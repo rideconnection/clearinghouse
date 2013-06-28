@@ -8,6 +8,7 @@ class TripTicketCommentsController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @trip_ticket_comments }
+      format.js
     end
   end
 

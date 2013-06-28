@@ -22,17 +22,15 @@ Clearinghouse::Application.routes.draw do
     resources :services, :except => [ :index, :show, :destroy ]
   end
 
-  resources :trip_claims, :only => :index
+  resources :trip_claims, :only => :dashboard
   
-  resources :trip_results
-
   resources :trip_tickets do
     post 'search', :on => :collection
     member do
       post 'rescind'
     end
 
-    resources :trip_claims, :except => [:index] do
+    resources :trip_claims do
       member do
         post 'approve'
         post 'decline'
@@ -41,6 +39,8 @@ Clearinghouse::Application.routes.draw do
     end
     
     resources :trip_ticket_comments
+
+    resource :trip_result
   end
 
   resources :users do

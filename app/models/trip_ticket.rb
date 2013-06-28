@@ -191,6 +191,10 @@ class TripTicket < ActiveRecord::Base
       end
     end
   end
+  
+  def activities
+    (trip_claims(true).all + trip_ticket_comments(true).all + Array(trip_result(true))).compact.sort_by(&:created_at) rescue []
+  end
 
   protected
 

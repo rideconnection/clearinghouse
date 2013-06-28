@@ -1,0 +1,11 @@
+$("#activities-dialog").html('<%= escape_javascript(render("show_fields", :result => @trip_result)) %>');
+$("#activities-dialog").dialog({
+  title: "Result",
+  width: 1062,
+  modal: true,
+  buttons: {
+    Cancel: function() {
+      $( this ).dialog( "close" );
+    }
+  }
+});
