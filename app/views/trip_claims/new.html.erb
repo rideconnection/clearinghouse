@@ -10,6 +10,6 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'All Claims', trip_claims_path %></li>
+    <li><%= link_to 'All Claims', trip_ticket_trip_claims_path(@trip_ticket) %></li>
   </ul>
 <% end %>

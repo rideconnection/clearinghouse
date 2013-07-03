@@ -14,7 +14,7 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'Trip Claims', trip_claims_path %></li>
+    <li><%= link_to 'Trip Claims', trip_ticket_trip_claims_path(@trip_ticket) %></li>
     <li><%= link_to 'Trip Ticket Details', trip_ticket_path(@trip_ticket) %></li>
     <% if !@trip_ticket.approved? %>
       <% if can?(:rescind, @trip_claim) && @trip_claim.editable? %>
