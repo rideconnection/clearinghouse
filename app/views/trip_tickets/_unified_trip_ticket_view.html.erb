@@ -5,8 +5,9 @@
     <% end %>
     <span class="count"><%= trip_ticket.seats_required %></span>
     <!--img src="/assets/icon01.png" width="16" height="14" alt="" /-->
+    <% trip_status = trip_ticket.status_for(current_user) %>
+    <span class="trip-status <%= underscore_status(trip_status) %>"><%= trip_status %></span>
   </h2>
-  <span class="trip-status <%= trip_ticket.status.downcase %>"><%= trip_ticket.status %></span>
   <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
     <%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "btn-request" do %>
       <span>Claim</span>

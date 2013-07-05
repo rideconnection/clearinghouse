@@ -16,7 +16,7 @@
       <legend>Status</legend>
       <div class="field">
         <%= f.label :status, "Status" %>
-        <%= @trip_ticket.status %>
+        <%= @trip_ticket.status_for(current_user) %>
       </div>
     </fieldset>
   <% end %>

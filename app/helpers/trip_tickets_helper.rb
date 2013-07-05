@@ -41,4 +41,15 @@ module TripTicketsHelper
   def formatted_activity_line(activity)
     raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize} - #{activity.audits.first.try(:user).try(:display_name)}"
   end
+
+  # this converts trip status to a simplified snake-cased form in a consistent way
+  def underscore_status(trip_status)
+    if trip_status =~ /Approved$/
+      'approved'
+    elsif trip_status =~ /Pending$/
+      'pending'
+    else
+      trip_status.downcase.gsub(' ', '_')
+    end
+  end
 end

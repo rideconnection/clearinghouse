@@ -164,9 +164,20 @@ body[data-controller="trip_tickets"] {
             padding:0 0 8px;
 
             .status {
-              &.rescinded {
-                color: red;
-              }
+              margin-top: 8px;
+
+              &.rescinded       { color: gray }
+              &.expired         { color: gray }
+              &.unavailable     { color: gray }
+              &.declined        { color: gray }
+              &.pending         { color: blue }
+              &.claim_pending   { color: blue }
+              &.approved        { color: blue }
+              &.claimed         { color: blue }
+              &.completed       { color: green }
+              &.no-show         { color: red }
+              &.cancelled       { color: red }
+              &.awaiting_result { color: darkorange }
             }
           }
 
@@ -276,18 +287,20 @@ body[data-controller="trip_tickets"] {
 
             .trip-status {
               display: inline-block;
-              padding: 4px 16px;
-              position: relative;
-              top: -1px;
               margin-left: 20px;
 
-              &.active {
-                color: green;
-              }
-              &.rescinded {
-                background-color: red;
-                color: white;
-              }
+              &.rescinded       { color: gray }
+              &.expired         { color: gray }
+              &.unavailable     { color: gray }
+              &.declined        { color: gray }
+              &.pending         { color: blue }
+              &.claim_pending   { color: blue }
+              &.approved        { color: blue }
+              &.claimed         { color: blue }
+              &.completed       { color: green }
+              &.no-show         { color: red }
+              &.cancelled       { color: red }
+              &.awaiting_result { color: darkorange }
             }
 
             /* Open Capacity */

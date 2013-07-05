@@ -49,7 +49,148 @@ class TripTicketsTest < ActionController::IntegrationTest
     click_button "Create Trip ticket comment"
     assert page.has_content?("Trip ticket comment was successfully created.")
   end 
- 
+
+  describe "TripTicket#status_for(user)" do
+
+    # tests to make sure status shows up in the UI where expected
+
+    it "should be displayed in the trip ticket index" do
+      trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
+      visit trip_tickets_path
+      assert page.find(".tickets-list").has_content?("No Claims")
+    end
+
+    it "should be displayed in the trip ticket unified view" do
+      trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
+      visit trip_tickets_path
+      assert page.find(".content-frame>.heading:first").has_content?("No Claims")
+    end
+
+    it "should be displayed in the trip ticket show action" do
+      trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
+      visit trip_ticket_path(trip)
+      assert page.has_content?("No Claims")
+    end
+
+    # the remainder of the status tests ensure compliance with the trip status grid spreadsheet
+
+    describe "when current user belongs to originator" do
+      setup do
+        @trip_ticket = FactoryGirl.create(
+            :trip_ticket,
+            :origin_provider_id => @user.provider.id,
+            :appointment_time => 2.days.from_now)
+      end
+
+      it "should return New if trip ticket is unsaved" do
+        TripTicket.new.status_for(@user).must_equal 'New'
+      end
+
+      it "should return Rescinded if trip ticket is rescinded" do
+        @trip_ticket.tap {|t| t.rescind! }.status_for(@user).must_equal 'Rescinded'
+      end
+
+      it "should return Expired if trip ticket is expired" do
+        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Expired'
+      end
+
+      it "should return No Claims if trip ticket has no claims" do
+        @trip_ticket.status_for(@user).must_equal 'No Claims'
+      end
+
+      it "should return Claims Pending with a count if trip ticket has claims" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+        @trip_ticket.status_for(@user).must_equal '1 Claim Pending'
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+        @trip_ticket.status_for(@user).must_equal '2 Claims Pending'
+      end
+
+      it "should return Approved with the name of the claimant if trip ticket has an approved claim" do
+        claimant = FactoryGirl.create(:provider, :name => "Some Claimant")
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => claimant, :status => :approved)
+        @trip_ticket.status_for(@user).must_equal "Some Claimant Approved"
+      end
+
+      it "should return Awaiting Result if trip ticket has an approved claim and appointment time has passed" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :approved)
+        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Awaiting Result'
+      end
+
+      it "should return result status if trip ticket is resolved" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :approved)
+        @trip_ticket.tap {|t| t.create_trip_result(:outcome => 'Completed') }.status_for(@user).must_equal 'Completed'
+      end
+    end
+
+    describe "when current user does not belongs to originator" do
+      setup do
+        @trip_ticket = FactoryGirl.create(:trip_ticket, :appointment_time => 2.days.from_now)
+      end
+
+      it "should return Available if trip ticket has no claims" do
+        @trip_ticket.status_for(@user).must_equal 'Available'
+      end
+
+      it "should return Available if trip ticket has only pending claims" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+        @trip_ticket.status_for(@user).must_equal 'Available'
+      end
+
+      it "should return Claim Pending if trip ticket has a claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider)
+        @trip_ticket.status_for(@user).must_equal 'Claim Pending'
+      end
+
+      it "should return Declined if trip ticket has a declined claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider, :status => :declined)
+        @trip_ticket.status_for(@user).must_equal 'Declined'
+      end
+
+      it "should return Claimed if trip ticket has an approved claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider, :status => :approved)
+        @trip_ticket.status_for(@user).must_equal 'Claimed'
+      end
+
+      it "should return Unavailable if trip ticket has an approved claim not from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :approved)
+        @trip_ticket.status_for(@user).must_equal 'Unavailable'
+      end
+
+      it "should return Unavailable if trip ticket is rescinded and has no claims from user's provider" do
+        @trip_ticket.tap {|t| t.rescind! }.status_for(@user).must_equal 'Unavailable'
+      end
+
+      it "should return Rescinded if trip ticket is rescinded and has a claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider)
+        @trip_ticket.tap {|t| t.rescind! }.status_for(@user).must_equal 'Rescinded'
+      end
+
+      it "should return Unavailable if trip ticket is expired" do
+        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Unavailable'
+      end
+
+      it "should return Unavailable if trip ticket is resolved and has no claims from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :approved)
+        @trip_ticket.tap {|t| t.create_trip_result(:outcome => 'Completed') }.status_for(@user).must_equal 'Unavailable'
+      end
+
+      it "should return Declined if trip ticket is resolved and has a declined claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider, :status => :declined)
+        @trip_ticket.tap {|t| t.create_trip_result(:outcome => 'Completed') }.status_for(@user).must_equal 'Declined'
+      end
+
+      it "should return Awaiting Result if trip ticket has an approved claim from user's provider and appointment time has passed" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider, :status => :approved)
+        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Awaiting Result'
+      end
+
+      it "should return result status if trip ticket is resolved and has an approved claim from user's provider" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :claimant => @provider, :status => :approved)
+        @trip_ticket.tap {|t| t.create_trip_result(:outcome => 'Completed') }.status_for(@user).must_equal 'Completed'
+      end
+    end
+  end
+
   TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES.each do |field_sym|
     describe "#{field_sym.to_s} string_array fields" do
       test "provider admins should see a single #{field_sym.to_s} field when creating a trip ticket (and can save it even w/o javascript, but cannot add more than a single new value)" do

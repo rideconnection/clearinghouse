@@ -40,7 +40,7 @@ class TripTicket < ActiveRecord::Base
   }
 
   CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
-  
+
   attr_accessible :allowed_time_variance, :appointment_time,
     :claimant_provider_id, :claimant_trip_id, :customer_address_attributes, 
     :customer_address_id, :customer_boarding_time, :customer_deboarding_time, 
@@ -129,10 +129,6 @@ class TripTicket < ActiveRecord::Base
     test_result.valid?
   end
 
-  def status
-    new_record? ? 'New' : (rescinded? ? 'Rescinded' : 'Active')
-  end
-
   def customer_full_name
     [customer_first_name, customer_middle_name, customer_last_name].reject(&:blank?).map(&:strip).join(" ")
   end
@@ -153,7 +149,85 @@ class TripTicket < ActiveRecord::Base
       ""
     end
   end
-  
+
+  def status_for(user)
+    user.provider.try(:id) == origin_provider_id ? originator_status(user.provider) : claimant_status(user.provider)
+  end
+
+  def originator_status(provider)
+    trip_status = status
+    case trip_status
+      when 'New', 'Rescinded', 'Expired'
+        trip_status
+      when 'Resolved'
+        trip_result.try(:outcome) || 'Awaiting Result'
+      when 'Active'
+        if (claim_count = trip_claims.count) == 0
+          'No Claims'
+        elsif (claim = approved_claim).present?
+          "#{claim.claimant.try(:name)} Approved"
+        else
+          "#{claim_count} Claim#{claim_count == 1 ? '' : 's'} Pending"
+        end
+    end
+  end
+
+  def claimant_status(provider)
+    trip_status = status
+    if trip_status == 'New'
+      'New'
+    elsif trip_status == 'Expired'
+      'Unavailable'
+    else
+      claim = claims_from(provider).order('created_at DESC').first
+      if claim.try(:status) == :declined
+        'Declined'
+      else
+        case trip_status
+          when 'Rescinded'
+            claim.present? ? 'Rescinded' : 'Unavailable'
+          when 'Resolved'
+            if claim.try(:status) == :approved
+              trip_result.try(:outcome) || 'Awaiting Result'
+            else
+              'Unavailable'
+            end
+          when 'Active'
+            if claim.try(:status) == :approved
+              'Claimed'
+            elsif claim.try(:status) == :pending
+              'Claim Pending'
+            else
+              approved? ? 'Unavailable' : 'Available'
+            end
+        end
+      end
+    end
+  end
+
+  def status
+    if new_record?
+      'New'
+    elsif rescinded?
+      'Rescinded'
+    elsif resolved?
+      'Resolved'
+    elsif expired?
+      'Expired'
+    else
+      'Active'
+    end
+  end
+
+  def expired?
+    # TODO per task #1356, TripTicket#expired? should include a date set by provider at which point it is too late to submit a claim
+    appointment_time.past? && !approved?
+  end
+
+  def resolved?
+    (appointment_time.past? && approved?) || trip_result.present?
+  end
+
   def approved_claim
     trip_claims.detect{ |claim| claim.status == :approved}
   end
@@ -165,10 +239,13 @@ class TripTicket < ActiveRecord::Base
   def claimable_by?(user)
     !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
-  
+
+  def claims_from(provider)
+    trip_claims.where(:claimant_provider_id => provider.id)
+  end
+
   def includes_claim_from?(provider)
-    claims = self.trip_claims.where(:claimant_provider_id => provider.id)
-    active = claims.where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS])
+    active = claims_from(provider).where(["status NOT IN (?)", TripClaim::INACTIVE_STATUS])
     active.count > 0
   end
 
