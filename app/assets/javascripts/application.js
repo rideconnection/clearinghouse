@@ -44,7 +44,7 @@ function initOpenClose() {
     animSpeed: 400,
     effect: 'slide'
   });
-  jQuery('.new-filter-form').openClose({
+  jQuery('.saved-filter-form').openClose({
     activeClass: 'active',
     opener: '.opener',
     slider: '.slide',

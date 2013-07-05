@@ -10,12 +10,12 @@ $ ->
   $('form.apply-filter select').change ->
     $(this).parent('form').submit()
 
-  $('form.form-filter input').change (evt) ->
+  $('form.form-filter input,form.form-filter select').change (evt) ->
     dirtyFilterForm = true
 
   # when the saved filter form is submitted, make sure any modified values in the
   # ad-hoc form are included by wiping out the old hidden fields and replacing them
-  $('div.new-filter-form form').submit (evt) ->
+  $('div.saved-filter-form form').submit (evt) ->
     if dirtyFilterForm == true
       $saved_filter_form = $(this)
       $saved_filter_form.children('input[name^="filter[data]"]').remove()
