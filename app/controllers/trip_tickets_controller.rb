@@ -3,8 +3,8 @@ require 'trip_tickets_filter'
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
   before_filter :compact_array_params, :only => [:create, :update]
-  before_filter :providers_for_lists, :except => [:destroy, :index]
-  before_filter :setup_locations, :except => :index
+  before_filter :providers_for_lists, :except => [:destroy, :index, :rescind]
+  before_filter :setup_locations, :except => [:index, :rescind]
 
   include TripTicketsFilter
 
