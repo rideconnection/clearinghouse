@@ -39,7 +39,7 @@ module TripTicketsHelper
   end
   
   def formatted_activity_line(activity)
-    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize} - #{activity.audits.first.try(:user).try(:display_name)}"
+    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize}#{ activity.is_a?(TripResult) ? ' ' + activity.outcome : ''} - #{activity.audits.first.try(:user).try(:display_name)}"
   end
 
   # this converts trip status to a simplified snake-cased form in a consistent way
