@@ -9,7 +9,7 @@
           $(this).find('a')[0].click();
         });
       });
-      $('.content-frame .activity-list').delegate('a', 'click', function(event){
+      $('.content-frame').on('click', '.activity-list a', function(event){
         event.preventDefault();
         $this = $(this);
         if ($this.data('activity-type') == 'trip_result') {
