@@ -53,7 +53,10 @@ class window.TripTicketsMap
   locateAddress: (address, setter, lastAddressFetched = false) ->
     geocoder = new google.maps.Geocoder()
     geocoder.geocode address, (results, status) =>
+      console.log "Looking for:", address
+      console.log "Found:", results
       if status == google.maps.GeocoderStatus.OK
+        console.log "Returning:", results[0]
         setter results[0]
       else
         alert("Unable to locate address for the following reason: " + status);
