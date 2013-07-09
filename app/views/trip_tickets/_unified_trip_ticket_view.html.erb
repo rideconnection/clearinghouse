@@ -48,8 +48,8 @@
         $(document).ready(function(){
           myMap = new TripTicketsMap;
           myMap.init(
-            {address: '<%= j trip_ticket.pick_up_location.try(:address_city_and_zip, ', ') %>'}, 
-            {address: '<%= j trip_ticket.drop_off_location.try(:address_city_and_zip, ', ') %>'}
+            {address: '<%= j trip_ticket.pick_up_location.try(:address_city_state_and_zip, ', ') %>'}, 
+            {address: '<%= j trip_ticket.drop_off_location.try(:address_city_state_and_zip, ', ') %>'}
           );
         });
       <% end %>

@@ -9,4 +9,8 @@ class Location < ActiveRecord::Base
   def address_city_and_zip(separator = "\n")
     [address_1, address_2, [city, zip].reject(&:blank?).map(&:strip).join(' ')].reject(&:blank?).map(&:strip).join(separator)
   end
+  
+  def address_city_state_and_zip(separator = "\n")
+    [address_1, address_2, city, [state, zip].reject(&:blank?).map(&:strip).join(' ')].reject(&:blank?).map(&:strip).join(separator)
+  end
 end
