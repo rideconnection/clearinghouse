@@ -41,8 +41,19 @@
       <li><!--img src="/assets/icon04.png" width="7" height="23" alt="" /--></li>
       <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
     </ul>
-    <div class="image-holder">
-      <%= image_tag 'img01.png', width: 275, height: 201, alt: 'new' %>
+    <div class="image-holder" style="width: 275px; height: 201px">
+      <div id="map-canvas" style="width: 100%; height: 100%"></div>
+      <%= javascript_tag do %>
+        var myMap;
+        $(document).ready(function(){
+          myMap = new TripTicketsMap;
+          myMap.init(
+            {address: '<%= j trip_ticket.pick_up_location.try(:address_city_and_zip, ', ') %>'}, 
+            {address: '<%= j trip_ticket.drop_off_location.try(:address_city_and_zip, ', ') %>'}
+          );
+        });
+      <% end %>
+      <%#= image_tag 'img01.png', width: 275, height: 201, alt: 'new' %>
     </div>
     <ul class="dates-list">
       <% unless trip_ticket.requested_pickup_time.blank? %>
