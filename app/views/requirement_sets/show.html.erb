@@ -1,0 +1,23 @@
+<div class="padded">
+  <header>
+    <h2>Eligibility Requirements Group</h2>
+  </header>
+
+  <p id="notice"><%= notice %></p>
+
+  <section class="service_detail" style="margin-left: 1em">
+    <h4 style="margin-bottom:0.5em"><%= RequirementSet::BOOLEAN_TYPES.key(@requirement_set.boolean_type) %></h4>
+    <div style="margin-left:1em; margin-top:1em">
+      <% @eligibility_requirements = @requirement_set.eligibility_requirements %>
+      <%= render 'eligibility_requirements/list' %>
+    </div>
+  </section>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Groups', provider_requirement_sets_path(@requirement_set.provider) %></li>
+    <li><%= link_to 'Edit Group', edit_requirement_set_path(@requirement_set) %></li>
+    <li><%= link_to 'Delete Group', @requirement_set, method: :delete, data: { confirm: 'Are you sure?' } %></li>
+  </ul>
+<% end %>

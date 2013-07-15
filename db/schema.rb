@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130624182706) do
+ActiveRecord::Schema.define(:version => 20130713204640) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -40,6 +40,17 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
+  create_table "eligibility_requirements", :force => true do |t|
+    t.integer  "requirement_set_id"
+    t.string   "trip_field"
+    t.string   "comparison_type"
+    t.string   "comparison_value"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  add_index "eligibility_requirements", ["requirement_set_id"], :name => "index_eligibility_requirements_on_requirement_set_id"
+
   create_table "filters", :force => true do |t|
     t.integer  "user_id"
     t.string   "name"
@@ -60,9 +71,9 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.spatial  "position",   :limit => {:no_constraints=>true}
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
 
   create_table "nonces", :force => true do |t|
@@ -129,6 +140,13 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
 
   add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true
 
+  create_table "requirement_sets", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "boolean_type"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "roles", :force => true do |t|
     t.string "name"
   end
@@ -151,12 +169,12 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
+    t.datetime "created_at",                                                    :null => false
+    t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:no_constraints=>true}
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"

@@ -78,6 +78,10 @@
   </section>
 
   <section>
+    <%= render 'requirement_sets/list' %>
+  </section>
+
+  <section>
     <h3><%= @provider.name %> Members</h3>
     <%= render 'users/list', :users => @provider.users %>
     <br/>

@@ -20,6 +20,7 @@ Clearinghouse::Application.routes.draw do
       post 'reset_keys'
     end
     resources :services, :except => [ :index, :show, :destroy ]
+    resources :requirement_sets, shallow: true
   end
 
   resources :trip_claims, :only => :dashboard

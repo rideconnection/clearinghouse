@@ -3,3 +3,8 @@
 
 en:
   hello: "Hello world"
+  helpers:
+    submit:
+      requirement_set:
+        create: "Create Eligibility Requirements Group"
+        update: "Update Eligibility Requirements Group"

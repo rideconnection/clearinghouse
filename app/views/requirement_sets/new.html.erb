@@ -1,0 +1,16 @@
+<div class="padded">
+  <header>
+    <h2>New Eligibility Requirements Group</h2>
+  </header>
+
+  <section class="form-holder">
+    <%= render 'form' %>
+  </section>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to "Provider Details", provider_path(@provider) %></li>
+    <li><%= link_to 'All Groups', provider_requirement_sets_path(@provider) %></li>
+  </ul>
+<% end %>

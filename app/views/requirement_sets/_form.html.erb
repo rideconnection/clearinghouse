@@ -1,0 +1,54 @@
+<%= form_for([@provider, @requirement_set]) do |f| %>
+  <% if @requirement_set.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@requirement_set.errors.count, "error") %> prohibited this requirement_set from being saved:</h2>
+
+      <ul>
+      <% @requirement_set.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :boolean_type, 'Comparison Type' %>
+    <%= f.select :boolean_type, RequirementSet::BOOLEAN_TYPES %>
+  </div>
+
+  <fieldset>
+    <legend>Eligibility Requirements</legend>
+    <% @eligibility_requirements = @requirement_set.eligibility_requirements %>
+    <%#= render 'eligibility_requirements/list' %>
+
+    <table id="eligibility-requirements-list" cellpadding="2" style="margin:8px 0">
+      <thead>
+        <tr>
+          <th>Trip Ticket Field</th>
+          <th>Comparison</th>
+          <th>Value</th>
+          <th>Delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @requirement_set.eligibility_requirements.build %>
+        <%= f.fields_for :eligibility_requirements do |er_fields| %>
+        <tr>
+          <td><%= er_fields.select :trip_field, EligibilityRequirement::TRIP_TICKET_FIELDS %></td>
+          <td><%= er_fields.select :comparison_type, EligibilityRequirement::COMPARISON_TYPES %></td>
+          <td><%= er_fields.text_field :comparison_value %></td>
+          <td style="text-align:center"><%= er_fields.check_box :_destroy, style: "float:none;width:auto;margin:0" %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= link_to 'Add Row', nil, id: 'eligibility-requirements-list-add' %>
+  </fieldset>
+
+  <div class="buttons-holder">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :id => "eligibility-requirements-list-submit", :class => "button" %>
+  </div>
+<% end %>
