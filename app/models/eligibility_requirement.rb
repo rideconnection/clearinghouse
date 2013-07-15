@@ -19,7 +19,7 @@ class EligibilityRequirement < ActiveRecord::Base
     'customer_primary_language'       => 'Customer Primary Language',
     'trip_notes'                      => 'Trip Notes',
     'trip_purpose_description'        => 'Trip Purpose Description',
-  }.merge(TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.stringify_keys)
+  }.merge(TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.inject({}) { |h, (k, v)| h[k.to_s] = v.pluralize; h })
 
   validates :trip_field, :presence => true, :inclusion => { :in => TRIP_TICKET_FIELDS.keys }
   validates :comparison_type, :presence => true, :inclusion => { :in => COMPARISON_TYPES.keys }
