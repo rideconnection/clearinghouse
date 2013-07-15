@@ -14,14 +14,11 @@ class EligibilityRequirement < ActiveRecord::Base
 
   TRIP_TICKET_FIELDS = {
     'customer_dob'                    =>'Customer Age',
-    'customer_ethnicity'              => 'Customer Ethnicity',
     'customer_impairment_description' => 'Customer Impairment Description',
     'customer_notes'                  => 'Customer Notes',
     'customer_primary_language'       => 'Customer Primary Language',
-    'customer_race'                   => 'Customer Race',
     'trip_notes'                      => 'Trip Notes',
     'trip_purpose_description'        => 'Trip Purpose Description',
-    'customer_identifiers'            => 'Customer Identifiers'
   }.merge(TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.stringify_keys)
 
   validates :trip_field, :presence => true, :inclusion => { :in => TRIP_TICKET_FIELDS.keys }
@@ -54,6 +51,6 @@ class EligibilityRequirement < ActiveRecord::Base
   protected
 
   def comparison_type_valid_for_field
-    errors[:comparison_type] << "not valid for selected trip ticket field #{TRIP_TICKET_FIELDS[trip_field]}" if !self.class.comparisons_for_field(trip_field).include?(comparison_type)
+    errors[:comparison_type] << "not valid for trip ticket field #{TRIP_TICKET_FIELDS[trip_field]}" if !self.class.comparisons_for_field(trip_field).include?(comparison_type)
   end
 end
