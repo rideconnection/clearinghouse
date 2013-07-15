@@ -7,8 +7,8 @@
   <tbody>
     <% @eligibility_requirements.each do |er| %>
       <tr>
-        <td><%= EligibilityRequirement::TRIP_TICKET_FIELDS.key(er.trip_field) %></td>
-        <td><%= EligibilityRequirement::COMPARISON_TYPES.key(er.comparison_type) %></td>
+        <td><%= EligibilityRequirement::TRIP_TICKET_FIELDS[er.trip_field] %></td>
+        <td><%= EligibilityRequirement::COMPARISON_TYPES[er.comparison_type] %></td>
         <td><%= er.comparison_value %></td>
       </tr>
     <% end %>

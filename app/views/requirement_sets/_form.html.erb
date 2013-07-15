@@ -13,14 +13,11 @@
 
   <div class="field">
     <%= f.label :boolean_type, 'Comparison Type' %>
-    <%= f.select :boolean_type, RequirementSet::BOOLEAN_TYPES %>
+    <%= f.select :boolean_type, RequirementSet::BOOLEAN_TYPES.invert %>
   </div>
 
   <fieldset>
     <legend>Eligibility Requirements</legend>
-    <% @eligibility_requirements = @requirement_set.eligibility_requirements %>
-    <%#= render 'eligibility_requirements/list' %>
-
     <table id="eligibility-requirements-list" cellpadding="2" style="margin:8px 0">
       <thead>
         <tr>
@@ -34,8 +31,8 @@
         <% @requirement_set.eligibility_requirements.build %>
         <%= f.fields_for :eligibility_requirements do |er_fields| %>
         <tr>
-          <td><%= er_fields.select :trip_field, EligibilityRequirement::TRIP_TICKET_FIELDS %></td>
-          <td><%= er_fields.select :comparison_type, EligibilityRequirement::COMPARISON_TYPES %></td>
+          <td><%= er_fields.select :trip_field, EligibilityRequirement::TRIP_TICKET_FIELDS.invert %></td>
+          <td><%= er_fields.select :comparison_type, EligibilityRequirement::COMPARISON_TYPES.invert %></td>
           <td><%= er_fields.text_field :comparison_value %></td>
           <td style="text-align:center"><%= er_fields.check_box :_destroy, style: "float:none;width:auto;margin:0" %></td>
         </tr>

@@ -7,9 +7,9 @@ class RequirementSet < ActiveRecord::Base
   attr_accessible :boolean_type, :eligibility_requirements_attributes
 
   BOOLEAN_TYPES = {
-    'Customer must match all of the following:' => 'and',
-    'Customer must match any of the following:' => 'or'
+    'and' => 'Customer must match all of the following:',
+    'or' => 'Customer must match any of the following:'
   }
 
-  validates :boolean_type, :presence => true, :inclusion => { :in => BOOLEAN_TYPES.values }
+  validates :boolean_type, :presence => true, :inclusion => { :in => BOOLEAN_TYPES.keys }
 end

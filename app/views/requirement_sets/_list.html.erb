@@ -3,7 +3,7 @@
   <% @provider.requirement_sets.each_with_index do |rs, i| %>
     <section class="service_detail" style="margin-left: 1em">
       <%= '<h4 style="margin-bottom:0.5em">OR</h4>'.html_safe if i > 0 %>
-      <h4 style="margin-bottom:0.5em"><%= RequirementSet::BOOLEAN_TYPES.key(rs.boolean_type) %></h4>
+      <h4 style="margin-bottom:0.5em"><%= RequirementSet::BOOLEAN_TYPES[rs.boolean_type] %></h4>
       <%= link_to 'Edit Requirements Group', edit_requirement_set_path(rs) %>
       <div style="margin-left:1em; margin-top:1em">
         <% @eligibility_requirements = rs.eligibility_requirements %>
