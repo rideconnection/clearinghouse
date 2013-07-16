@@ -11,6 +11,6 @@
 <% content_for :sidebar do %>
   <ul class="side-nav">
     <li><%= link_to "Provider Details", provider_path(@mobility_accomodation.provider) + '#mobility-accomodations' %></li>
-    <li><%= link_to 'Delete Mobility Accomodation', @mobility_accomodation, method: :delete, data: { confirm: 'Are you sure?' } %></li>
+    <li><%= link_to 'Delete Accomodation', @mobility_accomodation, method: :delete, data: { confirm: 'Are you sure?' } %></li>
   </ul>
 <% end %>

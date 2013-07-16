@@ -10,8 +10,8 @@
       <% @provider.mobility_accomodations.each do |ms| %>
         <tr>
           <td><%= ms.mobility_impairment %></td>
-          <td><%= link_to 'Edit Service', edit_mobility_accomodation_path(ms) %></td>
-          <td><%= link_to 'Delete Service', ms, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+          <td><%= link_to 'Edit Accomodation', edit_mobility_accomodation_path(ms) %></td>
+          <td><%= link_to 'Delete Accomodation', ms, method: :delete, data: { confirm: 'Are you sure?' } %></td>
         </tr>
       <% end %>
     </tbody>
