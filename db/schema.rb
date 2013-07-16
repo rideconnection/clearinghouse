@@ -76,14 +76,14 @@ ActiveRecord::Schema.define(:version => 20130716043120) do
     t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
 
-  create_table "mobility_accomodations", :force => true do |t|
+  create_table "mobility_accommodations", :force => true do |t|
     t.integer  "provider_id"
     t.string   "mobility_impairment"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
   end
 
-  add_index "mobility_accomodations", ["provider_id"], :name => "index_mobility_accomodations_on_provider_id"
+  add_index "mobility_accommodations", ["provider_id"], :name => "index_mobility_accommodations_on_provider_id"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"

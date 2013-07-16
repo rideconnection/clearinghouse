@@ -1,6 +1,6 @@
 <div class="padded">
   <header>
-    <h2>Edit Mobility Accomodation</h2>
+    <h2>Edit Mobility Accommodation</h2>
   </header>
 
   <section class="form-holder">
@@ -10,7 +10,7 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to "Provider Details", provider_path(@mobility_accomodation.provider) + '#mobility-accomodations' %></li>
-    <li><%= link_to 'Delete Accomodation', @mobility_accomodation, method: :delete, data: { confirm: 'Are you sure?' } %></li>
+    <li><%= link_to "Provider Details", provider_path(@mobility_accommodation.provider) + '#mobility-accommodations' %></li>
+    <li><%= link_to 'Delete Accommodation', @mobility_accommodation, method: :delete, data: { confirm: 'Are you sure?' } %></li>
   </ul>
 <% end %>

@@ -1,5 +1,5 @@
-<h3><%= @provider.name %> Mobility Accomodations</h3>
-<% if @provider.mobility_accomodations.any? %>
+<h3><%= @provider.name %> Mobility Accommodations</h3>
+<% if @provider.mobility_accommodations.any? %>
   <table class="table table-striped">
     <thead><tr>
       <th>Mobility Impairment</th>
@@ -7,19 +7,19 @@
       <th></th>
     </tr></thead>
     <tbody>
-      <% @provider.mobility_accomodations.each do |ms| %>
+      <% @provider.mobility_accommodations.each do |ms| %>
         <tr>
           <td><%= ms.mobility_impairment %></td>
-          <td><%= link_to 'Edit Accomodation', edit_mobility_accomodation_path(ms) %></td>
-          <td><%= link_to 'Delete Accomodation', ms, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+          <td><%= link_to 'Edit Accommodation', edit_mobility_accommodation_path(ms) %></td>
+          <td><%= link_to 'Delete Accommodation', ms, method: :delete, data: { confirm: 'Are you sure?' } %></td>
         </tr>
       <% end %>
     </tbody>
   </table>
 <% else %>
-  <h4>No mobility accomodations defined</h4>
+  <h4>No mobility accommodations defined</h4>
 <% end %>
 
-<% if can? :create, MobilityAccomodation %>
-  <%= link_to 'Create New Mobility Service', new_provider_mobility_accomodation_path(@provider) %><br/>
+<% if can? :create, MobilityAccommodation %>
+  <%= link_to 'Create New Mobility Service', new_provider_mobility_accommodation_path(@provider) %><br/>
 <% end %>

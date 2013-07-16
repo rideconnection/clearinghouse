@@ -1,10 +1,10 @@
-<%= form_for([@provider, @mobility_accomodation]) do |f| %>
-  <% if @mobility_accomodation.errors.any? %>
+<%= form_for([@provider, @mobility_accommodation]) do |f| %>
+  <% if @mobility_accommodation.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@mobility_accomodation.errors.count, "error") %> prohibited this mobility accomodation from being saved:</h2>
+      <h2><%= pluralize(@mobility_accommodation.errors.count, "error") %> prohibited this mobility accommodation from being saved:</h2>
 
       <ul>
-      <% @mobility_accomodation.errors.full_messages.each do |msg| %>
+      <% @mobility_accommodation.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>

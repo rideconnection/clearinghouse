@@ -21,7 +21,7 @@ Clearinghouse::Application.routes.draw do
     end
     resources :services, :except => [ :index, :show, :destroy ]
     resources :requirement_sets, shallow: true
-    resources :mobility_accomodations, shallow: true
+    resources :mobility_accommodations, shallow: true
   end
 
   resources :trip_claims, :only => :dashboard
