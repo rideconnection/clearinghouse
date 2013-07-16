@@ -1,5 +1,6 @@
 class ProvidersController < ApplicationController
   load_and_authorize_resource
+  before_filter :admins_only, :only => :index
 
   def index
     respond_to do |format|

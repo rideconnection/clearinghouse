@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   load_and_authorize_resource
+  before_filter :admins_only, :only => :index
 
   # GET /users
   # GET /users.json
