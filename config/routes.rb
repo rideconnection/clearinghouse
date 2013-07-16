@@ -53,5 +53,5 @@ Clearinghouse::Application.routes.draw do
   match 'admin', :controller => :admin, :action => :index
   match 'reports', :controller => :reports, :action => :index
 
-  root :to => 'home#dashboard'
+  root :to => 'trip_tickets#index'
 end

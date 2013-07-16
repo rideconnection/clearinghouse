@@ -29,15 +29,13 @@
   <nav class="nav-holder">
     <h1 class="logo"><%= link_to "Ride Connection", root_path %></h1>
     <ul id="nav">
-      <li><%= main_nav_helper 'Dashboard', root_path %></li>
       <li><%= main_nav_helper 'Tickets', trip_tickets_path %></li>
       <li><%= main_nav_helper 'Open Capacities', open_capacities_path %></li>
-      <li><%= main_nav_helper 'Reports', reports_path %></li>
       <% if current_user and current_user.has_admin_role? %>
-        <li><a href="#">Activities</a></li>
+        <li><%= main_nav_helper 'Reports', reports_path %></li>
         <li class="last"><%= main_nav_helper 'Admin', admin_path %></li>
       <% else %>
-        <li class="last"><a href="#">Activities</a></li>
+        <li class="last"><%= main_nav_helper 'Reports', reports_path %></li>
       <% end %>
     </ul>
   </nav>
