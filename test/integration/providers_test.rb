@@ -28,9 +28,9 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
   end
 
   teardown do
-    Provider.destroy_all
-    ProviderRelationship.destroy_all
-    User.destroy_all
+    # Provider.destroy_all
+    # ProviderRelationship.destroy_all
+    # User.destroy_all
   end
 
   test "provider_admin can create users, triggering an email" do
