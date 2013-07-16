@@ -122,6 +122,7 @@ class Ability
 
       can :manage, RequirementSet, :provider_id => user.provider_id
       can :manage, EligibilityRequirement, :requirement_set => { :provider_id => user.provider_id }
+      can :manage, MobilityAccomodation, :provider_id => user.provider_id
     end
 
     # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with

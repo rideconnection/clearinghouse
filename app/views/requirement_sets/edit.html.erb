@@ -10,7 +10,7 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'All Groups', provider_requirement_sets_path(@requirement_set.provider) %></li>
+    <li><%= link_to 'Provider Details', provider_path(@requirement_set.provider) + '#eligibility-requirements' %></li>
     <li><%= link_to 'Delete Group', @requirement_set, method: :delete, data: { confirm: 'Are you sure?' } %></li>
   </ul>
 <% end %>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130713204640) do
+ActiveRecord::Schema.define(:version => 20130716043120) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -75,6 +75,15 @@ ActiveRecord::Schema.define(:version => 20130713204640) do
     t.datetime "updated_at",                                          :null => false
     t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
+
+  create_table "mobility_accomodations", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "mobility_impairment"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
+
+  add_index "mobility_accomodations", ["provider_id"], :name => "index_mobility_accomodations_on_provider_id"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"
@@ -146,6 +155,8 @@ ActiveRecord::Schema.define(:version => 20130713204640) do
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end
+
+  add_index "requirement_sets", ["provider_id"], :name => "index_requirement_sets_on_provider_id"
 
   create_table "roles", :force => true do |t|
     t.string "name"

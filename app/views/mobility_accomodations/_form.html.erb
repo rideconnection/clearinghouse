@@ -1,0 +1,25 @@
+<%= form_for([@provider, @mobility_accomodation]) do |f| %>
+  <% if @mobility_accomodation.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@mobility_accomodation.errors.count, "error") %> prohibited this mobility accomodation from being saved:</h2>
+
+      <ul>
+      <% @mobility_accomodation.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :comparison_value, 'Mobility Impairment' %>
+    <%= f.text_field :mobility_impairment %>
+  </div>
+
+  <div class="buttons-holder">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :class => "button" %>
+  </div>
+<% end %>

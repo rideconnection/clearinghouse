@@ -12,6 +12,7 @@ class CreateEligibilityRequirementTables < ActiveRecord::Migration
       t.string :comparison_value
       t.timestamps
     end
+    add_index :requirement_sets, :provider_id
     add_index :eligibility_requirements, :requirement_set_id
   end
 end

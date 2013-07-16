@@ -6,6 +6,7 @@ class Provider < ActiveRecord::Base
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
   has_many :requirement_sets
+  has_many :mobility_accomodations
 
   # :address_attributes is needed to support mass-assignment of nested attrs
   attr_accessible :active, :address, :address_attributes, :name,
