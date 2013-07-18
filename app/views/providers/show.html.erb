@@ -58,7 +58,7 @@
       </table>
 
       <% if can? :create, ProviderRelationship.new(:requesting_provider => @provider) %>
-        <%= link_to 'Set Up New Provider Partnership', new_provider_relationship_path(:provider => @provider) %><br/>
+        <%= link_to 'Set Up New Provider Partnership', new_provider_relationship_path(:provider_id => @provider) %><br/>
       <% end %>
     </section>
 
