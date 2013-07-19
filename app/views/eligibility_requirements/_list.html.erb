@@ -5,10 +5,10 @@
     <th style="width:25%">Value</th>
   </tr></thead>
   <tbody>
-    <% @eligibility_requirements.each do |er| %>
+    <% @eligibility_rules.each do |er| %>
       <tr>
-        <td><%= EligibilityRequirement::TRIP_TICKET_FIELDS[er.trip_field] %></td>
-        <td><%= EligibilityRequirement::COMPARISON_TYPES[er.comparison_type] %></td>
+        <td><%= EligibilityRule::TRIP_TICKET_FIELDS[er.trip_field] %></td>
+        <td><%= EligibilityRule::COMPARISON_TYPES[er.comparison_type] %></td>
         <td><%= er.comparison_value %></td>
       </tr>
     <% end %>

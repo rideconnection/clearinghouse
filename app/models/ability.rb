@@ -120,8 +120,8 @@ class Ability
       # Provider admins and above can update trip ticket comments associated with trip tickets belonging to their own provider
       can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
 
-      can :manage, RequirementSet, :provider_id => user.provider_id
-      can :manage, EligibilityRequirement, :requirement_set => { :provider_id => user.provider_id }
+      can :manage, EligibilityRequirement, :provider_id => user.provider_id
+      can :manage, EligibilityRule, :eligibility_requirement => { :provider_id => user.provider_id }
       can :manage, MobilityAccommodation, :provider_id => user.provider_id
     end
 

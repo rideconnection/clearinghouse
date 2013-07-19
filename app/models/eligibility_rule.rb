@@ -1,7 +1,7 @@
-class EligibilityRequirement < ActiveRecord::Base
-  belongs_to :requirement_set
+class EligibilityRule < ActiveRecord::Base
+  belongs_to :eligibility_requirement
 
-  attr_accessible :requirement_set_id, :trip_field, :comparison_type, :comparison_value
+  attr_accessible :eligibility_requirement_id, :trip_field, :comparison_type, :comparison_value
 
   COMPARISON_TYPES = {
     'contain'       => 'must contain',

@@ -1,10 +1,10 @@
-<%= form_for([@provider, @requirement_set]) do |f| %>
-  <% if @requirement_set.errors.any? %>
+<%= form_for([@provider, @eligibility_requirement]) do |f| %>
+  <% if @eligibility_requirement.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@requirement_set.errors.count, "error") %> prohibited this group from being saved:</h2>
+      <h2><%= pluralize(@eligibility_requirement.errors.count, "error") %> prohibited this group from being saved:</h2>
 
       <ul>
-      <% @requirement_set.errors.full_messages.each do |msg| %>
+      <% @eligibility_requirement.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>
@@ -13,7 +13,7 @@
 
   <div class="field">
     <%= f.label :boolean_type, 'Comparison Type' %>
-    <%= f.select :boolean_type, RequirementSet::BOOLEAN_TYPES.invert %>
+    <%= f.select :boolean_type, EligibilityRequirement::BOOLEAN_TYPES.invert %>
   </div>
 
   <fieldset>
@@ -28,11 +28,11 @@
         </tr>
       </thead>
       <tbody>
-        <% @requirement_set.eligibility_requirements.build %>
-        <%= f.fields_for :eligibility_requirements do |er_fields| %>
+        <% @eligibility_requirement.eligibility_rules.build %>
+        <%= f.fields_for :eligibility_rules do |er_fields| %>
         <tr>
-          <td><%= er_fields.select :trip_field, EligibilityRequirement::TRIP_TICKET_FIELDS.invert %></td>
-          <td><%= er_fields.select :comparison_type, EligibilityRequirement::COMPARISON_TYPES.invert %></td>
+          <td><%= er_fields.select :trip_field, EligibilityRule::TRIP_TICKET_FIELDS.invert %></td>
+          <td><%= er_fields.select :comparison_type, EligibilityRule::COMPARISON_TYPES.invert %></td>
           <td><%= er_fields.text_field :comparison_value %></td>
           <td style="text-align:center"><%= er_fields.check_box :_destroy, style: "float:none;width:auto;margin:0" %></td>
         </tr>
