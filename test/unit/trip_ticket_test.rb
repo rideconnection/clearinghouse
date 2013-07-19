@@ -208,27 +208,38 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   describe "filter methods" do
-    it "prevents fuzzy string comparisons from matching blank values" do
-      u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '555')
-      u2 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '')
-    
-      results = TripTicket.filter_by_customer_name('555')
-    
-      assert_includes results, u1
-      refute_includes results, u2
-    end
+    # This was mainly an issue with customer first, middle, and last names, but since we're no longer
+    # using fuzzy search on those fields this special case is difficult to test for. Commenting out
+    # for now.
+    #
+    # it "prevents fuzzy string comparisons from matching blank values" do
+    #   u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '555')
+    #   u2 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :customer_middle_name => '')
+    # 
+    #   results = TripTicket.filter_by_customer_name('555')
+    # 
+    #   assert_includes results, u1
+    #   refute_includes results, u2
+    # end
 
-    it "has a filter_by_customer_name method that matches on a customer's first, middle, and last name" do
-      u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
-      u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob')
-      u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob')
-      u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim')
+    it "has a filter_by_customer_name method that matches on a customer's first and/or last name, but not fuzzily" do
+      u1 = FactoryGirl.create(:trip_ticket, :customer_first_name => 'Bob', :customer_last_name   => 'Jim')
+      u2 = FactoryGirl.create(:trip_ticket, :customer_first_name => 'Jim', :customer_last_name   => 'Bob')
+      u3 = FactoryGirl.create(:trip_ticket, :customer_first_name => 'Dan', :customer_last_name   => 'Jim')
+      u4 = FactoryGirl.create(:trip_ticket, :customer_first_name => 'Dan', :customer_last_name   => 'Kim')
     
-      results = TripTicket.filter_by_customer_name('bob')
+      results = TripTicket.filter_by_customer_name('jim')
     
       assert_includes results, u1
       assert_includes results, u2
       assert_includes results, u3
+      refute_includes results, u4
+    
+      results = TripTicket.filter_by_customer_name('jim bob')
+    
+      refute_includes results, u1
+      assert_includes results, u2
+      refute_includes results, u3
       refute_includes results, u4
     end
 
