@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130713204640) do
+ActiveRecord::Schema.define(:version => 20130716043120) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -40,13 +40,22 @@ ActiveRecord::Schema.define(:version => 20130713204640) do
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
+  create_table "eligibility_requirements", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "boolean_type"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "eligibility_requirements", ["provider_id"], :name => "index_eligibility_requirements_on_provider_id"
+
   create_table "eligibility_rules", :force => true do |t|
     t.integer  "eligibility_requirement_id"
     t.string   "trip_field"
     t.string   "comparison_type"
     t.string   "comparison_value"
-    t.datetime "created_at",         :null => false
-    t.datetime "updated_at",         :null => false
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   add_index "eligibility_rules", ["eligibility_requirement_id"], :name => "index_eligibility_rules_on_eligibility_requirement_id"
@@ -75,6 +84,15 @@ ActiveRecord::Schema.define(:version => 20130713204640) do
     t.datetime "updated_at",                                          :null => false
     t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
+
+  create_table "mobility_accommodations", :force => true do |t|
+    t.integer  "provider_id"
+    t.string   "mobility_impairment"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
+
+  add_index "mobility_accommodations", ["provider_id"], :name => "index_mobility_accommodations_on_provider_id"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"
@@ -139,15 +157,6 @@ ActiveRecord::Schema.define(:version => 20130713204640) do
   end
 
   add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true
-
-  create_table "eligibility_requirements", :force => true do |t|
-    t.integer  "provider_id"
-    t.string   "boolean_type"
-    t.datetime "created_at",   :null => false
-    t.datetime "updated_at",   :null => false
-  end
-
-  add_index "eligibility_requirements", ["provider_id"], :name => "index_eligibility_requirements_on_provider_id"
 
   create_table "roles", :force => true do |t|
     t.string "name"
