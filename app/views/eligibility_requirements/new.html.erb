@@ -10,6 +10,6 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'Provider Details', provider_path(@provider) + '#eligibility-requirements' %></li>
+    <li><%= link_to 'Provider Details', provider_path(@service.provider) + "#service-#{ @service.id }-eligibility-requirements" %></li>
   </ul>
 <% end %>

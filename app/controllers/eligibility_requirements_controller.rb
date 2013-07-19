@@ -1,8 +1,9 @@
 class EligibilityRequirementsController < ApplicationController
-  load_and_authorize_resource :provider
-  load_and_authorize_resource :eligibility_requirement, :through => :provider, :shallow => true
+  load_and_authorize_resource :service, :shallow => true
+  load_and_authorize_resource :eligibility_requirement, :through => :service, :shallow => true
 
   def index
+    @provider = Provider.find(params[:provider_id])
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @eligibility_requirements }
@@ -17,6 +18,7 @@ class EligibilityRequirementsController < ApplicationController
   end
 
   def new
+    @form_path = [ @service.provider, @service, @eligibility_requirement ]
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @eligibility_requirement }
@@ -24,14 +26,17 @@ class EligibilityRequirementsController < ApplicationController
   end
 
   def edit
+    @form_path = @eligibility_requirement
   end
 
   def create
     respond_to do |format|
       if @eligibility_requirement.save
+        @form_path = @eligibility_requirement
         format.html { redirect_to edit_eligibility_requirement_url(@eligibility_requirement), notice: 'Eligibility Requirements Group was successfully created.' }
         format.json { render json: @eligibility_requirement, status: :created, location: @eligibility_requirement }
       else
+        @form_path = [ @service.provider, @service, @eligibility_requirement ]
         format.html { render action: "new" }
         format.json { render json: @eligibility_requirement.errors, status: :unprocessable_entity }
       end
@@ -39,6 +44,7 @@ class EligibilityRequirementsController < ApplicationController
   end
 
   def update
+    @form_path = @eligibility_requirement
     respond_to do |format|
       if @eligibility_requirement.update_attributes(params[:eligibility_requirement])
         format.html { redirect_to edit_eligibility_requirement_url(@eligibility_requirement), notice: 'Eligibility Requirements Group was successfully updated.' }
@@ -53,7 +59,7 @@ class EligibilityRequirementsController < ApplicationController
   def destroy
     @eligibility_requirement.destroy
     respond_to do |format|
-      format.html { redirect_to provider_eligibility_requirements_url(@eligibility_requirement.provider) }
+      format.html { redirect_to provider_path(@eligibility_requirement.service.provider) + "#service-#{ @eligibility_requirement.service.id }-eligibility-requirements" }
       format.json { head :no_content }
     end
   end

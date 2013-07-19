@@ -41,13 +41,13 @@ ActiveRecord::Schema.define(:version => 20130716043120) do
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
   create_table "eligibility_requirements", :force => true do |t|
-    t.integer  "provider_id"
+    t.integer  "service_id"
     t.string   "boolean_type"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
   end
 
-  add_index "eligibility_requirements", ["provider_id"], :name => "index_eligibility_requirements_on_provider_id"
+  add_index "eligibility_requirements", ["service_id"], :name => "index_eligibility_requirements_on_service_id"
 
   create_table "eligibility_rules", :force => true do |t|
     t.integer  "eligibility_requirement_id"
@@ -86,13 +86,13 @@ ActiveRecord::Schema.define(:version => 20130716043120) do
   end
 
   create_table "mobility_accommodations", :force => true do |t|
-    t.integer  "provider_id"
+    t.integer  "service_id"
     t.string   "mobility_impairment"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
   end
 
-  add_index "mobility_accommodations", ["provider_id"], :name => "index_mobility_accommodations_on_provider_id"
+  add_index "mobility_accommodations", ["service_id"], :name => "index_mobility_accommodations_on_service_id"
 
   create_table "nonces", :force => true do |t|
     t.string   "nonce"

@@ -120,9 +120,9 @@ class Ability
       # Provider admins and above can update trip ticket comments associated with trip tickets belonging to their own provider
       can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
 
-      can :manage, EligibilityRequirement, :provider_id => user.provider_id
-      can :manage, EligibilityRule, :eligibility_requirement => { :provider_id => user.provider_id }
-      can :manage, MobilityAccommodation, :provider_id => user.provider_id
+      can :manage, EligibilityRequirement, :service => { :provider_id => user.provider_id }
+      can :manage, EligibilityRule, :eligibility_requirement => { :service => { :provider_id => user.provider_id }}
+      can :manage, MobilityAccommodation, :service => { :provider_id => user.provider_id }
     end
 
     # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with

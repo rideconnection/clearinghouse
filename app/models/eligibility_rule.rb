@@ -40,7 +40,7 @@ class EligibilityRule < ActiveRecord::Base
 
   def self.comparisons_for_field(field_name)
     if field_name == 'customer_dob'
-      [ 'equal', 'not_equal', 'greater_than', 'less_than ']
+      [ 'equal', 'not_equal', 'greater_than', 'less_than']
     elsif TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.with_indifferent_access[field_name].present?
       [ 'contain', 'not_contain', 'equal', 'not_equal' ]
     else

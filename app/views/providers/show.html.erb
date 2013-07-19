@@ -77,14 +77,6 @@
     <% end %>
   </section>
 
-  <section id="eligibility-requirements">
-    <%= render 'eligibility_requirements/list' %>
-  </section>
-
-  <section id="mobility-accommodations">
-    <%= render 'mobility_accommodations/list' %>
-  </section>
-
   <section>
     <h3><%= @provider.name %> Members</h3>
     <%= render 'users/list', :users => @provider.users %>

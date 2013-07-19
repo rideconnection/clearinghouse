@@ -1,4 +1,4 @@
-<%= form_for([@provider, @mobility_accommodation]) do |f| %>
+<%= form_for(@form_path) do |f| %>
   <% if @mobility_accommodation.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@mobility_accommodation.errors.count, "error") %> prohibited this mobility accommodation from being saved:</h2>

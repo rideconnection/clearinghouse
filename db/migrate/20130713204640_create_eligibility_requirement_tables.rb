@@ -1,7 +1,7 @@
 class CreateEligibilityRequirementTables < ActiveRecord::Migration
   def change
     create_table :eligibility_requirements do |t|
-      t.integer :provider_id
+      t.integer :service_id
       t.string :boolean_type
       t.timestamps
     end
@@ -12,7 +12,7 @@ class CreateEligibilityRequirementTables < ActiveRecord::Migration
       t.string :comparison_value
       t.timestamps
     end
-    add_index :eligibility_requirements, :provider_id
+    add_index :eligibility_requirements, :service_id
     add_index :eligibility_rules, :eligibility_requirement_id
   end
 end

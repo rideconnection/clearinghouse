@@ -1,5 +1,6 @@
-<h3><%= @provider.name %> Mobility Accommodations</h3>
-<% if @provider.mobility_accommodations.any? %>
+<% @service = service if defined?(service) %>
+<h3><%= @service.name %> Mobility Accommodations</h3>
+<% if @service.mobility_accommodations.any? %>
   <table class="table table-striped">
     <thead><tr>
       <th>Mobility Impairment</th>
@@ -7,7 +8,7 @@
       <th></th>
     </tr></thead>
     <tbody>
-      <% @provider.mobility_accommodations.each do |ms| %>
+      <% @service.mobility_accommodations.each do |ms| %>
         <tr>
           <td><%= ms.mobility_impairment %></td>
           <td><%= link_to 'Edit Accommodation', edit_mobility_accommodation_path(ms) %></td>
@@ -21,5 +22,5 @@
 <% end %>
 
 <% if can? :create, MobilityAccommodation %>
-  <%= link_to 'Create New Mobility Service', new_provider_mobility_accommodation_path(@provider) %><br/>
+  <%= link_to 'Create New Mobility Service', new_provider_service_mobility_accommodation_path(@service.provider, @service) %><br/>
 <% end %>

@@ -3,6 +3,8 @@ class Service < ActiveRecord::Base
   has_many :open_capacities
   has_many :operating_hours, :class_name => :OperatingHours
   has_one :funding_source
+  has_many :eligibility_requirements
+  has_many :mobility_accommodations
 
   attr_accessible :eligibility, :funding_id, :name, :operating_hours_id,
     :rate, :req_min_age, :req_veteran, :service_area, :provider_id

@@ -27,7 +27,13 @@
     <% end %>
     </table>
     <h4>Rates and Fares</h4>
-    <p><%= service.rate %></p>
+    <p><%= service.rate.presence || 'not defined' %></p>
+    <section id="service-<%= service.id %>-eligibility-requirements">
+      <%= render 'eligibility_requirements/list', :service => service %>
+    </section>
+    <section id="service-<%= service.id %>-mobility-accommodations">
+      <%= render 'mobility_accommodations/list', :service => service %>
+    </section>
   </div>
   <script type="text/javascript" charset="utf-8">
     <%
