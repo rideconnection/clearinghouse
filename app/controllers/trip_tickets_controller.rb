@@ -23,16 +23,16 @@ class TripTicketsController < ApplicationController
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
 
-    unless params[:ignore_mobility_requirements]
-      trips_len = @trip_tickets.length
-      @trip_tickets = provider_mobility_filter(@trip_tickets, current_user.provider)
-      logger.debug "******************** mobility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
-    end
-
-    unless params[:ignore_eligibility_factors]
+    unless params[:trip_ticket_filters].try(:[], :eligibility) == 'include_ineligible'
       trips_len = @trip_tickets.length
       @trip_tickets = provider_eligibility_filter(@trip_tickets, current_user.provider)
-      logger.debug "******************** eligibility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
+      logger.debug "*** eligibility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
+    end
+
+    unless params[:trip_ticket_filters].try(:[], :mobility) == 'include_unaccommodated'
+      trips_len = @trip_tickets.length
+      @trip_tickets = provider_mobility_filter(@trip_tickets, current_user.provider)
+      logger.debug "*** mobility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
     end
 
     massage_trip_ticket_trip_time_filter_values_for_form

@@ -54,15 +54,11 @@
     </div>
 
     <div class="field">
-      <%= select_tag 'trip_ticket_filters[rescinded]', options_for_select([["Hide rescinded (default)", :exclude_rescinded], ["Show rescinded", :include_rescinded], ["Only rescinded", :only_rescinded]], params[:trip_ticket_filters].try(:[], :rescinded)), :id => :trip_ticket_filters_rescinded, :prompt => "Rescinded Trip Tickets", :class => "form-input" %>
+      <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :id => :trip_ticket_filters_claim_status, :prompt => "Claim Status:", :class => "form-input" %>
     </div>
 
     <div class="field">
-      <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :id => :trip_ticket_filters_claim_status, :prompt => "Claim Status", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :prompt => "Scheduling Priority", :id => :trip_ticket_filters_scheduling_priority, :class => "form-input" %>
+      <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :prompt => "Scheduling Priority:", :id => :trip_ticket_filters_scheduling_priority, :class => "form-input" %>
     </div>
 
     <div class="field">
@@ -75,6 +71,25 @@
       <%= label_tag :trip_ticket_filters_trip_time_start, "Trip Time:" %><br>
       <%= text_field_tag 'trip_ticket_filters[trip_time][start]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start), :id => :trip_ticket_filters_trip_time_start, :placeholder => "From: yyyy-mm-dd hh:mm am", :class => "form-input" %><br>
       <%= text_field_tag 'trip_ticket_filters[trip_time][end]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end), :id => :trip_ticket_filters_trip_time_end, :placeholder => "To: yyyy-mm-dd hh:mm am", :class => "form-input" %>
+    </div>
+
+    <% auto_open = params[:trip_ticket_filters].try(:[], :rescinded).present? ||
+                   params[:trip_ticket_filters].try(:[], :eligibility).present? ||
+                   params[:trip_ticket_filters].try(:[], :mobility).present?
+    %>
+    <div class="field details-box<%= ' active' if auto_open %>">
+      <a class="opener" href="#">Advanced</a>
+      <div class="slide">
+        <div class="field">
+          <%= select_tag 'trip_ticket_filters[rescinded]', options_for_select([["Hide rescinded (default)", :exclude_rescinded], ["Show rescinded", :include_rescinded], ["Only rescinded", :only_rescinded]], params[:trip_ticket_filters].try(:[], :rescinded)), :id => :trip_ticket_filters_rescinded, :prompt => "Rescinded Trip Tickets:", :class => "form-input" %>
+        </div>
+        <div class="field">
+          <%= select_tag 'trip_ticket_filters[eligibility]', options_for_select([["Show only eligible trips (default)", :only_eligible], ["Include ineligible trips", :include_ineligible]], params[:trip_ticket_filters].try(:[], :eligibility)), :id => :trip_ticket_filters_eligibility, :prompt => "Eligibility Factors:", :class => "form-input" %>
+        </div>
+        <div class="field">
+          <%= select_tag 'trip_ticket_filters[mobility]', options_for_select([["Show only accommodated impairments (default)", :only_accommodated], ["Include unaccommodated impairments", :include_unaccommodated]], params[:trip_ticket_filters].try(:[], :mobility)), :id => :trip_ticket_filters_mobility, :prompt => "Mobility Requirements:", :class => "form-input" %>
+        </div>
+      </div>
     </div>
 
     <div class="buttons-holder">
