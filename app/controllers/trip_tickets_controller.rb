@@ -1,4 +1,6 @@
 require 'trip_tickets_filter'
+require 'mobility_filter'
+require 'eligibility_filter'
 
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
@@ -7,6 +9,8 @@ class TripTicketsController < ApplicationController
   before_filter :setup_locations, :except => [:index, :rescind]
 
   include TripTicketsFilter
+  include MobilityFilter
+  include EligibilityFilter
 
   helper_method :trip_ticket_filters_present?
 
@@ -18,6 +22,19 @@ class TripTicketsController < ApplicationController
 
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
+
+    unless params[:ignore_mobility_requirements]
+      trips_len = @trip_tickets.length
+      @trip_tickets = provider_mobility_filter(@trip_tickets, current_user.provider)
+      logger.debug "******************** mobility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
+    end
+
+    unless params[:ignore_eligibility_factors]
+      trips_len = @trip_tickets.length
+      @trip_tickets = provider_eligibility_filter(@trip_tickets, current_user.provider)
+      logger.debug "******************** eligibility filter reduced trip tickets from #{trips_len} to #{@trip_tickets.length}"
+    end
+
     massage_trip_ticket_trip_time_filter_values_for_form
 
     respond_to do |format|

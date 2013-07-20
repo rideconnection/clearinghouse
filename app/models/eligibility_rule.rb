@@ -26,18 +26,6 @@ class EligibilityRule < ActiveRecord::Base
   validates :comparison_value, :presence => true
   validate :comparison_type_valid_for_field
 
-  def sql_condition
-    # age is special
-    # array fields need special array field syntax
-    # regular fields use normal SQL comparison syntax
-    case trip_field
-      when 'customer_dob'
-        ''
-      else
-        ''
-    end
-  end
-
   def self.comparisons_for_field(field_name)
     if field_name == 'customer_dob'
       [ 'equal', 'not_equal', 'greater_than', 'less_than']
