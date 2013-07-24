@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130716043120) do
+ActiveRecord::Schema.define(:version => 20130724190258) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -186,6 +186,7 @@ ActiveRecord::Schema.define(:version => 20130716043120) do
     t.text     "rate"
     t.hstore   "eligibility"
     t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.string   "service_area_type"
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"

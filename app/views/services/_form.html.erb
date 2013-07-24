@@ -31,7 +31,14 @@
       </div>
     </div>
   </fieldset>
-  
+
+  <fieldset>
+    <legend>Trip Ticket Filtering</legend>
+    <div class="field">
+    <%= f.select :service_area_type, Service::SERVICE_AREA_TYPES.invert %>
+    </div>
+  </fieldset>
+
   <fieldset>
     <legend>Operating Hours</legend>
     <table style="border-collapse: collapse">
@@ -87,8 +94,8 @@
   </fieldset>
 
   <fieldset>
-    <legend>Eligibility and Funding</legend>
-    <p><strong>TBD</strong></p>
+    <legend>Funding</legend>
+    <p><em>TBD</em></p>
   </fieldset>
 
   <fieldset>

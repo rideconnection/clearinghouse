@@ -5,7 +5,22 @@ module EligibilityFilter
     collection ||= TripTicket.all
     query_str = ""
     query_params = []
+    service_area_query = ""
+    service_area_ignore = false
+
     provider.services.each do |service|
+      # Service area filtering
+      unless service_area_ignore
+        new_sql = service_area_filter(service, provider)
+        if new_sql.present?
+          service_area_query << " OR " if service_area_query.present?
+          service_area_query << new_sql
+        else
+          # this service ignores service area, so don't filter on service area at all
+          service_area_ignore = true
+        end
+      end
+      # Eligibility requirements filtering
       service.eligibility_requirements.each do |requirement|
         new_sql, new_params = eligibility_requirement_filter(requirement)
         if new_sql.present?
@@ -15,7 +30,42 @@ module EligibilityFilter
         end
       end
     end
-    query_str.blank? ? collection : collection.where(query_str, *query_params)
+    collection = add_service_area_filter(collection, service_area_query) unless service_area_ignore
+    collection = collection.where(query_str, *query_params) if query_str.present?
+    collection
+  end
+
+  def service_area_filter(service, provider)
+    pickup_query = '"((pickup"."position" IS NULL) OR EXISTS (' +
+      'SELECT 1 FROM "services" ' +
+        'WHERE (("services"."provider_id" = '+provider.id+') ' +
+          'AND ST_Contains("services"."service_area", "pickup"."position"))))'
+
+    dropoff_query = '(("dropoff"."position" IS NULL) OR EXISTS (' +
+      'SELECT 1 FROM "services" ' +
+        'WHERE (("services"."provider_id" = '+provider.id+') ' +
+          'AND ST_Contains("services"."service_area", "dropoff"."position"))))'
+
+    query = case service.service_area_type.to_s
+      when 'pickup'
+        pickup_query
+      when 'dropoff'
+        dropoff_query
+      when 'both'
+        "(#{pickup_query} AND #{dropoff_query})"
+      else
+        nil
+    end
+  end
+
+  def add_service_area_filter(collection, query_str)
+    if query_str.present?
+      collection = collection
+        .joins('LEFT JOIN "locations" AS "pickup" ON "pickup"."id" = "trip_tickets"."pick_up_location_id"')
+        .joins('LEFT JOIN "locations" AS "dropoff" ON "dropoff"."id" = "trip_tickets"."drop_off_location_id"')
+        .where(query_str)
+    end
+    collection
   end
 
   def eligibility_requirement_filter(requirement)
