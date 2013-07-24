@@ -8,6 +8,8 @@
     <h4>Service Area</h4>
     <div id="map-<%= service.id %>" class="map-view"></div>
     <br/>
+    <h4>Trip Ticket Filtering</h4>
+    <p><%= Service::SERVICE_AREA_TYPES[service.service_area_type.presence || 'none'] %></p>
     <h4>Hours</h4>
     <table class="table table-striped">
     <% service.operating_hours.each do |h| %>

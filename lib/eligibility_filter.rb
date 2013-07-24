@@ -38,12 +38,12 @@ module EligibilityFilter
   def service_area_filter(service, provider)
     pickup_query = '"((pickup"."position" IS NULL) OR EXISTS (' +
       'SELECT 1 FROM "services" ' +
-        'WHERE (("services"."provider_id" = '+provider.id+') ' +
+        'WHERE (("services"."provider_id" = ' + provider.id.to_s + ') ' +
           'AND ST_Contains("services"."service_area", "pickup"."position"))))'
 
     dropoff_query = '(("dropoff"."position" IS NULL) OR EXISTS (' +
       'SELECT 1 FROM "services" ' +
-        'WHERE (("services"."provider_id" = '+provider.id+') ' +
+        'WHERE (("services"."provider_id" = ' + provider.id.to_s + ') ' +
           'AND ST_Contains("services"."service_area", "dropoff"."position"))))'
 
     query = case service.service_area_type.to_s
