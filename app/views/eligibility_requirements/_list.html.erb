@@ -1,0 +1,22 @@
+<% @service = service if defined?(service) %>
+<h3><%= @service.name %> Eligibility Requirements</h3>
+<% if @service.eligibility_requirements.any? %>
+  <% @service.eligibility_requirements.each_with_index do |rs, i| %>
+    <section style="margin-left: 1em">
+      <%= '<h4 style="margin-bottom:0.5em">OR</h4>'.html_safe if i > 0 %>
+      <h4 style="margin-bottom:0.5em"><%= EligibilityRequirement::BOOLEAN_TYPES[rs.boolean_type] %></h4>
+      <%= link_to 'Edit Requirements Group', edit_eligibility_requirement_path(rs) %>
+      <div style="margin-left:1em; margin-top:1em">
+        <% @eligibility_rules = rs.eligibility_rules %>
+        <%= render 'eligibility_rules/list' %>
+      </div>
+    </section>
+  <% end %>
+<% else %>
+  <div style="margin-left: 1em">
+    <h4>General public (no eligibility requirements)</h4>
+  </div>
+<% end %>
+<% if can? :create, EligibilityRequirement %>
+  <%= link_to 'Create New Eligibility Requirements Group', new_provider_service_eligibility_requirement_path(@service.provider, @service) %><br/>
+<% end %>

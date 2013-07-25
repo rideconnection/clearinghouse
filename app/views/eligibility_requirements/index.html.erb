@@ -1,0 +1,11 @@
+<div class="padded">
+  <section>
+    <%= render 'list' %>
+  </section>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Provider Details', provider_path(@provider) %></li>
+  </ul>
+<% end %>

@@ -238,10 +238,28 @@ fieldset {
 
 /* Specific forms */
 
-.form-filter .field {
-  padding-bottom: 12px;
-}
+.form-filter {
+  .field {
+    padding-bottom: 12px;
+  }
 
+  .details-box {
+    .opener {
+      background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+      font-size:14px;
+      line-height:16px;
+      padding:0 0 0 18px;
+    }
+
+    &.active .opener {
+      background-position:-1px -86px;
+    }
+
+    .slide {
+      padding: 12px 0;
+    }
+  }
+}
 
 /*
 .form-update {
