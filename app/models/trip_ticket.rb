@@ -269,8 +269,12 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  def activities
-    (trip_claims(true).all + trip_ticket_comments(true).all + Array(trip_result(true))).compact.sort_by(&:created_at) rescue []
+  def activities_accessible_by(ability)
+    (
+      trip_claims.accessible_by(ability).all + 
+      trip_ticket_comments.accessible_by(ability).all + 
+      Array(trip_result.present? && ability.can?(:read, trip_result) ? trip_result : nil)
+    ).compact.sort_by(&:created_at)
   end
 
   protected
