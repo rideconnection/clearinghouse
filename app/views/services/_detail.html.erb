@@ -8,6 +8,8 @@
     <h4>Service Area</h4>
     <div id="map-<%= service.id %>" class="map-view"></div>
     <br/>
+    <h4>Service Area Eligibility</h4>
+    <p><%= Service::SERVICE_AREA_TYPES[service.service_area_type.presence || 'none'] %></p>
     <h4>Hours</h4>
     <table class="table table-striped">
     <% service.operating_hours.each do |h| %>
@@ -27,7 +29,13 @@
     <% end %>
     </table>
     <h4>Rates and Fares</h4>
-    <p><%= service.rate %></p>
+    <p><%= service.rate.presence || 'not defined' %></p>
+    <section id="service-<%= service.id %>-eligibility-requirements">
+      <%= render 'eligibility_requirements/list', :service => service %>
+    </section>
+    <section id="service-<%= service.id %>-mobility-accommodations">
+      <%= render 'mobility_accommodations/list', :service => service %>
+    </section>
   </div>
   <script type="text/javascript" charset="utf-8">
     <%

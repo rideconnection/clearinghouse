@@ -1,0 +1,16 @@
+<table class="table table-striped">
+  <thead><tr>
+    <th style="width:25%">Trip Ticket Field</th>
+    <th style="width:25%">Comparison</th>
+    <th style="width:25%">Value</th>
+  </tr></thead>
+  <tbody>
+    <% @eligibility_rules.each do |er| %>
+      <tr>
+        <td><%= EligibilityRule::TRIP_TICKET_FIELDS[er.trip_field] %></td>
+        <td><%= EligibilityRule::COMPARISON_TYPES[er.comparison_type] %></td>
+        <td><%= er.comparison_value %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -5,7 +5,7 @@ class Provider < ActiveRecord::Base
   belongs_to :address, :class_name => :Location, :validate => true, :dependent => :destroy
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
-  
+
   # :address_attributes is needed to support mass-assignment of nested attrs
   attr_accessible :active, :address, :address_attributes, :name,
                   :primary_contact_email
