@@ -22,7 +22,8 @@ module MobilityFilter
       return nil, []
     else
       # does case-insensitive array search by converting to text, applying lowercase, then converting back to an array
-      return "(lower(customer_mobility_impairments::text)::text[] <@ ARRAY[?])", [ accommodations.map {|s| "'#{s.downcase}'" }.join(',') ]
+      question_marks = (['?'] * accommodations.length).join(',')
+      return "(lower(customer_mobility_impairments::text)::text[] <@ ARRAY[#{ question_marks }])", accommodations.map {|s| s.downcase }
     end
   end
 end

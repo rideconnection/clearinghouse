@@ -37,4 +37,12 @@ class ActiveSupport::TestCase
     obj.errors[attr].must_be_empty
   end
 
+  # for debugging Rack::Test cookies
+
+  def rack_test_cookies
+    rack_test_driver = Capybara.current_session.driver
+    cookie_jar = rack_test_driver.browser.current_session.instance_variable_get(:@rack_mock_session).cookie_jar
+    #puts "Current cookies: #{cookie_jar.instance_variable_get(:@cookies).map(&:inspect).join("\n")}"
+    cookie_jar.instance_variable_get(:@cookies)
+  end
 end
