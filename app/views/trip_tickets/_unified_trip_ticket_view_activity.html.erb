@@ -1,3 +1,3 @@
 <li>
-  <%= link_to formatted_activity_line(activity), activity.is_a?(TripResult) ? trip_ticket_path(activity.trip_ticket) + '#trip_ticket_results' : [activity.trip_ticket, activity], data: {:"activity-type" => activity.class.name.underscore} %>
+  <%= link_to formatted_activity_line(activity), activity.is_a?(TripResult) ? trip_ticket_path(activity.trip_ticket) + '/trip_result' : [activity.trip_ticket, activity], data: {:"activity-type" => activity.class.name.underscore} %>
 </li>

@@ -4,6 +4,7 @@
 
 class window.TripTicketsMap
   map = null
+  marker = null
   mapOptions =
     zoom: 8
     mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -21,7 +22,9 @@ class window.TripTicketsMap
     @locateAddress(dropOffLocationAddress, @setDropOffLocation, true)
   
   showTwoPoints: ->
-    if pickUpLocation? and dropOffLocation?    
+    console.log "pickUpLocation", pickUpLocation
+    console.log "dropOffLocation", dropOffLocation
+    if pickUpLocation? and dropOffLocation?
       mapOptions.center = new google.maps.LatLng(
         (pickUpLocation.geometry.location.lat()+dropOffLocation.geometry.location.lat())/2,
         (pickUpLocation.geometry.location.lng()+dropOffLocation.geometry.location.lng())/2
@@ -43,11 +46,13 @@ class window.TripTicketsMap
     else 
       if pickUpLocation?
         mapOptions.center = pickUpLocation.geometry.location
+        @showMap()
+        @setMarker pickUpLocation
       else if dropOffLocation?
         mapOptions.center = dropOffLocation.geometry.location
-      
-      @showMap()
-    
+        @showMap()
+        @setMarker dropOffLocation
+        
     return @map
   
   locateAddress: (address, setter, lastAddressFetched = false) ->
@@ -59,13 +64,22 @@ class window.TripTicketsMap
         console.log "Returning:", results[0]
         setter results[0]
       else
-        alert("Unable to locate address for the following reason: " + status);
+        console.log "Unable to locate address", status
         setter null
         
       @showTwoPoints() if lastAddressFetched
   
   showMap: ->
+    console.log mapOptions
     map = new google.maps.Map $("#map-canvas")[0], mapOptions
+    
+  setMarker: (position) ->
+    console.log "setMarker", position
+    marker = new google.maps.Marker({
+      map: map,
+      position: position.geometry.location,
+      title: position.formatted_address
+    });
 
 $ ->
   dirtyFilterForm = false

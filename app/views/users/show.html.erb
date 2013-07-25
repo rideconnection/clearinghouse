@@ -28,7 +28,9 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'All Users', users_path %></li>
+    <% if current_user.has_any_role?([:site_admin, :provider_admin]) %>
+      <li><%= link_to 'All Users', users_path %></li>
+    <% end %>
     <% if can? :edit, @user %>
       <li><%= link_to 'Edit User', edit_user_path(@user) %></li>
     <% end %>

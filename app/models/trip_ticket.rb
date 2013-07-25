@@ -283,13 +283,17 @@ class TripTicket < ActiveRecord::Base
 
   class << self
     def filter_by_customer_name(customer_name)
-      value = customer_name.strip.downcase
-      sql, values = [], []
-      [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
-        sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value, value, value
+      parts = customer_name.strip.split(/\s+/)
+      first_name = parts.first
+      last_name = parts.size > 1 ? parts.last : nil
+      if first_name.present? and last_name.present?
+        sql = "LOWER(customer_first_name) LIKE LOWER(?) AND LOWER(customer_last_name) LIKE LOWER(?)"
+        values = ["%#{first_name}%", "%#{last_name}%"]
+      else
+        sql = "LOWER(customer_first_name) LIKE LOWER(?) OR LOWER(customer_last_name) LIKE LOWER(?)"
+        values = ["%#{first_name}%", "%#{first_name}%"]
       end
-      where(sql.join(' OR '), *values)
+      where(sql, *values)
     end
     
     def filter_by_customer_address_or_phone(customer_address_or_phone)

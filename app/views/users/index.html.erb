@@ -8,6 +8,8 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'New User', new_user_path %></li>
+    <% if can? :create, User.new(:provider_id => current_user.provider.try(:id)) %>
+      <li><%= link_to 'New User', new_user_path %></li>
+    <% end %>
   </ul>
 <% end %>

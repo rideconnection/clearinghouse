@@ -1,4 +1,4 @@
-set :branch, "master"
+set :branch, "production"
 set :deploy_to, "/srv/clearinghouse"
 set :rails_env, "production"
 role :web, "ch.rideconnection.org"

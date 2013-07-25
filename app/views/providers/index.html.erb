@@ -20,14 +20,14 @@
           <td><%= provider.id %></td>
           <td><%= link_to provider.name, provider_path(provider) %></td>
           <td><%= mail_to (provider.primary_contact_email) %></td>
-          <td><%= link_to 'Edit', edit_provider_path(provider) %></td>
-          <% if provider.active? %>
-            <td><%= link_to 'Deactivate', deactivate_provider_path(provider),
-                            :method=>:post %></td>
-          <% else %>
-            <td><%= link_to 'Activate', activate_provider_path(provider),
-                            :method=>:post %></td>
-          <% end %>
+          <td><% if can? :edit, provider %><%= link_to 'Edit', edit_provider_path(provider) %><% end %></td>
+          <td>
+            <% if provider.active? && can?(:deactivate, provider) %>
+              <%= link_to 'Deactivate', deactivate_provider_path(provider), :method=>:post %>
+            <% elsif can?(:activate, provider) %>
+              <%= link_to 'Activate', activate_provider_path(provider), :method=>:post %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
@@ -39,6 +39,8 @@
 
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <li><%= link_to 'New Provider', new_provider_path %></li>    
+    <% if can? :create, Provider %>
+      <li><%= link_to 'New Provider', new_provider_path %></li>
+    <% end %>
   </ul>
 <% end %>

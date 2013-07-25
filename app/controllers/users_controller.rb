@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   load_and_authorize_resource
+  before_filter :admins_only, :only => :index
 
   # GET /users
   # GET /users.json
@@ -14,7 +15,7 @@ class UsersController < ApplicationController
 
   def logout
     flash[:notice] = 'Logout is not implemented yet.'
-    redirect_to :controller => :home, :action => :dashboard
+    redirect_to root_path
   end
 
   # My Account (placeholder)

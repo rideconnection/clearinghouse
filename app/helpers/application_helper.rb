@@ -28,4 +28,13 @@ module ApplicationHelper
       link_to(title, path, :class => "active")
     end
   end
+  
+  def formatted_audit_attribute(attribute, data)
+    case attribute.to_sym
+    when :provider_white_list, :provider_black_list
+      ids = Array(data)
+      data = Provider.where(:id => ids).all.collect(&:name).sort.join(', ')
+    end
+    data.blank? ? "[an empty value]" : data.to_s
+  end
 end
