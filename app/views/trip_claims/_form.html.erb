@@ -13,7 +13,7 @@
 
   <div class="field">
     <%= f.label :claimant_provider_id, "Provider" %>
-    <% if current_user.has_admin_role? %>
+    <% if current_user.has_admin_role? and @trip_claim.editable? %>
       <%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
     <% else %>
       <%= @trip_claim.claimant.name %>
@@ -21,7 +21,7 @@
   </div>
   <div class="field">
     <%= f.label :claimant_customer_id, "Customer ID" %>
-    <% if can? :edit, @trip_claim %>
+    <% if can?(:edit, @trip_claim) and @trip_claim.editable? %>
       <%= f.text_field :claimant_customer_id, :readonly => true %>
     <% else %>
       <%= @trip_claim.claimant_customer_id %>
@@ -29,7 +29,7 @@
   </div>
   <div class="field">
     <%= f.label :claimant_trip_id, "Trip ID" %>
-    <% if can? :edit, @trip_claim %>
+    <% if can?(:edit, @trip_claim) and @trip_claim.editable? %>
       <%= f.text_field :claimant_trip_id, :readonly => true %>
     <% else %>
       <%= @trip_claim.claimant_trip_id %>
@@ -40,7 +40,7 @@
   </div>
   <div class="field">
     <%= f.label :proposed_pickup_time %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+    <% if (can?(:create, @trip_claim) || can?(:edit, @trip_claim)) and @trip_claim.editable? %>
       <%= f.datetime_select(:proposed_pickup_time, 
                             :order => [:month, :day, :year, :hour, :minute],
                             :default => DateTime.current,
@@ -52,7 +52,7 @@
   </div>
   <div class="field">
     <%= f.label :proposed_fare %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+    <% if (can?(:create, @trip_claim) || can?(:edit, @trip_claim)) and @trip_claim.editable? %>
       <%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
     <% else %>
       <%= @trip_claim.proposed_fare %>
@@ -60,14 +60,14 @@
   </div>
   <div class="field">
     <%= f.label :notes %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
+    <% if (can?(:create, @trip_claim) || can?(:edit, @trip_claim)) and @trip_claim.editable? %>
       <%= f.text_area :notes %>
     <% else %>
       <%= @trip_claim.notes %>
     <% end %>
   </div>
 
-  <% if can? :edit, @trip_claim %>
+  <% if can?(:edit, @trip_claim) and @trip_claim.editable? %>
     <div class="buttons-holder field-align">
       <%= link_to :back, :class => "button button-cancel" do %>
         <span>Cancel</span>
