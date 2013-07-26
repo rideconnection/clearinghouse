@@ -12,7 +12,7 @@
 //
 //= require jquery
 //= require jquery_ujs
-//= require jquery-ui-1.10.0
+//= require jquery-ui-1.10.3.custom.min
 //= require jquery-ui-timepicker-addon
 //= require jquery.placeholder.min
 //= require jcf

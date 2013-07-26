@@ -194,6 +194,18 @@ fieldset {
   
 }
 
+ul.ui-autocomplete {
+  width: 233px;
+  list-style-type: none;
+  padding: 4px;
+  li {
+    padding-bottom: 4px;
+    a {
+      padding: 2px;
+    }
+  }
+}
+
 /*
 #sidebar,#content {
   form.form-holder {

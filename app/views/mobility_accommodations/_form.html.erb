@@ -23,3 +23,17 @@
     <%= f.submit :class => "button" %>
   </div>
 <% end %>
+
+<%= content_for :head do %>
+  <script type="text/javascript">
+    var mobility_autocomplete_data = JSON.parse('<%= escape_javascript(mobility_autocomplete_values.to_json.html_safe) %>');
+
+    function setup_autocomplete_fields() {
+      $("input#mobility_accommodation_mobility_impairment").autocomplete({ source: mobility_autocomplete_data });
+    }
+
+    $(document).ready(function(){
+      setup_autocomplete_fields();
+    });
+  </script>
+<% end %>

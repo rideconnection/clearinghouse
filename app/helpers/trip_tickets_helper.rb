@@ -52,4 +52,12 @@ module TripTicketsHelper
       trip_status.downcase.gsub(' ', '_')
     end
   end
+
+  def eligibility_autocomplete_values
+    TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_eligibility_factors)').sort
+  end
+
+  def mobility_autocomplete_values
+    TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_mobility_impairments)').sort
+  end
 end

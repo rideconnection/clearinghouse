@@ -49,3 +49,17 @@
     <%= f.submit :id => "eligibility-requirements-list-submit", :class => "button" %>
   </div>
 <% end %>
+
+<%= content_for :head do %>
+  <script type="text/javascript">
+    var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
+
+    function setup_autocomplete_fields() {
+          $("input[name^='eligibility_requirement[eligibility_rules_attributes]']").autocomplete({ source: eligibility_autocomplete_data });
+    }
+
+    $(document).ready(function(){
+      setup_autocomplete_fields();
+    });
+  </script>
+<% end %>

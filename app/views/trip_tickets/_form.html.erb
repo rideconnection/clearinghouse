@@ -292,6 +292,7 @@
                 $(this).parent().before('<%= j raw(field_html) %>'.replace('?', window.field_indexes_<%= field_sym.to_s %>));
                 $('#trip_ticket_<%= field_sym.to_s %>_?'.replace('?', window.field_indexes_<%= field_sym.to_s %>)).focus();
                 blankify_<%= field_sym.to_s %>();
+                setup_autocomplete_fields();
               });
 
               function blankify_<%= field_sym.to_s %>() {
@@ -495,4 +496,20 @@
       <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
     <% end %>
   </ul>
+<% end %>
+
+<%= content_for :head do %>
+  <script type="text/javascript">
+    var mobility_autocomplete_data = JSON.parse('<%= escape_javascript(mobility_autocomplete_values.to_json.html_safe) %>');
+    var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
+
+    function setup_autocomplete_fields() {
+      $("input[name^='trip_ticket[customer_mobility_impairments]']").autocomplete({ source: mobility_autocomplete_data });
+      $("input[name^='trip_ticket[customer_eligibility_factors]']").autocomplete({ source: eligibility_autocomplete_data });
+    }
+
+    $(document).ready(function(){
+      setup_autocomplete_fields();
+    });
+  </script>
 <% end %>
