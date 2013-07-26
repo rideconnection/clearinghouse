@@ -1267,6 +1267,14 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
       end
+
+      it "should not cause any errors if an eligibility requirement contains no eligibility rules" do
+        visit @reset_filters_path
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+      end
     end
 
     describe "trip ticket mobility filter" do
