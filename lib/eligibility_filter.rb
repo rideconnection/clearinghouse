@@ -16,7 +16,7 @@ module EligibilityFilter
         new_sql, new_params = eligibility_requirement_filter(requirement)
         if new_sql.present?
           query_str << " OR " if query_str.present?
-          query_str << new_sql
+          query_str << "(#{new_sql})"
           query_params = query_params + new_params
         end
       end
@@ -91,11 +91,11 @@ module EligibilityFilter
       new_sql, new_params = eligibility_rule_filter(rule)
       if new_sql.present?
         query_str << join_str if query_str.present?
-        query_str << new_sql
+        query_str << "(#{new_sql})"
         query_params = query_params + new_params
       end
     end
-    return "(#{query_str})", query_params
+    return query_str, query_params
   end
 
   def eligibility_rule_filter(rule)
@@ -160,6 +160,6 @@ module EligibilityFilter
             query_params = [ rule.comparison_value.downcase ]
         end
     end
-    return "(#{query_str})", query_params
+    return query_str, query_params
   end
 end
