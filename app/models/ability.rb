@@ -121,9 +121,14 @@ class Ability
       can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
 
       can :manage, EligibilityRequirement, :service => { :provider_id => user.provider_id }
-      can :manage, EligibilityRule, :eligibility_requirement => { :service => { :provider_id => user.provider_id }}
+      can :manage, EligibilityRule, :service => { :provider_id => user.provider_id }
       can :manage, MobilityAccommodation, :service => { :provider_id => user.provider_id }
     end
+
+    #SELECT "eligibility_rules".* FROM "eligibility_rules"
+    #  INNER JOIN "eligibility_requirements" ON "eligibility_requirements"."id" = "eligibility_rules"."eligibility_requirement_id"
+    #  INNER JOIN "services" ON "services"."id" = "eligibility_requirements"."service_id"
+    #  WHERE "eligibility_requirements"."services" = '--- :provider_id: 3232 '
 
     # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with
     can :read, OpenCapacity, :service => { :provider_id => user.partner_provider_ids_for_tickets }
