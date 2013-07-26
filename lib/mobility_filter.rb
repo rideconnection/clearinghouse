@@ -1,8 +1,7 @@
 module MobilityFilter
   protected
 
-  def provider_mobility_filter(collection, provider)
-    collection ||= TripTicket.all
+  def provider_mobility_filter(provider)
     query_str = ""
     query_params = []
     provider.services.each do |service|
@@ -13,7 +12,8 @@ module MobilityFilter
         query_params = query_params + new_params
       end
     end
-    query_str.blank? ? collection : collection.where("(customer_mobility_impairments IS NULL) OR #{query_str}", *query_params)
+    query_str = "(customer_mobility_impairments IS NULL) OR #{query_str}" if query_str.present?
+    return query_str, query_params
   end
 
   def service_mobility_filter(service)

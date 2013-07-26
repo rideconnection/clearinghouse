@@ -1196,10 +1196,16 @@ class TripTicketsTest < ActionController::IntegrationTest
 
     describe "trip ticket eligibility filter" do
       setup do
-        @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => ['Veteran', 'Disabled'])
-        @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => ['Veteran'])
-        @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => ['Disabled'])
-        @t04 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => nil)
+        provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => provider_2
+        )
+        relationship.approve!
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_eligibility_factors => ['Veteran', 'Disabled'])
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_eligibility_factors => ['Veteran'])
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_eligibility_factors => ['Disabled'])
+        @t04 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_eligibility_factors => nil)
         @service = FactoryGirl.create(:service, :provider => @provider)
         @eligibility_requirement_1 = FactoryGirl.create(:eligibility_requirement, :boolean_type => 'or', :service => @service)
       end
@@ -1275,15 +1281,28 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("", {:href => trip_ticket_path(@t03)})
         assert page.has_link?("", {:href => trip_ticket_path(@t04)})
       end
+
+      it "should never filter out a provider's own trip tickets" do
+        own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => nil)
+        eligibility_rule_1
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
+      end
     end
 
     describe "trip ticket mobility filter" do
       setup do
-        @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => nil)
-        @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['Wheelchair'])
-        @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['Non-ambulatory'])
-        @t04 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['Wheelchair', 'Non-ambulatory'])
-        @t05 = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['Wheelchair - Oversized 2-seats'])
+        provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => provider_2
+        )
+        relationship.approve!
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_mobility_impairments => nil)
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_mobility_impairments => ['Wheelchair'])
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_mobility_impairments => ['Non-ambulatory'])
+        @t04 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_mobility_impairments => ['Wheelchair', 'Non-ambulatory'])
+        @t05 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_mobility_impairments => ['Wheelchair - Oversized 2-seats'])
         @service = FactoryGirl.create(:service, :provider => @provider)
         @mobility_accommodation_1 = FactoryGirl.create(:mobility_accommodation, :mobility_impairment => 'Wheelchair', :service => @service)
         @mobility_accommodation_2 = FactoryGirl.create(:mobility_accommodation, :mobility_impairment => 'Non-ambulatory', :service => @service)
@@ -1326,6 +1345,12 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t05)})
+      end
+
+      it "should never filter out a provider's own trip tickets" do
+        own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['- Not Accommodated -'])
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
       end
     end
 
