@@ -73,6 +73,28 @@ body[data-controller="trip_tickets"] {
       }
     }
 
+    .advanced-filters {
+      padding:0 0 17px;
+
+      .opener {
+        background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+        font-size:14px;
+        line-height:16px;
+        padding:0 0 0 18px;
+      }
+
+      &.active .opener {
+        background-position:-1px -86px;
+      }
+
+      .slide {
+        padding:20px 0 16px 0;
+      }
+
+      p {
+        margin:0 0 18px;
+      }
+    }
   }
 
   &[data-action="index"] {

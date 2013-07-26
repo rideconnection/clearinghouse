@@ -44,13 +44,6 @@ function initOpenClose() {
     animSpeed: 400,
     effect: 'slide'
   });
-  jQuery('.saved-filter-form').openClose({
-    activeClass: 'active',
-    opener: '.opener',
-    slider: '.slide',
-    animSpeed: 400,
-    effect: 'slide'
-  });
 }
 
 // // clear inputs on focus

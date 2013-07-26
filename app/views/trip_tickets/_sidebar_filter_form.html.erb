@@ -77,7 +77,7 @@
                    params[:trip_ticket_filters].try(:[], :eligibility).present? ||
                    params[:trip_ticket_filters].try(:[], :mobility).present?
     %>
-    <div class="field details-box<%= ' active' if auto_open %>">
+    <div class="field advanced-filters<%= ' active' if auto_open %>">
       <a class="opener" href="#">Advanced</a>
       <div class="slide">
         <div class="field">

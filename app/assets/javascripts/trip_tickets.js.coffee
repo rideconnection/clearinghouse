@@ -102,3 +102,11 @@ $ ->
         if field.name.indexOf('trip_ticket_filters') == 0 && field.value && field.value.length > 0
           new_field_name = field.name.replace(/^trip_ticket_filters/, "filter[data]");
           $saved_filter_form.append('<input type="hidden" value="'+field.value+'" name="'+new_field_name+'">')
+
+  $('.advanced-filters').openClose({
+    activeClass: 'active',
+    opener: '.opener',
+    slider: '.slide',
+    animSpeed: 400,
+    effect: 'slide'
+  });
