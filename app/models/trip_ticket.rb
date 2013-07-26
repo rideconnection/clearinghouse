@@ -162,10 +162,10 @@ class TripTicket < ActiveRecord::Base
       when 'Resolved'
         trip_result.try(:outcome) || 'Awaiting Result'
       when 'Active'
-        if (claim_count = trip_claims.count) == 0
-          'No Claims'
-        elsif (claim = approved_claim).present?
+        if (claim = approved_claim).present?
           "#{claim.claimant.try(:name)} Approved"
+        elsif (claim_count = trip_claims.where(status: 'pending').count) == 0
+          'No Claims'
         else
           "#{claim_count} Claim#{claim_count == 1 ? '' : 's'} Pending"
         end

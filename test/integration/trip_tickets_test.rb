@@ -98,11 +98,22 @@ class TripTicketsTest < ActionController::IntegrationTest
         @trip_ticket.status_for(@user).must_equal 'No Claims'
       end
 
+      it "should return No Claims if trip ticket has only rescinded claims" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :rescinded)
+        @trip_ticket.status_for(@user).must_equal 'No Claims'
+      end
+
       it "should return Claims Pending with a count if trip ticket has claims" do
         FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
         @trip_ticket.status_for(@user).must_equal '1 Claim Pending'
         FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
         @trip_ticket.status_for(@user).must_equal '2 Claims Pending'
+      end
+
+      it "should not count rescinded claims in Claims Pending" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :rescinded)
+        @trip_ticket.status_for(@user).must_equal '1 Claim Pending'
       end
 
       it "should return Approved with the name of the claimant if trip ticket has an approved claim" do
