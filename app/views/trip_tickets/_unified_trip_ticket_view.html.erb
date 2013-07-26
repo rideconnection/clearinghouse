@@ -142,7 +142,7 @@
         <% end %>
       </div>
       <ul class="activity-list">
-        <% trip_ticket.activities.each do |activity| %>
+        <% trip_ticket.activities_accessible_by(current_ability).each do |activity| %>
           <%= render 'unified_trip_ticket_view_activity', :activity => activity %>
         <% end %>
       </ul>
