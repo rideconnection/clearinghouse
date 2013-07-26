@@ -21,7 +21,6 @@
 <% if current_user and current_user.has_any_role?([:site_admin]) %>
 <div class="field">
   <%= f.label :position, "Coordinates (lon lat)" %>
-  <% %>
   <%= f.text_field :position, :placeholder => "e.g.: POINT (-122.6488 45.5282)" %>
 </div>
 <% end %>

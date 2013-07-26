@@ -60,4 +60,9 @@ module TripTicketsHelper
   def mobility_autocomplete_values
     TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_mobility_impairments)').sort
   end
+
+  def coordinates_from_location(location)
+    position = location.try(:position)
+    position.presence && "POINT (#{position.x} #{position.y})"
+  end
 end
