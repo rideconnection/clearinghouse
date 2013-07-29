@@ -57,6 +57,14 @@ class Provider < ActiveRecord::Base
     end while self.nonces.exists?(nonce: nonce)
     nonce
   end
+
+  def has_any_operating_hours?
+    services
+      .joins(:operating_hours)
+      .where('operating_hours.open_time IS NOT NULL')
+      .where('operating_hours.close_time IS NOT NULL')
+      .exists?
+  end
   
   private
   

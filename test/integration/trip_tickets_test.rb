@@ -24,7 +24,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     # For selectively enabling selenium driven tests
     # Capybara.current_driver = nil # reset
   end
-  
+
   test "provider admins can create new trip tickets" do
     click_link "Tickets"
     click_link "Add New"
@@ -407,7 +407,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   
   describe "filtering" do
     setup do
-      # because we use a cookie to restore previous filters, to start fresh we need trip_ticket_filters=clear
+      # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
       @reset_filters_path = "/trip_tickets?trip_ticket_filters=clear"
     end
 
@@ -1255,7 +1255,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
       end
 
-      it "should allow the mobility filter to be explicitly enabled" do
+      it "should allow the eligibility filter to be explicitly enabled" do
         eligibility_rule_1
 
         visit @reset_filters_path
@@ -1270,7 +1270,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
       end
 
-      it "should allow the mobility filter to be disabled" do
+      it "should allow the eligibility filter to be disabled" do
         eligibility_rule_1
 
         visit @reset_filters_path
@@ -1360,6 +1360,99 @@ class TripTicketsTest < ActionController::IntegrationTest
 
       it "should never filter out a provider's own trip tickets" do
         own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_mobility_impairments => ['- Not Accommodated -'])
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
+      end
+    end
+
+    describe "trip ticket operating hours filter" do
+      setup do
+        provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => provider_2
+        )
+        relationship.approve!
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+                                  :appointment_time => DateTime.parse('Sat, 27 Jul 2013 16:00:00 +0000'),
+                                  :requested_pickup_time => Time.parse('Sat, 27 Jul 2013 15:00:00 +0000').utc,
+                                  :requested_drop_off_time => Time.parse('Sat, 27 Jul 2013 17:00:00 +0000').utc)
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+                                  :appointment_time => DateTime.parse('Sat, 27 Jul 2013 22:00:00 +0000'),
+                                  :requested_pickup_time => Time.parse('Sat, 27 Jul 2013 21:00:00 +0000').utc,
+                                  :requested_drop_off_time => Time.parse('Sat, 27 Jul 2013 23:00:00 +0000').utc)
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+                                  :appointment_time => DateTime.parse('Sun, 28 Jul 2013 16:00:00 +0000'),
+                                  :requested_pickup_time => Time.parse('Sun, 28 Jul 2013 15:00:00 +0000').utc,
+                                  :requested_drop_off_time => Time.parse('Sun, 28 Jul 2013 17:00:00 +0000').utc)
+        @service = FactoryGirl.create(:service, :provider => @provider)
+      end
+
+      let(:operating_hours_1) {
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: Time.parse("09:00:00 UTC"), close_time: Time.parse("22:00:00 UTC"), :service => @service)
+      }
+      let(:operating_hours_2) {
+        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: Time.parse("09:00:00 UTC"), close_time: Time.parse("22:00:00 UTC"), :service => @service)
+      }
+
+      it "should filter out trips that are outside the provider's service hours by default" do
+        operating_hours_1
+        visit @reset_filters_path
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        operating_hours_2
+        visit @reset_filters_path
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow service hour filtering to be explicitly enabled via the eligibility filter control" do
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Show only eligible trips (default)", :from => "trip_ticket_filters_eligibility"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow service hour filtering to be disabled via the eligibility filter control" do
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Include ineligible trips", :from => "trip_ticket_filters_eligibility"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not cause any errors if a service contains no operating hours" do
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not cause any errors if a service contains nil operating hours" do
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: nil, close_time: nil, :service => @service)
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should never filter out a provider's own trip tickets" do
+        own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider,
+                                      :appointment_time => DateTime.parse('Mon, 29 Jul 2013 22:00:00 +0000'),
+                                      :requested_pickup_time => Time.parse('Mon, 29 Jul 2013 21:00:00 +0000').utc,
+                                      :requested_drop_off_time => Time.parse('Mon, 29 Jul 2013 23:00:00 +0000').utc)
+        operating_hours_1
         visit @reset_filters_path
         assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
       end

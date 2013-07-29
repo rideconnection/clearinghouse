@@ -21,7 +21,7 @@ class TripTicketsController < ApplicationController
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
 
-    service_filter_options = { include_unaccommodated: include_unaccommodated?, include_ineligible: include_ineligible? }
+    service_filter_options = { ignore_mobility: include_unaccommodated?, ignore_eligibility: include_ineligible? }
     @trip_tickets = provider_services_filter(@trip_tickets, current_user.provider, service_filter_options)
 
     massage_trip_ticket_trip_time_filter_values_for_form

@@ -2,6 +2,7 @@ require 'active_support/concern'
 require 'mobility_filter'
 require 'eligibility_filter'
 require 'service_area_filter'
+require 'operating_hours_filter'
 
 module ProviderServicesFilter
   extend ActiveSupport::Concern
@@ -9,17 +10,22 @@ module ProviderServicesFilter
   include MobilityFilter
   include EligibilityFilter
   include ServiceAreaFilter
-  #include OperatingHoursFilter
+  include OperatingHoursFilter
 
   # options:
-  # :include_unaccommodated - ignore mobility filters
-  # :include_ineligible - ignore eligibility, service area, and operating hours filters
+  # :ignore_mobility        - ignore mobility filters
+  # :ignore_eligibility     - ignore eligibility, service area, and operating hours filters
+  # :ignore_service_area    - ignore service area filtering
+  # :ignore_operating_hours - ignore operating hours filtering
 
   def provider_services_filter(collection, provider, options = {})
     options ||= {}
     provider_query = ""
     provider_query_params = []
     service_area_query_present = false
+
+    # ignore operating hours filters if provider has not yet defined any operating hours
+    options[:ignore_operating_hours] ||= !provider.has_any_operating_hours?
 
     provider.services.each do |service|
       # for each service:
@@ -45,12 +51,12 @@ module ProviderServicesFilter
   def provider_service_filter(service, options = {})
     # within a service:
     # filter for accommodated impairments AND eligible AND within service area AND within operating hours
+    mobility_query, mobility_params = service_mobility_filter(service) unless options[:ignore_mobility]
+    eligibility_query, eligibility_params = service_eligibility_filter(service) unless options[:ignore_eligibility]
+    service_area_query = service_area_filter(service) unless options[:ignore_eligibility] || options[:ignore_service_area]
+    operating_hours_query = service_operating_hours_filter(service) unless options[:ignore_eligibility] || options[:ignore_operating_hours]
 
-    mobility_query, mobility_params = service_mobility_filter(service) unless options[:include_unaccommodated]
-    eligibility_query, eligibility_params = service_eligibility_filter(service) unless options[:include_ineligible]
-    service_area_query = service_area_filter(service) unless options[:include_ineligible]
-
-    queries_array = [ mobility_query, eligibility_query, service_area_query ].map {|x| x.presence }.compact
+    queries_array = [ mobility_query, eligibility_query, service_area_query, operating_hours_query ].map {|x| x.presence }.compact
     combined_query = queries_array.map {|x| "(#{x})"}.join(' AND ')
     combined_params = (mobility_params || []) + (eligibility_params || [])
 
