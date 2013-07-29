@@ -61,7 +61,7 @@ module TripTicketsHelper
     TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_mobility_impairments)').sort
   end
 
-  def coordinates_from_location(location)
+  def wkt_point_from_location(location)
     position = location.try(:position)
     position.presence && "POINT (#{position.x} #{position.y})"
   end

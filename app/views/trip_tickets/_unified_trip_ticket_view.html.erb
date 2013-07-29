@@ -69,7 +69,15 @@
     </ul>
     <address><%= trip_ticket.pick_up_location.try(:address_city_and_zip, ', ') %></address>
     <address><%= trip_ticket.drop_off_location.try(:address_city_and_zip, ', ') %></address>
-    <span class="gps-data">GPS Coordinates</span>
+    <div class="gps-data">
+      GPS Coordinates
+      <% if trip_ticket.pick_up_location.try(:position).present? && trip_ticket.drop_off_location.try(:position).present? %>
+      <table>
+        <tr><td>Pick Up</td><td><%= trip_ticket.pick_up_location.try(:latitude) %>, <%= trip_ticket.pick_up_location.try(:longitude) %></td></tr>
+        <tr><td>Drop Off</td><td><%= trip_ticket.drop_off_location.try(:latitude) %>, <%= trip_ticket.drop_off_location.try(:longitude) %></td></tr>
+      </table>
+      <% end %>
+    </div>
     <% unless trip_ticket.trip_purpose_description.blank? %>
       <p>Purpose: <%= trip_ticket.trip_purpose_description %></p>
     <% end %>

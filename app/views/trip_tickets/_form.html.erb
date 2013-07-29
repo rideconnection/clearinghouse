@@ -101,7 +101,6 @@
       <% end %>
     </div>
     <% if can? :edit, @trip_ticket %>
-      <% @trip_ticket.customer_address.position = coordinates_from_location(@trip_ticket.customer_address) %>
       <%= f.fields_for :customer_address do |af| %>
         <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>
@@ -340,7 +339,6 @@
   <fieldset id="drop_off_location" class="">
     <legend>Drop Off Location</legend>
     <% if can? :edit, @trip_ticket %>
-      <% @trip_ticket.drop_off_location.position = coordinates_from_location(@trip_ticket.drop_off_location) %>
       <%= f.fields_for :drop_off_location do |af| %>
         <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>
@@ -352,7 +350,6 @@
   <fieldset id="pick_up_location" class="">
     <legend>Pick Up Location</legend>
     <% if can? :edit, @trip_ticket %>
-      <% @trip_ticket.pick_up_location.position = coordinates_from_location(@trip_ticket.pick_up_location) %>
       <%= f.fields_for :pick_up_location do |af| %>
         <%= render 'locations/address_form', { :f => af, required_fields: true } %>
       <% end %>

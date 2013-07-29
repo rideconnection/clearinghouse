@@ -470,7 +470,13 @@ body[data-controller="trip_tickets"] {
               
               .gps-data {
                 display:block;
-                padding:2px 0 16px;
+                padding:8px 0 16px;
+                table{
+                  td {
+                    padding-top: 4px;
+                    padding-right: 8px;
+                  }
+                }
               }
               
               p {
