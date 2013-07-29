@@ -1,7 +1,5 @@
 require 'trip_tickets_filter'
-require 'mobility_filter'
-require 'eligibility_filter'
-require 'service_area_filter'
+require 'provider_services_filter'
 
 class TripTicketsController < ApplicationController
   load_and_authorize_resource
@@ -10,9 +8,7 @@ class TripTicketsController < ApplicationController
   before_filter :setup_locations, :except => [:index, :rescind]
 
   include TripTicketsFilter
-  include MobilityFilter
-  include EligibilityFilter
-  include ServiceAreaFilter
+  include ProviderServicesFilter
 
   helper_method :trip_ticket_filters_present?
 
@@ -24,7 +20,9 @@ class TripTicketsController < ApplicationController
 
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
-    @trip_tickets = eligibility_and_mobility_filter(@trip_tickets)
+
+    service_filter_options = { include_unaccommodated: include_unaccommodated?, include_ineligible: include_ineligible? }
+    @trip_tickets = provider_services_filter(@trip_tickets, current_user.provider, service_filter_options)
 
     massage_trip_ticket_trip_time_filter_values_for_form
 
@@ -183,23 +181,5 @@ class TripTicketsController < ApplicationController
 
   def include_unaccommodated?
     params[:trip_ticket_filters].try(:[], :mobility) == 'include_unaccommodated'
-  end
-
-  def eligibility_and_mobility_filter(collection)
-    mobility_query, mobility_params = provider_mobility_filter(current_user.provider) unless include_unaccommodated?
-    eligibility_query, eligibility_params = provider_eligibility_filter(current_user.provider) unless include_ineligible?
-    service_area_query = provider_service_area_filter(current_user.provider) unless include_ineligible?
-
-    queries_array = [ mobility_query, eligibility_query, service_area_query ].map {|x| x.presence }.compact
-    combined_query = queries_array.map {|x| "(#{x})"}.join(' AND ')
-    combined_params = (mobility_params || []) + (eligibility_params || [])
-
-    if combined_query.present?
-      # always show a user their own provider's trips so they can be managed
-      combined_query = %Q{("trip_tickets"."origin_provider_id" = #{current_user.provider_id}) OR (#{combined_query})}
-      collection = add_service_area_joins(collection) if service_area_query.present?
-      collection = collection.where([combined_query, *combined_params])
-    end
-    collection
   end
 end

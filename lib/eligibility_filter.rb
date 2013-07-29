@@ -1,17 +1,21 @@
+require 'active_support/concern'
+
 module EligibilityFilter
+  extend ActiveSupport::Concern
+
   protected
 
-  def provider_eligibility_filter(provider)
+  def service_eligibility_filter(service)
     query_str = ""
     query_params = []
-    provider.services.each do |service|
-      service.eligibility_requirements.each do |requirement|
-        new_sql, new_params = eligibility_requirement_filter(requirement)
-        if new_sql.present?
-          query_str << " OR " if query_str.present?
-          query_str << "(#{new_sql})"
-          query_params = query_params + new_params
-        end
+    service.eligibility_requirements.each do |requirement|
+      # within a service
+      # filter for eligibility requirement met OR eligibility requirement met OR etc.
+      new_sql, new_params = eligibility_requirement_filter(requirement)
+      if new_sql.present?
+        query_str << " OR " if query_str.present?
+        query_str << "(#{new_sql})"
+        query_params = query_params + new_params
       end
     end
     return query_str, query_params
