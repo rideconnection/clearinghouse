@@ -44,6 +44,8 @@ Clearinghouse::Application.routes.draw do
     resources :trip_ticket_comments
 
     resource :trip_result
+
+    resources :audits, :only => [ :index ]
   end
 
   resources :users do
