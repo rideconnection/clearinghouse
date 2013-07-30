@@ -51,7 +51,7 @@ class EligibilityRuleTest < ActiveSupport::TestCase
   end
 
   it "should validate that array fields are used with contains and equality comparisons" do
-    @eligibility_rule.trip_field = TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys.first.to_s
+    @eligibility_rule.trip_field = 'customer_eligibility_factors'
     @eligibility_rule.comparison_type = 'equal'
     @eligibility_rule.valid?.must_equal true
     @eligibility_rule.comparison_type = 'contain'
