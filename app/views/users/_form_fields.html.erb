@@ -1,0 +1,59 @@
+  <div class="field">
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+  </div>
+  <% if @user.new_record? %>
+    <div class="field field-with-checkbox">
+      <%= check_box_tag "user[must_generate_password]" %>
+      <%= f.label "Send activation link instead of setting password" %>
+    </div>
+  <% end %>
+  <div class="field">
+    <%= f.label :password %>
+    <%= f.password_field :password %>
+  </div>
+  <div class="field">
+    <%= f.label :password_confirmation %>
+    <%= f.password_field :password_confirmation %>
+  </div>
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :phone %>
+    <%= f.text_field :phone %>
+  </div>
+  <% if @provider.present? && @user.provider_id == @provider.id %>
+    <%#= f.hidden_field :provider_id %>
+    <%= f.hidden_field :role_id %>
+  <% else %>
+    <div class="field">
+      <%= f.label :provider %>
+      <% if can? :set_provider, User %>
+        <%= collection_select :user, :provider_id, Provider.all, :id, :name,
+                              :include_blank => true %>
+      <% else %>
+        <% if @user.provider.nil? %>
+          <span style="color: #aaa">(none)</span>
+        <% else %>
+          <%= link_to @user.provider.name, provider_path(@user.provider) %>
+        <% end %>
+      <% end %>
+    </div>
+    <% if can? :set_any_role, @user and @user != current_user %>
+      <div class="field">
+        <%= f.label :role %>
+        <%= collection_select :user, :role_id, Role.all, :id, :name %>
+      </div>
+    <% elsif can? :set_provider_role, @user and @user != current_user %>
+      <div class="field">
+        <%= f.label :role %>
+        <%= collection_select :user, :role_id, Role.provider_roles, :id, :name %>
+      </div>
+    <% end %>
+  <% end %>

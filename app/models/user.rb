@@ -4,7 +4,7 @@ class User < ActiveRecord::Base
   # :registerable, :timeoutable and :omniauthable
   devise :database_authenticatable, :recoverable, :trackable, :validatable
 
-  belongs_to :provider
+  belongs_to :provider, inverse_of: :users
   belongs_to :role
   has_many :filters
 

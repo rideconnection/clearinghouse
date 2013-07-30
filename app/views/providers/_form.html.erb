@@ -23,6 +23,15 @@
     <%= f.text_field :primary_contact_email %>
   </div>
 
+  <% if @provider.new_record? && @user.present? %>
+  <fieldset id="provider_admin_user">
+    <legend>Administrative User</legend>
+    <%= f.fields_for :users, @user do |user_fields| %>
+      <%= render 'users/form_fields', { :f => user_fields } %>
+    <% end %>
+  </fieldset>
+  <% end %>
+
   <div class="buttons-holder">
     <%= link_to :back, :class => "button button-cancel" do %>
       <span>Cancel</span>
