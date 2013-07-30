@@ -140,11 +140,11 @@ class TripTicketTest < ActiveSupport::TestCase
   describe "icons" do
     it "should return icon01 if keyword scooter found" do
       @trip_ticket.customer_assistive_devices = ['scooter']
-      @trip_ticket.icon_list.must_include?({ file: 'icon01.png', alt: 'scooter' })
+      @trip_ticket.icon_list.must_include({ file: 'icon01.png', alt: 'scooter' })
     end
     it "should return icon05 if any service animal is listed" do
       @trip_ticket.customer_service_animals = ['unicorn']
-      @trip_ticket.icon_list.must_include?({ file: 'icon05.png', alt: 'dog' })
+      @trip_ticket.icon_list.must_include({ file: 'icon05.png', alt: 'customer service animals' })
     end
   end
 
