@@ -13,14 +13,20 @@ class EligibilityRule < ActiveRecord::Base
     'less_than'     => 'must be less than'
   }
 
+  DESIRED_TRIP_TICKET_ARRAY_FIELDS = [
+      :customer_eligibility_factors,
+      :customer_assistive_devices,
+      :guest_or_attendant_assistive_devices,
+      :customer_service_animals,
+      :guest_or_attendant_service_animals,
+      :trip_funders
+  ]
+  TRIP_TICKET_ARRAY_FIELDS = TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.select {|k,v| DESIRED_TRIP_TICKET_ARRAY_FIELDS.include?(k) }
+
   TRIP_TICKET_FIELDS = {
     'customer_dob'                    =>'Customer Age',
-    'customer_impairment_description' => 'Customer Impairment Description',
-    'customer_notes'                  => 'Customer Notes',
-    'customer_primary_language'       => 'Customer Primary Language',
-    'trip_notes'                      => 'Trip Notes',
     'trip_purpose_description'        => 'Trip Purpose Description',
-  }.merge(TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.inject({}) { |h, (k, v)| h[k.to_s] = v.pluralize; h })
+  }.merge(TRIP_TICKET_ARRAY_FIELDS.inject({}) { |h, (k, v)| h[k.to_s] = v.pluralize; h })
 
   validates :trip_field, :presence => true, :inclusion => { :in => TRIP_TICKET_FIELDS.keys }
   validates :comparison_type, :presence => true, :inclusion => { :in => COMPARISON_TYPES.keys }

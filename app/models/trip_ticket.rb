@@ -37,9 +37,9 @@ class TripTicket < ActiveRecord::Base
     :customer_mobility_impairments => "Mobility Impairment",
     :customer_eligibility_factors => "Eligibility Factor",
     :customer_assistive_devices => "Assistive Device",
+    :guest_or_attendant_assistive_devices => "Guest or Attendant Assistive Device",
     :customer_service_animals => "Service Animal",
     :guest_or_attendant_service_animals => "Guest or Attendant Service Animal",
-    :guest_or_attendant_assistive_devices => "Guest or Attendant Assistive Device",
     :trip_funders => "Trip Funder",
   }
 
