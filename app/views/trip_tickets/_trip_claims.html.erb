@@ -4,6 +4,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
+      <th>Provider</th>
       <th>Status</th>
       <th>Pickup Time</th>
       <th>Fare</th>
@@ -17,6 +18,7 @@
   <tbody>      
     <% trip_claims.try(:each) do |trip_claim| %>
       <tr>
+        <td><%= trip_claim.claimant.name %></td>
         <td><%= trip_claim.status.to_s.humanize.titlecase %></td>
         <td><%= trip_claim.proposed_pickup_time.blank? ? "" : trip_claim.proposed_pickup_time.to_s(:long) %></td>
         <td><%= trip_claim.proposed_fare %></td>

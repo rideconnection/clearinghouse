@@ -45,12 +45,15 @@ module TripTicketsHelper
       activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize
     end
     activity_action = activity.is_a?(TripResult) ? activity.outcome : ''
+
     activity_user = if activity.respond_to?(:user)
-      activity.user
+      activity.user.try(:display_name)
+    elsif activity.is_a?(TripClaim)
+      activity.claimant.name
     else
-      activity.audits.first.try(:user)
+      activity.audits.first.try(:user).try(:display_name)
     end
-    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span>#{activity_type} #{activity_action} - #{activity_user.try(:display_name)}"
+    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
   end
 
   # this converts trip status to a simplified snake-cased form in a consistent way
