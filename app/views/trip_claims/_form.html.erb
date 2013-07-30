@@ -41,14 +41,21 @@
   <div class="field">
     <%= f.label :proposed_pickup_time %>
     <% if (can?(:create, @trip_claim) || can?(:edit, @trip_claim)) and @trip_claim.editable? %>
-      <%= f.datetime_select(:proposed_pickup_time, 
+      <%
+        appt = @trip_ticket.appointment_time
+        pu = @trip_ticket.requested_pickup_time
+        default_pu = DateTime.new(appt.year, appt.month, appt.day, pu.hour, pu.min, pu.sec)
+      %>
+      <%= f.datetime_select(:proposed_pickup_time,
                             :order => [:month, :day, :year, :hour, :minute],
-                            :default => DateTime.current,
+                            :default => default_pu,
                             :ampm => true
       ) %>
     <% else %>
       <%= @trip_claim.proposed_pickup_time %>
     <% end %>
+    <p><label></label><em>Requested pickup: <%= @trip_ticket.requested_pickup_time.strftime('%l:%M %p') %></em></p>
+    <p><label></label><em>Earliest pickup: <%= @trip_ticket.earliest_pick_up_time.try(:strftime, '%l:%M %p') || 'n/a' %></em></p>
   </div>
   <div class="field">
     <%= f.label :proposed_fare %>
