@@ -2,6 +2,11 @@ class TripResultsController < ApplicationController
   load_and_authorize_resource :trip_ticket
   load_and_authorize_resource :trip_result, :through => :trip_ticket, :singleton => true
 
+  before_filter :only => [:create, :update] do
+    allow_blank_time_field(@trip_result, :actual_pick_up_time)
+    allow_blank_time_field(@trip_result, :actual_drop_off_time)
+  end
+
   # GET /trip_results
   # GET /trip_results.json
   def index

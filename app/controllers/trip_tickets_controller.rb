@@ -7,6 +7,11 @@ class TripTicketsController < ApplicationController
   before_filter :providers_for_lists, :except => [:destroy, :index, :rescind]
   before_filter :setup_locations, :except => [:index, :rescind]
 
+  before_filter :only => [:create, :update] do
+    allow_blank_time_field(@trip_ticket.trip_result, :actual_pick_up_time, :trip_ticket)
+    allow_blank_time_field(@trip_ticket.trip_result, :actual_drop_off_time, :trip_ticket)
+  end
+
   include TripTicketsFilter
   include ProviderServicesFilter
 
