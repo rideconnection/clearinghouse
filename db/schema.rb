@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130724190258) do
+ActiveRecord::Schema.define(:version => 20130730140005) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -225,19 +225,19 @@ ActiveRecord::Schema.define(:version => 20130724190258) do
     t.time     "actual_pick_up_time"
     t.time     "actual_drop_off_time"
     t.integer  "rate_type"
-    t.integer  "rate"
+    t.decimal  "rate",                   :precision => 10, :scale => 2
     t.string   "driver_id"
     t.integer  "vehicle_type"
     t.integer  "vehicle_id"
     t.integer  "fare_type"
-    t.integer  "base_fare"
-    t.integer  "fare"
+    t.decimal  "base_fare",              :precision => 10, :scale => 2
+    t.decimal  "fare",                   :precision => 10, :scale => 2
     t.float    "miles_traveled"
     t.float    "odometer_start"
     t.float    "odometer_end"
     t.float    "billable_mileage"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
     t.integer  "extra_securement_count"
   end
 
