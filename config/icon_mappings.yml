@@ -1,0 +1,26 @@
+---
+- field_names:
+  - customer_assistive_devices
+  - guest_or_attendant_assistive_devices
+  match_value: scooter
+  icon: icon01.png
+- field_names:
+  - customer_assistive_devices
+  - guest_or_attendant_assistive_devices
+  match_value: walker
+  icon: icon03.png
+- field_names:
+  - customer_assistive_devices
+  - guest_or_attendant_assistive_devices
+  match_value: oxygen
+  icon: icon04.png
+- field_names:
+  - customer_assistive_devices
+  - guest_or_attendant_assistive_devices
+  match_value: wheelchair
+  icon: icon07.png
+- field_names:
+  - customer_service_animals
+  - guest_or_attendant_service_animals
+  match_value: '*'
+  icon: icon05.png

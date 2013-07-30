@@ -137,6 +137,17 @@ class TripTicketTest < ActiveSupport::TestCase
     end
   end
 
+  describe "icons" do
+    it "should return icon01 if keyword scooter found" do
+      @trip_ticket.customer_assistive_devices = ['scooter']
+      @trip_ticket.icon_list.must_include?({ file: 'icon01.png', alt: 'scooter' })
+    end
+    it "should return icon05 if any service animal is listed" do
+      @trip_ticket.customer_service_animals = ['unicorn']
+      @trip_ticket.icon_list.must_include?({ file: 'icon05.png', alt: 'dog' })
+    end
+  end
+
   describe "white/black lists" do
     it "has an integer_array field for provider_white_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_white_list

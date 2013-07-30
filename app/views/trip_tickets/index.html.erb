@@ -60,13 +60,13 @@
             <div class="column">
               <em class="date"><%= tt.appointment_time.strftime "%I:%M %p" %><span><%= tt.appointment_time.strftime "%b %d" %></span> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></em>
               <address><%= tt.drop_off_location.try(:address_and_city, ', ') %></address>
+              <ul class="icons-list">
+                <% tt.icon_list.each do |icon| %>
+                <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
+                <% end %>
+              </ul>
             </div>
           </div>
-          <ul class="icons-list">
-            <li><!--img src="/assets/icon03.png" width="13" height="18" alt="" /--></li>
-            <li><!--img src="/assets/icon04.png" width="7" height="23" alt="" /--></li>
-            <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
-          </ul>
           <span class=""></span>
         </li>
       <% end %>

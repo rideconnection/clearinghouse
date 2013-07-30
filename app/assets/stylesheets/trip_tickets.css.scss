@@ -173,6 +173,11 @@ body[data-controller="trip_tickets"] {
 
           @include icons-list;
 
+          .icons-list {
+            display: inline-block;
+            margin-top: 8px;
+          }
+
           .check {
             background:#f1f4f1;
           }

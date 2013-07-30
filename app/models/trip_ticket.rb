@@ -1,4 +1,8 @@
+require "trip_ticket_icons"
+
 class TripTicket < ActiveRecord::Base
+  include TripTicketIcons
+
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
