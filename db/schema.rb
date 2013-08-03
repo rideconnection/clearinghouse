@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130805212825) do
+ActiveRecord::Schema.define(:version => 20130806200755) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -317,7 +317,8 @@ ActiveRecord::Schema.define(:version => 20130805212825) do
     t.integer_array "provider_black_list"
     t.integer       "origin_provider_id"
     t.boolean       "rescinded",                                           :default => false, :null => false
-    t.datetime      "expires_at"
+    t.datetime      "expire_at"
+    t.boolean       "expired",                                             :default => false
   end
 
   add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
@@ -325,6 +326,7 @@ ActiveRecord::Schema.define(:version => 20130805212825) do
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
   add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
+  add_index "trip_tickets", ["expired"], :name => "index_trip_tickets_on_expired"
   add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
   add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
