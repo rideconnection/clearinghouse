@@ -122,15 +122,20 @@
     <div class="details-box active">
       <a class="opener" href="#">Trip Details</a>
       <div class="slide">
-        <% unless trip_ticket.trip_funders.blank? %>
-          <p>Trip Funders: <%= formatted_customer_identifiers trip_ticket.trip_funders %></p>
-        <% end %>
-        <% unless trip_ticket.provider_white_list.blank? %>
-          <p>Trip Whitelist: <%= providers_from_white_black_list trip_ticket.provider_white_list %></p>
-        <% end %>
-        <% unless trip_ticket.provider_black_list.blank? %>
-          <p>Trip Blacklist: <%= providers_from_white_black_list trip_ticket.provider_black_list %></p>
-        <% end %>
+        <dl>
+          <% unless trip_ticket.trip_funders.blank? %>
+            <dt>Funders:</dt>
+            <dd><%= formatted_customer_identifiers trip_ticket.trip_funders %></dd>
+          <% end %>
+          <% unless trip_ticket.provider_white_list.blank? %>
+            <dt>Whitelist:</dt>
+            <dd><%= providers_from_white_black_list trip_ticket.provider_white_list %></dd>
+          <% end %>
+          <% unless trip_ticket.provider_black_list.blank? %>
+            <dt>Blacklist:</dt>
+            <dd><%= providers_from_white_black_list trip_ticket.provider_black_list %></dd>
+          <% end %>
+        </dl>
       </div>
     </div>
     <div class="form-holder">

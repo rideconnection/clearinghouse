@@ -365,6 +365,8 @@ body[data-controller="trip_tickets"] {
               overflow:hidden;
               padding:0 0 4px;
               vertical-align:top;
+              overflow: hidden;
+              white-space: nowrap;
             
               span {
                 background:url(image-path("separator02.gif")) no-repeat 100% 2px;
