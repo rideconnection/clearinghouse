@@ -178,7 +178,8 @@ class TripTicketsController < ApplicationController
   end
   
   def providers_for_lists
-    @providers_for_lists = Provider.accessible_by(current_ability) - [current_user.provider]
+    # This list needs to be based on the originating provider, not the current user
+    @providers_for_lists = Provider.where(:id => ProviderRelationship.partner_ids_for_provider(current_user.provider))
   end
 
   def include_ineligible?
