@@ -40,27 +40,6 @@
     <% end %>
   </fieldset>
 
-  <fieldset id="claimant" class="">
-    <legend>Claimant</legend>
-
-    <div class="field">
-      <%= f.label :claimant_provider_id, "Provider" %>
-      <% if can? :edit, @trip_ticket %>
-        <%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
-      <% else %>
-        <%= @trip_ticket.claimant.name if @trip_ticket.claimant.present? %>
-      <% end %>
-    </div>
-    <div class="field">
-      <%= f.label :claimant_trip_id, "Trip ID" %>
-      <% if can? :edit, @trip_ticket %>
-        <%= f.text_field :claimant_trip_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.claimant_trip_id %>
-      <% end %>
-    </div>
-  </fieldset>
-
   <fieldset id="customer" class="">
     <legend>Customer</legend>
     <div class="field">

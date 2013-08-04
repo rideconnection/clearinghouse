@@ -6,7 +6,6 @@ class TripTicket < ActiveRecord::Base
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
-  belongs_to :claimant, :foreign_key => :claimant_provider_id, :class_name => :Provider, :validate => true
   belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :pick_up_location,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :drop_off_location, :class_name => :Location, :validate => true, :dependent => :destroy
@@ -46,20 +45,20 @@ class TripTicket < ActiveRecord::Base
   CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
 
   attr_accessible :allowed_time_variance, :appointment_time,
-    :claimant_provider_id, :claimant_trip_id, :customer_address_attributes, 
-    :customer_address_id, :customer_boarding_time, :customer_deboarding_time, 
-    :customer_dob, :customer_emergency_phone, :customer_ethnicity, 
-    :customer_first_name, :customer_impairment_description, 
-    :customer_information_withheld, :customer_last_name, :customer_middle_name, 
-    :customer_notes, :customer_primary_language, :customer_primary_phone, 
-    :customer_race, :customer_seats_required, :drop_off_location_attributes,
-    :drop_off_location_id, :earliest_pick_up_time,
-    :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,
-    :origin_trip_id, :pick_up_location_attributes, :pick_up_location_id,
+    :customer_address_attributes, :customer_address_id,
+    :customer_boarding_time, :customer_deboarding_time, :customer_dob,
+    :customer_emergency_phone, :customer_ethnicity, :customer_first_name,
+    :customer_impairment_description, :customer_information_withheld,
+    :customer_last_name, :customer_middle_name, :customer_notes,
+    :customer_primary_language, :customer_primary_phone, :customer_race,
+    :customer_seats_required, :drop_off_location_attributes,
+    :drop_off_location_id, :earliest_pick_up_time, :num_attendants,
+    :num_guests, :origin_customer_id, :origin_provider_id, :origin_trip_id,
+    :pick_up_location_attributes, :pick_up_location_id,
     :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
     :trip_notes, :trip_purpose_description, :trip_result_attributes,
-    :customer_identifiers, :customer_mobility_impairments, 
-    :customer_eligibility_factors, :customer_assistive_devices, 
+    :customer_identifiers, :customer_mobility_impairments,
+    :customer_eligibility_factors, :customer_assistive_devices,
     :customer_service_animals, :guest_or_attendant_service_animals,
     :guest_or_attendant_assistive_devices, :trip_funders,
     :provider_white_list, :provider_black_list
