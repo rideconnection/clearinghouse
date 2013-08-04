@@ -274,9 +274,10 @@ class TripTicket < ActiveRecord::Base
   
   def activities_accessible_by(ability)
     (
+      [audits.first] +
       trip_claims.accessible_by(ability).all +
       trip_ticket_comments.accessible_by(ability).all +
-      Array(trip_result.present? && trip_result.id.present? && ability.can?(:read, trip_result) ? trip_result : nil) +
+      [trip_result.present? && trip_result.id.present? && ability.can?(:read, trip_result) ? trip_result : nil] +
       audits.where(action: 'update').where("audited_changes LIKE '%rescinded:%'")
     ).compact.sort_by(&:created_at)
   end

@@ -39,8 +39,19 @@ module TripTicketsHelper
   end
   
   def formatted_activity_line(activity)
-    activity_type = if activity.respond_to?(:audited_changes) && activity.audited_changes.first[0] == 'rescinded'
-      activity.audited_changes.first[1][1] ? 'Rescinded' : 'Unrescinded'
+    activity_type = if activity.respond_to?(:auditable) 
+      if activity.audited_changes.first[0] == 'rescinded'
+        activity.audited_changes.first[1][1] ? 'Rescinded' : 'Unrescinded'
+      else
+        case activity.action
+        when "create"
+          "Created"
+        when "update"
+          "Updated"
+        else
+          activity.action.capitalize
+        end
+      end
     else
       activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize
     end
@@ -50,10 +61,26 @@ module TripTicketsHelper
       activity.user.try(:display_name)
     elsif activity.is_a?(TripClaim)
       activity.claimant.name
-    else
+    elsif activity.respond_to?(:auditable)
       activity.audits.first.try(:user).try(:display_name)
+    else
+      ""
     end
     raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
+  end
+  
+  def formatted_activity_type(activity)
+    activity.class.name.demodulize.underscore
+  end
+  
+  def activity_path(activity)
+    if activity.is_a?(TripResult) 
+      trip_ticket_path(activity.trip_ticket) + '/trip_result'
+    elsif activity.respond_to?(:auditable)
+      trip_ticket_audits_path(activity.auditable)
+    else
+      [activity.trip_ticket, activity]
+    end
   end
 
   # this converts trip status to a simplified snake-cased form in a consistent way
