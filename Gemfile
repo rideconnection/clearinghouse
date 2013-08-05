@@ -37,6 +37,8 @@ gem 'devise', '~> 2.2'
 gem 'jquery-rails', '~> 2.1'
 gem 'seedbank', '~> 0.2'
 gem 'time_of_day', '~> 0.1'
+gem 'delayed_job_active_record', '~> 4.0'
+gem 'daemons', '~> 1.1'
 
 # API web service
 gem 'grape', '~> 0.2.0'

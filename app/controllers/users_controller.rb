@@ -64,7 +64,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        NewUserMailer.welcome(@user).deliver
+        NewUserMailer.delay.welcome(@user)
         destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }

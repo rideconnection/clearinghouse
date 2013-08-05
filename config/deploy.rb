@@ -1,5 +1,6 @@
 # Bundler and RVM integrations
 require 'bundler/capistrano'
+require "delayed/recipes" 
 
 set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
@@ -34,3 +35,6 @@ task :link_database_yml do
 end
 
 before "deploy:assets:precompile", :copy_database_yml
+after  "deploy:stop",    "delayed_job:stop"
+after  "deploy:start",   "delayed_job:start"
+after  "deploy:restart", "delayed_job:restart"
