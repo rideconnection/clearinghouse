@@ -15,7 +15,7 @@ set :user, "deployer"  # The server's user for deployments
 set :use_sudo, false
 
 namespace :deploy do
-  task :start do ; end
+  task :start ; end
   task :stop do ; end
   task :restart, :roles => :app, :except => { :no_release => true } do
     run "touch #{File.join(current_path,'tmp','restart.txt')}"
@@ -27,6 +27,12 @@ task :copy_database_yml do
   run  "cp #{latest_release}/config/database.yml.example #{latest_release}/config/database.yml"
 end
 
+task :link_pids_folder do
+  puts "    Link in pids folder"
+  run  "mkdir -p #{deploy_to}/shared/pids"
+  run  "ln -nFs #{deploy_to}/shared/pids #{latest_release}/pids"
+end
+
 task :link_database_yml do
   puts "    Link in database.yml file"
   run  "ln -nfs #{deploy_to}/shared/config/database.yml #{latest_release}/config/database.yml"
@@ -35,6 +41,7 @@ task :link_database_yml do
 end
 
 before "deploy:assets:precompile", :copy_database_yml
+before "deploy:assets:precompile", :link_pids_folder
 after  "deploy:stop",    "delayed_job:stop"
 after  "deploy:start",   "delayed_job:start"
 after  "deploy:restart", "delayed_job:restart"
