@@ -35,7 +35,7 @@ end
 
 task :link_djw_assets_folder do
   puts "    Link in DelayedJobWeb assets folder"
-  run "ln -nfs `bundle show delayed_job_web`/lib/delayed_job_web/application/public #{latest_release}/public/job_queue"
+  run "ln -nFs `bundle show delayed_job_web`/lib/delayed_job_web/application/public #{latest_release}/public/job_queue"
 end
 
 task :link_database_yml do
