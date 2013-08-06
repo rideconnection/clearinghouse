@@ -57,7 +57,7 @@ Clearinghouse::Application.routes.draw do
 
   match 'admin', :controller => :admin, :action => :index
   match 'reports', :controller => :reports, :action => :index
-  match "/admin/job_queue" => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
+  match "admin/job_queue" => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
     request.env['warden'].authenticated? # are we authenticated?
     request.env['warden'].authenticate! # authenticate if not already
     request.env['warden'].user.has_admin_role? # Ensure site_admin role
