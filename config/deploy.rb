@@ -33,6 +33,11 @@ task :link_pids_folder do
   run  "ln -nFs #{deploy_to}/shared/pids #{latest_release}/pids"
 end
 
+task :link_djw_assets_folder do
+  puts "    Link in DelayedJobWeb assets folder"
+  run "ln -nfs `bundle show delayed_job_web`/lib/delayed_job_web/application/public #{latest_release}/public/job_queue"
+end
+
 task :link_database_yml do
   puts "    Link in database.yml file"
   run  "ln -nfs #{deploy_to}/shared/config/database.yml #{latest_release}/config/database.yml"
@@ -42,6 +47,7 @@ end
 
 before "deploy:assets:precompile", :copy_database_yml
 before "deploy:assets:precompile", :link_pids_folder
+before "deploy:assets:precompile", :link_djw_assets_folder
 after  "deploy:stop",    "delayed_job:stop"
 after  "deploy:start",   "delayed_job:start"
 after  "deploy:restart", "delayed_job:restart"
