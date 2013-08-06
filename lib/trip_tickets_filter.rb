@@ -34,9 +34,9 @@ module TripTicketsFilter
       end
     end
 
-    # expects 'include_rescinded', 'only_rescinded', or 'exclude_rescinded'/nil (default)
-    # 'include_rescinded' basically means to not filter so does nothing
-    collection = collection.filter_by_rescinded(rescinded_filter) unless rescinded_filter == 'include_rescinded'
+    # expects 'exclude_rescinded', 'only_rescinded', or 'include_rescinded'/nil (default)
+    # 'include_rescinded' is the same as saying 'do not filter', so does nothing
+    collection = collection.filter_by_rescinded(rescinded_filter) unless ['include_rescinded', nil].include?(rescinded_filter)
 
     collection
   end

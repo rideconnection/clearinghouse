@@ -359,11 +359,13 @@ class TripTicket < ActiveRecord::Base
     end
 
     def filter_by_rescinded(filter)
-      # anything except :only_rescinded results in the default of hiding rescinded
-      if filter.present? && filter.to_sym == :only_rescinded
-        where(rescinded: true)
-      else
-        where(rescinded: false)
+      case filter.try(:to_sym)
+        when :exclude_rescinded
+          where(rescinded: false)
+        when :only_rescinded
+          where(rescinded: true)
+        else
+          scoped
       end
     end
 
