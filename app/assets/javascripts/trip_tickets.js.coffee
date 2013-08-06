@@ -103,7 +103,7 @@ $ ->
           new_field_name = field.name.replace(/^trip_ticket_filters/, "filter[data]");
           $saved_filter_form.append('<input type="hidden" value="'+field.value+'" name="'+new_field_name+'">')
 
-  $('.advanced-filters').openClose({
+  $('.advanced-filters, .saved-filter-form').openClose({
     activeClass: 'active',
     opener: '.opener',
     slider: '.slide',
