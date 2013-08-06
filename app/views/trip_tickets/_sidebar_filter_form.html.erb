@@ -24,6 +24,10 @@
 
   <%= form_tag trip_tickets_path, :method => :get, :class => "form-filter" do %>
     <div class="field">
+      <%= select_tag 'trip_ticket_filters[service_filters]', options_for_select([["Do not apply service filters (default)", :ignore_service_filters], ["Apply service filters", :apply_service_filters]], params[:trip_ticket_filters].try(:[], :service_filters)), :id => :trip_ticket_filters_service_filters, :prompt => "Service Filters:", :class => "form-input" %>
+    </div>
+
+    <div class="field">
       <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>
     </div>
 
@@ -75,22 +79,6 @@
       <%= label_tag :trip_ticket_filters_trip_time_start, "Trip Time:" %><br>
       <%= text_field_tag 'trip_ticket_filters[trip_time][start]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start), :id => :trip_ticket_filters_trip_time_start, :placeholder => "From: yyyy-mm-dd hh:mm am", :class => "form-input" %><br>
       <%= text_field_tag 'trip_ticket_filters[trip_time][end]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end), :id => :trip_ticket_filters_trip_time_end, :placeholder => "To: yyyy-mm-dd hh:mm am", :class => "form-input" %>
-    </div>
-
-    <% auto_open = params[:trip_ticket_filters].try(:[], :rescinded).present? ||
-                   params[:trip_ticket_filters].try(:[], :eligibility).present? ||
-                   params[:trip_ticket_filters].try(:[], :mobility).present?
-    %>
-    <div class="field advanced-filters<%= ' active' if auto_open %>">
-      <a class="opener" href="#">Advanced</a>
-      <div class="slide">
-        <div class="field">
-          <%= select_tag 'trip_ticket_filters[eligibility]', options_for_select([["Show only eligible trips (default)", :only_eligible], ["Include ineligible trips", :include_ineligible]], params[:trip_ticket_filters].try(:[], :eligibility)), :id => :trip_ticket_filters_eligibility, :prompt => "Eligibility Factors:", :class => "form-input" %>
-        </div>
-        <div class="field">
-          <%= select_tag 'trip_ticket_filters[mobility]', options_for_select([["Show only accommodated impairments (default)", :only_accommodated], ["Include unaccommodated impairments", :include_unaccommodated]], params[:trip_ticket_filters].try(:[], :mobility)), :id => :trip_ticket_filters_mobility, :prompt => "Mobility Requirements:", :class => "form-input" %>
-        </div>
-      </div>
     </div>
 
     <div class="buttons-holder">

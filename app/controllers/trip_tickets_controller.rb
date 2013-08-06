@@ -27,7 +27,7 @@ class TripTicketsController < ApplicationController
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets)
 
-    service_filter_options = { ignore_mobility: include_unaccommodated?, ignore_eligibility: include_ineligible? }
+    service_filter_options = { ignore_mobility: ignore_service_filters?, ignore_eligibility: ignore_service_filters? }
     @trip_tickets = provider_services_filter(@trip_tickets, current_user.provider, service_filter_options)
 
     massage_trip_ticket_trip_time_filter_values_for_form
@@ -182,11 +182,7 @@ class TripTicketsController < ApplicationController
     @providers_for_lists = Provider.where(:id => ProviderRelationship.partner_ids_for_provider(current_user.provider))
   end
 
-  def include_ineligible?
-    params[:trip_ticket_filters].try(:[], :eligibility) == 'include_ineligible'
-  end
-
-  def include_unaccommodated?
-    params[:trip_ticket_filters].try(:[], :mobility) == 'include_unaccommodated'
+  def ignore_service_filters?
+    params[:trip_ticket_filters].try(:[], :service_filters) != 'apply_service_filters'
   end
 end
