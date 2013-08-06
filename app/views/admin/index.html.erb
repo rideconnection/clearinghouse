@@ -11,7 +11,7 @@
     <li><%= link_to 'Providers', providers_path %></li>
     <li><%= link_to 'Users', users_path %></li>
     <% if current_user.has_admin_role? %>
-      <li><%= link_to 'Job Queue', admin_job_queue_path, :target => '_blank' %></li>
+      <li><%= link_to 'Job Queue', job_queue_path, :target => '_blank' %></li>
     <% end %>
   </ul>
 <% end %>
