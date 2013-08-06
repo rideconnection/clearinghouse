@@ -1161,17 +1161,17 @@ class TripTicketsTest < ActionController::IntegrationTest
         @t03 = FactoryGirl.create(:trip_ticket, :rescinded => true, :originator => @provider)
       end
 
-      it "should filter out rescinded trips by default" do
+      it "should not filter out rescinded trips by default" do
         visit @reset_filters_path
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
       end
 
       it "should allow the rescinded trip filter to be explicitly enabled" do
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Hide rescinded (default)", :from => "trip_ticket_filters_rescinded"
+          select "Hide rescinded", :from => "trip_ticket_filters_rescinded"
           click_button "Search"
         end
 
@@ -1183,7 +1183,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       it "should allow the rescinded trip filter to be disabled" do
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Show rescinded", :from => "trip_ticket_filters_rescinded"
+          select "Show rescinded (default)", :from => "trip_ticket_filters_rescinded"
           click_button "Search"
         end
 
@@ -1240,19 +1240,19 @@ class TripTicketsTest < ActionController::IntegrationTest
         )
       }
 
-      it "should filter out trips the provider is ineligible to fulfill by default" do
+      it "should not filter out trips the provider is ineligible to fulfill by default" do
         eligibility_rule_1
         visit @reset_filters_path
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
         eligibility_rule_2
         visit @reset_filters_path
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
       end
 
       it "should allow the eligibility filter to be explicitly enabled" do
@@ -1260,7 +1260,7 @@ class TripTicketsTest < ActionController::IntegrationTest
 
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Show only eligible trips (default)", :from => "trip_ticket_filters_eligibility"
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
 
@@ -1275,7 +1275,7 @@ class TripTicketsTest < ActionController::IntegrationTest
 
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Include ineligible trips", :from => "trip_ticket_filters_eligibility"
+          select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
 
@@ -1319,20 +1319,20 @@ class TripTicketsTest < ActionController::IntegrationTest
         @mobility_accommodation_2 = FactoryGirl.create(:mobility_accommodation, :mobility_impairment => 'Non-ambulatory', :service => @service)
       end
 
-      it "should filter out mobility impairments the provider cannot accommodate by default" do
+      it "should not filter out mobility impairments the provider cannot accommodate by default" do
         visit @reset_filters_path
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t05)})
       end
 
       it "should allow the mobility filter to be explicitly enabled" do
         visit @reset_filters_path
 
         within('#trip_ticket_filters') do
-          select "Show only accommodated impairments (default)", :from => "trip_ticket_filters_mobility"
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
 
@@ -1347,7 +1347,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         visit @reset_filters_path
 
         within('#trip_ticket_filters') do
-          select "Include unaccommodated impairments", :from => "trip_ticket_filters_mobility"
+          select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
 
@@ -1395,24 +1395,24 @@ class TripTicketsTest < ActionController::IntegrationTest
         FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: Time.parse("09:00:00 UTC"), close_time: Time.parse("22:00:00 UTC"), :service => @service)
       }
 
-      it "should filter out trips that are outside the provider's service hours by default" do
+      it "should not filter out trips that are outside the provider's service hours by default" do
         operating_hours_1
         visit @reset_filters_path
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
         operating_hours_2
         visit @reset_filters_path
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
       end
 
       it "should allow service hour filtering to be explicitly enabled via the eligibility filter control" do
         operating_hours_1
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Show only eligible trips (default)", :from => "trip_ticket_filters_eligibility"
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
@@ -1424,7 +1424,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         operating_hours_1
         visit @reset_filters_path
         within('#trip_ticket_filters') do
-          select "Include ineligible trips", :from => "trip_ticket_filters_eligibility"
+          select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
           click_button "Search"
         end
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})

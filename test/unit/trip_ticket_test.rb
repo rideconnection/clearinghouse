@@ -336,7 +336,7 @@ class TripTicketTest < ActiveSupport::TestCase
       refute_includes results, t3
     end
 
-    it "all filters out rescinded trip tickets by default" do
+    it "should not filter out rescinded trip tickets by default" do
       t1 = FactoryGirl.create(:trip_ticket)
       t2 = FactoryGirl.create(:trip_ticket, :rescinded => true)
       t3 = FactoryGirl.create(:trip_ticket)
@@ -344,7 +344,7 @@ class TripTicketTest < ActiveSupport::TestCase
       results = TripTicket.filter_by_rescinded(nil)
 
       assert_includes results, t1
-      refute_includes results, t2
+      assert_includes results, t2
       assert_includes results, t3
     end
 
