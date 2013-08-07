@@ -7,7 +7,10 @@ class Provider < ActiveRecord::Base
   has_many :trip_claims, :foreign_key => :claimant_provider_id
 
   # :address_attributes is needed to support mass-assignment of nested attrs
-  attr_accessible :active, :address, :address_attributes, :name, :primary_contact_email, :users_attributes
+  attr_accessible :active, :address, :address_attributes, :name, 
+    :primary_contact_email, :users_attributes, 
+    :trip_ticket_expiration_days_before, :trip_ticket_expiration_time_of_day
+
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :users
 
@@ -16,6 +19,8 @@ class Provider < ActiveRecord::Base
   validates :api_key, uniqueness: true, presence: {on: :update}
   validates :private_key, presence: {on: :update}
   validates_presence_of :name, :address, :primary_contact_email
+  validates :trip_ticket_expiration_days_before, :numericality => {:greater_than_or_equal_to => 0, :allow_blank => true}
+  validates :trip_ticket_expiration_time_of_day, :timeliness => {:type => :time, :allow_blank => true}
 
   def approved_partnerships
     partnerships = ProviderRelationship.where(
