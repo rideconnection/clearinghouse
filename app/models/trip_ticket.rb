@@ -61,7 +61,7 @@ class TripTicket < ActiveRecord::Base
     :customer_eligibility_factors, :customer_assistive_devices,
     :customer_service_animals, :guest_or_attendant_service_animals,
     :guest_or_attendant_assistive_devices, :trip_funders,
-    :provider_white_list, :provider_black_list, :expires_at
+    :provider_white_list, :provider_black_list, :expire_at
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
@@ -81,7 +81,7 @@ class TripTicket < ActiveRecord::Base
   validates :requested_drop_off_time, :timeliness => {:type => :time}
   validates :appointment_time, :timeliness => {:type => :datetime}
   validates :earliest_pick_up_time, :timeliness => {:type => :time, :allow_blank => true}
-  validates :expires_at, :timeliness => {:type => :datetime, :allow_blank => true}
+  validates :expire_at, :timeliness => {:type => :datetime, :allow_blank => true}
 
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
@@ -443,17 +443,17 @@ class TripTicket < ActiveRecord::Base
         # is after the requested_pickup_time on the day of appointment_time. If so, the ticket is expired.
       
         if ticket.expire_at.present?
-          expires_at = ticket.expire_at
+          expire_at = ticket.expire_at
         elsif ticket.originator.trip_ticket_expiration_days_before.present? && ticket.originator.trip_ticket_expiration_time_of_day.present?
           days_before = ticket.originator.trip_ticket_expiration_days_before + (
             ((ticket.appointment_time.to_date - ticket.originator.trip_ticket_expiration_days_before.days).to_date..ticket.appointment_time.to_date).select{ |d| [0,6].include?(d.wday) }.size
           )
-          expires_at = DateTime.parse((ticket.appointment_time.to_date - days_before.days).to_s + " " + ticket.originator.trip_ticket_expiration_time_of_day.to_s).in_time_zone.past?
+          expire_at = DateTime.parse((ticket.appointment_time.to_date - days_before.days).to_s + " " + ticket.originator.trip_ticket_expiration_time_of_day.to_s).in_time_zone.past?
         else
-          expires_at = DateTime.parse(ticket.appointment_time.to_date.to_s + " " + ticket.requested_pickup_time.to_s).in_time_zone
+          expire_at = DateTime.parse(ticket.appointment_time.to_date.to_s + " " + ticket.requested_pickup_time.to_s).in_time_zone
         end
         
-        ticket.update_attribute(:expired, true) if expires_at.past?
+        ticket.update_attribute(:expired, true) if expire_at.past?
       end
     end
 

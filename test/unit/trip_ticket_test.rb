@@ -599,17 +599,17 @@ class TripTicketTest < ActiveSupport::TestCase
   end
 
   describe "ticket expiration" do
-    describe "expires_at" do
+    describe "expire_at" do
       it "is not required" do
-        trip_ticket = FactoryGirl.build(:trip_ticket, :expires_at => "")
+        trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "")
         assert trip_ticket.valid?
       end
 
       it "must be a valid datetime string" do
-        trip_ticket = FactoryGirl.build(:trip_ticket, :expires_at => "foo")
+        trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "foo")
         refute trip_ticket.valid?
 
-        trip_ticket.expires_at = "2008-09-10 00:00"
+        trip_ticket.expire_at = "2008-09-10 00:00"
         assert trip_ticket.valid?
       end
     end
@@ -620,7 +620,7 @@ class TripTicketTest < ActiveSupport::TestCase
     
     describe "calculating ticket expiration" do
       before do
-        @current_datetime = DateTime.parse("2013-08-03 12:00 PM").in_time_zone
+        @current_datetime = Time.parse("2013-08-03 12:00 PM UTC").in_time_zone
         @provider = FactoryGirl.create(:provider, :trip_ticket_expiration_days_before => 0, :trip_ticket_expiration_time_of_day => "11:00 AM")
       end
 
@@ -632,7 +632,7 @@ class TripTicketTest < ActiveSupport::TestCase
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id, 
           :appointment_time => @current_datetime,
           :requested_pickup_time => @current_datetime, # Today at 12:00 PM
-          :expires_at => nil
+          :expire_at => nil
         )
         Timecop.freeze(@current_datetime - 30.minutes) do # Time.now is frozen at 2013-08-03 11:30 AM
           assert trip_ticket.expired? # Ticket expired today at 11:00 AM
@@ -643,7 +643,7 @@ class TripTicketTest < ActiveSupport::TestCase
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
           :appointment_time => @current_datetime,
           :requested_pickup_time => @current_datetime, # Today at 12:00 PM
-          :expires_at => @current_datetime - 2.hours # Today at 10:00 AM
+          :expire_at => @current_datetime - 2.hours # Today at 10:00 AM
         )
         Timecop.freeze(@current_datetime - 90.minutes) do # Time.now is frozen at 2013-08-03 10:30 AM
           assert trip_ticket.expired? # Ticket expired today at 10:00 AM
@@ -655,7 +655,7 @@ class TripTicketTest < ActiveSupport::TestCase
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
           :appointment_time => @current_datetime,
           :requested_pickup_time => @current_datetime - 30.minutes, # Today at 11:30 AM
-          :expires_at => nil
+          :expire_at => nil
         )
         Timecop.freeze(@current_datetime) do # Time.now is frozen at 2013-08-03 12:00 PM
           assert trip_ticket.expired? # Ticket expired today at 11:30 AM
