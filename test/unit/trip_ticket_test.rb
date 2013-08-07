@@ -635,7 +635,8 @@ class TripTicketTest < ActiveSupport::TestCase
           :expire_at => nil
         )
         Timecop.freeze(@current_datetime - 30.minutes) do # Time.now is frozen at 2013-08-03 11:30 AM
-          assert trip_ticket.expired? # Ticket expired today at 11:00 AM
+          TripTicket.expire_tickets!
+          assert trip_ticket.reload.expired? # Ticket expired today at 11:00 AM
         end
       end
     
@@ -646,7 +647,8 @@ class TripTicketTest < ActiveSupport::TestCase
           :expire_at => @current_datetime - 2.hours # Today at 10:00 AM
         )
         Timecop.freeze(@current_datetime - 90.minutes) do # Time.now is frozen at 2013-08-03 10:30 AM
-          assert trip_ticket.expired? # Ticket expired today at 10:00 AM
+          TripTicket.expire_tickets!
+          assert trip_ticket.reload.expired? # Ticket expired today at 10:00 AM
         end
       end
     
@@ -658,7 +660,8 @@ class TripTicketTest < ActiveSupport::TestCase
           :expire_at => nil
         )
         Timecop.freeze(@current_datetime) do # Time.now is frozen at 2013-08-03 12:00 PM
-          assert trip_ticket.expired? # Ticket expired today at 11:30 AM
+          TripTicket.expire_tickets!
+          assert trip_ticket.reload.expired? # Ticket expired today at 11:30 AM
         end
       end
     end
