@@ -5,6 +5,12 @@ require "delayed/recipes"
 set :stages, %w(staging production)
 require 'capistrano/ext/multistage'
 
+set :whenever_command, "bundle exec whenever"
+set :whenever_environment, defer { stage }
+set :whenever_identifier, defer { "#{application}_#{stage}" }
+set :whenever_roles, [:db, :app]
+require "whenever/capistrano"
+
 set :application, "Clearinghouse"
 set :repository,  "http://github.com/rideconnection/clearinghouse.git"
 

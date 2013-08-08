@@ -91,7 +91,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "should return Expired if trip ticket is expired" do
-        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Expired'
+        @trip_ticket.tap {|t| t.expired = true }.status_for(@user).must_equal 'Expired'
       end
 
       it "should return No Claims if trip ticket has no claims" do
@@ -177,7 +177,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "should return Unavailable if trip ticket is expired" do
-        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Unavailable'
+        @trip_ticket.tap {|t| t.expired = true }.status_for(@user).must_equal 'Unavailable'
       end
 
       it "should return Unavailable if trip ticket is resolved and has no claims from user's provider" do

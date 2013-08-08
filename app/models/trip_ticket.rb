@@ -61,7 +61,7 @@ class TripTicket < ActiveRecord::Base
     :customer_eligibility_factors, :customer_assistive_devices,
     :customer_service_animals, :guest_or_attendant_service_animals,
     :guest_or_attendant_assistive_devices, :trip_funders,
-    :provider_white_list, :provider_black_list
+    :provider_white_list, :provider_black_list, :expire_at
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
@@ -69,12 +69,19 @@ class TripTicket < ActiveRecord::Base
   
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
-    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time, 
-    :appointment_time
+    :origin_provider_id
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
-  validate :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
+  validate  :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
+
+  # TODO - are these too restrictive for the data coming in the API?
+  validates :customer_dob, :timeliness => {:type => :date}
+  validates :requested_pickup_time, :timeliness => {:type => :time}
+  validates :requested_drop_off_time, :timeliness => {:type => :time}
+  validates :appointment_time, :timeliness => {:type => :datetime}
+  validates :earliest_pick_up_time, :timeliness => {:type => :time, :allow_blank => true}
+  validates :expire_at, :timeliness => {:type => :datetime, :allow_blank => true}
 
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
@@ -222,11 +229,6 @@ class TripTicket < ActiveRecord::Base
     end
   end
 
-  def expired?
-    # TODO per task #1356, TripTicket#expired? should include a date set by provider at which point it is too late to submit a claim
-    appointment_time.past? && !approved?
-  end
-
   def resolved?
     (appointment_time.past? && approved?) || trip_result.present?
   end
@@ -369,6 +371,15 @@ class TripTicket < ActiveRecord::Base
       end
     end
 
+    def filter_by_expired(filter)
+      # anything except :only_expired results in the default of hiding expired
+      if filter.present? && filter.to_sym == :only_expired
+        where(expired: true)
+      else
+        where(expired: false)
+      end
+    end
+
     def filter_by_claim_status(status)
       case status.to_sym
       when :unclaimed
@@ -417,6 +428,31 @@ class TripTicket < ActiveRecord::Base
       #   number of elements.
       array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
+    end
+    
+    def expire_tickets!(threshold = Time.current)
+      threshold = threshold.to_datetime.in_time_zone
+      default_query = TripTicket.unscoped.
+        # Exclude already expired or rescinded tickets
+        where('"trip_tickets"."expired" = ? AND "trip_tickets"."rescinded" = ?', false, false).
+        # Exclude tickets that have an approved claim
+        where('NOT EXISTS(SELECT 1 FROM trip_claims WHERE trip_ticket_id = trip_tickets.id AND status = \'approved\')').
+        # Exclude tickets that have a trip result
+        where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
+        
+      # Part 1 - expire tickets with an explicit expire_at date
+      default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      
+      # Part 2 - use provider default values to look for other tickets eligible for expiration
+      Provider.unscoped.each do |provider|
+        if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
+          days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
+          expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
+          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
+        else
+          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
+        end
+      end
     end
 
     private
