@@ -66,7 +66,13 @@ class TripTicket < ActiveRecord::Base
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
   audited
-  
+
+  acts_as_notifier do
+    after_create do
+      notify ->(trip){ trip.originator.users.pluck(:email) }, :if => proc{ !rescinded? }, :method => :test_notification
+    end
+  end
+
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
     :origin_provider_id
@@ -441,7 +447,7 @@ class TripTicket < ActiveRecord::Base
         # appointment_time. If so, the ticket has expired. If we are on that day, then check if the time is currently at or after 
         # trip_ticket_expiration_time_of_day. If so, then the ticket is expired. If those values are nil, check to see if the current time
         # is after the requested_pickup_time on the day of appointment_time. If so, the ticket is expired.
-      
+
         if ticket.expire_at.present?
           expire_at = ticket.expire_at
         elsif ticket.originator.trip_ticket_expiration_days_before.present? && ticket.originator.trip_ticket_expiration_time_of_day.present?
@@ -452,7 +458,7 @@ class TripTicket < ActiveRecord::Base
         else
           expire_at = DateTime.parse(ticket.appointment_time.to_date.to_s + " " + ticket.requested_pickup_time.to_s).in_time_zone
         end
-        
+
         ticket.update_attribute(:expired, true) if expire_at.past?
       end
     end
