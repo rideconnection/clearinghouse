@@ -100,6 +100,7 @@ class ProviderTest < ActiveSupport::TestCase
     end
   end
 
+
   describe "with an unapproved partnership" do
     before do
       @partner = FactoryGirl.create(:provider)
@@ -121,36 +122,6 @@ class ProviderTest < ActiveSupport::TestCase
 
       assert_equal @partner.partnerships_awaiting_its_approval, [@partnership]
       assert_equal @partner.pending_partnerships_initiated_by_it, []
-    end
-  end
-  
-  describe "trip_ticket_expiration_days_before" do
-    it "is not required" do
-      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_days_before => "")
-      assert provider.valid?
-    end
-    
-    it "must be greater than or equal to 0 if specified" do
-      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_days_before => -1)
-      refute provider.valid?
-
-      provider.trip_ticket_expiration_days_before = 0
-      assert provider.valid?
-    end
-  end
-
-  describe "trip_ticket_expiration_time_of_day" do
-    it "is not required" do
-      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_time_of_day => "")
-      assert provider.valid?
-    end
-    
-    it "must be a valid time string" do
-      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_time_of_day => "-25:61")
-      refute provider.valid?
-
-      provider.trip_ticket_expiration_time_of_day = "23:59"
-      assert provider.valid?
     end
   end
 

@@ -61,7 +61,7 @@ class TripTicket < ActiveRecord::Base
     :customer_eligibility_factors, :customer_assistive_devices,
     :customer_service_animals, :guest_or_attendant_service_animals,
     :guest_or_attendant_assistive_devices, :trip_funders,
-    :provider_white_list, :provider_black_list, :expire_at
+    :provider_white_list, :provider_black_list
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
@@ -69,19 +69,12 @@ class TripTicket < ActiveRecord::Base
   
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
-    :origin_provider_id
+    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time, 
+    :appointment_time
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
-  validate  :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
-
-  # TODO - are these too restrictive for the data coming in the API?
-  validates :customer_dob, :timeliness => {:type => :date}
-  validates :requested_pickup_time, :timeliness => {:type => :time}
-  validates :requested_drop_off_time, :timeliness => {:type => :time}
-  validates :appointment_time, :timeliness => {:type => :datetime}
-  validates :earliest_pick_up_time, :timeliness => {:type => :time, :allow_blank => true}
-  validates :expire_at, :timeliness => {:type => :datetime, :allow_blank => true}
+  validate :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
 
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
@@ -229,6 +222,11 @@ class TripTicket < ActiveRecord::Base
     end
   end
 
+  def expired?
+    # TODO per task #1356, TripTicket#expired? should include a date set by provider at which point it is too late to submit a claim
+    appointment_time.past? && !approved?
+  end
+
   def resolved?
     (appointment_time.past? && approved?) || trip_result.present?
   end
@@ -371,15 +369,6 @@ class TripTicket < ActiveRecord::Base
       end
     end
 
-    def filter_by_expired(filter)
-      # anything except :only_expired results in the default of hiding expired
-      if filter.present? && filter.to_sym == :only_expired
-        where(expired: true)
-      else
-        where(expired: false)
-      end
-    end
-
     def filter_by_claim_status(status)
       case status.to_sym
       when :unclaimed
@@ -428,33 +417,6 @@ class TripTicket < ActiveRecord::Base
       #   number of elements.
       array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
-    end
-    
-    def expire_tickets!(before = Time.zone.now)
-      TripTicket.where(expired: false).where(
-        '"appointment_time" <= ? OR (TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_pickup_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?)',
-        before, before
-      ).find_each do |ticket|
-        # If the ticket has a expire_at value, check to see if the time is currently at or after that date. If so, the ticket is expired.
-        # If expire_at is blank, then if the originator has non-nil values for both trip_ticket_expiration_days_before and
-        # trip_ticket_expiration_time_of_day, then check if we are within trip_ticket_expiration_days_before number of week days before the 
-        # appointment_time. If so, the ticket has expired. If we are on that day, then check if the time is currently at or after 
-        # trip_ticket_expiration_time_of_day. If so, then the ticket is expired. If those values are nil, check to see if the current time
-        # is after the requested_pickup_time on the day of appointment_time. If so, the ticket is expired.
-      
-        if ticket.expire_at.present?
-          expire_at = ticket.expire_at
-        elsif ticket.originator.trip_ticket_expiration_days_before.present? && ticket.originator.trip_ticket_expiration_time_of_day.present?
-          days_before = ticket.originator.trip_ticket_expiration_days_before + (
-            ((ticket.appointment_time.to_date - ticket.originator.trip_ticket_expiration_days_before.days).to_date..ticket.appointment_time.to_date).select{ |d| [0,6].include?(d.wday) }.size
-          )
-          expire_at = DateTime.parse((ticket.appointment_time.to_date - days_before.days).to_s + " " + ticket.originator.trip_ticket_expiration_time_of_day.to_s).in_time_zone.past?
-        else
-          expire_at = DateTime.parse(ticket.appointment_time.to_date.to_s + " " + ticket.requested_pickup_time.to_s).in_time_zone
-        end
-        
-        ticket.update_attribute(:expired, true) if expire_at.past?
-      end
     end
 
     private

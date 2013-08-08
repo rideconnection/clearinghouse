@@ -33,15 +33,13 @@ end
 gem "audited", "~> 3.0"
 gem "audited-activerecord", "~> 3.0"
 gem "cancan", "~> 1.6"
-gem "daemons", "~> 1.1"
-gem "delayed_job_active_record", "~> 4.0"
-gem "delayed_job_web", "~> 1.2"
 gem "devise", "~> 2.2"
 gem "jquery-rails", "~> 2.1"
 gem "seedbank", "~> 0.2"
-gem "time_of_day", "~> 0.1" # TODO - this gem is no longer being developed. Switch to TOC gem
-gem "validates_timeliness", "~> 3.0"
-gem "whenever", "~> 0.8", :require => false
+gem "time_of_day", "~> 0.1"
+gem "delayed_job_active_record", "~> 4.0"
+gem "daemons", "~> 1.1"
+gem "delayed_job_web", "~> 1.2"
 
 # API web service
 gem "grape", "~> 0.2.0"
@@ -58,7 +56,6 @@ group :test do
   gem "capybara"
   gem "database_cleaner"
   gem "launchy"
-  gem "timecop"
 end
 
 group :test, :development do
