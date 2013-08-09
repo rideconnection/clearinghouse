@@ -40,11 +40,11 @@ module ActsAsNotifier
       cattr_accessor :notification_actions
       self.notification_actions = NotificationDsl.evaluate(&block).presence || []
       Rails.logger.debug "ActsAsNotifier NOTIFICATION DSL returned action list: #{self.notification_actions}"
-      include ActsAsNotifier::LocalInstanceMethods
+      include LocalInstanceMethods
     end
   end
 
-  module ActsAsNotifier::LocalInstanceMethods
+  module LocalInstanceMethods
     extend ActiveSupport::Concern
 
     included do
