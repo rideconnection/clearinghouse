@@ -7,14 +7,17 @@
 #
 # Params:
 #   recipients  - can be a string containing email addresses, any object with an 'email' method, an array of
-#                 strings/objects, or a proc or symbolic method name returning any of the above.
+#                 strings/objects, or a proc or symbolic method name returning any of the above. procs will be
+#                 passed the options hash as a parameter.
 #
 #   on_callback - :after_save or :after_create
 #
 #   options
-#     :if       - string to eval, proc, or method name, !!result must equal true for notification to be sent
+#     :if       - string to eval, proc, or method name, !!result must equal true for notification to be sent. procs will
+#                 be passed the options hash as a parameter.
 #     :mailer   - a class inheriting from ActionMailer::Base, may be a string or symbol or actual class
 #     :method   - mailer class method to invoke, should accept recipient list and sending ActiveRecord model as params
+#     custom    - any additional options can be saved in the action and will be available to procs
 #
 # Examples:
 #   acts_as_notifier do
@@ -82,13 +85,14 @@ module ActsAsNotifier
     end
 
     def notifier_conditions_satisfied?(action)
-      condition = case action[:if]
+      condition = action[:if]
+      condition = case condition
         when String
-          instance_eval(action[:if])
+          instance_eval(condition)
         when Proc
-          instance_eval(&action[:if])
+          instance_exec(action, &condition)
         when Symbol
-          self.send(action[:if])
+          self.send(condition)
         else
           true
       end
@@ -97,13 +101,14 @@ module ActsAsNotifier
     end
 
     def notifier_recipients(action)
-      recipients = case action[:recipients]
+      recipients = action[:recipients]
+      recipients = case recipients
         when Proc
-          instance_eval(&action[:recipients])
+          instance_exec(action, &recipients)
         when Symbol
-          self.send(action[:recipients])
+          self.send(recipients)
         else
-          action[:recipients]
+          recipients
       end
       recipients = [ recipients ] unless recipients.is_a?(Array)
       recipient_list = recipients.map {|r| r.respond_to?(:email) ? r.email : r }.join(', ')
