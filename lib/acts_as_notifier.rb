@@ -37,9 +37,9 @@ module ActsAsNotifier
 
   module ClassMethods
     def acts_as_notifier(&block)
-      cattr_accessor :notification_actions
-      self.notification_actions = NotificationDsl.evaluate(&block).presence || []
-      Rails.logger.debug "ActsAsNotifier NOTIFICATION DSL returned action list: #{self.notification_actions}"
+      cattr_accessor :notifier_actions
+      self.notifier_actions = NotificationDsl.evaluate(&block).presence || []
+      Rails.logger.debug "ActsAsNotifier NOTIFICATION DSL returned action list: #{self.notifier_actions}"
       include LocalInstanceMethods
     end
   end
@@ -48,27 +48,27 @@ module ActsAsNotifier
     extend ActiveSupport::Concern
 
     included do
-      after_create :acts_as_notifier_create_handler
-      after_save :acts_as_notifier_save_handler
+      after_create :notifier_create_handler
+      after_save :notifier_save_handler
     end
 
     private
 
-    def acts_as_notifier_create_handler
-      acts_as_notifier_handler(:after_create)
+    def notifier_create_handler
+      notifier_handler(:after_create)
     end
 
-    def acts_as_notifier_save_handler
-      acts_as_notifier_handler(:after_save)
+    def notifier_save_handler
+      notifier_handler(:after_save)
     end
 
-    def acts_as_notifier_handler(callback_type)
-      self.class.notification_actions.each do |action|
+    def notifier_handler(callback_type)
+      self.class.notifier_actions.each do |action|
         if action[:callback_type].to_sym == callback_type &&
-            acts_as_notifier_conditions_satisfied?(action) &&
-            (recipients = acts_as_notifier_recipients(action)).present?
+            notifier_conditions_satisfied?(action) &&
+            (recipients = notifier_recipients(action)).present?
 
-          mailer, method = acts_as_notifier_get_mailer(action)
+          mailer, method = notifier_get_mailer(action)
 
           if ActsAsNotifier::Config.use_delayed_job && mailer.respond_to?(:delay)
             Rails.logger.debug "ActsAsNotifier #{callback_type.to_s.upcase} HANDLER sending message with #{mailer.to_s}.delay.#{method}"
@@ -81,7 +81,7 @@ module ActsAsNotifier
       end
     end
 
-    def acts_as_notifier_conditions_satisfied?(action)
+    def notifier_conditions_satisfied?(action)
       condition = case action[:if]
         when String
           instance_eval(action[:if])
@@ -96,7 +96,7 @@ module ActsAsNotifier
       !!condition
     end
 
-    def acts_as_notifier_recipients(action)
+    def notifier_recipients(action)
       recipients = case action[:recipients]
         when Proc
           instance_eval(&action[:recipients])
@@ -115,7 +115,7 @@ module ActsAsNotifier
       recipient_list
     end
 
-    def acts_as_notifier_get_mailer(action)
+    def notifier_get_mailer(action)
       mailer = action[:mailer] || ActsAsNotifier::Config.default_mailer
       raise "ActsAsNotifier invalid mailer configuration, mailer not specified" unless mailer.present?
 
