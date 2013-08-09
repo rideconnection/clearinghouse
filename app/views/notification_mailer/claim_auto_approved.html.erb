@@ -1,0 +1,19 @@
+A new Ride Connection Clearinghouse <%= link_to 'trip ticket claim', @trip_claim %> has been automatically approved:<br><br>
+<table>
+  <caption>Trip Claim Summary</caption>
+  <tbody>
+    <tr>
+      <th>Trip ID</th>
+      <td><%= @trip_claim.trip_ticket.origin_trip_id %></td>
+    </tr>
+    <tr>
+      <th>Claimant</th>
+      <td><%= @trip_claim.claimant.name %></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<%= link_to 'Full details', @trip_claim %>
+<br><br>
+You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.
+To stop receiving notification emails, please <%= link_to 'update your user preferences', preferences_url %>.

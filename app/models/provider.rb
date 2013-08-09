@@ -22,6 +22,13 @@ class Provider < ActiveRecord::Base
   validates :trip_ticket_expiration_days_before, :numericality => {:greater_than_or_equal_to => 0, :allow_blank => true}
   validates :trip_ticket_expiration_time_of_day, :timeliness => {:type => :time, :allow_blank => true}
 
+  def approved_partners
+    partnerships = approved_partnerships
+    partner_ids = partnerships.map {|ap| ap.requesting_provider_id == id ? nil : ap.requesting_provider_id }.compact
+    partner_ids = partner_ids + partnerships.map {|ap| ap.cooperating_provider_id == id ? nil : ap.cooperating_provider_id }.compact
+    Provider.where(id: partner_ids.uniq)
+  end
+
   def approved_partnerships
     partnerships = ProviderRelationship.where(
       %Q{

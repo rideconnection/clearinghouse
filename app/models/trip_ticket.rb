@@ -1,7 +1,9 @@
-require "trip_ticket_icons"
+require 'trip_ticket_icons'
+require 'notification_recipients'
 
 class TripTicket < ActiveRecord::Base
   include TripTicketIcons
+  include NotificationRecipients
 
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
@@ -69,7 +71,11 @@ class TripTicket < ActiveRecord::Base
 
   acts_as_notifier do
     after_create do
-      notify ->(trip){ trip.originator.users.pluck(:email) }, :if => proc{ !rescinded? }, :method => :test_notification
+      notify ->(opts){ partner_users(self, opts) }, method: :trip_created
+    end
+    after_save do
+      notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
+      notify ->(opts){ claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
     end
   end
 
