@@ -1,4 +1,4 @@
-A Ride Connection Clearinghouse <%= link_to 'trip ticket comment', @trip_comment %> has been added:<br><br>
+A Ride Connection Clearinghouse <%= link_to 'trip ticket comment', trip_ticket_trip_ticket_comments_url(@trip_comment.trip_ticket, @trip_comment) %> has been added:<br><br>
 <table>
   <caption>Trip Ticket Summary</caption>
   <tbody>
@@ -29,7 +29,7 @@ A Ride Connection Clearinghouse <%= link_to 'trip ticket comment', @trip_comment
 <p style="margin-left:1em">
   <%= @trip_comment.body %>
 </p>
-<%= link_to 'Full details', @trip_comment %>
+<%= link_to 'Full details', trip_ticket_trip_ticket_comments_url(@trip_comment.trip_ticket, @trip_comment) %>
 <br><br>
 You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.
 To stop receiving notification emails, please <%= link_to 'update your user preferences', preferences_url %>.
