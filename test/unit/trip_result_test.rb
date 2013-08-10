@@ -51,4 +51,13 @@ class TripTicketTest < ActiveSupport::TestCase
     user.provider = @third_party_provider
     assert !@result.can_be_edited_by?(user)
   end
+
+  it "should have a claimant method which returns the provider who submitted the result" do
+    @claim.approve!
+    @result.trip_ticket = @ticket
+    @result.save!
+    @result.must_respond_to :claimant
+    @result.claimant.must_equal @claimant
+  end
+
 end
