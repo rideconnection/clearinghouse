@@ -122,8 +122,17 @@ class ProviderTest < ActiveSupport::TestCase
       assert_equal @partner.partnerships_awaiting_its_approval, [@partnership]
       assert_equal @partner.pending_partnerships_initiated_by_it, []
     end
+
+    describe "#approved_partners" do
+      it "should return a list of providers with approved partnerships" do
+        assert @provider.approved_partners.empty?
+        @partnership.approve!
+        @provider.approved_partners.must_include(@partner)
+      end
+    end
   end
-  
+
+
   describe "trip_ticket_expiration_days_before" do
     it "is not required" do
       provider = FactoryGirl.build(:provider, :trip_ticket_expiration_days_before => "")
