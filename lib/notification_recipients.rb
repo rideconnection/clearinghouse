@@ -30,39 +30,35 @@ module NotificationRecipients
 
   def provider_users(provider, notifier_options)
     provider_ids = (provider.is_a?(Array) ? provider : [provider]).compact.map {|p| p.id }
-    users_by_provider_id(provider_ids, notifier_options)
+    user_emails_by_provider_id(provider_ids, notifier_options)
   end
 
   def partner_users(trip_ticket, notifier_options)
     provider_ids = trip_ticket.originator.approved_partners.pluck(:id)
     provider_ids &= trip_ticket.provider_white_list if trip_ticket.provider_white_list.present?
     provider_ids -= trip_ticket.provider_black_list if trip_ticket.provider_black_list.present?
-    users_by_provider_id(provider_ids, notifier_options)
+    user_emails_by_provider_id(provider_ids, notifier_options)
   end
 
   def claimant_users(trip_ticket, notifier_options)
     provider_ids = trip_ticket.trip_claims.where(status: TripClaim::ACTIVE_STATUS).pluck(:claimant_provider_id)
-    users_by_provider_id(provider_ids, notifier_options)
+    user_emails_by_provider_id(provider_ids, notifier_options)
   end
 
   def originator_and_claimant_users(trip_ticket, notifier_options)
     provider_ids = trip_ticket.trip_claims.where(status: TripClaim::ACTIVE_STATUS).pluck(:claimant_provider_id)
     provider_ids << trip_ticket.origin_provider_id
-    users_by_provider_id(provider_ids, notifier_options)
+    user_emails_by_provider_id(provider_ids, notifier_options)
   end
 
   # filtering
 
-  def users_by_provider_id(provider_ids, notifier_options)
-    User.unscoped.where(provider_id: provider_ids).apply_filters(notifier_options)
+  def user_emails_by_provider_id(provider_ids, notifier_options)
+    notification_enabled_filter(User.unscoped.where(provider_id: provider_ids), notifier_options).pluck(:email)
   end
 
-  def apply_filters(notifier_options)
-    for_notification_type(notifier_options).pluck(:email)
-  end
-
-  def for_notification_type(notifier_options)
+  def notification_enabled_filter(users, notifier_options)
     type = notifier_options[:method].to_sym
-    where("(users.notification_preferences @> ?)", "{\"#{type}\"}")
+    users.where("(users.notification_preferences @> ?)", "{\"#{type}\"}")
   end
 end
