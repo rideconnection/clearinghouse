@@ -6,25 +6,25 @@
 module NotificationRecipients
   extend ActiveSupport::Concern
 
-  # The NOTIFICATION_TYPES array is used to build the UI for users to enable notification types. The method names are
-  # saved as strings in user preferences. When a recipient list is generated, the acts_as_notify options are passed to
+  # The NOTIFICATION_TYPES array is used to build the UI for users to enable notification types. The keys are saved
+  # as strings in user preferences. When a recipient list is generated, the acts_as_notify options are passed to
   # the functions which include the mailer method about to be invoked -- recipients are filtered to those users who
-  # have enabled that method.
+  # have enabled keys matching the mailer method.
   #
-  # Method names should be kept unique. If method names need to overlap, the mailer class could be added to distinguish.
+  # Mailer method names need to be unique, even across multiple mailer classes.
 
-  NOTIFICATION_TYPES = [
-    { description: 'Partner creates a trip ticket',     method: :trip_created },
-    { description: 'Claimed trip ticket rescinded',     method: :trip_rescinded },
-    { description: 'Claimed trip ticket expired',       method: :trip_expired },
-    { description: 'New trip claim awaiting approval',  method: :claim_for_approval },
-    { description: 'New trip claim auto-approved',      method: :claim_auto_approved },
-    { description: 'Trip claim approved',               method: :claim_approved },
-    { description: 'Trip claim declined',               method: :claim_declined },
-    { description: 'Trip claim rescinded',              method: :claim_rescinded },
-    { description: 'Trip result submitted',             method: :trip_result_created },
-    { description: 'Trip comment added',                method: :trip_comment_created }
-  ]
+  NOTIFICATION_TYPES = {
+      trip_created:         'Partner creates a trip ticket',
+      trip_rescinded:       'Claimed trip ticket rescinded',
+      trip_expired:         'Claimed trip ticket expired',
+      claim_for_approval:   'New trip claim awaiting approval',
+      claim_auto_approved:  'New trip claim auto-approved',
+      claim_approved:       'Trip claim approved',
+      claim_declined:       'Trip claim declined',
+      claim_rescinded:      'Trip claim rescinded',
+      trip_result_created:  'Trip result submitted',
+      trip_comment_created: 'Trip comment added'
+  }
 
   protected
 
@@ -62,14 +62,7 @@ module NotificationRecipients
   end
 
   def for_notification_type(notifier_options)
-    type = notification_type(notifier_options)
+    type = notifier_options[:method].to_sym
     where("(users.notification_preferences @> ?)", "{\"#{type}\"}")
-  end
-
-  def notification_type(notifier_options)
-    notifier_options ||= {}
-    # note: mailer class not needed to identify a type, if we keep method names unique
-    method = notifier_options[:method].to_sym
-    NOTIFICATION_TYPES.select {|type| type[:method] == method }.first
   end
 end
