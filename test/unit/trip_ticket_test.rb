@@ -4,7 +4,7 @@ class TripTicketTest < ActiveSupport::TestCase
   setup do
     @trip_ticket = FactoryGirl.create(:trip_ticket)
   end
-  
+
   it "returns the customer's full name" do
     t = TripTicket.new
     t.customer_first_name = "Billy"
@@ -614,14 +614,10 @@ class TripTicketTest < ActiveSupport::TestCase
       end
     end
     
-    describe "expired?" do
-      # TODO
-    end
-    
     describe "calculating ticket expiration" do
       before do
-        @current_datetime = Time.parse("2013-08-03 12:00 PM UTC").in_time_zone
-        @provider = FactoryGirl.create(:provider, :trip_ticket_expiration_days_before => 0, :trip_ticket_expiration_time_of_day => "11:00 AM")
+        @provider = FactoryGirl.create(:provider, :trip_ticket_expiration_days_before => 1, :trip_ticket_expiration_time_of_day => "11:00 AM")
+        Timecop.freeze(@current_datetime = Time.parse("Mon, 05 Aug 2013 12:00:00 +0000").in_time_zone)
       end
 
       after do
@@ -630,39 +626,54 @@ class TripTicketTest < ActiveSupport::TestCase
 
       test "inheriting expiration from provider" do
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id, 
-          :appointment_time => @current_datetime,
-          :requested_pickup_time => @current_datetime, # Today at 12:00 PM
+          :appointment_time => @current_datetime + 1.day, # Tue, 06 Aug 2013 12:00:00 +0000
+          :requested_pickup_time => "12:00 PM",
           :expire_at => nil
         )
-        Timecop.freeze(@current_datetime - 30.minutes) do # Time.now is frozen at 2013-08-03 11:30 AM
-          TripTicket.expire_tickets!
-          assert trip_ticket.reload.expired? # Ticket expired today at 11:00 AM
-        end
+        TripTicket.expire_tickets!
+        assert trip_ticket.reload.expired?
       end
     
       test "overriding inherited expiration" do
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
-          :appointment_time => @current_datetime,
-          :requested_pickup_time => @current_datetime, # Today at 12:00 PM
-          :expire_at => @current_datetime - 2.hours # Today at 10:00 AM
+          :appointment_time => @current_datetime + 2.days, # Wed, 07 Aug 2013 12:00:00 +0000
+          :requested_pickup_time => "12:00 PM",
+          :expire_at => @current_datetime - 2.hours # Mon, 05 Aug 2013 10:00:00 +0000
         )
-        Timecop.freeze(@current_datetime - 90.minutes) do # Time.now is frozen at 2013-08-03 10:30 AM
-          TripTicket.expire_tickets!
-          assert trip_ticket.reload.expired? # Ticket expired today at 10:00 AM
-        end
+        TripTicket.expire_tickets!
+        assert trip_ticket.reload.expired?
       end
     
       test "no expiration specified" do
         @provider.update_attributes(:trip_ticket_expiration_days_before => nil, :trip_ticket_expiration_time_of_day => nil)
         trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
-          :appointment_time => @current_datetime,
-          :requested_pickup_time => @current_datetime - 30.minutes, # Today at 11:30 AM
+          :appointment_time => @current_datetime + 30.minutes, # Mon, 05 Aug 2013 12:30:00 +0000
+          :requested_pickup_time => "12:00 PM",
           :expire_at => nil
         )
-        Timecop.freeze(@current_datetime) do # Time.now is frozen at 2013-08-03 12:00 PM
-          TripTicket.expire_tickets!
-          assert trip_ticket.reload.expired? # Ticket expired today at 11:30 AM
-        end
+        TripTicket.expire_tickets!
+        assert trip_ticket.reload.expired?
+      end
+      
+      test "ignores recinded tickets" do
+        recinded = FactoryGirl.create(:trip_ticket, rescinded: true, expire_at: @current_datetime)
+        TripTicket.expire_tickets!
+        assert_equal false, recinded.reload.expired?
+      end
+      
+      test "ignores tickets with results" do
+        resulted = FactoryGirl.create(:trip_ticket, expire_at: @current_datetime)
+        claim = FactoryGirl.create(:trip_claim, trip_ticket_id: resulted.id, status: :approved)
+        resulted.create_trip_result(outcome: "Completed")
+        TripTicket.expire_tickets!
+        assert_equal false, resulted.reload.expired?
+      end
+      
+      test "ignores tickets with an approved claim" do
+        approved = FactoryGirl.create(:trip_ticket, expire_at: @current_datetime)
+        FactoryGirl.create(:trip_claim, trip_ticket_id: approved.id, status: :approved)
+        TripTicket.expire_tickets!
+        assert_equal false, approved.reload.expired?
       end
     end
   end

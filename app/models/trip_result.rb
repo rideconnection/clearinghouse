@@ -32,7 +32,7 @@ class TripResult < ActiveRecord::Base
   validate :ensure_trip_ticket_is_approved
 
   def claimant
-    (trip_claim || trip_ticket.approved_claim).try(:claimant)
+    trip_ticket.approved_claim.try(:claimant)
   end
 
   def can_be_edited_by?(user)

@@ -442,30 +442,28 @@ class TripTicket < ActiveRecord::Base
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
     
-    def expire_tickets!(before = Time.zone.now)
-      TripTicket.where(expired: false).where(
-        '"appointment_time" <= ? OR (TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_pickup_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?)',
-        before, before
-      ).find_each do |ticket|
-        # If the ticket has a expire_at value, check to see if the time is currently at or after that date. If so, the ticket is expired.
-        # If expire_at is blank, then if the originator has non-nil values for both trip_ticket_expiration_days_before and
-        # trip_ticket_expiration_time_of_day, then check if we are within trip_ticket_expiration_days_before number of week days before the 
-        # appointment_time. If so, the ticket has expired. If we are on that day, then check if the time is currently at or after 
-        # trip_ticket_expiration_time_of_day. If so, then the ticket is expired. If those values are nil, check to see if the current time
-        # is after the requested_pickup_time on the day of appointment_time. If so, the ticket is expired.
-
-        if ticket.expire_at.present?
-          expire_at = ticket.expire_at
-        elsif ticket.originator.trip_ticket_expiration_days_before.present? && ticket.originator.trip_ticket_expiration_time_of_day.present?
-          days_before = ticket.originator.trip_ticket_expiration_days_before + (
-            ((ticket.appointment_time.to_date - ticket.originator.trip_ticket_expiration_days_before.days).to_date..ticket.appointment_time.to_date).select{ |d| [0,6].include?(d.wday) }.size
-          )
-          expire_at = DateTime.parse((ticket.appointment_time.to_date - days_before.days).to_s + " " + ticket.originator.trip_ticket_expiration_time_of_day.to_s).in_time_zone.past?
+    def expire_tickets!(threshold = Time.current)
+      threshold = threshold.to_datetime.in_time_zone
+      default_query = TripTicket.unscoped.
+        # Exclude already expired or rescinded tickets
+        where('"trip_tickets"."expired" = ? AND "trip_tickets"."rescinded" = ?', false, false).
+        # Exclude tickets that have an approved claim
+        where('NOT EXISTS(SELECT 1 FROM trip_claims WHERE trip_ticket_id = trip_tickets.id AND status = \'approved\')').
+        # Exclude tickets that have a trip result
+        where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
+        
+      # Part 1 - expire tickets with an explicit expire_at date
+      default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      
+      # Part 2 - use provider default values to look for other tickets eligible for expiration
+      Provider.unscoped.each do |provider|
+        if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
+          days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
+          expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
+          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
         else
-          expire_at = DateTime.parse(ticket.appointment_time.to_date.to_s + " " + ticket.requested_pickup_time.to_s).in_time_zone
+          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
         end
-
-        ticket.update_attribute(:expired, true) if expire_at.past?
       end
     end
 

@@ -444,6 +444,14 @@
         <%= @trip_ticket.trip_notes %>
       <% end %>
     </div>
+    <div class="field">
+      <%= f.label :expire_at, "Trip Expires At" %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.datetime_select :expire_at, :ampm => true, :minute_step => 60, :include_blank => true %>
+      <% else %>
+        <%= @trip_ticket.expire_at %>
+      <% end %>
+    </div>
   </fieldset>
 
   <fieldset id="info" class="">

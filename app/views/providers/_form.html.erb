@@ -22,6 +22,14 @@
     <%= f.label :primary_contact_email %>
     <%= f.text_field :primary_contact_email %>
   </div>
+  <div class="field">
+    <%= f.label :trip_ticket_expiration_days_before %>
+    <%= f.number_field :trip_ticket_expiration_days_before, :min => 0, :max => 99 %>
+  </div>
+  <div class="field">
+    <%= f.label :trip_ticket_expiration_time_of_day %>
+    <%= f.time_select :trip_ticket_expiration_time_of_day, :ampm => true, :minute_step => 60, :include_blank => true %>
+  </div>
 
   <% if @provider.new_record? && @user.present? %>
   <fieldset id="provider_admin_user">

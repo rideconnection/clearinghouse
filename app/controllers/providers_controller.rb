@@ -2,6 +2,10 @@ class ProvidersController < ApplicationController
   load_and_authorize_resource
   before_filter :admins_only, :only => :index
 
+  before_filter :only => [:create, :update] do
+    allow_blank_time_field(@provider, :trip_ticket_expiration_time_of_day)
+  end
+
   def index
     respond_to do |format|
       format.html # index.html.erb
