@@ -30,12 +30,13 @@
 #   ActsAsNotifier::Config.default_mailer  = a class inheriting from ActionMailer::Base
 #   ActsAsNotifier::Config.default_method  = mailer class method to invoke, should accept recipient list and sending
 #                                            ActiveRecord model as params
+#   ActsAsNotifier::Config.disabled        = true/false, can be globally enabled or disabled at any time
 
 module ActsAsNotifier
   extend ActiveSupport::Concern
 
   module Config
-    mattr_accessor :use_delayed_job, :default_mailer, :default_method
+    mattr_accessor :use_delayed_job, :default_mailer, :default_method, :disabled
   end
 
   module ClassMethods
@@ -57,11 +58,11 @@ module ActsAsNotifier
     private
 
     def notifier_create_handler
-      notifier_handler(:after_create)
+      notifier_handler(:after_create) unless ActsAsNotifier::Config.disabled
     end
 
     def notifier_save_handler
-      notifier_handler(:after_save)
+      notifier_handler(:after_save) unless ActsAsNotifier::Config.disabled
     end
 
     def notifier_handler(callback_type)
@@ -77,7 +78,7 @@ module ActsAsNotifier
             mailer.delay.send(method, recipients, self)
           else
             Rails.logger.debug "ActsAsNotifier #{callback_type.to_s.upcase} HANDLER sending message with #{mailer.to_s}.#{method}"
-            mailer.send(method, recipients, self)
+            mailer.send(method, recipients, self).deliver
           end
         end
       end
