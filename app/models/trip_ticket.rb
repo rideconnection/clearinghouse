@@ -285,7 +285,7 @@ class TripTicket < ActiveRecord::Base
       end
     end
   end
-  
+
   def activities_accessible_by(ability)
     (
       [audits.first] +
@@ -453,16 +453,25 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      default_query.where('expire_at <= ?', threshold).each do |trip|
+        trip.expired = true
+        trip.save
+      end
       
       # Part 2 - use provider default values to look for other tickets eligible for expiration
       Provider.unscoped.each do |provider|
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
-          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
+          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).each do |trip|
+            trip.expired = true
+            trip.save
+          end
         else
-          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
+          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).each do |trip|
+            trip.expired = true
+            trip.save
+          end
         end
       end
     end

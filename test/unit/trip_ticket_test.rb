@@ -677,4 +677,37 @@ class TripTicketTest < ActiveSupport::TestCase
       end
     end
   end
+
+  describe "notifications" do
+    setup do
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+      @recipients = 'aaa@example.com, bbb@example.com'
+      TripTicket.any_instance.stubs(:partner_users).returns(@recipients)
+      TripTicket.any_instance.stubs(:claimant_users).returns(@recipients)
+      @mail_message = mock()
+      @mail_message.stubs(:deliver)
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = true
+    end
+
+    it "should notify all partner users when a trip is created" do
+      NotificationMailer.expects(:trip_created).with(@recipients, instance_of(TripTicket)).returns(@mail_message)
+      FactoryGirl.create(:trip_ticket)
+    end
+
+    it "should notify all claimant users when a trip is rescinded" do
+      NotificationMailer.expects(:trip_rescinded).with(@recipients, @trip_ticket).returns(@mail_message)
+      @trip_ticket.rescind!
+    end
+
+    it "should notify all claimant users when a trip expires" do
+      NotificationMailer.expects(:trip_expired).with(@recipients, @trip_ticket).returns(@mail_message)
+      # note: can't end out expiry notifications with a callback because update_all queries are used!
+      @trip_ticket.update_attributes(expire_at: 2.days.ago)
+      TripTicket.expire_tickets!
+    end
+  end
 end
