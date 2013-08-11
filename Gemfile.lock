@@ -169,6 +169,7 @@ GEM
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    metaclass (0.0.1)
     mime-types (1.21)
     minitest (4.6.2)
     minitest-capybara (0.1.0)
@@ -176,6 +177,8 @@ GEM
       minitest-matchers (>= 1.2)
     minitest-matchers (1.2.0)
       minitest (>= 2.5.0)
+    mocha (0.14.0)
+      metaclass (~> 0.0.1)
     multi_json (1.6.1)
     multi_xml (0.5.3)
     net-scp (1.1.0)
@@ -322,6 +325,7 @@ DEPENDENCIES
   launchy
   minitest-rails!
   minitest-rails-capybara!
+  mocha
   pg
   rails (~> 3.2)
   rails-erd
