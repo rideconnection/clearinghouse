@@ -108,7 +108,7 @@ class Ability
       can :activate, ProviderRelationship, :cooperating_provider_id => user.provider_id
             
       # Provider admins and above can create, update and deactivate users belonging to their own provider
-      can [:create, :update, :activate, :deactivate, :set_provider_role], User, :provider_id => user.provider_id
+      can [:create, :update, :activate, :deactivate, :set_provider_role, :preferences], User, :provider_id => user.provider_id
       
       # Provider admins and above can update and work with the keys of their own provider
       can [:update, :keys, :reset_keys], Provider, :id => user.provider_id
@@ -174,7 +174,7 @@ class Ability
     can :read, User, :provider_id => user.provider_id
 
     # All users can update their own profile
-    can :update, User, :id => user.id
+    can [:update, :preferences], User, :id => user.id
 
     # No user can deactivate themselves
     cannot :deactivate, User, :id => user.id
