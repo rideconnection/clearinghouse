@@ -465,6 +465,12 @@
       <%= f.label :updated_at, "Updated" %>
       <%= @trip_ticket.updated_at %>
     </div>
+    <% if can? :edit, @trip_ticket %>
+      <div class="field">
+        <%= f.label :expired, "Expired?" %>
+        <%= @trip_ticket.expired? ? "True" : "False" %>
+      </div>
+    <% end %>
   </fieldset>
 
   <% if can? :edit, @trip_ticket %>
