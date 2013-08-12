@@ -441,16 +441,23 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      logger.debug "Expiring tickets for all providers where expire_at <= #{threshold}"
+      updated = default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      logger.debug "  #{updated} tickets expired"
       
       # Part 2 - use provider default values to look for other tickets eligible for expiration
+      logger.debug "Preparing to expire tickets for each provider"
       Provider.unscoped.each do |provider|
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
-          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
+          logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold}"
+          updated = default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
+          logger.debug "    #{updated} tickets expired"
         else
-          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
+          logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold}"
+          updated = default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
+          logger.debug "    #{updated} tickets expired"
         end
       end
     end
