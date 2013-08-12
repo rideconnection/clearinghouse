@@ -682,6 +682,7 @@ class TripTicketTest < ActiveSupport::TestCase
     setup do
       ActsAsNotifier::Config.disabled = false
       ActsAsNotifier::Config.use_delayed_job = false
+      @recipients = 'aaa@example.com, bbb@example.com'
     end
 
     teardown do
@@ -689,37 +690,36 @@ class TripTicketTest < ActiveSupport::TestCase
     end
 
     it "should notify all partner users when a trip is created" do
-      recipients = 'aaa@example.com, bbb@example.com'
-      TripTicket.send(:define_method, :partner_users) { |trip, opts| recipients }
-      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-        FactoryGirl.create(:trip_ticket)
+      TripTicket.all_instances.stub(:partner_users, @recipients) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+          FactoryGirl.create(:trip_ticket)
+        end
       end
       msg = ActionMailer::Base.deliveries.last
-      msg.to.must_equal recipients.split(/,\s*/)
+      msg.to.must_equal @recipients.split(/,\s*/)
       msg.subject.must_equal 'Ride Connection Clearinghouse: new trip ticket'
     end
 
     it "should notify all claimant users when a trip is rescinded" do
-      recipients = 'aaa@example.com, bbb@example.com'
-      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-        @trip_ticket.stub(:claimant_users, recipients) do
+      TripTicket.all_instances.stub(:claimant_users, @recipients) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
           @trip_ticket.rescind!
         end
       end
       msg = ActionMailer::Base.deliveries.last
-      msg.to.must_equal recipients.split(/,\s*/)
+      msg.to.must_equal @recipients.split(/,\s*/)
       msg.subject.must_equal 'Ride Connection Clearinghouse: claimed trip ticket rescinded'
     end
 
     it "should notify all claimant users when a trip expires" do
-      recipients = 'aaa@example.com, bbb@example.com'
-      TripTicket.send(:define_method, :claimant_users) { |trip, opts| recipients }
       @trip_ticket.update_attributes(expire_at: 2.days.ago)
-      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-        TripTicket.expire_tickets!
+      TripTicket.all_instances.stub(:claimant_users, @recipients) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+          TripTicket.expire_tickets!
+        end
       end
       msg = ActionMailer::Base.deliveries.last
-      msg.to.must_equal recipients.split(/,\s*/)
+      msg.to.must_equal @recipients.split(/,\s*/)
       msg.subject.must_equal 'Ride Connection Clearinghouse: claimed trip ticket expired'
     end
   end
