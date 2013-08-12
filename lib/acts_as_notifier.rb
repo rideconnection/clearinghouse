@@ -55,6 +55,13 @@ module ActsAsNotifier
       after_save :notifier_save_handler
     end
 
+    # find a notification action matching options and trigger it, ignoring conditions
+    def force_notification(options = {})
+      opts = options.to_a
+      action = self.class.notifier_actions.find { |action| action.to_a & opts == opts }
+      notifier_send(action)
+    end
+
     private
 
     def notifier_create_handler
@@ -67,20 +74,7 @@ module ActsAsNotifier
 
     def notifier_handler(callback_type)
       self.class.notifier_actions.each do |action|
-        if action[:callback_type].to_sym == callback_type &&
-            notifier_conditions_satisfied?(action) &&
-            (recipients = notifier_recipients(action)).present?
-
-          mailer, method = notifier_get_mailer(action)
-
-          if ActsAsNotifier::Config.use_delayed_job && mailer.respond_to?(:delay)
-            Rails.logger.debug "ActsAsNotifier #{callback_type.to_s.upcase} HANDLER sending message with #{mailer.to_s}.delay.#{method}"
-            mailer.delay.send(method, recipients, self)
-          else
-            Rails.logger.debug "ActsAsNotifier #{callback_type.to_s.upcase} HANDLER sending message with #{mailer.to_s}.#{method}"
-            mailer.send(method, recipients, self).deliver
-          end
-        end
+        notifier_send(action) if action[:callback_type].to_sym == callback_type && notifier_conditions_satisfied?(action)
       end
     end
 
@@ -118,6 +112,19 @@ module ActsAsNotifier
         Rails.logger.debug "ActsAsNotifier recipients list \"#{ recipient_list }\""
       end
       recipient_list
+    end
+
+    def notifier_send(action)
+      if  (recipients = notifier_recipients(action)).present?
+        mailer, method = notifier_get_mailer(action)
+        if ActsAsNotifier::Config.use_delayed_job && mailer.respond_to?(:delay)
+          Rails.logger.debug "ActsAsNotifier sending message with #{mailer.to_s}.delay.#{method}"
+          mailer.delay.send(method, recipients, self)
+        else
+          Rails.logger.debug "ActsAsNotifier sending message with #{mailer.to_s}.#{method}"
+          mailer.send(method, recipients, self).deliver
+        end
+      end
     end
 
     def notifier_get_mailer(action)
