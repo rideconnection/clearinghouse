@@ -453,7 +453,7 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      default_query.where('expire_at <= ?', threshold).each do |trip|
+      default_query.where('expire_at <= ?', threshold).find_each(batch_size: 100) do |trip|
         trip.expired = true
         trip.save
       end
@@ -463,12 +463,12 @@ class TripTicket < ActiveRecord::Base
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
-          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).each do |trip|
+          default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).find_each(batch_size: 100) do |trip|
             trip.expired = true
             trip.save
           end
         else
-          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).each do |trip|
+          default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).find_each(batch_size: 100) do |trip|
             trip.expired = true
             trip.save
           end
