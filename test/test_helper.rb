@@ -11,8 +11,6 @@ Spork.prefork do
   require "minitest/rails"
   require "minitest/rails/capybara"
   require "turn/autorun"
-  require "test/unit"
-  require "mocha/setup"
 
   class MiniTest::Rails::ActiveSupport::TestCase
     # Setup all fixtures in test/fixtures/*.(yml|csv) for all tests in
