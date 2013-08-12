@@ -713,7 +713,7 @@ class TripTicketTest < ActiveSupport::TestCase
     it "should notify all claimant users when a trip expires" do
       @trip_ticket.update_attributes(expire_at: 2.days.ago)
       assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-        TripTicket.expire_tickets!
+        TripTicket.expire_tickets!(1.days.ago)
       end
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket expired')
     end
