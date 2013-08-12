@@ -452,11 +452,11 @@ class TripTicket < ActiveRecord::Base
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
           logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold}"
-          updated = default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at).update_all(expired: true)
+          updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at).update_all(expired: true)
           logger.debug "    #{updated} tickets expired"
         else
           logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold}"
-          updated = default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold).update_all(expired: true)
+          updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', provider.id, threshold).update_all(expired: true)
           logger.debug "    #{updated} tickets expired"
         end
       end
