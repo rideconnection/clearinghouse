@@ -38,7 +38,7 @@ class TripClaim < ActiveRecord::Base
       notify ->(opts){ provider_users([trip_ticket.originator, claimant], opts) }, if: proc{ can_be_auto_approved? }, method: :claim_auto_approved
     end
     after_save do
-      notify ->(opts){ provider_users(claimant, opts) }, if: proc{ status_changed? && status == :approved }, method: :claim_approved
+      notify ->(opts){ provider_users(claimant, opts) }, if: proc{ status_changed? && status == :approved && !can_be_auto_approved? }, method: :claim_approved
       notify ->(opts){ provider_users(claimant, opts) }, if: proc{ status_changed? && status == :declined }, method: :claim_declined
       notify ->(opts){ provider_users(trip_ticket.originator, opts) }, if: proc{ status_changed? && status == :rescinded }, method: :claim_rescinded
     end
