@@ -77,7 +77,6 @@ class TripTicketTest < ActiveSupport::TestCase
     end
 
     it "should notify trip ticket originator and claimant users when a trip result is submitted" do
-      @ticket.trip_result.must_equal nil
       assert_difference 'ActionMailer::Base.deliveries.size', +1 do
         @claim.approve!
         result = TripResult.create(:trip_ticket_id => @ticket.id, :outcome => "Completed")
