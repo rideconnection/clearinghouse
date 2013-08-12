@@ -441,7 +441,7 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      logger.debug "Expiring tickets for all providers where expire_at <= #{threshold}"
+      logger.debug "Expiring tickets for all providers where expire_at <= #{threshold.to_s}"
       updated = default_query.where('expire_at <= ?', threshold).update_all(expired: true)
       logger.debug "  #{updated} tickets expired"
       
@@ -451,11 +451,11 @@ class TripTicket < ActiveRecord::Base
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
-          logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold}"
+          logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold.to_s}"
           updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at).update_all(expired: true)
           logger.debug "    #{updated} tickets expired"
         else
-          logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold}"
+          logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.to_s}"
           updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', provider.id, threshold).update_all(expired: true)
           logger.debug "    #{updated} tickets expired"
         end
