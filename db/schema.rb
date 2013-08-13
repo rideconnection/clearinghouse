@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130813181347) do
+ActiveRecord::Schema.define(:version => 20130813195422) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -303,7 +303,6 @@ ActiveRecord::Schema.define(:version => 20130813181347) do
     t.time          "requested_pickup_time"
     t.time          "requested_drop_off_time"
     t.hstore        "customer_identifiers"
-    t.string_array  "customer_mobility_impairments",   :limit => 255
     t.string        "customer_ethnicity"
     t.string_array  "customer_eligibility_factors",    :limit => 255
     t.string_array  "customer_mobility_factors",       :limit => 255
@@ -317,13 +316,14 @@ ActiveRecord::Schema.define(:version => 20130813181347) do
     t.boolean       "rescinded",                                      :default => false, :null => false
     t.datetime      "expire_at"
     t.boolean       "expired",                                        :default => false
+    t.string        "customer_service_level"
   end
 
   add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
   add_index "trip_tickets", ["customer_mobility_factors"], :name => "customer_mobility_factors"
-  add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
+  add_index "trip_tickets", ["customer_service_level"], :name => "customer_service_level"
   add_index "trip_tickets", ["expired"], :name => "index_trip_tickets_on_expired"
   add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"

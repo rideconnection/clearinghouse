@@ -1,5 +1,5 @@
 require 'active_support/concern'
-require 'mobility_filter'
+require 'service_level_filter'
 require 'eligibility_filter'
 require 'service_area_filter'
 require 'operating_hours_filter'
@@ -7,7 +7,7 @@ require 'operating_hours_filter'
 module ProviderServicesFilter
   extend ActiveSupport::Concern
 
-  include MobilityFilter
+  include ServiceLevelFilter
   include EligibilityFilter
   include ServiceAreaFilter
   include OperatingHoursFilter
@@ -51,7 +51,7 @@ module ProviderServicesFilter
   def provider_service_filter(service, options = {})
     # within a service:
     # filter for accommodated impairments AND eligible AND within service area AND within operating hours
-    mobility_query, mobility_params = service_mobility_filter(service) unless options[:ignore_mobility]
+    mobility_query, mobility_params = service_level_filter(service) unless options[:ignore_mobility]
     eligibility_query, eligibility_params = service_eligibility_filter(service) unless options[:ignore_eligibility]
     service_area_query = service_area_filter(service) unless options[:ignore_eligibility] || options[:ignore_service_area]
     operating_hours_query = service_operating_hours_filter(service) unless options[:ignore_eligibility] || options[:ignore_operating_hours]
