@@ -254,7 +254,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def claimable_by?(user)
-    !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
+    !self.expired? && !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
 
   def claims_from(provider)
@@ -268,7 +268,7 @@ class TripTicket < ActiveRecord::Base
 
   def rescindable?
     # any trip that does not have a result can be rescinded (if customer cancels, claims and approvals are irrelevant)
-    trip_result.nil? || trip_result.new_record?
+    !self.expired? && (trip_result.nil? || trip_result.new_record?)
   end
 
   def rescind!
@@ -285,7 +285,7 @@ class TripTicket < ActiveRecord::Base
       end
     end
   end
-
+  
   def activities_accessible_by(ability)
     (
       [audits.first] +
@@ -453,37 +453,39 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      current_query = default_query.where('expire_at <= ?', threshold)
-      current_query.find_each(batch_size: 100) do |trip|
-        trip.expired = true
-        trip.save
-      end
-      current_query.update_all(expired: true)
-
+      logger.debug "Expiring tickets for all providers where expire_at <= #{threshold.to_s}"
+      updated = expire_collection(default_query.where('expire_at <= ?', threshold))
+      logger.debug "  #{updated} tickets expired"
+      
       # Part 2 - use provider default values to look for other tickets eligible for expiration
+      logger.debug "Preparing to expire tickets for each provider"
       Provider.unscoped.each do |provider|
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
-          current_query = default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at)
-          current_query.update_all(expired: true)
-          current_query.find_each(batch_size: 100) do |trip|
-            trip.expired = true
-            trip.save
-          end
+          logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold.to_s}"
+          updated = expire_collection(default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at))
+          logger.debug "    #{updated} tickets expired"
         else
-          current_query = default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold)
-          current_query.update_all(expired: true)
-          current_query.find_each(batch_size: 100) do |trip|
-            trip.expired = true
-            trip.save
-          end
+          logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.to_s}"
+          updated = expire_collection(default_query.where('origin_provider_id = ? AND expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', provider.id, threshold))
+          logger.debug "    #{updated} tickets expired"
         end
       end
     end
 
     private
-    
+
+    def expire_collection(collection)
+      updated = 0
+      collection.find_each(batch_size: 100) do |trip|
+        trip.expired = true
+        trip.save
+        updated += 1
+      end
+      updated
+    end
+
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE LOWER(?) OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
