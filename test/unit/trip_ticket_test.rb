@@ -677,4 +677,45 @@ class TripTicketTest < ActiveSupport::TestCase
       end
     end
   end
+
+  describe "notifications" do
+    setup do
+      @acts_as_notifier_disbled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+      @recipients = 'aaa@example.com, bbb@example.com'
+      TripTicket.all_instances.stub(:partner_users, @recipients)
+      TripTicket.all_instances.stub(:claimant_users, @recipients)
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disbled
+      ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
+      TripTicket.all_instances.unstub(:partner_users)
+      TripTicket.all_instances.unstub(:claimant_users)
+    end
+
+    it "should notify all partner users when a trip is created" do
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        FactoryGirl.create(:trip_ticket)
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: new trip ticket')
+    end
+
+    it "should notify all claimant users when a trip is rescinded" do
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        @trip_ticket.rescind!
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket rescinded')
+    end
+
+    it "should notify all claimant users when a trip expires" do
+      @trip_ticket.update_attributes(expire_at: 2.days.ago)
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        TripTicket.expire_tickets!(1.days.ago)
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket expired')
+    end
+  end
 end

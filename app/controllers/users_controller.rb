@@ -47,6 +47,11 @@ class UsersController < ApplicationController
   def edit
   end
 
+  # GET /preferences
+  def preferences
+    redirect_to edit_user_url(current_user)
+  end
+
   # POST /users
   # POST /users.json
   def create    

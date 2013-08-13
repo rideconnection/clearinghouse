@@ -186,4 +186,61 @@ class TripClaimTest < ActiveSupport::TestCase
     assert_equal true, tc.approved?, "Expected trip claim to be approved"
     assert_equal true, tt.approved?, "Expected trip ticket to be claimed"
   end
+
+  describe "notifications" do
+    setup do
+      @acts_as_notifier_disbled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+      @recipients = 'aaa@example.com, bbb@example.com'
+      TripClaim.all_instances.stub(:provider_users, @recipients)
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disbled
+      ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
+      TripClaim.all_instances.unstub(:provider_users)
+    end
+
+    it "should notify trip ticket originator users when a new claim is pending" do
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        FactoryGirl.create(:trip_claim)
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket claim awaiting approval')
+    end
+
+    it "should notify trip ticket originator and claimant users when a new claim is auto-approved" do
+      TripClaim.all_instances.stub(:can_be_auto_approved?, true) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+          FactoryGirl.create(:trip_claim)
+        end
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket claim auto-approved')
+    end
+
+    it "should notify claimant users when a pending claim is approved" do
+      claim = FactoryGirl.create(:trip_claim)
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        claim.approve!
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket claim approved')
+    end
+
+    it "should notify claimant users when a pending claim is declined" do
+      claim = FactoryGirl.create(:trip_claim)
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        claim.decline!
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket claim declined')
+    end
+
+    it "should notify trip ticket originator users when a claim is rescinded" do
+      claim = FactoryGirl.create(:trip_claim)
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        claim.rescind!
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket claim rescinded')
+    end
+  end
 end

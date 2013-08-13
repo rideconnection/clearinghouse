@@ -1,4 +1,23 @@
 // Place all the styles related to the Users controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-body[data-controller="users"] {}
+body[data-controller="users"] {
+  .notification-preferences {
+    margin-bottom: 12px;
+    ul {
+      float: left;
+      margin: 0;
+      padding: 0;
+      li {
+        list-style-type: none;
+        padding-top: 4px;
+      }
+    }
+    div {
+      float: left;
+      p {
+        margin: 0;
+      }
+    }
+  }
+}

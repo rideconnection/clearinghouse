@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider_id, :role_id, 
-    :title
+    :title, :notification_preferences
 
   validate do |user|
     # This pattern should technically work, but it doesn't...

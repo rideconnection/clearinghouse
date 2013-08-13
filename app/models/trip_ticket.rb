@@ -1,7 +1,9 @@
-require "trip_ticket_icons"
+require 'trip_ticket_icons'
+require 'notification_recipients'
 
 class TripTicket < ActiveRecord::Base
   include TripTicketIcons
+  include NotificationRecipients
 
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
@@ -66,7 +68,17 @@ class TripTicket < ActiveRecord::Base
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
 
   audited
-  
+
+  acts_as_notifier do
+    after_create do
+      notify ->(opts){ partner_users(self, opts) }, method: :trip_created
+    end
+    after_save do
+      notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
+      notify ->(opts){ claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
+    end
+  end
+
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
     :origin_provider_id
@@ -442,7 +454,7 @@ class TripTicket < ActiveRecord::Base
         
       # Part 1 - expire tickets with an explicit expire_at date
       logger.debug "Expiring tickets for all providers where expire_at <= #{threshold.to_s}"
-      updated = default_query.where('expire_at <= ?', threshold).update_all(expired: true)
+      updated = expire_collection(default_query.where('expire_at <= ?', threshold))
       logger.debug "  #{updated} tickets expired"
       
       # Part 2 - use provider default values to look for other tickets eligible for expiration
@@ -452,18 +464,28 @@ class TripTicket < ActiveRecord::Base
           days_ahead = provider.trip_ticket_expiration_days_before + (((threshold.to_date - provider.trip_ticket_expiration_days_before.days).to_date..threshold.to_date).select{ |d| [0,6].include?(d.wday) }.size)
           expire_at = DateTime.parse((threshold.to_date + days_ahead.days).to_s + " " + provider.trip_ticket_expiration_time_of_day.to_s).in_time_zone
           logger.debug "  Expiring tickets for #{provider.name} where appointment_time <= #{threshold.to_s}"
-          updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at).update_all(expired: true)
+          updated = expire_collection(default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at))
           logger.debug "    #{updated} tickets expired"
         else
           logger.debug "  Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.to_s}"
-          updated = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', provider.id, threshold).update_all(expired: true)
+          updated = expire_collection(default_query.where('origin_provider_id = ? AND expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', provider.id, threshold))
           logger.debug "    #{updated} tickets expired"
         end
       end
     end
 
     private
-    
+
+    def expire_collection(collection)
+      updated = 0
+      collection.find_each(batch_size: 100) do |trip|
+        trip.expired = true
+        trip.save
+        updated += 1
+      end
+      updated
+    end
+
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE LOWER(?) OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (

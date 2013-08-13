@@ -41,6 +41,9 @@ Spork.prefork do
   Turn.config.format = :pretty
   Turn.config.trace = 30
 
+  # by default, do not send email notifications in test mode
+  ActsAsNotifier::Config.disabled = true
+
   Dir[Rails.root.join("test/support/**/*.rb")].each {|f| require f}
 end
 

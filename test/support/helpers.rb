@@ -45,4 +45,13 @@ class ActiveSupport::TestCase
     #puts "Current cookies: #{cookie_jar.instance_variable_get(:@cookies).map(&:inspect).join("\n")}"
     cookie_jar.instance_variable_get(:@cookies)
   end
+
+  # for checking ActionMailer delivery results
+  def validate_last_delivery(to, subject)
+    msg = ActionMailer::Base.deliveries.last
+    msg.wont_be_nil
+    msg.to.must_equal to.is_a?(String) ? to.split(/,\s*/) : to
+    msg.subject.must_equal subject
+  end
+
 end
