@@ -60,10 +60,9 @@ module Clearinghouse
           :customer_information_withheld, :customer_identifiers,
           :customer_notes, :customer_boarding_time, :customer_deboarding_time,
           :customer_seats_required, :customer_impairment_description,
-          :customer_mobility_impairments, :customer_assistive_devices,
+          :customer_service_level, :customer_mobility_factors,
           :customer_service_animals, :customer_eligibility_factors,
-          :num_attendants, :num_guests, :guest_or_attendant_service_animals,
-          :guest_or_attendant_assistive_devices, :requested_pickup_time,
+          :num_attendants, :num_guests, :requested_pickup_time,
           :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
           :allowed_time_variance, :trip_purpose_description, :trip_funders,
           :trip_notes, :scheduling_priority

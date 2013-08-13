@@ -98,8 +98,8 @@ module TripTicketsHelper
     TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_eligibility_factors)').sort
   end
 
-  def mobility_autocomplete_values
-    TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_mobility_impairments)').sort
+  def service_level_autocomplete_values
+    TripTicket.unscoped.accessible_by(current_ability).pluck(:customer_service_level).sort
   end
 
   def wkt_point_from_location(location)

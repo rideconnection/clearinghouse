@@ -141,6 +141,14 @@
       <% end %>
     </div>
     <div class="field">
+      <%= f.label :customer_service_level, "Service Level" %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.text_field :customer_service_level %>
+      <% else %>
+        <%= @trip_ticket.customer_service_level %>
+      <% end %>
+    </div>
+    <div class="field">
       <%= f.label :customer_information_withheld, "Information Withheld?", class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.select :customer_information_withheld, [["Yes", true], ["No", false]], :include_blank => true %>
@@ -227,8 +235,8 @@
         </ul>
       <% end %>
     </div>
-    
-    <% 
+
+    <%
       field_indexes = {}
       TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.each do |field_sym, legend| 
     %>
@@ -239,7 +247,7 @@
             <% field_indexes[field_sym] = 0 %>
             <% @trip_ticket.send(field_sym).try(:each_with_index) do |v,index| %>
               <div class="field pgStringArray">
-                <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue", :size => 30 %>
+                <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New eligibility factor', :class => "pgStringArrayValue", :size => 30 %>
                 <a href="#" class='removePgStringArray'>X</a>
               </div>
               <% field_indexes[field_sym] += 1 %>
@@ -493,11 +501,11 @@
 
 <%= content_for :head do %>
   <script type="text/javascript">
-    var mobility_autocomplete_data = JSON.parse('<%= escape_javascript(mobility_autocomplete_values.to_json.html_safe) %>');
+    var service_level_autocomplete_data = JSON.parse('<%= escape_javascript(service_level_autocomplete_values.to_json.html_safe) %>');
     var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
 
     function setup_autocomplete_fields() {
-      $("input[name^='trip_ticket[customer_mobility_impairments]']").autocomplete({ source: mobility_autocomplete_data });
+      $("input[name^='trip_ticket[customer_service_level]']").autocomplete({ source: service_level_autocomplete_data });
       $("input[name^='trip_ticket[customer_eligibility_factors]']").autocomplete({ source: eligibility_autocomplete_data });
     }
 

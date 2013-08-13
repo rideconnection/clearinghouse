@@ -35,12 +35,9 @@ class TripTicket < ActiveRecord::Base
   ]
 
   CUSTOMER_IDENTIFIER_ARRAY_FIELDS = {
-    :customer_mobility_impairments => "Mobility Impairment",
     :customer_eligibility_factors => "Eligibility Factor",
-    :customer_assistive_devices => "Assistive Device",
-    :guest_or_attendant_assistive_devices => "Guest or Attendant Assistive Device",
+    :customer_mobility_factors => "Mobility Factors",
     :customer_service_animals => "Service Animal",
-    :guest_or_attendant_service_animals => "Guest or Attendant Service Animal",
     :trip_funders => "Trip Funder",
   }
 
@@ -59,10 +56,8 @@ class TripTicket < ActiveRecord::Base
     :pick_up_location_attributes, :pick_up_location_id,
     :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
     :trip_notes, :trip_purpose_description, :trip_result_attributes,
-    :customer_identifiers, :customer_mobility_impairments,
-    :customer_eligibility_factors, :customer_assistive_devices,
-    :customer_service_animals, :guest_or_attendant_service_animals,
-    :guest_or_attendant_assistive_devices, :trip_funders,
+    :customer_identifiers, :customer_service_level, :customer_eligibility_factors,
+    :customer_mobility_factors, :customer_service_animals, :trip_funders,
     :provider_white_list, :provider_black_list, :expire_at
   
   accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
