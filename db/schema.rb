@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130809203013) do
+ActiveRecord::Schema.define(:version => 20130813195422) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -272,6 +272,7 @@ ActiveRecord::Schema.define(:version => 20130809203013) do
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
   create_table "trip_tickets", :force => true do |t|
+    t.integer       "origin_provider_id"
     t.string        "origin_customer_id"
     t.boolean       "customer_information_withheld"
     t.date          "customer_dob"
@@ -293,8 +294,8 @@ ActiveRecord::Schema.define(:version => 20130809203013) do
     t.string        "trip_purpose_code"
     t.string        "trip_purpose_description"
     t.text          "trip_notes"
-    t.datetime      "created_at",                                                             :null => false
-    t.datetime      "updated_at",                                                             :null => false
+    t.datetime      "created_at",                                                        :null => false
+    t.datetime      "updated_at",                                                        :null => false
     t.string        "customer_primary_language"
     t.string        "customer_first_name"
     t.string        "customer_last_name"
@@ -302,33 +303,29 @@ ActiveRecord::Schema.define(:version => 20130809203013) do
     t.time          "requested_pickup_time"
     t.time          "requested_drop_off_time"
     t.hstore        "customer_identifiers"
-    t.string_array  "customer_mobility_impairments",        :limit => 255
     t.string        "customer_ethnicity"
-    t.string_array  "customer_eligibility_factors",         :limit => 255
-    t.string_array  "customer_assistive_devices",           :limit => 255
-    t.string_array  "customer_service_animals",             :limit => 255
-    t.string_array  "guest_or_attendant_service_animals",   :limit => 255
-    t.string_array  "guest_or_attendant_assistive_devices", :limit => 255
-    t.string_array  "trip_funders",                         :limit => 255
+    t.string_array  "customer_eligibility_factors",    :limit => 255
+    t.string_array  "customer_mobility_factors",       :limit => 255
+    t.string_array  "customer_service_animals",        :limit => 255
+    t.string_array  "trip_funders",                    :limit => 255
     t.string        "customer_race"
     t.time          "earliest_pick_up_time"
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
-    t.integer       "origin_provider_id"
-    t.boolean       "rescinded",                                           :default => false, :null => false
+    t.boolean       "rescinded",                                      :default => false, :null => false
     t.datetime      "expire_at"
-    t.boolean       "expired",                                             :default => false
+    t.boolean       "expired",                                        :default => false
+    t.string        "customer_service_level"
   end
 
-  add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
   add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
-  add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
+  add_index "trip_tickets", ["customer_mobility_factors"], :name => "customer_mobility_factors"
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
+  add_index "trip_tickets", ["customer_service_level"], :name => "customer_service_level"
   add_index "trip_tickets", ["expired"], :name => "index_trip_tickets_on_expired"
-  add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
-  add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
+  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
   add_index "trip_tickets", ["provider_white_list"], :name => "provider_white_list"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"

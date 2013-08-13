@@ -139,7 +139,7 @@ class TripTicketTest < ActiveSupport::TestCase
 
   describe "icons" do
     it "should return icon01 if keyword scooter found" do
-      @trip_ticket.customer_assistive_devices = ['scooter']
+      @trip_ticket.customer_mobility_factors = ['scooter']
       @trip_ticket.icon_list.must_include({ file: 'icon01.png', alt: 'scooter' })
     end
     it "should return icon05 if any service animal is listed" do
@@ -527,41 +527,17 @@ class TripTicketTest < ActiveSupport::TestCase
 
     it "has a filter_by_customer_identifiers method that matches on hstore and string_array fields" do
       t01 = FactoryGirl.create(:trip_ticket, :customer_identifiers                 => {'a' => 'b', 'c' => 'd'})
-      t02 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['a', 'b'])
-      t03 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['b', 'c'])
-      t04 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['c', 'a'])
-      t05 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['a', 'b'])
-      t06 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['b', 'c'])
-      t07 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['c', 'a'])
-      t08 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['a', 'b'])
-      t09 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['b', 'c'])
-      t10 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['c', 'a'])
-      t11 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['a', 'b'])
-      t12 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['b', 'c'])
-      t13 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['c', 'a'])
-      t14 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['a', 'b'])
-      t15 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['b', 'c'])
+      t02 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['c', 'a'])
+      t03 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['a', 'b'])
+      t04 = FactoryGirl.create(:trip_ticket, :customer_mobility_factors            => ['b', 'c'])
+      t05 = FactoryGirl.create(:trip_ticket, :customer_mobility_factors            => ['c', 'a'])
+      t06 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['a', 'b'])
+      t07 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['b', 'c'])
+      t08 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['a', 'b'])
+      t09 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['b', 'c'])
     
       results = TripTicket.filter_by_customer_identifiers('a')
       
-      assert_includes results, t01
-      assert_includes results, t02
-      refute_includes results, t03
-      assert_includes results, t04
-      assert_includes results, t05
-      refute_includes results, t06
-      assert_includes results, t07
-      assert_includes results, t08
-      refute_includes results, t09
-      assert_includes results, t10
-      assert_includes results, t11
-      refute_includes results, t12
-      assert_includes results, t13
-      assert_includes results, t14
-      refute_includes results, t15
-    
-      results = TripTicket.filter_by_customer_identifiers('b')
-    
       assert_includes results, t01
       assert_includes results, t02
       assert_includes results, t03
@@ -570,13 +546,19 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_includes results, t06
       refute_includes results, t07
       assert_includes results, t08
+      refute_includes results, t09
+    
+      results = TripTicket.filter_by_customer_identifiers('b')
+    
+      assert_includes results, t01
+      refute_includes results, t02
+      assert_includes results, t03
+      assert_includes results, t04
+      refute_includes results, t05
+      assert_includes results, t06
+      assert_includes results, t07
+      assert_includes results, t08
       assert_includes results, t09
-      refute_includes results, t10
-      assert_includes results, t11
-      assert_includes results, t12
-      refute_includes results, t13
-      assert_includes results, t14
-      assert_includes results, t15
     
       results = TripTicket.filter_by_customer_identifiers('d')
     
@@ -589,12 +571,6 @@ class TripTicketTest < ActiveSupport::TestCase
       refute_includes results, t07
       refute_includes results, t08
       refute_includes results, t09
-      refute_includes results, t10
-      refute_includes results, t11
-      refute_includes results, t12
-      refute_includes results, t13
-      refute_includes results, t14
-      refute_includes results, t15
     end
   end
 
