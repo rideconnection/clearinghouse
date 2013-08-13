@@ -20,6 +20,16 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
+  it "has a string_array field for notification_preferences which returns an array" do
+    user = FactoryGirl.create(:user)
+    assert_equal nil, user.notification_preferences
+    user.notification_preferences = [:a, 'B', 1]
+    user.save!
+    user.reload
+    # NOTE - Values are coerced to strings
+    assert_equal ['a', 'B', '1'], user.notification_preferences
+  end
+
   describe "validations" do
     setup do
       @user = FactoryGirl.create(:user)

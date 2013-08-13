@@ -62,6 +62,7 @@ Clearinghouse::Application.routes.draw do
     request.env['warden'].authenticate! # authenticate if not already
     request.env['warden'].user.has_admin_role? # Ensure site_admin role
   }
-  
+  match 'preferences', :controller => :users, :action => :preferences
+
   root :to => 'trip_tickets#index'
 end
