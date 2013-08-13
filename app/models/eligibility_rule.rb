@@ -21,8 +21,9 @@ class EligibilityRule < ActiveRecord::Base
   TRIP_TICKET_ARRAY_FIELDS = TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.select {|k,v| DESIRED_TRIP_TICKET_ARRAY_FIELDS.include?(k) }
 
   TRIP_TICKET_FIELDS = {
-    'customer_dob'                    =>'Customer Age',
-    'trip_purpose_description'        => 'Trip Purpose Description',
+    'customer_dob'                    => 'Customer Age',
+    'customer_service_level'          => 'Service Level',
+    'trip_purpose_description'        => 'Trip Purpose Description'
   }.merge(TRIP_TICKET_ARRAY_FIELDS.inject({}) { |h, (k, v)| h[k.to_s] = v.pluralize; h })
 
   validates :trip_field, :presence => true, :inclusion => { :in => TRIP_TICKET_FIELDS.keys }
