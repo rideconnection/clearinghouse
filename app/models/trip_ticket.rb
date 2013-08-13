@@ -455,7 +455,8 @@ class TripTicket < ActiveRecord::Base
       # Part 1 - expire tickets with an explicit expire_at date
       current_query = default_query.where('expire_at <= ?', threshold)
       current_query.find_each(batch_size: 100) do |trip|
-        trip.force_notification(method: :trip_expired)
+        trip.expired = true
+        trip.save
       end
       current_query.update_all(expired: true)
 
@@ -467,13 +468,15 @@ class TripTicket < ActiveRecord::Base
           current_query = default_query.where('expire_at IS NULL AND appointment_time <= ?', expire_at)
           current_query.update_all(expired: true)
           current_query.find_each(batch_size: 100) do |trip|
-            trip.force_notification(method: :trip_expired)
+            trip.expired = true
+            trip.save
           end
         else
           current_query = default_query.where('expire_at IS NULL AND TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') <= ?', threshold)
           current_query.update_all(expired: true)
           current_query.find_each(batch_size: 100) do |trip|
-            trip.force_notification(method: :trip_expired)
+            trip.expired = true
+            trip.save
           end
         end
       end
