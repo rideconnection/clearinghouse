@@ -4,7 +4,6 @@ class Service < ActiveRecord::Base
   has_many :operating_hours, :class_name => :OperatingHours
   has_one :funding_source
   has_many :eligibility_requirements
-  has_many :mobility_accommodations
 
   SERVICE_AREA_TYPES = {
     'none' => 'Do not filter trip tickets based on this service area',

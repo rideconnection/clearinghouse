@@ -1277,66 +1277,6 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
 
-    describe "trip ticket mobility filter" do
-      setup do
-        provider_2 = FactoryGirl.create(:provider)
-        relationship = ProviderRelationship.create!(
-          :requesting_provider => @provider,
-          :cooperating_provider => provider_2
-        )
-        relationship.approve!
-        @t01 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_service_level => nil)
-        @t02 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_service_level => 'Wheelchair')
-        @t03 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_service_level => 'Non-ambulatory')
-        @t04 = FactoryGirl.create(:trip_ticket, :originator => provider_2, :customer_service_level => 'Wheelchair - Oversized 2-seats')
-        @service = FactoryGirl.create(:service, :provider => @provider)
-        @mobility_accommodation_1 = FactoryGirl.create(:mobility_accommodation, :mobility_impairment => 'Wheelchair', :service => @service)
-        @mobility_accommodation_2 = FactoryGirl.create(:mobility_accommodation, :mobility_impairment => 'Non-ambulatory', :service => @service)
-      end
-
-      it "should not filter out service levels the provider cannot accommodate by default" do
-        visit @reset_filters_path
-        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
-        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
-      end
-
-      it "should allow the service level filter to be explicitly enabled" do
-        visit @reset_filters_path
-
-        within('#trip_ticket_filters') do
-          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
-          click_button "Search"
-        end
-
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
-      end
-
-      it "should allow the service level filter to be disabled" do
-        visit @reset_filters_path
-
-        within('#trip_ticket_filters') do
-          select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
-          click_button "Search"
-        end
-
-        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
-      end
-
-      it "should never filter out a provider's own trip tickets" do
-        own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_service_level => '- Not Accommodated -')
-        visit @reset_filters_path
-        assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
-      end
-    end
-
     describe "trip ticket operating hours filter" do
       setup do
         provider_2 = FactoryGirl.create(:provider)
