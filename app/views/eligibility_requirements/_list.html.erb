@@ -20,4 +20,5 @@
 <% if can? :create, EligibilityRequirement %>
   <%= link_to 'Create New Eligibility Requirements Group', new_provider_service_eligibility_requirement_path(@service.provider, @service) %>
   <span style='color:gray'><em>- multiple groups provide alternative ways a customer can be considered eligible</em></span><br/>
+  <br/>
 <% end %>
