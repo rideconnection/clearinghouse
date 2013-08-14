@@ -23,6 +23,8 @@ module ServiceAreaFilter
         dropoff_query
       when 'both'
         "(#{pickup_query} AND #{dropoff_query})"
+      when 'either'
+        "(#{pickup_query} OR #{dropoff_query})"
       else
         nil
     end
