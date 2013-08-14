@@ -15,7 +15,6 @@ class EligibilityRule < ActiveRecord::Base
 
   DESIRED_TRIP_TICKET_ARRAY_FIELDS = [
       :customer_eligibility_factors,
-      :customer_mobility_factors,
       :trip_funders
   ]
   TRIP_TICKET_ARRAY_FIELDS = TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.select {|k,v| DESIRED_TRIP_TICKET_ARRAY_FIELDS.include?(k) }
