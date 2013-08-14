@@ -21,7 +21,6 @@ Clearinghouse::Application.routes.draw do
     end
     resources :services, :except => [ :index, :show, :destroy ] do
       resources :eligibility_requirements, shallow: true
-      resources :mobility_accommodations, shallow: true
     end
   end
 

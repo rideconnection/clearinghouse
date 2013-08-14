@@ -1,5 +1,4 @@
 require 'active_support/concern'
-require 'service_level_filter'
 require 'eligibility_filter'
 require 'service_area_filter'
 require 'operating_hours_filter'
@@ -7,13 +6,11 @@ require 'operating_hours_filter'
 module ProviderServicesFilter
   extend ActiveSupport::Concern
 
-  include ServiceLevelFilter
   include EligibilityFilter
   include ServiceAreaFilter
   include OperatingHoursFilter
 
   # options:
-  # :ignore_mobility        - ignore mobility filters
   # :ignore_eligibility     - ignore eligibility, service area, and operating hours filters
   # :ignore_service_area    - ignore service area filtering
   # :ignore_operating_hours - ignore operating hours filtering
@@ -51,14 +48,13 @@ module ProviderServicesFilter
   def provider_service_filter(service, options = {})
     # within a service:
     # filter for accommodated impairments AND eligible AND within service area AND within operating hours
-    mobility_query, mobility_params = service_level_filter(service) unless options[:ignore_mobility]
     eligibility_query, eligibility_params = service_eligibility_filter(service) unless options[:ignore_eligibility]
     service_area_query = service_area_filter(service) unless options[:ignore_eligibility] || options[:ignore_service_area]
     operating_hours_query = service_operating_hours_filter(service) unless options[:ignore_eligibility] || options[:ignore_operating_hours]
 
-    queries_array = [ mobility_query, eligibility_query, service_area_query, operating_hours_query ].map {|x| x.presence }.compact
+    queries_array = [ eligibility_query, service_area_query, operating_hours_query ].map {|x| x.presence }.compact
     combined_query = queries_array.map {|x| "(#{x})"}.join(' AND ')
-    combined_params = (mobility_params || []) + (eligibility_params || [])
+    combined_params = (eligibility_params || [])
 
     return combined_query, combined_params, service_area_query.present?
   end
