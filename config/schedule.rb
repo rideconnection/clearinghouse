@@ -3,6 +3,6 @@
 
 set :output, "#{path}/log/cron.log"
 
-every '0 * * * 1-5', :roles => [:app] do
+every '0 * * * *', :roles => [:app] do
   rake 'clearinghouse:trip_tickets:expire'
 end

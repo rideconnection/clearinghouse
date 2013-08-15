@@ -7,7 +7,7 @@ module ApiParamFactory
   def self.authenticatable_params(provider, additional_params = {})
     Rails.logger.debug "additional_params: #{additional_params}"
     
-    timestamp = Time.now.xmlschema
+    timestamp = Time.now.utc.xmlschema
     nonce = provider.generate_nonce
     required_params = {
       api_key:     provider.api_key,

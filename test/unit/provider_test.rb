@@ -13,7 +13,7 @@ class ProviderTest < ActiveSupport::TestCase
         :cooperating_provider => provider_2,
         :automatic_requester_approval => false,
         :automatic_cooperator_approval => true,
-        :approved_at => Time.now
+        :approved_at => Time.zone.now
       )
       @provider.can_auto_approve_for?(provider_2).must_equal false
       provider_2.can_auto_approve_for?(@provider).must_equal true

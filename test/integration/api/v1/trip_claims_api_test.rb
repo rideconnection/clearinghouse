@@ -101,7 +101,7 @@ describe "Clearinghouse::API_v1 trip claims endpoints" do
     let(:claim_params) {{
       claimant_service_id: 1,
       status: :pending,
-      proposed_pickup_time: DateTime.now,
+      proposed_pickup_time: Time.zone.now,
       proposed_fare: "$3.33"
     }}
 

@@ -2,8 +2,8 @@ namespace :clearinghouse do
   namespace :trip_tickets do
     desc 'Expire trip tickets as necessary'
     task :expire => :environment do
-      puts "Preparing to expire tickets #{Time.current.to_datetime.in_time_zone}"
-      TripTicket.expire_tickets!
+      puts "Calling TripTicket.expire_tickets! with threshold #{Time.zone.now.to_s :rfc822}"
+      TripTicket.expire_tickets! Logger.new(STDOUT)
       puts "Completed expiring tickets"
     end
   end

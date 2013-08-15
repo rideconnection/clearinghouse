@@ -156,9 +156,9 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       customer_primary_phone: "555-555-5555",
       customer_seats_required: 1,
       origin_customer_id: "newtrip123",
-      requested_drop_off_time: Time.now,
-      requested_pickup_time: Time.now,
-      appointment_time: Time.now,
+      requested_drop_off_time: "12:00",
+      requested_pickup_time: "12:00",
+      appointment_time: Time.zone.now,
       scheduling_priority: "pickup"
     }}}
 

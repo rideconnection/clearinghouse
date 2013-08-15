@@ -4,7 +4,7 @@ module TripTicketsHelper
   end
   
   def customer_age(dob)
-    now = Time.now.utc.to_date
+    now = Time.zone.now
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
   
