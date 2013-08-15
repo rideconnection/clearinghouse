@@ -43,20 +43,20 @@ module EligibilityFilter
       when 'customer_dob'
         # convert specified age to dates in the past and compare to date of birth field
         age_target = rule.comparison_value.to_i
-        less_than_dob = age_target.years.ago.midnight + 1.day
-        greater_than_dob = (age_target + 1).years.ago.midnight + 1.day
+        less_than_dob = age_target.years.ago.to_date
+        greater_than_dob = (age_target + 1).years.ago.to_date
         case rule.comparison_type
           when 'equal'
-            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" < ?) AND ("trip_tickets"."customer_dob" >= ?)}
+            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" <= ?) AND ("trip_tickets"."customer_dob" > ?)}
             query_params = [ less_than_dob, greater_than_dob ]
           when 'not_equal'
-            query_str = %Q{("trip_tickets"."customer_dob" IS NULL) OR ("trip_tickets"."customer_dob" >= ?) OR ("trip_tickets"."customer_dob" < ?)}
+            query_str = %Q{("trip_tickets"."customer_dob" IS NULL) OR ("trip_tickets"."customer_dob" > ?) OR ("trip_tickets"."customer_dob" <= ?)}
             query_params = [ less_than_dob, greater_than_dob ]
           when 'greater_than'
-            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" < ?)}
+            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" <= ?)}
             query_params = [ greater_than_dob ]
           when 'less_than'
-            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" >= ?)}
+            query_str = %Q{("trip_tickets"."customer_dob" IS NOT NULL) AND ("trip_tickets"."customer_dob" > ?)}
             query_params = [ less_than_dob ]
         end
       when *TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.stringify_keys.keys
@@ -88,7 +88,7 @@ module EligibilityFilter
             query_str = %Q{lower("trip_tickets"."#{rule.trip_field}") = ?}
             query_params = [ rule.comparison_value.downcase ]
           when 'not_equal'
-            query_str = %Q{("trip_tickets"."#{rule.trip_field}" IS NULL) OR (lower("trip_tickets"."#{rule.trip_field}") = ?)}
+            query_str = %Q{("trip_tickets"."#{rule.trip_field}" IS NULL) OR (lower("trip_tickets"."#{rule.trip_field}") != ?)}
             query_params = [ rule.comparison_value.downcase ]
           when 'greater_than'
             query_str = %Q{("trip_tickets"."#{rule.trip_field}" IS NOT NULL) AND ("trip_tickets"."#{rule.trip_field}" > ?)}
