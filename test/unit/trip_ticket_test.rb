@@ -484,10 +484,10 @@ class TripTicketTest < ActiveSupport::TestCase
     end
 
     it "has a filter_by_trip_time method that matches on the the pickup OR drop-off times" do
-      t1 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
-      t2 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('10:00'), :requested_drop_off_time => Time.zone.parse('23:00'))
-      t3 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-03-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
-      t4 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-04-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+      t1 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
+      t2 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => '10:00', :requested_drop_off_time => '23:00')
+      t3 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-03-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
+      t4 = FactoryGirl.create(:trip_ticket, :appointment_time => Time.zone.parse('2012-04-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
     
       results = TripTicket.filter_by_trip_time(Time.zone.parse('2012-01-01 11:00'), Time.zone.parse('2012-01-01 22:00'))
       
@@ -574,83 +574,18 @@ class TripTicketTest < ActiveSupport::TestCase
     end
   end
 
-  describe "ticket expiration" do
-    describe "expire_at" do
-      it "is not required" do
-        trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "")
-        assert trip_ticket.valid?
-      end
-
-      it "must be a valid datetime string" do
-        trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "foo")
-        refute trip_ticket.valid?
-
-        trip_ticket.expire_at = "2008-09-10 00:00"
-        assert trip_ticket.valid?
-      end
+  describe "expire_at" do
+    it "is not required" do
+      trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "")
+      assert trip_ticket.valid?
     end
-    
-    describe "calculating ticket expiration" do
-      before do
-        @provider = FactoryGirl.create(:provider, :trip_ticket_expiration_days_before => 1, :trip_ticket_expiration_time_of_day => "11:00 AM")
-        Timecop.freeze(@current_datetime = Time.parse("Mon, 05 Aug 2013 12:00:00 +0000").in_time_zone)
-      end
 
-      after do
-        Timecop.return
-      end
+    it "must be a valid datetime string" do
+      trip_ticket = FactoryGirl.build(:trip_ticket, :expire_at => "foo")
+      refute trip_ticket.valid?
 
-      test "inheriting expiration from provider" do
-        trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id, 
-          :appointment_time => @current_datetime + 1.day, # Tue, 06 Aug 2013 12:00:00 +0000
-          :requested_pickup_time => "12:00 PM",
-          :expire_at => nil
-        )
-        TripTicket.expire_tickets!
-        assert trip_ticket.reload.expired?
-      end
-    
-      test "overriding inherited expiration" do
-        trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
-          :appointment_time => @current_datetime + 2.days, # Wed, 07 Aug 2013 12:00:00 +0000
-          :requested_pickup_time => "12:00 PM",
-          :expire_at => @current_datetime - 2.hours # Mon, 05 Aug 2013 10:00:00 +0000
-        )
-        TripTicket.expire_tickets!
-        assert trip_ticket.reload.expired?
-      end
-    
-      test "no expiration specified" do
-        @provider.update_attributes(:trip_ticket_expiration_days_before => nil, :trip_ticket_expiration_time_of_day => nil)
-        trip_ticket = FactoryGirl.create(:trip_ticket, :origin_provider_id => @provider.id,
-          :appointment_time => @current_datetime + 30.minutes, # Mon, 05 Aug 2013 12:30:00 +0000
-          :requested_pickup_time => "12:00 PM",
-          :expire_at => nil
-        )
-        TripTicket.expire_tickets!
-        assert trip_ticket.reload.expired?
-      end
-      
-      test "ignores recinded tickets" do
-        recinded = FactoryGirl.create(:trip_ticket, rescinded: true, expire_at: @current_datetime)
-        TripTicket.expire_tickets!
-        assert_equal false, recinded.reload.expired?
-      end
-      
-      test "ignores tickets with results" do
-        resulted = FactoryGirl.create(:trip_ticket, expire_at: @current_datetime)
-        claim = FactoryGirl.create(:trip_claim, trip_ticket_id: resulted.id, status: :approved)
-        resulted.create_trip_result(outcome: "Completed")
-        TripTicket.expire_tickets!
-        assert_equal false, resulted.reload.expired?
-      end
-      
-      test "ignores tickets with an approved claim" do
-        approved = FactoryGirl.create(:trip_ticket, expire_at: @current_datetime)
-        FactoryGirl.create(:trip_claim, trip_ticket_id: approved.id, status: :approved)
-        TripTicket.expire_tickets!
-        assert_equal false, approved.reload.expired?
-      end
+      trip_ticket.expire_at = "2008-09-10 00:00"
+      assert trip_ticket.valid?
     end
   end
 
@@ -688,8 +623,10 @@ class TripTicketTest < ActiveSupport::TestCase
 
     it "should notify all claimant users when a trip expires" do
       @trip_ticket.update_attributes(expire_at: 2.days.ago)
-      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
-        TripTicket.expire_tickets!(1.days.ago)
+      Timecop.freeze(1.days.ago) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+          TripTicket.expire_tickets!
+        end
       end
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket expired')
     end

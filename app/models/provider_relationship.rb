@@ -28,7 +28,7 @@ class ProviderRelationship < ActiveRecord::Base
   end
 
   def approve!
-    self.approved_at = Time.now
+    self.approved_at = Time.zone.now
     save!
   end
 

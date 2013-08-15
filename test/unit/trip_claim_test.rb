@@ -5,7 +5,7 @@ class TripClaimTest < ActiveSupport::TestCase
     @valid_attributes = {
       :claimant_provider_id => 1, 
       :proposed_fare => "1.23", 
-      :proposed_pickup_time => DateTime.now, 
+      :proposed_pickup_time => Time.zone.now, 
       :status => "pending", 
       :trip_ticket_id => 1,
       :claimant_trip_id => "ABC123"      
@@ -146,7 +146,7 @@ class TripClaimTest < ActiveSupport::TestCase
       :cooperating_provider => p2,
       :automatic_requester_approval => false,
       :automatic_cooperator_approval => false,
-      :approved_at => Time.now
+      :approved_at => Time.zone.now
     )
     tt = FactoryGirl.create(:trip_ticket, :originator => p1)
     tc = FactoryGirl.create(:trip_claim, :trip_ticket => tt, :claimant => p2)
@@ -162,7 +162,7 @@ class TripClaimTest < ActiveSupport::TestCase
       :cooperating_provider => p2,
       :automatic_requester_approval => false,
       :automatic_cooperator_approval => true,
-      :approved_at => Time.now
+      :approved_at => Time.zone.now
     )
     
     tt = FactoryGirl.create(:trip_ticket, :originator => p1)

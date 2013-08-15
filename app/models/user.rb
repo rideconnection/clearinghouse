@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
       temp_token = Devise.friendly_token.first(10) + "!1"
       self.password = self.password_confirmation = temp_token
       self.reset_password_token = User.reset_password_token
-      self.reset_password_sent_at = Time.now
+      self.reset_password_sent_at = Time.zone.now
     end
   end
 end

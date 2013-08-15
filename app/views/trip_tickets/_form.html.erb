@@ -72,8 +72,8 @@
         <%= f.date_select(:customer_dob,
                           :order => [:month, :day, :year],
                           :prompt => { :day => 'Select day', :month => 'Select month', :year => 'Select year' },
-                          :start_year => Time.now.year - 100,
-                          :end_year => Time.now.year
+                          :start_year => Time.zone.now.year - 100,
+                          :end_year => Time.zone.now.year
         ) %>
       <% else %>
         <%= @trip_ticket.customer_dob %>
