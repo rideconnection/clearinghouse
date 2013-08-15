@@ -1587,15 +1587,15 @@ class TripTicketsTest < ActionController::IntegrationTest
           :cooperating_provider => @provider_2
         )
         relationship.approve!
-        @t01 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
                                   :appointment_time => Time.zone.parse('Sat, 27 Jul 2013 16:00'),
                                   :requested_pickup_time => '15:00',
                                   :requested_drop_off_time => '17:00')
-        @t02 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
                                   :appointment_time => Time.zone.parse('Sat, 27 Jul 2013 22:00'),
                                   :requested_pickup_time => '21:00',
                                   :requested_drop_off_time => '23:00')
-        @t03 = FactoryGirl.create(:trip_ticket, :originator => provider_2,
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
                                   :appointment_time => Time.zone.parse('Sun, 28 Jul 2013 16:00'),
                                   :requested_pickup_time => '15:00',
                                   :requested_drop_off_time => '17:00')
