@@ -35,8 +35,8 @@ module NotificationRecipients
 
   def partner_users(trip_ticket, notifier_options)
     provider_ids = trip_ticket.originator.approved_partners.pluck(:id)
-    provider_ids &= trip_ticket.provider_white_list if trip_ticket.provider_white_list.present?
-    provider_ids -= trip_ticket.provider_black_list if trip_ticket.provider_black_list.present?
+    provider_ids &= trip_ticket.provider_white_list.map {|x| x.to_i } if trip_ticket.provider_white_list.present?
+    provider_ids -= trip_ticket.provider_black_list.map {|x| x.to_i } if trip_ticket.provider_black_list.present?
     user_emails_by_provider_id(provider_ids, notifier_options)
   end
 

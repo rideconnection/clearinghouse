@@ -25,6 +25,50 @@ class TripTicketsTest < ActionController::IntegrationTest
     # Capybara.current_driver = nil # reset
   end
 
+  describe "notifications" do
+    setup do
+      @partner = FactoryGirl.create(:provider, :name => "Macrohard")
+      @relationship = ProviderRelationship.create!(
+        :requesting_provider => @provider,
+        :cooperating_provider => @partner
+      )
+      @relationship.approve!
+      @partner_user = FactoryGirl.create(:user,
+                                         :provider => @partner,
+                                         :role => Role.find_or_create_by_name!("provider_admin"),
+                                         :notification_preferences => NotificationRecipients::NOTIFICATION_TYPES.stringify_keys.keys)
+      @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disabled
+      ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
+    end
+
+    it "should notify partner users of new trips" do
+      click_link "Tickets"
+      click_link "Add New"
+      fill_in_minimum_required_trip_ticket_fields
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        click_button "Create Trip ticket"
+      end
+      validate_last_delivery(@partner_user.email, 'Ride Connection Clearinghouse: new trip ticket')
+    end
+
+    it "should not notify users for partners in blacklist of new trips" do
+      click_link "Tickets"
+      click_link "Add New"
+      fill_in_minimum_required_trip_ticket_fields
+      select "Macrohard", :from => "Provider black list"
+      assert_no_difference 'ActionMailer::Base.deliveries.size' do
+        click_button "Create Trip ticket"
+      end
+    end
+  end
+
   test "provider admins can create new trip tickets" do
     click_link "Tickets"
     click_link "Add New"
