@@ -525,16 +525,6 @@ class TripTicket < ActiveRecord::Base
 
     private
 
-    def expire_collection(collection)
-      updated = 0
-      collection.find_each(batch_size: 100) do |trip|
-        trip.expired = true
-        trip.save
-        updated += 1
-      end
-      updated
-    end
-
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE LOWER(?) OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
