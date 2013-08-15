@@ -608,7 +608,7 @@ class TripTicketTest < ActiveSupport::TestCase
 
   describe "notifications" do
     setup do
-      @acts_as_notifier_disbled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
       @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
       ActsAsNotifier::Config.disabled = false
       ActsAsNotifier::Config.use_delayed_job = false
@@ -618,7 +618,7 @@ class TripTicketTest < ActiveSupport::TestCase
     end
 
     teardown do
-      ActsAsNotifier::Config.disabled = @acts_as_notifier_disbled
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disabled
       ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
       TripTicket.all_instances.unstub(:partner_users)
       TripTicket.all_instances.unstub(:claimant_users)
