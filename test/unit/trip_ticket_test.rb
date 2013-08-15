@@ -142,9 +142,26 @@ class TripTicketTest < ActiveSupport::TestCase
       @trip_ticket.customer_mobility_factors = ['scooter']
       @trip_ticket.icon_list.must_include({ file: 'icon01.png', alt: 'scooter' })
     end
+    it "should return icon03 if keyword walker found" do
+      @trip_ticket.customer_mobility_factors = ['walker']
+      @trip_ticket.icon_list.must_include({ file: 'icon03.png', alt: 'walker' })
+    end
+    it "should return icon04 if keyword oxygen found" do
+      @trip_ticket.customer_mobility_factors = ['oxygen']
+      @trip_ticket.icon_list.must_include({ file: 'icon04.png', alt: 'oxygen' })
+    end
+    it "should return icon07 if keyword wheelchair found" do
+      @trip_ticket.customer_mobility_factors = ['wheelchair']
+      @trip_ticket.icon_list.must_include({ file: 'icon07.png', alt: 'wheelchair' })
+    end
     it "should return icon05 if any service animal is listed" do
       @trip_ticket.customer_service_animals = ['unicorn']
       @trip_ticket.icon_list.must_include({ file: 'icon05.png', alt: 'customer service animals' })
+    end
+    it "should match keywords regardless of case" do
+      @trip_ticket.customer_mobility_factors = ['Walker', 'SCOOTER']
+      @trip_ticket.icon_list.must_include({ file: 'icon01.png', alt: 'scooter' })
+      @trip_ticket.icon_list.must_include({ file: 'icon03.png', alt: 'walker' })
     end
   end
 
