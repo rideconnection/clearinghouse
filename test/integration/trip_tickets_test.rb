@@ -404,7 +404,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
   end
-  
+
   describe "filtering" do
     setup do
       # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
@@ -1640,6 +1640,26 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("", {:href => trip_ticket_path(@t01)})
         assert page.has_link?("", {:href => trip_ticket_path(@t02)})
         assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should handle the case where service operating hours end after midnight" do
+        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: "06:00", close_time: "02:00", :service => @service)
+
+        t04 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
+                                  :appointment_time => Time.zone.parse('Sun, 28 Jul 2013 01:00'),
+                                  :requested_pickup_time => '11:00',
+                                  :requested_drop_off_time => '01:00')
+
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("",    {:href => trip_ticket_path(t04)})
       end
 
       it "should allow service hour filtering to be disabled via the eligibility filter control" do
