@@ -112,7 +112,7 @@ class ServicesController < ApplicationController
     t  = Time.zone.parse(t1)
     
     #puts "#{t}"
-    3puts "#{t2}"
+    #puts "#{t2}"
     while t.to_s(:time_utc) != t2.to_s(:time_utc) do
       @start_hours << t
       t += interval
