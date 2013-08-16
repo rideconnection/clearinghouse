@@ -1605,17 +1605,12 @@ class TripTicketsTest < ActionController::IntegrationTest
       let(:operating_hours_1) {
         FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: "09:00", close_time: "22:00", :service => @service)
       }
-      let(:operating_hours_2) {
-        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: "09:00", close_time: "22:00", :service => @service)
+      let(:nil_operating_hours) {
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: nil, close_time: nil, :service => @service)
       }
 
       it "should not filter out trips that are outside the provider's service hours by default" do
         operating_hours_1
-        visit @reset_filters_path
-        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
-        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
-        operating_hours_2
         visit @reset_filters_path
         assert page.has_link?("", {:href => trip_ticket_path(@t01)})
         assert page.has_link?("", {:href => trip_ticket_path(@t02)})
@@ -1632,6 +1627,19 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should filter out no trips if 24-hour service is specified" do
+        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: "00:00", close_time: "00:00", :service => @service)
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: "00:00", close_time: "00:00", :service => @service)
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
       end
 
       it "should allow service hour filtering to be disabled via the eligibility filter control" do
@@ -1654,11 +1662,36 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "should not cause any errors if a service contains nil operating hours" do
-        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: nil, close_time: nil, :service => @service)
+        nil_operating_hours
         visit @reset_filters_path
         assert page.has_link?("", {:href => trip_ticket_path(@t01)})
         assert page.has_link?("", {:href => trip_ticket_path(@t02)})
         assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not filter out any trips if a service contains nil operating hours" do
+        nil_operating_hours
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not affects other service filters if a service contains nil operating hours" do
+        nil_operating_hours
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
       end
 
       it "should never filter out a provider's own trip tickets" do
