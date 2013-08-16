@@ -68,7 +68,7 @@
             <% @start_hours.each do |h| %>
               <option value="<%= h %>"
                 <%= !hours.nil? and h == hours.open_time ? "selected" : "" %>>
-                <%= h.to_formatted_s :time %>
+                <%= h.strftime("%l:%M%P") %>
               </option>
             <% end %>
           </select> to
@@ -77,7 +77,7 @@
             <% @end_hours.each do |h| %>
               <option value="<%= h %>"
                 <%= !hours.nil? and h == hours.close_time ? "selected" : "" %>>
-                <%= h.to_formatted_s :time %></option>
+                <%= h.strftime("%l:%M%P") %></option>
             <% end %>
           </select>
         </td>

@@ -39,7 +39,6 @@ gem "delayed_job_web", "~> 1.2"
 gem "devise", "~> 2.2"
 gem "jquery-rails", "~> 2.1"
 gem "seedbank", "~> 0.2"
-gem "time_of_day", "~> 0.1" # TODO - this gem is no longer being developed. Switch to TOC gem
 gem "validates_timeliness", "~> 3.0"
 gem "whenever", "~> 0.8", :require => false
 

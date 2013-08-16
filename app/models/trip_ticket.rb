@@ -444,12 +444,12 @@ class TripTicket < ActiveRecord::Base
       logger = alternate_logger || self.logger
       
       threshold = Time.zone.now
-      logger.info "- TripTicket#expire_tickets! called at #{threshold.to_s :rfc822}"
+      logger.info "- TripTicket#expire_tickets! called at #{threshold.to_s(:rfc822)}"
 
       # Note: This task is heavily reliant on times, so we are going to round
       # all times down to the nearest hour.
       threshold = threshold.change(min: 0)
-      logger.info "- Threshold adjusted to #{threshold.to_s :rfc822}"
+      logger.info "- Threshold adjusted to #{threshold.to_s(:rfc822)}"
       
       affected_tickets = []
 
@@ -462,7 +462,7 @@ class TripTicket < ActiveRecord::Base
         where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
         
       # Part 1 - expire tickets with an explicit expire_at date
-      logger.debug "- Expiring tickets across all providers where expire_at <= #{threshold.change(min: 59, sec: 59).to_s :rfc822}"
+      logger.debug "- Expiring tickets across all providers where expire_at <= #{threshold.change(min: 59, sec: 59).to_s(:rfc822)}"
 
       # A necessary hack. See https://github.com/rails/rails/issues/11894
       ids_to_update = default_query.where('expire_at <= ?', threshold.change(min: 59, sec: 59)).pluck(:id)
@@ -478,26 +478,26 @@ class TripTicket < ActiveRecord::Base
         logger.debug "--- trip_ticket_expiration_days_before = #{provider.trip_ticket_expiration_days_before || "nil"}"
         logger.debug "--- trip_ticket_expiration_time_of_day = #{provider.trip_ticket_expiration_time_of_day || "nil"}"
         if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
-          trip_ticket_expiration_time_of_day_adjusted = Time.zone.parse(provider.trip_ticket_expiration_time_of_day.to_s).change(min: 0).strftime("%H:%M:%S")
+          trip_ticket_expiration_time_of_day_adjusted = Time.zone.parse(provider.trip_ticket_expiration_time_of_day.to_s(:time_utc)).change(min: 0).to_s(:time_utc)
           logger.debug "--- trip_ticket_expiration_time_of_day adjusted to #{trip_ticket_expiration_time_of_day_adjusted}"
-          logger.debug "--- Checking to see if threshold time of day >= trip_ticket_expiration_time_of_day_adjusted"
+          logger.debug "--- Checking to see if threshold time >= trip_ticket_expiration_time_of_day_adjusted"
           # We can safely compare this using >= just in case a previous run failed
-          if threshold.strftime("%H:%M:%S") >= trip_ticket_expiration_time_of_day_adjusted
-            logger.debug "--- #{threshold.strftime("%H:%M:%S")} >= #{trip_ticket_expiration_time_of_day_adjusted}"
+          if threshold.to_s(:time_utc) >= trip_ticket_expiration_time_of_day_adjusted
+            logger.debug "--- #{threshold.to_s(:time_utc)} >= #{trip_ticket_expiration_time_of_day_adjusted}"
             
             # Calculate number of days ahead
             end_date = threshold.to_date
-            logger.debug "--- counting #{provider.trip_ticket_expiration_days_before} weekdays ahead from #{end_date.strftime "%a, %e %b %Y"}"
+            logger.debug "--- counting #{provider.trip_ticket_expiration_days_before} weekdays ahead from #{end_date.strftime("%a, %e %b %Y")}"
             counter = 0
             while counter < provider.trip_ticket_expiration_days_before do
               end_date = end_date + 1.day
               counter += 1 unless [0,6].include?(end_date.wday)
-              logger.debug "--- added #{end_date.strftime "%a, %e %b %Y"}, now at #{counter} weekdays ahead"
+              logger.debug "--- added #{end_date.strftime("%a, %e %b %Y")}, now at #{counter} weekdays ahead"
             end
-            logger.debug "--- end date = #{end_date.strftime "%a, %e %b %Y"}"
+            logger.debug "--- end date = #{end_date.strftime("%a, %e %b %Y")}"
             
             expire_at = end_date.end_of_day
-            logger.debug "--- Expiring tickets for #{provider.name} where appointment_time <= #{expire_at.to_s :rfc822}"
+            logger.debug "--- Expiring tickets for #{provider.name} where appointment_time <= #{expire_at.to_s(:rfc822)}"
             
             # A necessary hack. See https://github.com/rails/rails/issues/11894
             ids_to_update = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at).pluck(:id)
@@ -506,10 +506,10 @@ class TripTicket < ActiveRecord::Base
             
             affected_tickets << updated
           else
-            logger.debug "--- #{threshold.strftime("%H:%M:%S")} < #{trip_ticket_expiration_time_of_day_adjusted}, skipping provider"
+            logger.debug "--- #{threshold.to_s(:time_utc)} < #{trip_ticket_expiration_time_of_day_adjusted}, skipping provider"
           end
         else
-          logger.debug "--- Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.change(min: 59, sec: 59).to_s :rfc822}"
+          logger.debug "--- Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.change(min: 59, sec: 59).to_s(:rfc822)}"
           
           # A necessary hack. See https://github.com/rails/rails/issues/11894
           ids_to_update = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND (TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI\') - interval \'? seconds\') <= ?', provider.id, threshold.utc_offset, threshold.change(min: 59, sec: 59)).pluck(:id)
