@@ -1681,7 +1681,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         )
         relationship.approve!
 
-        @service_area = "POLYGON ((-70.6365966796875 42.60377635247125, -70.9991455078125 42.026989870279486, -71.4825439453125 42.45804908709509))"
+        @service_area = "POLYGON ((-70.6365966796875 42.60377635247125, -70.9991455078125 42.026989870279486, -71.3825439453125 42.25804908709509, -70.6365966796875 42.60377635247125))"
         @location_in_area = FactoryGirl.create(:location, :position => "POINT (-71.06266021728516 42.35664962372854)")
         @location_outside_area = FactoryGirl.create(:location, :position => "POINT (-72.0 42.0)")
 
@@ -1692,16 +1692,16 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       let(:service_1) {
-        FactoryGirl.create(:service, :service_area => @service_area, :service_area_type => 'pickup')
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'pickup')
       }
       let(:service_2) {
-        FactoryGirl.create(:service, :service_area => @service_area, :service_area_type => 'dropoff')
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'dropoff')
       }
       let(:service_3) {
-        FactoryGirl.create(:service, :service_area => @service_area, :service_area_type => 'both')
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'both')
       }
       let(:service_4) {
-        FactoryGirl.create(:service, :service_area => @service_area, :service_area_type => 'either')
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'either')
       }
 
       it "should not filter trips that are outside the provider's service area by default" do
