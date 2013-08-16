@@ -67,7 +67,7 @@
                   name="start_hour[<%= day_value %>]">
             <% @start_hours.each do |h| %>
               <option value="<%= h %>"
-                <%= !hours.nil? and h == hours.open_time ? "selected" : "" %>>
+                <%= !hours.nil? and h.to_s(:time_utc) == hours.open_time.to_s(:time_utc) ? "selected" : "" %>>
                 <%= h.strftime("%l:%M%P") %>
               </option>
             <% end %>
@@ -76,7 +76,7 @@
                   name="end_hour[<%= day_value %>]">
             <% @end_hours.each do |h| %>
               <option value="<%= h %>"
-                <%= !hours.nil? and h == hours.close_time ? "selected" : "" %>>
+                <%= !hours.nil? and h.to_s(:time_utc) == hours.close_time.to_s(:time_utc) ? "selected" : "" %>>
                 <%= h.strftime("%l:%M%P") %></option>
             <% end %>
           </select>
