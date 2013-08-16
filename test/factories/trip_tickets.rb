@@ -11,8 +11,8 @@ FactoryGirl.define do
     customer_seats_required 1
     origin_customer_id "ABC123"
     appointment_time { Time.zone.now }
-    requested_drop_off_time { (appointment_time - 15.minutes).strftime("%H:%M") }
-    requested_pickup_time { (appointment_time - 45.minutes).strftime("%H:%M") }
+    requested_drop_off_time { (appointment_time - 15.minutes).to_s(:time_utc) }
+    requested_pickup_time { (appointment_time - 45.minutes).to_s(:time_utc) }
     scheduling_priority "pickup"
     association :originator, :factory => :provider
     association :customer_address, :factory => :location
