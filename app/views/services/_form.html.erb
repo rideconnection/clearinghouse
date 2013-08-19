@@ -65,19 +65,19 @@
           Open...
           <select id="start-hour-<%= day_value %>"
                   name="start_hour[<%= day_value %>]">
-            <% @start_hours.each do |h| %>
-              <option value="<%= h %>"
-                <%= !hours.nil? and h.to_s(:time_utc) == hours.open_time.to_s(:time_utc) ? "selected" : "" %>>
-                <%= h.strftime("%l:%M%P") %>
+            <% @start_hours.each do |hour| %>
+              <option value="<%= hour %>"
+                <%= !hours.nil? and hour.to_s(:time_utc) == hours.open_time.try(:to_s, :time_utc) ? "selected" : "" %>>
+                <%= hour.strftime("%l:%M%P") %>
               </option>
             <% end %>
           </select> to
           <select id="end-hour-<%= day_value %>"
                   name="end_hour[<%= day_value %>]">
-            <% @end_hours.each do |h| %>
-              <option value="<%= h %>"
-                <%= !hours.nil? and h.to_s(:time_utc) == hours.close_time.to_s(:time_utc) ? "selected" : "" %>>
-                <%= h.strftime("%l:%M%P") %></option>
+            <% @end_hours.each do |hour| %>
+              <option value="<%= hour %>"
+                <%= !hours.nil? and hour.to_s(:time_utc) == hours.close_time.try(:to_s, :time_utc) ? "selected" : "" %>>
+                <%= hour.strftime("%l:%M%P") %></option>
             <% end %>
           </select>
         </td>
