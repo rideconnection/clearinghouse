@@ -42,6 +42,8 @@ module TripTicketsHelper
     activity_type = if activity.respond_to?(:auditable) 
       if activity.audited_changes.first[0] == 'rescinded'
         activity.audited_changes.first[1][1] ? 'Rescinded' : 'Unrescinded'
+      elsif activity.audited_changes.first[0] == 'expired'
+        activity.audited_changes.first[1][1] ? 'Expired' : 'Unexpired'
       else
         case activity.action
         when "create"
