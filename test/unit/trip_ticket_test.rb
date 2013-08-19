@@ -615,6 +615,7 @@ class TripTicketTest < ActiveSupport::TestCase
       @recipients = 'aaa@example.com, bbb@example.com'
       TripTicket.all_instances.stub(:partner_users, @recipients)
       TripTicket.all_instances.stub(:claimant_users, @recipients)
+      TripTicket.all_instances.stub(:originator_and_claimant_users, @recipients)
     end
 
     teardown do
@@ -622,6 +623,7 @@ class TripTicketTest < ActiveSupport::TestCase
       ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
       TripTicket.all_instances.unstub(:partner_users)
       TripTicket.all_instances.unstub(:claimant_users)
+      TripTicket.all_instances.unstub(:originator_and_claimant_users)
     end
 
     it "should notify all partner users when a trip is created" do
@@ -638,7 +640,7 @@ class TripTicketTest < ActiveSupport::TestCase
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket rescinded')
     end
 
-    it "should notify all claimant users when a trip expires" do
+    it "should notify all originator and claimant users when a trip expires" do
       @trip_ticket.update_attributes(expire_at: 2.days.ago)
       Timecop.freeze(1.days.ago) do
         assert_difference 'ActionMailer::Base.deliveries.size', +1 do

@@ -70,7 +70,7 @@ class TripTicket < ActiveRecord::Base
     end
     after_save do
       notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
-      notify ->(opts){ claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
+      notify ->(opts){ originator_and_claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
     end
   end
 
