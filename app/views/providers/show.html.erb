@@ -20,7 +20,7 @@
     </div>
     <div class="field">
       <%= label_tag :trip_ticket_expiration_time_of_day %>
-      <%= @provider.trip_ticket_expiration_time_of_day %>
+      <%= @provider.trip_ticket_expiration_time_of_day.try(:to_s, :time) %>
     </div>
   </section>
 
