@@ -4,7 +4,10 @@
 	"dbpass": "clearinghouse",
   "site_url": "ch.clearinghouse.org",
   "public_directory": "/srv/clearinghouse/current/public",
+  "ssl_cert": "/etc/apache2/certs/ch.rideconnection.org.crt",
+  "ssl_cert_key": "/etc/apache2/certs/ch.rideconnection.org.key",
 	
+  "apache":{"listen_ports": ["80", "443"]},
 	"postgresql":{"password":{"postgres":"password"}},
 	"passenger":{"version":"3.0.14", "max_pool_size":"2"},
 	"default_attributes":{"build_essential":{"compiletime": "true"}},
