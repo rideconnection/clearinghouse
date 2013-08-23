@@ -29,7 +29,7 @@ Clearinghouse::Application.configure do
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # TODO: Change this to true once we have an ssl cert for production and implement it.
-  config.force_ssl = false
+  config.force_ssl = true
 
   # See everything in the log (default is :info)
   # config.log_level = :debug
