@@ -21,7 +21,8 @@ Blank Ubuntu 12.04 server machine with root SSH access.  You can set this initia
 
 Make sure on your machine which you are running the chef commands from that you have ruby, chef & knife-solo installed
 
-: gem install chef knife-solo
+: gem install chef -v 11.4.0
+: gem install knife-solo -v 0.2.0
 
 ** Prepare server and deploy:
 
