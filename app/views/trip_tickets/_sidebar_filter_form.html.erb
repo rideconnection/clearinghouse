@@ -28,6 +28,25 @@
     </div>
 
     <div class="field">
+      <%= label_tag :trip_ticket_filters_ticket_status, "Ticket Status:" %><br>
+      <%= select_tag 'trip_ticket_filters[ticket_status][]', options_for_select([
+        ["Approved", "approved"],
+        ["Available", "available"],
+        ["Awaiting Result", "awaiting result"],
+        ["Cancelled", "cancelled"],
+        ["Claim Pending", "claim pending"],
+        ["Claimed", "claimed"],
+        ["Completed", "completed"],
+        ["Declined", "declined"],
+        ["Expired", "expired"],
+        ["No Claims", "no claims"],
+        ["No-Show", "no-show"],
+        ["Rescinded", "rescinded"],
+        ["Unavailable", "unavailable"]
+      ], params[:trip_ticket_filters].try(:[], :ticket_status)), {:multiple => true, :size => 13, :id => :trip_ticket_filters_ticket_status, :class => "form-input"} %>
+    </div>
+
+    <div class="field">
       <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>
     </div>
 

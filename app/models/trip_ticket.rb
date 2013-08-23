@@ -167,11 +167,15 @@ class TripTicket < ActiveRecord::Base
     end
   end
 
-  def status_for(user)
-    user.provider.try(:id) == origin_provider_id ? originator_status(user.provider) : claimant_status(user.provider)
+  def status_for(resource)
+    provider = if resource.is_a?(User) then resource.provider elsif resource.is_a?(Provider) then resource else Provider.new end
+    provider.try(:id) == origin_provider_id ? originator_status(provider) : claimant_status(provider)
   end
 
   def originator_status(provider)
+    # The TripTicket.filter_by_ticket_status method is (unfortunately) tightly
+    # coupled to this method. If this method changes, that method may need
+    # to be updated as well.
     trip_status = status
     case trip_status
       when 'New', 'Rescinded', 'Expired'
@@ -190,6 +194,9 @@ class TripTicket < ActiveRecord::Base
   end
 
   def claimant_status(provider)
+    # The TripTicket.filter_by_ticket_status method is (unfortunately) tightly
+    # coupled to this method. If this method changes, that method may need
+    # to be updated as well.
     trip_status = status
     if trip_status == 'New'
       'New'
@@ -436,6 +443,39 @@ class TripTicket < ActiveRecord::Base
       #   number of elements.
       array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
+    end
+    
+    # The ticket_status filter requires that we evaluate the final status of
+    # each ticket, which is often calculated dynamically based on related 
+    # objects' statuses. Because it has the potential to have to instantiate
+    # lots of objects, it's best to run this filter after all other filters
+    # are applied.
+    # 
+    # This method is (unfortunately) tightly coupled to the #claimant_status
+    # and #originator_status methods. If they change, this method may need
+    # to be updated as well.
+    def filter_by_ticket_status(ticket_statuses, provider)
+      ticket_statuses = Array(ticket_statuses).compact.map(&:downcase)
+      if ticket_statuses.any?
+        # This can be a costly filter to apply if the current scope returns
+        # lots of records, so let's make debugging future bottlenecks easy.
+        # You're welcome, future self.
+        logger.debug "-- Filtering #{scoped.count} records through filter_by_ticket_status"
+
+        where(:id => scoped.all.keep_if{ |ticket|
+          ticket_status = ticket.status_for(provider).downcase
+
+          # #originator_status may return "{claimant_name} Approved"
+          ticket_status = "approved" if !(ticket_status =~ /\bapproved$/).nil?
+
+          # #originator_status may return "{claim_count} Claim(s) Pending"
+          ticket_status = "claim pending" if !(ticket_status =~ /\bclaims? pending$/).nil?
+
+          ticket_statuses.include?(ticket_status)
+        }.collect(&:id))
+      else
+        scoped
+      end
     end
     
     def expire_tickets!(alternate_logger = nil)

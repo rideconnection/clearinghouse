@@ -1,11 +1,21 @@
 module TripTicketsFilter
 
-  def trip_tickets_filter(collection)
-    collection ||= TripTicket.all
+  def trip_tickets_filter(collection, provider)
+    collection ||= TripTicket.scoped
     init_trip_ticket_trip_time_filter_values
 
-    # apply rescinded filter at the end so we can apply default if not specified
+    # Apply rescinded filter at the end so we can apply default if not
+    # specified. Note that if ticket_status is specified, the rescinded param
+    # will be deleted
     rescinded_filter = nil
+    
+    # If we're filtering by trip ticket status we need to unset some other
+    # filters that could cause conflicting results.
+    ticket_status_filter = nil
+    if params[:trip_ticket_filters].try(:[], :ticket_status).try(:length)
+      params[:trip_ticket_filters].delete(:claim_status)
+      params[:trip_ticket_filters].delete(:rescinded)
+    end
 
     params[:trip_ticket_filters].try(:each) do |filter, value|
       case filter.to_sym
@@ -27,6 +37,8 @@ module TripTicketsFilter
         end
       when :rescinded
         rescinded_filter = value
+      when :ticket_status
+        ticket_status_filter = Array(value).compact
       else
         if !value.blank? && TripTicket.respond_to?("filter_by_#{filter.to_s}")
           collection = collection.send("filter_by_#{filter.to_s}", value)
@@ -37,7 +49,11 @@ module TripTicketsFilter
     # expects 'exclude_rescinded', 'only_rescinded', or 'include_rescinded'/nil (default)
     # 'include_rescinded' is the same as saying 'do not filter', so does nothing
     collection = collection.filter_by_rescinded(rescinded_filter) unless ['include_rescinded', nil].include?(rescinded_filter)
-
+    
+    # We need to apply this filter last so that we're iterating over as few
+    # records as possible.
+    collection = collection.filter_by_ticket_status(ticket_status_filter, provider) unless ticket_status_filter.nil?
+    
     collection
   end
 

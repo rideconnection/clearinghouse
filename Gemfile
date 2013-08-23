@@ -48,6 +48,21 @@ gem "grape", "~> 0.2.0"
 # Javascript engine
 gem "therubyracer", "~> 0.11"
 
+group :test, :development, :staging do
+  gem "debugger"
+  gem "factory_girl_rails"
+end
+
+group :test, :development do
+  gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
+  gem "minitest-rails-capybara",
+    git: "git://github.com/blowmage/minitest-rails-capybara.git"
+  gem "spork-rails"
+  gem "spork-testunit", git: "git://github.com/sporkrb/spork-testunit.git"
+  gem "spork-minitest", git: "git://github.com/semaperepelitsa/spork-minitest.git"
+  gem "turn", :require => false
+end
+
 group :development do
   gem "rails-erd"
   gem "thin"
@@ -58,18 +73,6 @@ group :test do
   gem "database_cleaner"
   gem "launchy"
   gem "timecop"
-end
-
-group :test, :development do
-  gem "debugger"
-  gem "factory_girl_rails"
-  gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
-  gem "minitest-rails-capybara",
-    git: "git://github.com/blowmage/minitest-rails-capybara.git"
-  gem "spork-rails"
-  gem "spork-testunit", git: "git://github.com/sporkrb/spork-testunit.git"
-  gem "spork-minitest", git: "git://github.com/semaperepelitsa/spork-minitest.git"
-  gem "turn", :require => false
 end
 
 # To use ActiveModel has_secure_password

@@ -25,7 +25,7 @@ class TripTicketsController < ApplicationController
     restore_or_save_last_used_filters
 
     @providers_for_filters = Provider.accessible_by(current_ability)
-    @trip_tickets = trip_tickets_filter(@trip_tickets)
+    @trip_tickets = trip_tickets_filter(@trip_tickets, current_user.provider)
 
     service_filter_options = { ignore_eligibility: ignore_service_filters? }
     @trip_tickets = provider_services_filter(@trip_tickets, current_user.provider, service_filter_options)
