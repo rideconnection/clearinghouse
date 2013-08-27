@@ -2,10 +2,10 @@ require 'trip_tickets_filter'
 require 'provider_services_filter'
 
 class TripTicketsController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource :except => [:clear_filters]
   before_filter :compact_array_params, :only => [:create, :update]
-  before_filter :providers_for_lists, :except => [:destroy, :index, :rescind]
-  before_filter :setup_locations, :except => [:index, :rescind]
+  before_filter :providers_for_lists, :except => [:destroy, :index, :rescind, :clear_filters]
+  before_filter :setup_locations, :except => [:index, :rescind, :clear_filters]
 
   before_filter :only => [:create, :update] do
     allow_blank_time_field(@trip_ticket, :earliest_pick_up_time)
@@ -29,13 +29,30 @@ class TripTicketsController < ApplicationController
 
     service_filter_options = { ignore_eligibility: ignore_service_filters? }
     @trip_tickets = provider_services_filter(@trip_tickets, current_user.provider, service_filter_options)
+    
+    @trip_ticket = @trip_tickets.where(:id => params[:id]).first || @trip_tickets.first
 
     massage_trip_ticket_trip_time_filter_values_for_form
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @trip_tickets }
+      format.json { render json: trip_ticket_collection_as_json_for_backbone }
     end
+  end
+  
+  # GET /trip_tickets/clear_filters
+  # GET /trip_tickets/clear_filters.json
+  # While it isn't optimal to be changing state via a GET request, it is going
+  # to be easier in the long run since we need to both redirect here from the
+  # FiltersController, and send AJAX requests here from the dashboard.
+  def clear_filters
+    params[:trip_ticket_filters] = 'clear'
+    save_last_used_filters
+    return_to = params[:return_to] || trip_tickets_url
+    respond_to do |format|
+      format.html { redirect_to return_to, notice: 'Trip ticket filters cleared.' }
+      format.json { head :no_content }
+    end    
   end
 
   # GET /trip_tickets/1
@@ -43,8 +60,7 @@ class TripTicketsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @trip_ticket }
-      format.js
+      format.json { render json: trip_ticket_instance_as_json_for_backbone }
     end
   end
 
@@ -91,6 +107,7 @@ class TripTicketsController < ApplicationController
 
   # DELETE /trip_tickets/1
   # DELETE /trip_tickets/1.json
+  # TODO: remove, not used
   def destroy
     @trip_ticket.destroy
 
@@ -147,10 +164,16 @@ class TripTicketsController < ApplicationController
 
   def save_last_used_filters
     if params[:trip_ticket_filters] == 'clear'
+      # TODO - Move this into the clear_filters action - all requests to clear
+      # filters should be handled by that method now so that we can redirect
+      # properly afterward.
       logger.debug "Clearing last_used_filters cookie"
       cookies.delete(:last_used_filters)
       params[:trip_ticket_filters] = nil
     else
+      # TODO - Ideally saving a new filter should redirect back to the index
+      # action so that we don't have a messy URL on redisplay, mainly for
+      # vanity sake with the AJAX dashboard and it's hashbang URL scheme.
       values = {}
       values[:trip_ticket_filters] = params[:trip_ticket_filters] if params[:trip_ticket_filters].present?
       values[:saved_filter] = params[:saved_filter] if params[:saved_filter].present?
@@ -184,5 +207,33 @@ class TripTicketsController < ApplicationController
 
   def ignore_service_filters?
     params[:trip_ticket_filters].try(:[], :service_filters) != 'apply_service_filters'
+  end
+  
+  # Rendering the entire collection as JSON is dangerous as we could be exposing information
+  # to provider users that shouldn't have access to some attributes. Additionally, we are
+  # using a lot of complex helper and model methods to render this data to the end user,
+  # often conditionally based on who is logged in. As such, it is going to be much more
+  # simple to pass rendered Rails views to Backbone rather than use javascript templates
+  # via Backbone.
+  
+  def trip_ticket_collection_as_json_for_backbone
+    trip_tickets = []
+    @trip_tickets.each do |trip_ticket|
+      trip_tickets << {
+        id: trip_ticket.id,
+        downcased_status: trip_ticket.status.downcase,
+        primary_ordering_timestamp: trip_ticket.appointment_time.to_f,
+        secondary_ordering_timestamp: trip_ticket.created_at.to_f,
+        rendered_partial: render_to_string(partial: "trip_tickets/ajaxified_dashboard/trip_ticket_list_item", locals: {trip_ticket: trip_ticket}, formats: [:html]),
+      }
+    end
+    trip_tickets.to_json
+  end
+  
+  def trip_ticket_instance_as_json_for_backbone
+    {
+      id: @trip_ticket.id,
+      rendered_partial: render_to_string(partial: "trip_tickets/ajaxified_dashboard/trip_ticket_details", locals: {trip_ticket: @trip_ticket}, formats: [:html]),
+    }.to_json
   end
 end

@@ -107,40 +107,40 @@ body[data-controller="trip_tickets"] {
         background:#ededed;
         overflow:hidden;
         padding:9px 33px 4px;
+      }
 
-        .actions-list {
-          float:right;
-          font-weight:600;
-          list-style:none;
-          margin:0;
-          padding:0;
+      .actions-list {
+        float:right;
+        font-weight:600;
+        list-style:none;
+        margin:0;
+        padding:0;
 
-          li {
-            float:left;
+        li {
+          float:left;
 
-            a {
-              background:url(image-path("sprite1.png")) no-repeat 0 -520px;
-              color:#666;
+          a {
+            background:url(image-path("sprite1.png")) no-repeat 0 -520px;
+            color:#666;
+            display:block;
+      
+            span {
+              background:url(image-path("separator03.gif")) no-repeat 0 1px;
               display:block;
-        
-              span {
-                background:url(image-path("separator03.gif")) no-repeat 0 1px;
-                display:block;
-                padding:7px 12px 11px 9px;
-              }
+              padding:7px 12px 11px 9px;
             }
-        
-            &:first-child a {
-              background-position:0 -470px;
-            }
-        
-            &.last a {
-              background-position:100% -570px;
-            }
-        
-            &:first-child a span {
-              background:none;
-            }
+          }
+      
+          &:first-child a {
+            background-position:0 -470px;
+          }
+      
+          &.last a {
+            background-position:100% -570px;
+          }
+      
+          &:first-child a span {
+            background:none;
           }
         }
       }
@@ -292,13 +292,14 @@ body[data-controller="trip_tickets"] {
         width:655px;
       
         .content-frame {
-          height:643px;
-          min-height:643px;
+          height:642px;
+          min-height:642px;
           padding:8px 33px 20px 24px;
 
           .heading {
             margin:0 0 12px;
             position:relative;
+            @include clearfix;
 
             &.alt-heading {
               margin-bottom:26px;

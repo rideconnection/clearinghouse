@@ -1,10 +1,12 @@
-$("#activities-dialog").html('<%= escape_javascript(render("show_fields", :result => @trip_result)) %>');
-$("#activities-dialog").dialog({
+$("#modal-dialog").html('<%= escape_javascript(render("show_fields", :result => @trip_result)) %>');
+$("#modal-dialog").dialog({
   title: "Result",
   width: 1062,
   modal: true,
+  draggable: false,
+  resizable: false,
   buttons: {
-    Cancel: function() {
+    OK: function() {
       $( this ).dialog( "close" );
     }
   }

@@ -29,15 +29,16 @@ jQuery(function(){
 });
 
 // open-close init
-function initOpenClose() {
-  jQuery('.details-box').openClose({
+function initOpenClose(scope) {
+  scope = scope || $(document);
+  scope.find('.details-box').openClose({
     activeClass: 'active',
     opener: '.opener',
     slider: '.slide',
     animSpeed: 400,
     effect: 'slide'
   });
-  jQuery('.form-holder').openClose({
+  scope.find('.form-holder').openClose({
     activeClass: 'active',
     opener: '.opener',
     slider: '.slide',
