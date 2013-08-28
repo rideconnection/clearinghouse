@@ -57,10 +57,6 @@
     </div>
 
     <div class="field">
-      <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :id => :trip_ticket_filters_claim_status, :prompt => "Claim Status:", :class => "form-input" %>
-    </div>
-
-    <div class="field">
       <%= select_tag 'trip_ticket_filters[rescinded]', options_for_select([["Show rescinded (default)", :include_rescinded], ["Hide rescinded", :exclude_rescinded], ["Only rescinded", :only_rescinded]], params[:trip_ticket_filters].try(:[], :rescinded)), :id => :trip_ticket_filters_rescinded, :prompt => "Rescinded Trip Tickets:", :class => "form-input" %>
     </div>
 
