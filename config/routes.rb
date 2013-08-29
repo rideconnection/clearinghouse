@@ -54,6 +54,12 @@ Clearinghouse::Application.routes.draw do
 
   resources :filters
 
+  resources :bulk_operations, :only => [ :index, :show, :new, :create ] do
+    member do
+      get 'download'
+    end
+  end
+
   match 'admin', :controller => :admin, :action => :index
   match 'reports', :controller => :reports, :action => :index
   match 'job_queue' => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
