@@ -81,6 +81,7 @@ class BulkOperationsController < ApplicationController
     trip_filter = ['updated_at > ?', last_update] if last_update.present?
     exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
     exporter.process(TripTicket.accessible_by(::Ability.new(user)).where(trip_filter))
+    bulk_operation.completed = true
     bulk_operation.data = exporter.data
     bulk_operation.row_count = exporter.row_count
     bulk_operation.last_imported_timestamp = exporter.last_imported_timestamp
@@ -94,6 +95,7 @@ class BulkOperationsController < ApplicationController
 
 
 
+    bulk_operation.completed = true
     bulk_operation.row_count = exporter.row_count
     bulk_operation.error_count =
     bulk_operation.bad_row_numbers =

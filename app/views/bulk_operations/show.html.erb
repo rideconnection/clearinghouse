@@ -15,7 +15,7 @@
 
   <div class="field">
     <h3>Status</h3>
-    <span class="status"><%= @bulk_operation.data.blank? ? 'Pending' : 'Completed' %></span>
+    <span class="status"><%= @bulk_operation.completed? ? 'Completed' : 'Pending' %></span>
   </div>
 
   <div class="field">
@@ -59,11 +59,11 @@
 <% end %>
 
 <script type="text/javascript">
-  var waiting = <%= @bulk_operation.data.blank? %>;
+  var waiting = <%= !@bulk_operation.completed? %>;
 
   function waitForBulkOperation() {
     $.get('<%= bulk_operation_path(@bulk_operation) %>.json', function(data){
-      waiting = data.data == false;
+      waiting = data.completed == false;
       if (waiting) {
         setTimeout(function(){ waitForBulkOperation() }, 2000)
       } else {
