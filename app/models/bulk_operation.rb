@@ -7,6 +7,10 @@ class BulkOperation < ActiveRecord::Base
 
   SINGLE_DOWNLOAD_LIMIT = 200
 
+  def to_json(options = {})
+    attributes.delete_if {|k| k.to_s == 'data'}.merge({ data: data.present? }).to_json(options)
+  end
+
   def self.make_file_name
     "ride_clearinghouse_download-#{Time.zone.now.strftime("%Y%m%d-%H%M%S")}.csv"
   end

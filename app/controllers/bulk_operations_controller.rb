@@ -42,24 +42,20 @@ class BulkOperationsController < ApplicationController
   def create
     @bulk_operation = current_user.bulk_operations.build(params[:bulk_operation])
 
-    # TODO use DJ for this to do it in the background
-
-    if @bulk_operation.is_upload?
-      # TODO for upload, we should be accepting a file upload in the form, then import and process the data
-    else
-      last_update = current_user.bulk_operations.maximum(:last_import_time)
-      trip_filter = ['updated_at > ?', last_update] if last_update.present?
-      exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
-      exporter.process(TripTicket.accessible_by(current_ability).where(trip_filter))
-      @bulk_operation.data = exporter.data
-      @bulk_operation.row_count = exporter.row_count
-      @bulk_operation.last_import_time = exporter.last_import_time
-      @bulk_operation.file_name = BulkOperation.make_file_name
-    end
-
     respond_to do |format|
       if @bulk_operation.save
-        format.html { redirect_to bulk_operation_url(@bulk_operation, :download => true) }
+        format.html do
+          if @bulk_operation.is_upload?
+            # TODO for upload, we should be accepting a file upload in the form, then import and process the data
+          else
+            if Rails.env.development?
+              self.class.export(current_user.id, @bulk_operation.id)
+            else
+              self.class.delay.export(current_user.id, @bulk_operation.id)
+            end
+          end
+          redirect_to bulk_operation_url(@bulk_operation, :download => true)
+        end
         format.json { render json: @bulk_operation }
       else
         format.html { render action: "new" }
@@ -70,6 +66,20 @@ class BulkOperationsController < ApplicationController
 
   def download
     send_download(@bulk_operation)
+  end
+
+  def self.export(user_id, bulk_operation_id)
+    user = User.find(user_id)
+    bulk_operation = BulkOperation.find(bulk_operation_id)
+    last_update = user.bulk_operations.maximum(:last_import_time)
+    trip_filter = ['updated_at > ?', last_update] if last_update.present?
+    exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
+    exporter.process(TripTicket.accessible_by(::Ability.new(user)).where(trip_filter))
+    bulk_operation.data = exporter.data
+    bulk_operation.row_count = exporter.row_count
+    bulk_operation.last_import_time = exporter.last_import_time
+    bulk_operation.file_name = BulkOperation.make_file_name
+    bulk_operation.save!
   end
 
   protected

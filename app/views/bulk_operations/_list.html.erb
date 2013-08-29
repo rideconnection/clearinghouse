@@ -3,6 +3,7 @@
       <tr>
         <th>Time</th>
         <th>Type</th>
+        <th>Status</th>
         <th>File Name</th>
         <th>Rows</th>
         <th>Errors</th>
@@ -14,6 +15,7 @@
         <tr>
           <td><%= bulk_operation.created_at %></td>
           <td><%= bulk_operation.is_upload? ? 'Upload' : 'Download' %></td>
+          <td><%= bulk_operation.data.present? ? 'Completed' : 'Pending' %></td>
           <td><%= bulk_operation.file_name %></td>
           <td><%= bulk_operation.row_count || 'none' %></td>
           <td><%= bulk_operation.error_count || 'none' %></td>
