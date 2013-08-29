@@ -42,15 +42,16 @@ ActiveRecord::Schema.define(:version => 20130828140519) do
 
   create_table "bulk_operations", :force => true do |t|
     t.integer       "user_id"
+    t.boolean       "completed",               :default => false
     t.integer       "row_count"
-    t.datetime      "last_import_time"
-    t.boolean       "is_upload",        :default => false
     t.string        "file_name"
+    t.datetime      "last_imported_timestamp"
+    t.boolean       "is_upload",               :default => false
     t.integer       "error_count"
     t.integer_array "bad_row_numbers"
     t.text          "data"
-    t.datetime      "created_at",                          :null => false
-    t.datetime      "updated_at",                          :null => false
+    t.datetime      "created_at",                                 :null => false
+    t.datetime      "updated_at",                                 :null => false
   end
 
   create_table "delayed_jobs", :force => true do |t|

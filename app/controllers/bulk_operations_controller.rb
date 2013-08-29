@@ -25,7 +25,7 @@ class BulkOperationsController < ApplicationController
 
     unless @bulk_operation.is_upload?
       @last_download = BulkOperation.maximum(:created_at)
-      @last_update = BulkOperation.maximum(:last_import_time)
+      @last_update = BulkOperation.maximum(:last_imported_timestamp)
       @row_count = if @last_update.blank?
         TripTicket.accessible_by(current_ability).count
       else
@@ -42,11 +42,17 @@ class BulkOperationsController < ApplicationController
   def create
     @bulk_operation = current_user.bulk_operations.build(params[:bulk_operation])
 
+    save_upload if @bulk_operation.is_upload?
+
     respond_to do |format|
       if @bulk_operation.save
         format.html do
           if @bulk_operation.is_upload?
-            # TODO for upload, we should be accepting a file upload in the form, then import and process the data
+            if Rails.env.development?
+              self.class.import(current_user.id, @bulk_operation.id)
+            else
+              self.class.delay.import(current_user.id, @bulk_operation.id)
+            end
           else
             if Rails.env.development?
               self.class.export(current_user.id, @bulk_operation.id)
@@ -65,26 +71,42 @@ class BulkOperationsController < ApplicationController
   end
 
   def download
-    send_download(@bulk_operation)
+    send_data(@bulk_operation.data, type: 'text/csv', disposition: 'attachment', filename: @bulk_operation.file_name)
   end
 
   def self.export(user_id, bulk_operation_id)
     user = User.find(user_id)
     bulk_operation = BulkOperation.find(bulk_operation_id)
-    last_update = user.bulk_operations.maximum(:last_import_time)
+    last_update = user.bulk_operations.maximum(:last_imported_timestamp)
     trip_filter = ['updated_at > ?', last_update] if last_update.present?
     exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
     exporter.process(TripTicket.accessible_by(::Ability.new(user)).where(trip_filter))
     bulk_operation.data = exporter.data
     bulk_operation.row_count = exporter.row_count
-    bulk_operation.last_import_time = exporter.last_import_time
+    bulk_operation.last_imported_timestamp = exporter.last_imported_timestamp
     bulk_operation.file_name = BulkOperation.make_file_name
+    bulk_operation.save!
+  end
+
+  def self.import(user_id, bulk_operation_id)
+    user = User.find(user_id)
+    bulk_operation = BulkOperation.find(bulk_operation_id)
+
+
+
+    bulk_operation.row_count = exporter.row_count
+    bulk_operation.error_count =
+    bulk_operation.bad_row_numbers =
+    bulk_operation.last_imported_timestamp = exporter.last_imported_timestamp
     bulk_operation.save!
   end
 
   protected
 
-  def send_download(bulk_operation)
-    send_data(bulk_operation.data, type: 'text/csv', disposition: 'attachment', filename: bulk_operation.file_name)
+  def save_upload
+    if io = params[:bulk_operation][:uploaded_file] && io.is_a?(IO)
+      @bulk_operation.data = io.read
+      @bulk_operation.file_name = io.original_filename
+    end
   end
 end

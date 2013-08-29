@@ -2,7 +2,7 @@ require 'csv'
 
 class TripTicketExport
 
-  attr_accessor :batch_limit, :data, :row_count, :last_import_time
+  attr_accessor :batch_limit, :data, :row_count, :last_imported_timestamp
 
   def initialize(batch_limit = nil)
     self.batch_limit = batch_limit
@@ -12,13 +12,13 @@ class TripTicketExport
     trip_tickets = trip_tickets.limit(batch_limit) if batch_limit.present?
     keys = make_detailed_trip(trip_tickets.first).stringify_keys.keys
     self.row_count = trip_tickets.length
-    self.last_import_time = nil
+    self.last_imported_timestamp = nil
 
     self.data = CSV.generate(headers: keys, write_headers: true) do |csv|
       trip_tickets.each do |trip|
         detailed_trip = make_detailed_trip(trip)
         csv << keys.map { |key| detailed_trip[key] }
-        self.last_import_time = trip.updated_at if last_import_time.nil? || trip.updated_at > last_import_time
+        self.last_imported_timestamp = trip.updated_at if last_imported_timestamp.nil? || trip.updated_at > last_imported_timestamp
       end
     end
   end

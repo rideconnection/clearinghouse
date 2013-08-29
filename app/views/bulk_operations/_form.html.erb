@@ -12,7 +12,10 @@
   <% end %>
 
   <% if @bulk_operation.is_upload? %>
-    <p>Select a file to upload</p>
+    <div class="field">
+      <%= f.label :uploaded_file, "Select file to upload for import" %>
+      <%= f.file_field :uploaded_file, accept: 'text/csv,text/plain' %>
+    </div>
   <% elsif @row_count == 0 %>
     <% if @last_download.blank? %>
       <p>There are no trip tickets to download.</p>
