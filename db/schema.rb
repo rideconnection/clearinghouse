@@ -41,17 +41,17 @@ ActiveRecord::Schema.define(:version => 20130828140519) do
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
   create_table "bulk_operations", :force => true do |t|
-    t.integer       "user_id"
-    t.boolean       "completed",               :default => false
-    t.integer       "row_count"
-    t.string        "file_name"
-    t.datetime      "last_imported_timestamp"
-    t.boolean       "is_upload",               :default => false
-    t.integer       "error_count"
-    t.integer_array "bad_row_numbers"
-    t.text          "data"
-    t.datetime      "created_at",                                 :null => false
-    t.datetime      "updated_at",                                 :null => false
+    t.integer      "user_id"
+    t.boolean      "completed",                              :default => false
+    t.integer      "row_count"
+    t.string       "file_name"
+    t.datetime     "last_imported_timestamp"
+    t.boolean      "is_upload",                              :default => false
+    t.integer      "error_count"
+    t.string_array "row_errors",              :limit => 255
+    t.text         "data"
+    t.datetime     "created_at",                                                :null => false
+    t.datetime     "updated_at",                                                :null => false
   end
 
   create_table "delayed_jobs", :force => true do |t|

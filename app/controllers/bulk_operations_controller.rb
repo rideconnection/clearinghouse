@@ -1,8 +1,9 @@
 require 'trip_ticket_export'
+require 'trip_ticket_import'
 
 class BulkOperationsController < ApplicationController
   load_and_authorize_resource
-  skip_load_resource :only => :index
+  skip_load_resource :only => [ :index, :create ]
 
   def index
     @bulk_operations = BulkOperation.accessible_by(current_ability).order('created_at DESC').page(params[:page]).per(5)
@@ -40,27 +41,28 @@ class BulkOperationsController < ApplicationController
   end
 
   def create
+    uploaded_file = params[:bulk_operation].try(:delete, :uploaded_file)
     @bulk_operation = current_user.bulk_operations.build(params[:bulk_operation])
-
-    save_upload if @bulk_operation.is_upload?
+    save_upload(uploaded_file) if @bulk_operation.is_upload?
 
     respond_to do |format|
       if @bulk_operation.save
         format.html do
           if @bulk_operation.is_upload?
-            if Rails.env.development?
-              self.class.import(current_user.id, @bulk_operation.id)
-            else
+            #if Rails.env.development?
+            #  self.class.import(current_user.id, @bulk_operation.id)
+            #else
               self.class.delay.import(current_user.id, @bulk_operation.id)
-            end
+            #end
+            redirect_to bulk_operation_url(@bulk_operation)
           else
             if Rails.env.development?
               self.class.export(current_user.id, @bulk_operation.id)
             else
               self.class.delay.export(current_user.id, @bulk_operation.id)
             end
+            redirect_to bulk_operation_url(@bulk_operation, :download => true)
           end
-          redirect_to bulk_operation_url(@bulk_operation, :download => true)
         end
         format.json { render json: @bulk_operation }
       else
@@ -92,23 +94,30 @@ class BulkOperationsController < ApplicationController
   def self.import(user_id, bulk_operation_id)
     user = User.find(user_id)
     bulk_operation = BulkOperation.find(bulk_operation_id)
-
-
-
-    bulk_operation.completed = true
-    bulk_operation.row_count = exporter.row_count
-    bulk_operation.error_count =
-    bulk_operation.bad_row_numbers =
-    bulk_operation.last_imported_timestamp = exporter.last_imported_timestamp
-    bulk_operation.save!
+    importer = TripTicketImport.new(user.provider)
+    begin
+      importer.process(bulk_operation.data)
+    rescue
+      raise
+    ensure
+      bulk_operation.completed = true
+      bulk_operation.row_count = importer.row_count
+      bulk_operation.error_count = importer.errors.length
+      bulk_operation.row_errors = importer.errors
+      bulk_operation.save!
+    end
   end
 
   protected
 
-  def save_upload
-    if io = params[:bulk_operation][:uploaded_file] && io.is_a?(IO)
-      @bulk_operation.data = io.read
-      @bulk_operation.file_name = io.original_filename
+  def save_upload(uploaded_file)
+    if uploaded_file.present?
+      logger.debug "Saving contents of uploaded file for bulk operation processing: #{uploaded_file}, #{uploaded_file.class}, IO? #{uploaded_file.is_a?(IO)}"
+      @bulk_operation.data = uploaded_file.read
+      @bulk_operation.file_name = uploaded_file.original_filename
+      logger.debug "Uploaded file name: #{@bulk_operation.file_name}, data: #{@bulk_operation.data}"
+    else
+      logger.debug "Uploaded file for bulk operation processing is empty"
     end
   end
 end

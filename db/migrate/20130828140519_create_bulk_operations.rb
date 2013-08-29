@@ -8,7 +8,7 @@ class CreateBulkOperations < ActiveRecord::Migration
       t.datetime :last_imported_timestamp
       t.boolean :is_upload, default: false
       t.integer :error_count
-      t.integer_array :bad_row_numbers
+      t.string_array :row_errors
       t.text :data
       t.timestamps
     end

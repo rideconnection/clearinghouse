@@ -16,6 +16,7 @@
       <%= f.label :uploaded_file, "Select file to upload for import" %>
       <%= f.file_field :uploaded_file, accept: 'text/csv,text/plain' %>
     </div>
+    <%= f.hidden_field :is_upload, value: true %>
   <% elsif @row_count == 0 %>
     <% if @last_download.blank? %>
       <p>There are no trip tickets to download.</p>

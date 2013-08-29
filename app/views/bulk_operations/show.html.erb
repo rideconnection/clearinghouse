@@ -31,15 +31,18 @@
 <% if @bulk_operation.is_upload? %>
   <div class="field">
     <h3>Error Count</h3>
-    <%= @bulk_operation.error_count || 'none' %>
+    <span class="error_count"><%= @bulk_operation.error_count || '-' %></span>
   </div>
 
-  <% if @bulk_operation.bad_row_numbers.present? %>
-  <div class="field">
-    <h3>The following row numbers contained errors:</h3>
-    <%= @bulk_operation.bad_row_numbers.join(', ') %>
+  <div class="field row_errors_field" style="display:<%= @bulk_operation.row_errors.present? ? 'block' : 'none' %>">
+    <h3>The following rows contained errors:</h3>
+    <ul class="row_errors">
+      <% (@bulk_operation.row_errors || []).each do |err| %>
+      <li><%= err %></li>
+      <% end %>
+    </ul>
   </div>
-  <% end %>
+
 <% else %>
   <div class="field">
     <h3>Most Recent Trip Ticket Update Time</h3>
@@ -67,9 +70,18 @@
       if (waiting) {
         setTimeout(function(){ waitForBulkOperation() }, 2000)
       } else {
-        $('.show_bulk_operation .file_name').text(data.file_name);
-        $('.show_bulk_operation .row_count').text(data.row_count);
-        $('.show_bulk_operation .last_imported_timestamp').text(data.last_imported_timestamp.toLocaleString());
+        if (data.file_name) $('.show_bulk_operation .file_name').text(data.file_name);
+        if (data.row_count) $('.show_bulk_operation .row_count').text(data.row_count);
+        if (data.error_count) $('.show_bulk_operation .error_count').text(data.error_count);
+        if (data.last_imported_timestamp) $('.show_bulk_operation .last_imported_timestamp').text(data.last_imported_timestamp.toLocaleString());
+        $ul = $('ul.row_errors');
+        $ul.empty();
+        if (data.row_errors && data.row_errors.length > 0) {
+          $('.row_errors_field').show();
+          for (var i = 0; i < data.row_errors.length; i++) {
+            $ul.append('<li>'+data.row_errors[i]+'</li>');
+          }
+        }
         bulkOperationComplete();
       }
     });

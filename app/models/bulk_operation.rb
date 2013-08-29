@@ -1,10 +1,10 @@
 class BulkOperation < ActiveRecord::Base
   belongs_to :user
 
-  attr_accessible :row_count, :last_imported_timestamp, :is_upload, :file_name, :error_count, :bad_row_numbers, :data
+  attr_accessible :row_count, :last_imported_timestamp, :is_upload, :file_name, :error_count, :row_errors, :data
 
   validates_presence_of :user_id
-  validates_presence_of :data, on: create, if: Proc.new { |op| op.is_upload? }
+  validates_presence_of :data, on: :create, if: Proc.new { |op| op.is_upload? }, message: "can't be blank when uploading a file"
 
   SINGLE_DOWNLOAD_LIMIT = 200
 
