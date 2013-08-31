@@ -26,7 +26,7 @@ class BulkOperationsController < ApplicationController
 
     unless @bulk_operation.is_upload?
       @last_download = BulkOperation.maximum(:created_at)
-      @last_update = BulkOperation.maximum(:last_imported_timestamp)
+      @last_update = BulkOperation.maximum(:last_exported_timestamp)
       @row_count = if @last_update.blank?
         TripTicket.accessible_by(current_ability).count
       else
@@ -79,14 +79,14 @@ class BulkOperationsController < ApplicationController
   def self.export(user_id, bulk_operation_id)
     user = User.find(user_id)
     bulk_operation = BulkOperation.find(bulk_operation_id)
-    last_update = user.bulk_operations.maximum(:last_imported_timestamp)
+    last_update = user.bulk_operations.maximum(:last_exported_timestamp)
     trip_filter = ['updated_at > ?', last_update] if last_update.present?
     exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
     exporter.process(TripTicket.accessible_by(::Ability.new(user)).where(trip_filter))
     bulk_operation.completed = true
     bulk_operation.data = exporter.data
     bulk_operation.row_count = exporter.row_count
-    bulk_operation.last_imported_timestamp = exporter.last_imported_timestamp
+    bulk_operation.last_exported_timestamp = exporter.last_exported_timestamp
     bulk_operation.file_name = BulkOperation.make_file_name
     bulk_operation.save!
   end

@@ -46,7 +46,7 @@
 <% else %>
   <div class="field">
     <h3>Most Recent Trip Ticket Update Time</h3>
-    <span class="last_imported_timestamp"><%= @bulk_operation.last_imported_timestamp || '-' %></span>
+    <span class="last_exported_timestamp"><%= @bulk_operation.last_exported_timestamp || '-' %></span>
   </div>
 <% end %>
 
@@ -73,7 +73,7 @@
         if (data.file_name) $('.show_bulk_operation .file_name').text(data.file_name);
         if (data.row_count) $('.show_bulk_operation .row_count').text(data.row_count);
         if (data.error_count) $('.show_bulk_operation .error_count').text(data.error_count);
-        if (data.last_imported_timestamp) $('.show_bulk_operation .last_imported_timestamp').text(data.last_imported_timestamp.toLocaleString());
+        if (data.last_exported_timestamp) $('.show_bulk_operation .last_exported_timestamp').text(data.last_exported_timestamp.toLocaleString());
         $ul = $('ul.row_errors');
         $ul.empty();
         if (data.row_errors && data.row_errors.length > 0) {

@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(:version => 20130828140519) do
     t.boolean      "completed",                              :default => false
     t.integer      "row_count"
     t.string       "file_name"
-    t.datetime     "last_imported_timestamp"
+    t.datetime     "last_exported_timestamp"
     t.boolean      "is_upload",                              :default => false
     t.integer      "error_count"
     t.string_array "row_errors",              :limit => 255
