@@ -6,6 +6,7 @@ class TripTicketImport
   class RowError < RuntimeError; end
 
   def initialize(originator)
+    raise ArgumentError unless originator.is_a?(Provider)
     self.originator = originator
   end
 
@@ -36,10 +37,8 @@ class TripTicketImport
 
           if trip
             raise RowError, "trip ticket being updated was not created by your provider" if trip.origin_provider_id != originator.id
-            Rails.logger.debug "TripTicketImport::process updating trip ticket ID #{trip.id} with attributes #{row}"
             trip.update_attributes(row)
           else
-            Rails.logger.debug "TripTicketImport::process creating new trip ticket with attributes #{row}"
             trip = TripTicket.create(row)
           end
           raise RowError, "trip ticket could not be created, error unknown" if trip.nil?
@@ -57,6 +56,7 @@ class TripTicketImport
         self.row_count += 1
       end
 
+      errors << "No data rows found, import cancelled" if row_count == 0
       raise ActiveRecord::Rollback, "Errors detected, import cancelled" unless errors.empty?
     end
   end
@@ -84,12 +84,6 @@ class TripTicketImport
     row['pick_up_location_attributes'] = pick_up_location_hash if pick_up_location_hash.present?
     row['drop_off_location_attributes'] = drop_off_location_hash if drop_off_location_hash.present?
     row['trip_result_attributes'] = trip_result_hash if trip_result_hash.present?
-
-    # the CSV parser does not handle arrays and hashes, but the JSON parser does
-    # TODO probably need to back similar code into the Adapter
-    (TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + TripTicket::CUSTOMER_IDENTIFIER_HSTORE_FIELD_NAMES).each do |k|
-      row[k] = JSON.parse(row[k]) if row[k].present? && row[k] =~ /^\s*\[.*\]\s*$/
-    end
   end
 
   def nested_object_to_hash(row, prefix)
