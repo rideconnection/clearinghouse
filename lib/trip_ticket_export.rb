@@ -25,9 +25,12 @@ class TripTicketExport
 
   protected
 
-  # TODO this relies on our Grape API implementation to generate a deeply-nested trip ticket, would be better to just combine attributes explicitly
+  # NOTE this relies on our Grape API implementation to generate a deeply-nested trip ticket, would be better not to rely on the API code
   def make_detailed_trip(trip_ticket)
-    flatten_hash(JSON.parse(Clearinghouse::Entities::V1::TripTicketDetailed.represent(trip_ticket).to_json))
+    detailed_trip = JSON.parse(Clearinghouse::Entities::V1::TripTicketDetailed.represent(trip_ticket).to_json)
+    detailed_trip.delete('trip_ticket_comments')
+    detailed_trip.delete('trip_claims')
+    flatten_hash(detailed_trip)
   end
 
   # flatten hash structure, changing keys of nested objects to parentkey_nestedkey
