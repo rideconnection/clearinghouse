@@ -21,12 +21,12 @@
     <% if @last_download.blank? %>
       <p>There are no trip tickets to download.</p>
     <% else %>
-      <p>There have been no trip tickets updated since your last download (<%= @last_download %>).</p>
+      <p>There have been no trip tickets updated since your last download (<%= @last_download.strftime("%Y-%m-%d %H:%M:%S") %>).</p>
     <% end %>
   <% else %>
     <p>
       Downloading <%= [@row_count, BulkOperation::SINGLE_DOWNLOAD_LIMIT].min %> trip tickets that have been updated since your last download
-      (<%= @last_download.blank? ? 'this is your first download' : @last_download %>).
+      (<%= @last_download.blank? ? 'this is your first download' : @last_download.strftime("%Y-%m-%d %H:%M:%S") %>).
     </p>
     <% if @row_count > BulkOperation::SINGLE_DOWNLOAD_LIMIT %>
     <p>

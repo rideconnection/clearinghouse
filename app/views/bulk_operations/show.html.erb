@@ -10,7 +10,7 @@
 
   <div class="field">
     <h3>Time</h3>
-    <%= @bulk_operation.created_at %>
+    <%= @bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
   </div>
 
   <div class="field">
@@ -46,7 +46,7 @@
 <% else %>
   <div class="field">
     <h3>Most Recent Trip Ticket Update Time</h3>
-    <span class="last_exported_timestamp"><%= @bulk_operation.last_exported_timestamp || '-' %></span>
+    <span class="last_exported_timestamp"><%= @bulk_operation.last_exported_timestamp.try(:strftime, "%Y-%m-%d %H:%M:%S") || '-' %></span>
   </div>
 <% end %>
 
@@ -73,7 +73,13 @@
         if (data.file_name) $('.show_bulk_operation .file_name').text(data.file_name);
         if (data.row_count) $('.show_bulk_operation .row_count').text(data.row_count);
         if (data.error_count) $('.show_bulk_operation .error_count').text(data.error_count);
-        if (data.last_exported_timestamp) $('.show_bulk_operation .last_exported_timestamp').text(data.last_exported_timestamp.toLocaleString());
+        if (data.last_exported_timestamp) {
+          var timeStr = data.last_exported_timestamp.toLocaleString();
+          // formatting hacks for consistency
+          timeStr = timeStr.replace('T', ' ');
+          timeStr = timeStr.replace(/\s*(([+-]?[\d:]+)|(utc)|(z))$/i, '');
+          $('.show_bulk_operation .last_exported_timestamp').text(timeStr);
+        }
         $ul = $('ul.row_errors');
         $ul.empty();
         if (data.row_errors && data.row_errors.length > 0) {

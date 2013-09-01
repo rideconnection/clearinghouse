@@ -13,7 +13,7 @@
     <tbody>
       <% @bulk_operations.each do |bulk_operation| %>
         <tr>
-          <td><%= bulk_operation.created_at %></td>
+          <td><%= bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
           <td><%= bulk_operation.is_upload? ? 'Upload' : 'Download' %></td>
           <td><%= bulk_operation.data.present? ? 'Completed' : 'Pending' %></td>
           <td><%= bulk_operation.file_name %></td>
