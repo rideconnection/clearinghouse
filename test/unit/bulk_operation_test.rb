@@ -11,7 +11,7 @@ class BulkOperationTest < ActiveSupport::TestCase
   it "should require data attribute if operation is an upload" do
     op = FactoryGirl.build(:bulk_operation, :is_upload => true)
     op.valid?.must_equal false
-    op.errors[:data].must_include "can't be blank when uploading a file"
+    op.errors[:file_name].must_include "can't be blank"
   end
 
   it "should not include the data attribute when converted to JSON" do
