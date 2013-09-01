@@ -1,0 +1,15 @@
+<div class="padded">
+  <header>
+    <h2>Bulk Operations</h2>
+  </header>
+  <%= render 'list' %>
+</div>
+
+<% content_for :sidebar do %>
+  <% if can? :create, BulkOperation %>
+    <ul class="side-nav">
+        <li><%= link_to 'Download Trip Tickets', new_bulk_operation_path(operation_type: :download) %></li>
+        <li><%= link_to 'Upload Trip Tickets', new_bulk_operation_path(operation_type: :upload) %></li>
+    </ul>
+  <% end %>
+<% end %>

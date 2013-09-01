@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   belongs_to :provider, inverse_of: :users
   belongs_to :role
   has_many :filters
+  has_many :bulk_operations
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider_id, :role_id, 
@@ -47,6 +48,10 @@ class User < ActiveRecord::Base
   
   def has_admin_role?
     self.role.is_admin_role?
+  end
+
+  def has_read_only_role?
+    self.role.is_read_only_role?
   end
 
   def active_for_authentication?

@@ -43,6 +43,12 @@ class TripTicket < ActiveRecord::Base
 
   CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
 
+  CUSTOMER_IDENTIFIER_HSTORE_FIELDS = {
+    :customer_identifiers => "Customer Identifiers",
+  }
+
+  CUSTOMER_IDENTIFIER_HSTORE_FIELD_NAMES = CUSTOMER_IDENTIFIER_HSTORE_FIELDS.keys
+
   attr_accessible :allowed_time_variance, :appointment_time,
     :customer_address_attributes, :customer_address_id,
     :customer_boarding_time, :customer_deboarding_time, :customer_dob,

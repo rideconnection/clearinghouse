@@ -23,9 +23,12 @@ module ApplicationHelper
     end
   end
 
-  def main_nav_helper(title, path)
-    link_to_unless_current(title, path) do
-      link_to(title, path, :class => "active")
+  def main_nav_helper(title, path, li_class = nil)
+    opts = { :class => li_class } if li_class.present?
+    content_tag(:li, opts) do
+      link_to_unless_current(title, path) do
+        link_to(title, path, :class => "active")
+      end
     end
   end
   

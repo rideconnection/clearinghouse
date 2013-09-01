@@ -1,0 +1,50 @@
+<%= form_for(@bulk_operation) do |f| %>
+
+  <% if @bulk_operation.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@bulk_operation.errors.count, "error") %> prohibited this bulk operation from being saved:</h2>
+      <ul>
+      <% @bulk_operation.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <% if @bulk_operation.is_upload? %>
+    <div class="field">
+      <%= f.label :uploaded_file, "Select file to upload for import" %>
+      <%= f.file_field :uploaded_file, accept: 'text/csv,text/plain' %>
+    </div>
+    <%= f.hidden_field :is_upload, value: true %>
+  <% elsif @row_count == 0 %>
+    <% if @last_download.blank? %>
+      <p>There are no trip tickets to download.</p>
+    <% else %>
+      <p>There have been no trip tickets updated since your last download (<%= @last_download.strftime("%Y-%m-%d %H:%M:%S") %>).</p>
+    <% end %>
+  <% else %>
+    <p>
+      Downloading <%= [@row_count, BulkOperation::SINGLE_DOWNLOAD_LIMIT].min %> trip tickets that have been updated since your last download
+      (<%= @last_download.blank? ? 'this is your first download' : @last_download.strftime("%Y-%m-%d %H:%M:%S") %>).
+    </p>
+    <% if @row_count > BulkOperation::SINGLE_DOWNLOAD_LIMIT %>
+    <p>
+      <%= BulkOperation::SINGLE_DOWNLOAD_LIMIT %> is the maximum number of trip tickets that can be downloaded in one batch.
+      There are <%= @row_count - BulkOperation::SINGLE_DOWNLOAD_LIMIT %> additional trips available for subsequent downloads.
+    </p>
+    <% end %>
+  <% end %>
+
+  <div class="buttons-holder"<%= ' style="background-image:none"'.html_safe unless @bulk_operation.is_upload? || @row_count > 0 %>>
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <% if @bulk_operation.is_upload? %>
+      <%= f.submit 'Upload', :class => "button" %>
+    <% elsif @row_count > 0 %>
+      <%= f.submit 'Confirm Download', :class => "button" %>
+    <% end %>
+  </div>
+
+<% end %>

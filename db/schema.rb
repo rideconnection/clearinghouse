@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130813234756) do
+ActiveRecord::Schema.define(:version => 20130828140519) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -39,6 +39,20 @@ ActiveRecord::Schema.define(:version => 20130813234756) do
   add_index "audits", ["auditable_id", "auditable_type"], :name => "auditable_index"
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
+
+  create_table "bulk_operations", :force => true do |t|
+    t.integer      "user_id"
+    t.boolean      "completed",                              :default => false
+    t.integer      "row_count"
+    t.string       "file_name"
+    t.datetime     "last_exported_timestamp"
+    t.boolean      "is_upload",                              :default => false
+    t.integer      "error_count"
+    t.string_array "row_errors",              :limit => 255
+    t.text         "data"
+    t.datetime     "created_at",                                                :null => false
+    t.datetime     "updated_at",                                                :null => false
+  end
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0, :null => false
@@ -263,6 +277,7 @@ ActiveRecord::Schema.define(:version => 20130813234756) do
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
   create_table "trip_tickets", :force => true do |t|
+    t.integer       "origin_provider_id"
     t.string        "origin_customer_id"
     t.boolean       "customer_information_withheld"
     t.date          "customer_dob"
@@ -303,7 +318,6 @@ ActiveRecord::Schema.define(:version => 20130813234756) do
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
-    t.integer       "origin_provider_id"
     t.boolean       "rescinded",                                      :default => false, :null => false
     t.datetime      "expire_at"
     t.boolean       "expired",                                        :default => false
@@ -316,6 +330,7 @@ ActiveRecord::Schema.define(:version => 20130813234756) do
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
   add_index "trip_tickets", ["customer_service_level"], :name => "customer_service_level"
   add_index "trip_tickets", ["expired"], :name => "index_trip_tickets_on_expired"
+  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
   add_index "trip_tickets", ["provider_white_list"], :name => "provider_white_list"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"
