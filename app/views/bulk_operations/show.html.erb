@@ -1,0 +1,110 @@
+<div class="padded show_bulk_operation">
+  <header>
+    <h2>Bulk Operation</h2>
+  </header>
+
+  <div class="field">
+    <h3>Type</h3>
+    <%= @bulk_operation.is_upload? ? 'Upload' : 'Download' %>
+  </div>
+
+  <div class="field">
+    <h3>Time</h3>
+    <%= @bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S") %>
+  </div>
+
+  <div class="field">
+    <h3>Status</h3>
+    <span class="status"><%= @bulk_operation.completed? ? 'Completed' : 'Pending' %></span>
+  </div>
+
+  <div class="field">
+    <h3>File Name</h3>
+    <span class="file_name"><%= @bulk_operation.file_name || '-' %></span>
+  </div>
+
+  <div class="field">
+    <h3>Row Count</h3>
+    <span class="row_count"><%= @bulk_operation.row_count || '-' %></span>
+  </div>
+
+<% if @bulk_operation.is_upload? %>
+  <div class="field">
+    <h3>Error Count</h3>
+    <span class="error_count"><%= @bulk_operation.error_count || '-' %></span>
+  </div>
+
+  <div class="field row_errors_field" style="display:<%= @bulk_operation.row_errors.present? ? 'block' : 'none' %>">
+    <h3>The following rows contained errors:</h3>
+    <ul class="row_errors">
+      <% (@bulk_operation.row_errors || []).each do |err| %>
+      <li><%= err %></li>
+      <% end %>
+    </ul>
+  </div>
+
+<% else %>
+  <div class="field">
+    <h3>Most Recent Trip Ticket Update Time</h3>
+    <span class="last_exported_timestamp"><%= @bulk_operation.last_exported_timestamp.try(:strftime, "%Y-%m-%d %H:%M:%S") || '-' %></span>
+  </div>
+<% end %>
+
+<% if !@bulk_operation.is_upload? && can?(:download, @bulk_operation) %>
+  <%= button_to 'Re-download', download_bulk_operation_path(@bulk_operation), method: :get %>
+<% end %>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Bulk Operations', bulk_operations_path %></li>
+  </ul>
+<% end %>
+
+<script type="text/javascript">
+  var waiting = <%= !@bulk_operation.completed? %>;
+
+  function waitForBulkOperation() {
+    $.get('<%= bulk_operation_path(@bulk_operation) %>.json', function(data){
+      waiting = data.completed == false;
+      if (waiting) {
+        setTimeout(function(){ waitForBulkOperation() }, 2000)
+      } else {
+        if (data.file_name) $('.show_bulk_operation .file_name').text(data.file_name);
+        if (data.row_count) $('.show_bulk_operation .row_count').text(data.row_count);
+        if (data.error_count) $('.show_bulk_operation .error_count').text(data.error_count);
+        if (data.last_exported_timestamp) {
+          var timeStr = data.last_exported_timestamp.toLocaleString();
+          // formatting hacks for consistency
+          timeStr = timeStr.replace('T', ' ');
+          timeStr = timeStr.replace(/\s*(([+-]?[\d:]+)|(utc)|(z))$/i, '');
+          $('.show_bulk_operation .last_exported_timestamp').text(timeStr);
+        }
+        $ul = $('ul.row_errors');
+        $ul.empty();
+        if (data.row_errors && data.row_errors.length > 0) {
+          $('.row_errors_field').show();
+          for (var i = 0; i < data.row_errors.length; i++) {
+            $ul.append('<li>'+data.row_errors[i]+'</li>');
+          }
+        }
+        bulkOperationComplete();
+      }
+    });
+  }
+
+  function bulkOperationComplete() {
+    $('.show_bulk_operation .status').text('Completed');
+    <% if params[:download] == 'true' %>
+    window.location = "<%= download_bulk_operation_path(@bulk_operation) %>";
+    <% end %>
+  }
+
+  $(function() {
+    if (waiting) {
+      waitForBulkOperation();
+    } else {
+      bulkOperationComplete();
+    }
+  });
+</script>

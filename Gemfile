@@ -41,6 +41,7 @@ gem "jquery-rails", "~> 2.1"
 gem "seedbank", "~> 0.2"
 gem "validates_timeliness", "~> 3.0"
 gem "whenever", "~> 0.8", :require => false
+gem "kaminari"
 
 # API web service
 gem "grape", "~> 0.2.0"

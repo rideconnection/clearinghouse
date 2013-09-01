@@ -1,0 +1,38 @@
+  <table class="table table-striped" id="bulk_operations_list">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>File Name</th>
+        <th>Rows</th>
+        <th>Errors</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @bulk_operations.each do |bulk_operation| %>
+        <tr>
+          <td><%= bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S") %></td>
+          <td><%= bulk_operation.is_upload? ? 'Upload' : 'Download' %></td>
+          <td><%= bulk_operation.data.present? ? 'Completed' : 'Pending' %></td>
+          <td><%= bulk_operation.file_name %></td>
+          <td><%= bulk_operation.row_count || 'none' %></td>
+          <td><%= bulk_operation.error_count || 'none' %></td>
+          <td>
+            <ul>
+              <li><%= link_to 'View Details', bulk_operation %></li>
+              <% if !bulk_operation.is_upload? && can?(:download, bulk_operation) %>
+                <li><%= link_to 'Re-download', download_bulk_operation_path(bulk_operation) %></li>
+              <% end %>
+            </ul>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @bulk_operations.empty? %>
+    <p>No bulk operations have been performed.</p>
+  <% else %>
+    <%= paginate @bulk_operations %>
+  <% end %>
