@@ -49,11 +49,11 @@ class BulkOperationsController < ApplicationController
       if @bulk_operation.save
         format.html do
           if @bulk_operation.is_upload?
-            #if Rails.env.development?
-            #  self.class.import(current_user.id, @bulk_operation.id)
-            #else
+            if Rails.env.development?
+              self.class.import(current_user.id, @bulk_operation.id)
+            else
               self.class.delay.import(current_user.id, @bulk_operation.id)
-            #end
+            end
             redirect_to bulk_operation_url(@bulk_operation)
           else
             if Rails.env.development?
@@ -98,7 +98,7 @@ class BulkOperationsController < ApplicationController
     begin
       importer.process(bulk_operation.data)
     rescue
-      raise
+      logger.error "Import exception #{$!}"
     ensure
       bulk_operation.completed = true
       bulk_operation.row_count = importer.row_count
