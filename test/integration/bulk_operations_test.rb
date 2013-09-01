@@ -143,10 +143,10 @@ class BulkOperationsTest < ActionController::IntegrationTest
 
       it "should update bulk operation status when bulk operation is complete" do
         assert page.has_content?("Type Download")
-        assert page.has_content?("Time #{@bulk_operation.created_at}")
+        assert page.has_content?("Time #{@bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S")}")
         assert page.has_content?("Status Completed")
         assert page.has_content?("Row Count 3")
-        assert page.has_content?("Most Recent Trip Ticket Update Time #{@trip_ticket3.updated_at}")
+        assert page.has_content?("Most Recent Trip Ticket Update Time #{@trip_ticket3.updated_at.strftime("%Y-%m-%d %H:%M:%S")}")
       end
 
       it "should initiate download when download operation is complete" do
@@ -193,7 +193,7 @@ class BulkOperationsTest < ActionController::IntegrationTest
 
       it "should update bulk operation status when bulk operation is complete" do
         assert page.has_content?("Type Upload")
-        assert page.has_content?("Time #{@bulk_operation.created_at}")
+        assert page.has_content?("Time #{@bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S")}")
         assert page.has_content?("Status Completed")
         assert page.has_content?("Row Count 1")
         assert page.has_content?("Error Count 0")
