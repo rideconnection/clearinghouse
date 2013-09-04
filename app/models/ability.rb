@@ -39,11 +39,6 @@ class Ability
       can [:create, :update], TripResult do |result| 
         result.can_be_edited_by?(user)
       end
-
-      # bulk operations are a history of uploads and downloads made by the user
-      # they should only be created and read, not updated or destroyed
-      can [:create, :read], BulkOperation, :user_id => user.id
-      can :download, BulkOperation, :user_id => user.id, :is_upload => false
     end
     
     if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :api]
@@ -79,7 +74,17 @@ class Ability
       # TODO - add a :cancel, :rescind, or similar action for waypoints
       # TODO - add appropriate tests once waypoint functionality has been better defined
       can [:create, :read, :update], Waypoint, :open_capacity => { :service => { :provider_id => user.provider_id } }
-              
+
+    end
+
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler]
+
+      # bulk operations are a history of user uploads and downloads, the API does not need to use this table
+      # bulk operations may only be accessed by the user that created them
+      # bulk operations should only be created and read, not updated or destroyed
+      can [:create, :read], BulkOperation, :user_id => user.id
+      can :download, BulkOperation, :user_id => user.id, :is_upload => false
+
     end
 
     if user.has_any_role? [:api]
