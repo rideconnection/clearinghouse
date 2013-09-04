@@ -66,7 +66,7 @@ class TripTicketExportTest < ActiveSupport::TestCase
 
     it "records the timestamp of the most recently updated trip in the last_exported_timestamp attribute" do
       exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
-      exporter.last_exported_timestamp.must_equal @trip_ticket3.updated_at
+      exporter.last_exported_timestamp.must_equal @trip_ticket3.reload.updated_at
     end
   end
 end
