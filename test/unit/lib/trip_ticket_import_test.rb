@@ -70,7 +70,9 @@ class TripTicketImportTest < ActiveSupport::TestCase
         end
         importer.errors.length.must_equal 1
         @existing_trip.reload
-        @existing_trip.attributes.must_equal old_attrs
+        old_attrs.each do |k, v|
+          @existing_trip[k].must_equal v
+        end
       end
 
       it "should ignore attempts to import a specific trip origin_provider_id" do
@@ -92,7 +94,9 @@ class TripTicketImportTest < ActiveSupport::TestCase
         end
         different_importer.errors.length.must_equal 1
         @existing_trip.reload
-        @existing_trip.attributes.must_equal old_attrs
+        old_attrs.each do |k, v|
+          @existing_trip[k].must_equal v
+        end
       end
 
       it "should update existing trip tickets with matching origin_trip_id and appointment_time" do
