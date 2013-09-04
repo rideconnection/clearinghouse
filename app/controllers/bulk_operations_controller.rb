@@ -6,7 +6,7 @@ class BulkOperationsController < ApplicationController
   skip_load_resource :only => [ :index, :create ]
 
   def index
-    @bulk_operations = BulkOperation.accessible_by(current_ability).order('created_at DESC').page(params[:page]).per(5)
+    @bulk_operations = @current_user.bulk_operations.accessible_by(current_ability).order('created_at DESC').page(params[:page]).per(5)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -25,8 +25,8 @@ class BulkOperationsController < ApplicationController
     @bulk_operation.is_upload = params[:operation_type].try(:to_sym) == :upload
 
     unless @bulk_operation.is_upload?
-      @last_download = BulkOperation.maximum(:created_at)
-      @last_update = BulkOperation.maximum(:last_exported_timestamp)
+      @last_download = @current_user.bulk_operations.maximum(:created_at)
+      @last_update = @current_user.bulk_operations.maximum(:last_exported_timestamp)
       @row_count = if @last_update.blank?
         TripTicket.accessible_by(current_ability).count
       else
@@ -78,7 +78,7 @@ class BulkOperationsController < ApplicationController
 
   def self.export(user_id, bulk_operation_id)
     user = User.find(user_id)
-    bulk_operation = BulkOperation.find(bulk_operation_id)
+    bulk_operation = user.bulk_operations.find(bulk_operation_id)
     last_update = user.bulk_operations.maximum(:last_exported_timestamp)
     trip_filter = ['updated_at > ?', last_update] if last_update.present?
     exporter = TripTicketExport.new(BulkOperation::SINGLE_DOWNLOAD_LIMIT)
@@ -93,7 +93,7 @@ class BulkOperationsController < ApplicationController
 
   def self.import(user_id, bulk_operation_id)
     user = User.find(user_id)
-    bulk_operation = BulkOperation.find(bulk_operation_id)
+    bulk_operation = user.bulk_operations.find(bulk_operation_id)
     importer = TripTicketImport.new(user.provider)
     begin
       importer.process(bulk_operation.data)

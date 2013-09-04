@@ -16,6 +16,13 @@ class BulkOperationsTest < ActionController::IntegrationTest
     @user.role = Role.find_or_create_by_name!("provider_admin")
     @user.save!
 
+    @user2 = FactoryGirl.create(:user,
+      :password => @password,
+      :password_confirmation => @password,
+      :provider => @provider)
+    @user2.role = Role.find_or_create_by_name!("scheduler")
+    @user2.save!
+
     login_as @user, :scope => :user
     visit '/'
   end
@@ -96,6 +103,17 @@ class BulkOperationsTest < ActionController::IntegrationTest
       bulk_operation3
       visit current_path
       assert page.has_content?("Downloading 1 trip tickets that have been updated since your last download")
+    end
+
+    it "should store the timestamp of each user's last download separately" do
+      bulk_operation2
+      bulk_operation3
+      logout :user
+      login_as @user2, :scope => :user
+      visit '/'
+      click_link "Bulk Operations"
+      click_link "Download Trip Tickets"
+      assert page.has_content?("Downloading 3 trip tickets that have been updated since your last download")
     end
 
     describe "with delayed_jobs stubbed" do
