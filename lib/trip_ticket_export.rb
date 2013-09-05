@@ -17,7 +17,23 @@ class TripTicketExport
     self.data = CSV.generate(headers: keys, write_headers: true) do |csv|
       trip_tickets.each do |trip|
         detailed_trip = make_detailed_trip(trip)
-        csv << keys.map { |key| detailed_trip[key] }
+        csv << keys.map do |key|
+          value = detailed_trip[key]
+          case value
+          when Array
+            # desired format: {"value","value","value"}
+            quoted_strings = []
+            value.each {|v| quoted_strings << "\"#{v}\""}
+            "{#{quoted_strings.join(',')}}"
+          when Hash
+            # desired format: "eye_color"=>"brown","height"=>"5ft 9in","drivers_license_no"=>"12345"
+            quoted_strings = []
+            value.each {|k,v| quoted_strings << "\"#{k}\"=>\"#{v}\"" }
+            quoted_strings.join(',')
+          else
+            value
+          end
+        end
         self.last_exported_timestamp = trip.updated_at if last_exported_timestamp.nil? || trip.updated_at > last_exported_timestamp
       end
     end
@@ -41,7 +57,12 @@ class TripTicketExport
       new_key = [prepend_name, key.to_s].compact.join('_')
       case value
         when Hash
-          new_hash.merge!(flatten_hash(value, new_key))
+          if value['id'].present?
+            # only flatten sub-hashes that are objects with an ID
+            new_hash.merge!(flatten_hash(value, new_key))
+          else
+            new_hash[new_key] = value
+          end
         when Array
           hash_array = value.index{|x| x.is_a?(Hash) }.present?
           new_hash[new_key] = value unless hash_array

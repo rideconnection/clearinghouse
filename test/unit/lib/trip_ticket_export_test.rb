@@ -47,6 +47,22 @@ class TripTicketExportTest < ActiveSupport::TestCase
       exporter.data.must_match /,_a_driver_[^\w]/
     end
 
+    it "should export arrays in postgresql format" do
+      # desired format: {"value","value","value"}
+      @trip_ticket1.customer_service_animals = ['seeing eye dog']
+      @trip_ticket1.save
+      exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
+      exporter.data.must_match /"{""seeing eye dog""}"/
+    end
+
+    it "should export hashes in postgresql format" do
+      # desired format: "eye_color"=>"brown","height"=>"5ft 9in","drivers_license_no"=>"12345"
+      @trip_ticket1.customer_identifiers = { "eye color" => "blue" }
+      @trip_ticket1.save
+      exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
+      exporter.data.must_match /"""eye color""=>""blue"""/
+    end
+
     it "should not include trip ticket comments in the output" do
       FactoryGirl.create(:trip_ticket_comment, :trip_ticket => @trip_ticket1)
       exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
