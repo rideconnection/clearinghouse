@@ -116,8 +116,11 @@ class BulkOperationsTest < ActionController::IntegrationTest
       assert page.has_content?("Downloading 3 trip tickets that have been updated since your last download")
     end
 
-    describe "with delayed_jobs stubbed" do
+    describe "with delayed_job configured" do
       setup do
+        @old_settings = Clearinghouse::Application.config.bulk_operation_options
+        Clearinghouse::Application.config.bulk_operation_options = { use_delayed_job: true }
+        # stub delayed_job #delay method and count invocations
         class BulkOperationsController
           @@invocation_count = 0
           alias :orig_delay :delay
@@ -132,6 +135,7 @@ class BulkOperationsTest < ActionController::IntegrationTest
       end
 
       teardown do
+        Clearinghouse::Application.config.bulk_operation_options = @old_settings
         class BulkOperationsController
           class << self
             remove_method :invocation_count

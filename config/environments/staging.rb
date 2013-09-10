@@ -70,4 +70,6 @@ Clearinghouse::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
   
   config.relative_url_root = '/clearinghouse'
+
+  config.bulk_operation_options = { use_delayed_job: false }
 end
