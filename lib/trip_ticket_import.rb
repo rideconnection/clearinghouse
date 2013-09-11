@@ -23,6 +23,8 @@ class TripTicketImport
           # prepare nested locations and trip results for automatic handling by ActiveRecord
           handle_nested_objects(row)
 
+          handle_date_conversions(row)
+
           trip = nil
           row_id = row.delete(:id)
           if row_id.present?
@@ -84,6 +86,19 @@ class TripTicketImport
     row['pick_up_location_attributes'] = pick_up_location_hash if pick_up_location_hash.present?
     row['drop_off_location_attributes'] = drop_off_location_hash if drop_off_location_hash.present?
     row['trip_result_attributes'] = trip_result_hash if trip_result_hash.present?
+  end
+
+  def handle_date_conversions(row)
+    # assume any date entered as ##/##/#### is mm/dd/yyyy, convert to dd/mm/yyyy the way Ruby prefers
+    row.each do |k,v|
+      parts = k.rpartition('_')
+      if parts[1] == '_' && ['date', 'time', 'at', 'on', 'dob'].include?(parts[2])
+        if v =~ /^(\d{1,2})\/(\d{1,2})\/(\d{4})(.*)$/
+          new_val = "#{ "%02d" % $2 }/#{ "%02d" % $1 }/#{ $3 }#{ $4 }"
+          row[k] = new_val
+        end
+      end
+    end
   end
 
   def nested_object_to_hash(row, prefix)

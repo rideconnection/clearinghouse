@@ -6,10 +6,10 @@ class TripTicketImportTest < ActiveSupport::TestCase
   setup do
     @csv_header = 'id,origin_provider_id,origin_customer_id,origin_trip_id,customer_first_name,customer_last_name,customer_middle_name,customer_dob,customer_primary_phone,customer_emergency_phone,customer_primary_language,customer_ethnicity,customer_race,customer_information_withheld,customer_notes,customer_boarding_time,customer_deboarding_time,customer_seats_required,customer_impairment_description,customer_service_level,customer_mobility_factors,customer_service_animals,customer_eligibility_factors,num_attendants,num_guests,requested_pickup_time,earliest_pick_up_time,appointment_time,requested_drop_off_time,allowed_time_variance,trip_purpose_description,trip_funders,trip_notes,scheduling_priority,customer_address_address_1,customer_address_address_2,customer_address_city,customer_address_position,customer_address_state,customer_address_zip,pick_up_location_address_1,pick_up_location_address_2,pick_up_location_city,pick_up_location_position,pick_up_location_state,pick_up_location_zip,drop_off_location_address_1,drop_off_location_address_2,drop_off_location_city,drop_off_location_position,drop_off_location_state,drop_off_location_zip'
 
-    @csv_new_attrs = ',,customer123,trip123,Joe,Testington,,2/5/16,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,5 Barker St,,Boston,,MA,02134,123 Main St Apt A,,Andover,,MA,01810'
+    @csv_new_attrs = ',,customer123,trip123,Joe,Testington,,02/05/2013,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,5 Barker St,,Boston,,MA,02134,123 Main St Apt A,,Andover,,MA,01810'
     @csv_new = @csv_header + "\n" + @csv_new_attrs
 
-    @csv_invalid_attrs = ',,,,,,2/5/16,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,5 Barker St,,Boston,,MA,02134,123 Main St Apt A,,Andover,,MA,01810'
+    @csv_invalid_attrs = ',,,,,,02/05/2013,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,5 Barker St,,Boston,,MA,02134,123 Main St Apt A,,Andover,,MA,01810'
     @csv_invalid = @csv_header + "\n" + @csv_invalid_attrs
 
     @existing_trip = FactoryGirl.create(:trip_ticket)
@@ -170,6 +170,35 @@ class TripTicketImportTest < ActiveSupport::TestCase
         importer.process(csv_location_update)
         @existing_trip.reload
         @existing_trip.customer_address.position.to_s.must_equal 'POINT (-27.0 45.0)'
+      end
+
+      it "should recognize mm/dd/yyyy date format instead of dd/mm/yyyy" do
+        csv_update = @csv_header + "\n" + "#{@existing_trip.id}" + @csv_new_attrs
+        importer.process(csv_update)
+        @existing_trip.reload
+        @existing_trip.customer_dob.month.must_equal 2
+        @existing_trip.customer_dob.day.must_equal 5
+        @existing_trip.customer_dob.year.must_equal 2013
+      end
+
+      it "should recognize m/d/yyyy date format" do
+        csv_update = @csv_header + "\n" + "#{@existing_trip.id}" + @csv_new_attrs
+        csv_update.gsub(/,02\/05\/2013,/, ',2/5/2013,')
+        importer.process(csv_update)
+        @existing_trip.reload
+        @existing_trip.customer_dob.month.must_equal 2
+        @existing_trip.customer_dob.day.must_equal 5
+        @existing_trip.customer_dob.year.must_equal 2013
+      end
+
+      it "should recognize yyyy/mm/dd date formats" do
+        csv_update = @csv_header + "\n" + "#{@existing_trip.id}" + @csv_new_attrs
+        csv_update.gsub(/,2\/5\/2013,/, ',2013/02/05,')
+        importer.process(csv_update)
+        @existing_trip.reload
+        @existing_trip.customer_dob.month.must_equal 2
+        @existing_trip.customer_dob.day.must_equal 5
+        @existing_trip.customer_dob.year.must_equal 2013
       end
     end
   end
