@@ -20,7 +20,18 @@ module Reports
     def report_body(report)
       content_tag(:tbody) do
         report.rows.collect do |row|
-          content_tag(:tr) { row.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
+          if row.is_a?(Hash)
+            if row.key(:title)
+              content_tag(:tr) { content_tag(:td, colspan: 42) { row.key(:title) }}
+            elsif row.key(:subtotal) || row.key(:total)
+              type = row.key(:subtotal) ? 'Subtotals' : 'Totals'
+              row_vals = row.key(:subtotal) || row.key(:total)
+              content_tag(:tr) { content_tag(:td, colspan: 42) { type }} +
+              content_tag(:tr) { row_vals.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
+            end
+          else
+            content_tag(:tr) { row.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
+          end
         end.join().html_safe
       end
     end
@@ -35,7 +46,7 @@ module Reports
               section.delete(title)
               content_tag(:tr) { content_tag(:td, colspan: 2) { content_tag(:hr) + content_tag(:h1, title.to_s) }}
             else
-              ""
+              content_tag(:tr) { content_tag(:td, colspan: 2) }
             end +
             section.collect do |k, v|
               content_tag(:tr) { content_tag(:td) { k.to_s } + content_tag(:td) { v.to_s }}

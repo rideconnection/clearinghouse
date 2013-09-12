@@ -178,6 +178,25 @@ class TripTicket < ActiveRecord::Base
     provider.try(:id) == origin_provider_id ? originator_status(provider) : claimant_status(provider)
   end
 
+  # does not add counts or specific claimant names, used for aggregating reports
+  def simple_originator_status(provider)
+    trip_status = status
+    case trip_status
+      when 'New', 'Rescinded', 'Expired'
+        trip_status
+      when 'Resolved'
+        trip_result.try(:outcome) || 'Awaiting Result'
+      when 'Active'
+        if (claim = approved_claim).present?
+          'Claim Approved'
+        elsif (claim_count = trip_claims.where(status: 'pending').count) == 0
+          'No Claims'
+        else
+          'Claims Pending'
+        end
+    end
+  end
+
   def originator_status(provider)
     # The TripTicket.filter_by_ticket_status method is (unfortunately) tightly
     # coupled to this method. If this method changes, that method may need
