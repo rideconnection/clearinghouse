@@ -3,6 +3,15 @@
     <h2><%= report_name %></h2>
   </header>
 
+  <div class="field">
+  <%= form_tag report_path(params[:id]), :method => :get, :class => "form-filter" do %>
+    <%= label_tag :date_begin, "Date Range:" %>
+    <%= text_field_tag 'date_begin', params[:date_begin], :placeholder => "From: yyyy-mm-dd hh:mm am", :class => "form-input" %>
+    <%= text_field_tag 'date_end', params[:date_end], :placeholder => "To: yyyy-mm-dd hh:mm am", :class => "form-input" %>
+    <%= submit_tag('Search') %>
+  <% end %>
+  </div>
+
   <%= report_table(@report) do |r| %>
     <%= report_header(r) %>
     <%= report_body(r) %>
@@ -10,3 +19,52 @@
 
   <%= report_summary(@report) %>
 </div>
+<script type="text/javascript">
+var startDateTextBox, endDateTextBox;
+$(document).ready(function() {
+  startDateTextBox = $('#date_begin');
+  endDateTextBox = $('#date_end');
+  startDateTextBox.datetimepicker({
+    onClose: function(dateText, inst) {
+      if (endDateTextBox.val() != '') {
+        var testStartDate = startDateTextBox.datetimepicker('getDate');
+        var testEndDate = endDateTextBox.datetimepicker('getDate');
+        if (testStartDate > testEndDate) endDateTextBox.datetimepicker('setDate', testStartDate);
+      }
+      else {
+        endDateTextBox.val(dateText);
+      }
+    },
+    onSelect: function (selectedDateTime) {
+      endDateTextBox.datetimepicker('option', 'minDate', startDateTextBox.datetimepicker('getDate') );
+    },
+    changeMonth: false,
+    dateFormat: "yy-mm-dd",
+    numberOfMonths: 1,
+    showOn: "both",
+    stepMinute: 15,
+    timeFormat: 'hh:mm tt'
+  });
+  endDateTextBox.datetimepicker({
+    onClose: function(dateText, inst) {
+      if (startDateTextBox.val() != '') {
+        var testStartDate = startDateTextBox.datetimepicker('getDate');
+        var testEndDate = endDateTextBox.datetimepicker('getDate');
+        if (testStartDate > testEndDate) startDateTextBox.datetimepicker('setDate', testEndDate);
+      }
+      else {
+        startDateTextBox.val(dateText);
+      }
+    },
+    onSelect: function (selectedDateTime) {
+      startDateTextBox.datetimepicker('option', 'maxDate', endDateTextBox.datetimepicker('getDate') );
+    },
+    changeMonth: false,
+    dateFormat: "yy-mm-dd",
+    numberOfMonths: 1,
+    showOn: "both",
+    stepMinute: 15,
+    timeFormat: 'hh:mm tt'
+  });
+});
+</script>

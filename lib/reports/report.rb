@@ -8,12 +8,13 @@ module Reports
   end
 
   class Report
-    def initialize(report_class, user)
+    def initialize(report_class, user, options = {})
       raise "A valid user is required for generating reports" if user.blank?
+      options = options.with_indifferent_access
       # this works because require isn't scoped
       require File.join("reports", "#{report_class}.rb")
       @report_class = "Reports::#{report_class.camelize}".constantize
-      @report_instance = @report_class.new(user)
+      @report_instance = @report_class.new(user, options)
     end
 
     # TODO might be helpful if report headers and rows can be array of hashes so values can be sparse and in any order
@@ -40,5 +41,25 @@ module Reports
     def summary
       @report_instance.try(:summary)
     end
+
+    protected
+
+    # reports can use this to generate their date range conditions
+    # TODO reject invalid date strings so they don't get to the database
+    def date_condition(field_name, options)
+      condition = ""
+      values = []
+      if options[:date_begin].present?
+        condition << "(#{field_name} >= ?)"
+        values << options[:date_begin]
+      end
+      if options[:date_end].present?
+        condition << " AND " if condition.length > 0
+        condition << "(#{field_name} < ?)"
+        values << options[:date_end]
+      end
+      condition.present? ? ["(#{condition})", *values] : nil
+    end
+
   end
 end

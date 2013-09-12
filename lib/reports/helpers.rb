@@ -37,11 +37,10 @@ module Reports
     end
 
     def report_summary(report)
-      content_tag(:table, :style => "margin-top:20px") do
+      content_tag(:table) do
         report.summary.collect do |k, v|
           content_tag(:tr) do
-            content_tag(:td, :style => "font-weight:bold;padding-bottom:10px;padding-right:10px") { k.to_s } +
-            content_tag(:td, :style => "padding-bottom:10px") { v.to_s }
+            content_tag(:td) { k.to_s } + content_tag(:td) { v.to_s }
           end
         end.join().html_safe
       end

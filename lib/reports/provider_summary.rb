@@ -2,12 +2,17 @@ require 'reports/report'
 
 module Reports
   class ProviderSummary < Report
-    def initialize(user)
+    def initialize(user, options = {})
       @report_user = user
+
+      trips = @report_user.provider.trip_tickets.where(date_condition('trip_tickets.created_at', options)).count
+      offers = @report_user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.created_at', options)).count
+      requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.created_at', options)).count
+
       @summary = {
-        "Trip tickets submitted" => @report_user.provider.trip_tickets.count,
-        "Claim offers received" => @report_user.provider.trip_tickets.joins(:trip_claims).count,
-        "Claim requests made" => @report_user.provider.trip_claims.count
+        "Trip tickets submitted" => trips,
+        "Claim offers received" => offers,
+        "Claim requests made" => requests
       }
     end
 
