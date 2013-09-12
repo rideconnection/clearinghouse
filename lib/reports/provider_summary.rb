@@ -9,11 +9,16 @@ module Reports
       offers = @report_user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.created_at', options)).count
       requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.created_at', options)).count
 
-      @summary = {
-        "Trip tickets submitted" => trips,
-        "Claim offers received" => offers,
-        "Claim requests made" => requests
-      }
+      @summary = [
+        { "Overall" => :title,
+          "Trip tickets submitted" => trips,
+          "Claim offers received" => offers,
+          "Claim requests made" => requests },
+        {  "Blah Blah" => :title,
+          "Trip tickets submitted" => trips / 2,
+          "Claim offers received" => offers / 2,
+          "Claim requests made" => requests / 2 }
+        ]
     end
 
     def summary

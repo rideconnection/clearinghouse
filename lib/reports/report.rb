@@ -38,6 +38,8 @@ module Reports
 
     # a summary section is not displayed as a table, but is displayed like a form with labels and values in each row
     # reports should return summary data as a hash: { "A description" => "a value", "Another thing" => "thing value"  }
+    # if report returns an array of hashes, each hash will be display like a section
+    # if a hash entry has value :title, it is treated as a title line for the section
     def summary
       @report_instance.try(:summary)
     end
