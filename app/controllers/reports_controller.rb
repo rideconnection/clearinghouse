@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
     "Provider Summary" => "provider_summary"
   }
 
-  helper_method :available_reports
+  helper_method :available_reports, :report_name
 
   def index
   end
@@ -20,6 +20,10 @@ class ReportsController < ApplicationController
 
   def available_reports
     AVAILABLE_REPORTS
+  end
+
+  def report_name
+    available_reports.index(params[:id]) + ' Report'
   end
 
 end

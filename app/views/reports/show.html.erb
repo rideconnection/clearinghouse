@@ -1,8 +1,12 @@
 <div class="padded">
   <header>
-    <h2><%= available_reports.index(params[:id]) %> Report</h2>
+    <h2><%= report_name %></h2>
   </header>
 
-  <%= report_summary(@report) %>
+  <%= report_table(@report) do |r| %>
+    <%= report_header(r) %>
+    <%= report_body(r) %>
+  <% end %>
 
+  <%= report_summary(@report) %>
 </div>

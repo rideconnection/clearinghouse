@@ -16,19 +16,21 @@ module Reports
       @report_instance = @report_class.new(user)
     end
 
-    # if a report has a header row, it should return an array of arrays or array of hashes
-    # if array of arrays each value is used as a column header in order
-    # if array of hashes, each value should be something like: { 'Field Description' => 'field_name' }
+    # TODO might be helpful if report headers and rows can be array of hashes so values can be sparse and in any order
+    # e.g.:
+    # headers returns [{ 'One Thing' => 'one_thing', 'Two Thing' => 'two_thing', 'Last Thing' => 'last_thing' }]
+    # rows returns [{ 'last_thing' => '99', 'two_thing' => 2 }]
+    # report outputs headers 'One Thing', 'Two Thing', 'Last Thing' and values "", "2", "99"
+
+    # if a report has header rows, it should return an array of arrays
     def headers
       @report_instance.try(:headers) || []
     end
 
-    # if a report has rows, it should return an array of arrays or array of hashes
-    # if array of arrays each value will be used as a column value in order
-    # if array of hashes, each value should be something like: { 'field_name' => 'field value' }
-    # subtotals and totals can be represented as follows:
-    # { 'subtotal' => { 'field_name' => 'field subtotal value' }}
-    # { 'total' => { 'field_name' => 'field total value' }}
+    # if a report has rows, it should return an array of arrays
+    # subtotals and totals can be represented by returning a hash in the array as follows:
+    # { 'subtotal' => [ 1, 2, 3, 4 ]}
+    # { 'total' => [ 10, 20, 30, 40 ]}
     def rows
       @report_instance.try(:rows) || []
     end
