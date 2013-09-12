@@ -26,7 +26,7 @@ class ReportsController < ApplicationController
   end
 
   def report_name
-    available_reports.index(params[:id]) + ' Report'
+    available_reports.key(params[:id]) + ' Report'
   end
 
 end
