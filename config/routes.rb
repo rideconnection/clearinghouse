@@ -60,8 +60,9 @@ Clearinghouse::Application.routes.draw do
     end
   end
 
+  resources :reports, :only => [ :index, :show ]
+
   match 'admin', :controller => :admin, :action => :index
-  match 'reports', :controller => :reports, :action => :index
   match 'job_queue' => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
     request.env['warden'].authenticated? # are we authenticated?
     request.env['warden'].authenticate! # authenticate if not already
