@@ -2,18 +2,16 @@
 #
 # To create a report, first subclass Reports::Report.
 # If you want a table in your report, define the methods #headers and/or #rows.
-# To add a summary section to the report, define the method #summary
-# (Summary sections look like a form, with a label and value on each row).
+# To add a summary section to the report, define the method #summary (summary sections
+# look like a form, with a label and value on each row).
 # You can use a table or summary section alone, or combine both. Summary appears below the table.
 #
-# Method #headers
-#
-# Should return an array of arrays containing header row values.
+# Method #headers:
+# Should be an array of arrays containing header row values.
 # These will be put into the thead section of the report table.
 #
-# Method #rows
-#
-# Should return an array of rows, where each data row is an array of values.
+# Method #rows:
+# Should be an array of rows, where each data row is an array of values.
 # Rows should have the same number of values as the headers. Sparse rows are not supported.
 # Section break rows can be inserted by returning a hash instead of an array as follows:
 # { 'Section Title' => :title }
@@ -21,11 +19,11 @@
 # { [ 1, 2, 3, 4 ] => :subtotal }
 # { [ 10, 20, 30, 40 ] => :total }
 #
-# Method #summary
-#
-# Should return summary data as a hash, e.g.: { "Total widgets" => "215", "Total sprockets" => "305" }
-# If #summary returns an array of hashes, each hash will be displayed as a separate section.
+# Method #summary:
+# Summary should be an array of hashes, e.g.: [{ "Total widgets" => "215", "Total sprockets" => "305" }]
+# Each hash will be displayed as a separate section.
 # To give a section a title, include a hash entry with value :title, e.g. { 'Section Title' => :title }
+# Summary can also be a simple hash to create a summary section with no title or section styling.
 #
 # Convenience Methods
 # The following methods can be used to help in generating output data in the proper format:
@@ -39,6 +37,9 @@
 #
 # This #date_condition(field_name, options) method can be used to generate a SQL WHERE condition on the
 # specified date or timestamp field. The options hash is assumed to include :date_begin and/or :date_end.
+#
+# Helpers
+# reports/helpers.rb contains helpers that can be used in a view to render reports.
 
 require 'reports/helpers'
 
@@ -59,8 +60,6 @@ module Reports
       @report_instance = @report_class.new(user, options)
     end
 
-    # TODO might be helpful if report headers and rows can be array of hashes so values can be sparse and in any order
-
     def headers
       @report_instance.try(:headers) || []
     end
@@ -70,7 +69,7 @@ module Reports
     end
 
     def summary
-      @report_instance.try(:summary)
+      @report_instance.try(:summary) || []
     end
 
     protected
@@ -79,30 +78,35 @@ module Reports
 
     def create_table_section(title, new_rows)
       create_title_row(title)
-      rows += new_rows
+      self.rows += new_rows
     end
 
     def create_title_row(title)
-      rows << { title => :title }
+      self.rows ||= []
+      self.rows << { title => :title }
     end
 
     def create_data_row(row_values)
-      rows << row_values
+      self.rows ||= []
+      self.rows << row_values
     end
 
     def create_subtotals_row(row_values)
-      rows << { row_values => :subtotal }
+      self.rows ||= []
+      self.rows << { row_values => :subtotal }
     end
 
     def create_totals_row(row_values)
-      rows << { row_values => :total }
+      self.rows ||= []
+      self.rows << { row_values => :total }
     end
 
     # convenience methods for adding summary sections in the proper format
 
     def create_summary_section(title, data_hash)
       data_hash[title] = :title
-      summary << data_hash
+      self.summary ||= []
+      self.summary << data_hash
     end
 
     # reports can use this to generate their date range conditions
