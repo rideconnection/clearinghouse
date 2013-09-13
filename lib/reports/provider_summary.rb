@@ -14,35 +14,38 @@ module Reports
       created_requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.created_at', options))
       updated_requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.updated_at', options))
 
-      section_data = {
-        "New trips submitted" => created_trips.count
-      }
+      section_data = { "Total new trips" => created_trips.count }
+      create_summary_section("New Trip Tickets", section_data)
+
+      section_data = { "Total updated trips" => updated_trips.count }
       updated_trips.each do |trip|
         status = trip.simple_originator_status(user.provider)
         section_data[status] ||= 0
         section_data[status] += 1
       end
-      create_summary_section("Trip Tickets", section_data)
+      create_summary_section("Updated Trip Tickets", section_data)
 
-      section_data = {
-        "Total offers received" => created_offers.count
-      }
+      section_data = { "Total new offers" => created_offers.count }
+      create_summary_section("New Claim Offers Received", section_data)
+
+      section_data = { "Total updated offers" => updated_offers.count }
       updated_offers.each do |claim|
         status = claim.status.capitalize
         section_data[status] ||= 0
         section_data[status] += 1
       end
-      create_summary_section("Claim Offers Received", section_data)
+      create_summary_section("Updated Claim Offers Received", section_data)
 
-      section_data = {
-        "Total claim requests" => created_requests.count
-      }
+      section_data = { "Total new requests" => created_requests.count }
+      create_summary_section("New Claim Requests Submitted", section_data)
+
+      section_data = { "Total updated requests" => updated_requests.count }
       updated_requests.each do |claim|
         status = claim.status.capitalize
         section_data[status] ||= 0
         section_data[status] += 1
       end
-      create_summary_section("Claim Requests Submitted", section_data)
+      create_summary_section("Updated Claim Requests Submitted", section_data)
     end
   end
 end
