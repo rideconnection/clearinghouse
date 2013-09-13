@@ -2,7 +2,9 @@ table {
   &.report-table {
     thead {
       tr{
-        th {}
+        th {
+          padding: 0.5em 2em 0 0;
+        }
       }
     }
     tbody {
@@ -12,6 +14,9 @@ table {
         &.totals-title {}
         &.subtotals {}
         &.totals {}
+        td {
+          padding: 0.5em 2em 0 0;
+        }
       }
     }
   }
@@ -22,6 +27,7 @@ table {
       }
       td {
         &.label {
+          font-weight: bold;
           width: 250px;
         }
       }
