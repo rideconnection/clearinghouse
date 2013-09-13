@@ -4,6 +4,10 @@ module Reports
   class ProviderSummary < Report
     attr_accessor :summary
 
+    #def self.title
+    #  "Custom Title Here, default would be Provider Summary Report based on class name"
+    #end
+
     def initialize(user, options = {})
       @report_user = user
 
