@@ -3,7 +3,7 @@
     <h2>Reports</h2>
   </header>
 
-  <% available_reports.each do |k,v| %>
-    <p><%= link_to k, report_path(v) %></p>
+  <% available_reports.each do |report| %>
+    <p><%= link_to report[:title], report_path(report[:id]) %></p>
   <% end %>
 </div>

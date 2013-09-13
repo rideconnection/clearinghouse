@@ -1,6 +1,7 @@
 # Using the Reports::Report class
 #
-# To create a report, first subclass Reports::Report.
+# To create a report, first subclass Reports::Report in a file name ending with _report.rb.
+# Create a class method #title that returns the title or a default will be created using the class name.
 # If you want a table in your report, define the methods #headers and/or #rows.
 # To add a summary section to the report, define the method #summary (summary sections
 # look like a form, with a label and value on each row).
@@ -40,11 +41,20 @@
 #
 # Helpers
 # reports/helpers.rb contains helpers that can be used in a view to render reports.
+#
+# Controller Support
+# When this class is included in a controller, the method available_reports is defined which returns an array
+# of hashes with the form, { id: "report id", title: "My Report Title", klass: MyReportClass }. This method is
+# defined as a helper method so it is available in views. Also defined are the methods report_title and report_class
+# which accept a report ID parameter and return the title or class of the report. These are also defined as helpers.
 
 require 'reports/helpers'
+require 'reports/registry'
 
 module Reports
   extend ActiveSupport::Concern
+
+  include Reports::Registry
 
   included do
     helper Reports::Helpers
@@ -54,10 +64,13 @@ module Reports
     def initialize(report_class, user, options = {})
       raise "A valid user is required for generating reports" if user.blank?
       options = options.with_indifferent_access
-      # this works because require isn't scoped
-      require File.join("reports", "#{report_class}.rb")
-      @report_class = "Reports::#{report_class.camelize}".constantize
+      @report_id = report_class.to_s
+      @report_class = "Reports::#{@report_id.camelize}".constantize
       @report_instance = @report_class.new(user, options)
+    end
+
+    def title
+      @report_instance.class.try(:title) || Reports::Registry.report_list.key(@report_id)
     end
 
     def headers
