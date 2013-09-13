@@ -9,14 +9,12 @@ module Reports
     #end
 
     def initialize(user, options = {})
-      @report_user = user
-
-      created_trips = @report_user.provider.trip_tickets.where(date_condition('trip_tickets.created_at', options))
-      updated_trips = @report_user.provider.trip_tickets.where(date_condition('trip_tickets.updated_at', options))
-      created_offers = @report_user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.created_at', options))
-      updated_offers = @report_user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.updated_at', options))
-      created_requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.created_at', options))
-      updated_requests = @report_user.provider.trip_claims.where(date_condition('trip_claims.updated_at', options))
+      created_trips = user.provider.trip_tickets.where(date_condition('trip_tickets.created_at', options))
+      updated_trips = user.provider.trip_tickets.where(date_condition('trip_tickets.updated_at', options))
+      created_offers = user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.created_at', options))
+      updated_offers = user.provider.trip_tickets.joins(:trip_claims).where(date_condition('trip_claims.updated_at', options))
+      created_requests = user.provider.trip_claims.where(date_condition('trip_claims.created_at', options))
+      updated_requests = user.provider.trip_claims.where(date_condition('trip_claims.updated_at', options))
 
       section_data = { "Total new trips" => created_trips.count }
       create_summary_section("New Trip Tickets", section_data)
