@@ -1,7 +1,7 @@
 require 'reports/report'
 
 module Reports
-  class ProviderSummary < Report
+  class ProviderSummaryReport < Report
     attr_accessor :summary
 
     #def self.title

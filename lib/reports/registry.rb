@@ -13,7 +13,7 @@ module Reports
       Reports::Report.descendants.each do |report_class|
         report_id = report_class.name.rpartition('::').last.underscore
         report_title = report_class.title if report_class.respond_to?(:title)
-        report_title ||= report_id.titleize + ' Report'
+        report_title ||= report_id.titleize
         Reports::Registry.report_list << { id: report_id, title: report_title, klass: report_class }
       end
 
