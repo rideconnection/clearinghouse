@@ -4,7 +4,7 @@ module Reports
   module Helpers
 
     def report_table(report, &block)
-      content_tag(:table) do
+      content_tag(:table, class: 'report-table') do
         capture(report, &block)
       end.html_safe
     end
@@ -22,12 +22,12 @@ module Reports
         report.rows.collect do |row|
           if row.is_a?(Hash)
             if row.key(:title)
-              content_tag(:tr) { content_tag(:td, colspan: 42) { row.key(:title) }}
+              content_tag(:tr, class: 'section-title') { content_tag(:td, colspan: 42) { row.key(:title) }}
             elsif row.key(:subtotal) || row.key(:total)
-              type = row.key(:subtotal) ? 'Subtotals' : 'Totals'
+              type = row.key(:subtotal) ? 'subtotals' : 'totals'
               row_vals = row.key(:subtotal) || row.key(:total)
-              content_tag(:tr) { content_tag(:td, colspan: 42) { type }} +
-              content_tag(:tr) { row_vals.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
+              content_tag(:tr, class: "#{type}-title") { content_tag(:td, colspan: 42) { type.capitalize }} +
+              content_tag(:tr, class: type) { row_vals.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
             end
           else
             content_tag(:tr) { row.collect { |column| content_tag(:td) { column.to_s }}.join().html_safe }
@@ -37,16 +37,16 @@ module Reports
     end
 
     def report_summary(report)
-      content_tag(:table) do
+      content_tag(:table, class: 'report-summary') do
         if report.summary.is_a?(Array)
           # each array entry is a separate report section
           report.summary.collect do |section|
             title = section.key(:title)
             if title.present?
               section.delete(title)
-              content_tag(:tr) { content_tag(:td, colspan: 2) { content_tag(:hr) + content_tag(:h1, title.to_s) }}
+              content_tag(:tr, class: 'section-title') { content_tag(:td, colspan: 42) { content_tag(:hr) + content_tag(:h1, title.to_s) }}
             else
-              content_tag(:tr) { content_tag(:td, colspan: 2) }
+              content_tag(:tr, class: 'section-title') { content_tag(:td, colspan: 42) { content_tag(:hr) }}
             end +
             section.collect do |k, v|
               content_tag(:tr) { content_tag(:td) { k.to_s } + content_tag(:td) { v.to_s }}
