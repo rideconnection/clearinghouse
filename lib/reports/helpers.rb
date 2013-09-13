@@ -49,12 +49,12 @@ module Reports
               content_tag(:tr, class: 'section-title') { content_tag(:td, colspan: 42) { content_tag(:hr) }}
             end +
             section.collect do |k, v|
-              content_tag(:tr) { content_tag(:td) { k.to_s } + content_tag(:td) { v.to_s }}
+              content_tag(:tr) { content_tag(:td, class: 'label') { k.to_s } + content_tag(:td) { v.to_s }}
             end.join().html_safe
           end.join().html_safe
         else
           report.summary.collect do |k, v|
-            content_tag(:tr) { content_tag(:td) { k.to_s } + content_tag(:td) { v.to_s }}
+            content_tag(:tr) { content_tag(:td, class: 'label') { k.to_s } + content_tag(:td) { v.to_s }}
           end.join().html_safe
         end
       end

@@ -1,4 +1,36 @@
+table {
+  &.report-table {
+    thead {
+      tr{
+        th {}
+      }
+    }
+    tbody {
+      tr {
+        &.section-title {}
+        &.subtotals-title {}
+        &.totals-title {}
+        &.subtotals {}
+        &.totals {}
+      }
+    }
+  }
+  &.report-summary {
+    width:100%;
+    tr {
+      &.section-title {
+      }
+      td {
+        &.label {
+          width: 250px;
+        }
+      }
+    }
+  }
+}
+
 body[data-controller="reports"] {
+
   /*
   .reports-list {
     background:#ededed;
