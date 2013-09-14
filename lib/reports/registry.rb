@@ -6,8 +6,8 @@ module Reports
 
     included do
       if Reports::Registry.report_list.nil?
-        REPORTS_PARENT_DIR = File.join(Rails.root, 'lib')
-        Dir[File.join(REPORTS_PARENT_DIR, 'reports', '**', '*_report.rb')].each do |file|
+        reports_base_dir = Reports::Config.reports_parent_directory || File.join(Rails.root, 'lib')
+        Dir[File.join(reports_base_dir, 'reports', '**', '*_report.rb')].each do |file|
           require File.join('reports', File.basename(file))
         end
         Reports::Registry.report_list ||= []

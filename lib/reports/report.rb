@@ -60,11 +60,15 @@ module Reports
     helper Reports::Helpers
   end
 
+  module Config
+    mattr_accessor :reports_parent_directory
+  end
+
   class Report
     attr_accessor :report_id, :user, :options, :errors
 
     def initialize(report_id, user, options = {})
-      raise "A valid user is required for generating reports" if user.blank?
+      raise ArgumentError, "A valid user is required for generating reports" if user.blank?
       self.report_id = report_id.to_s
       self.user = user
       self.options = options.with_indifferent_access
@@ -73,7 +77,7 @@ module Reports
     end
 
     def run
-      raise "Invalid report parameters" unless valid?
+      raise RuntimeError, "Invalid report parameters" unless valid?
       @report_instance = @report_class.new(user, options)
     end
 
@@ -91,19 +95,19 @@ module Reports
     end
 
     def title
-      @report_instance.class.try(:title) || Reports::Registry.report_list.key(report_id)
+      @report_class.respond_to?(:title) ? @report_class.title : report_id.titleize
     end
 
     def headers
-      @report_instance.try(:headers) || []
+      @report_instance.respond_to?(:headers) ? @report_instance.headers : []
     end
 
     def rows
-      @report_instance.try(:rows) || []
+      @report_instance.respond_to?(:rows) ? @report_instance.rows : []
     end
 
     def summary
-      @report_instance.try(:summary) || []
+      @report_instance.respond_to?(:summary) ? @report_instance.summary : []
     end
 
     protected
