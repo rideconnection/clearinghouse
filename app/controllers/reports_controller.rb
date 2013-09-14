@@ -7,7 +7,7 @@ class ReportsController < ApplicationController
   end
 
   def show
-    params[:date_begin] ||= 1.week.ago.strftime("%Y-%m-%d %H:%M %P")
+    params[:date_begin] ||= 1.week.ago.strftime("%Y-%m-%d %I:%M %P")
     options = {}
     options[:date_begin] = params[:date_begin]
     options[:date_end] = params[:date_end]
