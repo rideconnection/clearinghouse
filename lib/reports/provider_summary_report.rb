@@ -20,33 +20,21 @@ module Reports
       create_summary_section("New Trip Tickets", section_data)
 
       section_data = { "Total updated trips" => updated_trips.count }
-      updated_trips.each do |trip|
-        status = trip.simple_originator_status(user.provider)
-        section_data[status] ||= 0
-        section_data[status] += 1
-      end
+      section_data.merge(summarize_object_counts_by_category(updated_trips, :status_for, user))
       create_summary_section("Updated Trip Tickets", section_data)
 
       section_data = { "Total new offers" => created_offers.count }
       create_summary_section("New Claim Offers Received", section_data)
 
       section_data = { "Total updated offers" => updated_offers.count }
-      updated_offers.each do |claim|
-        status = claim.status.capitalize
-        section_data[status] ||= 0
-        section_data[status] += 1
-      end
+      section_data.merge(summarize_object_counts_by_category(updated_offers, :status))
       create_summary_section("Updated Claim Offers Received", section_data)
 
       section_data = { "Total new requests" => created_requests.count }
       create_summary_section("New Claim Requests Submitted", section_data)
 
       section_data = { "Total updated requests" => updated_requests.count }
-      updated_requests.each do |claim|
-        status = claim.status.capitalize
-        section_data[status] ||= 0
-        section_data[status] += 1
-      end
+      section_data.merge(summarize_object_counts_by_category(updated_requests, :status))
       create_summary_section("Updated Claim Requests Submitted", section_data)
     end
   end

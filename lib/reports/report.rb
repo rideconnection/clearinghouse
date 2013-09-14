@@ -61,16 +61,37 @@ module Reports
   end
 
   class Report
-    def initialize(report_class, user, options = {})
+    attr_accessor :report_id, :user, :options, :errors
+
+    def initialize(report_id, user, options = {})
       raise "A valid user is required for generating reports" if user.blank?
-      options = options.with_indifferent_access
-      @report_id = report_class.to_s
-      @report_class = "Reports::#{@report_id.camelize}".constantize
+      self.report_id = report_id.to_s
+      self.user = user
+      self.options = options.with_indifferent_access
+      self.errors = []
+      @report_class = "Reports::#{self.report_id.camelize}".constantize
+    end
+
+    def run
+      raise "Invalid report parameters" unless valid?
       @report_instance = @report_class.new(user, options)
     end
 
+    def valid?
+      self.errors = []
+      if options[:date_begin].present? && options[:date_begin].is_a?(String)
+        options[:date_begin] = Time.zone.parse(options[:date_begin]) rescue nil
+        errors << "Start date is invalid" if options[:date_begin].nil?
+      end
+      if options[:date_end].present? && options[:date_end].is_a?(String)
+        options[:date_end] = Time.zone.parse(options[:date_end]) rescue nil
+        errors << "End date is invalid" if options[:date_end].nil?
+      end
+      errors.blank?
+    end
+
     def title
-      @report_instance.class.try(:title) || Reports::Registry.report_list.key(@report_id)
+      @report_instance.class.try(:title) || Reports::Registry.report_list.key(report_id)
     end
 
     def headers
@@ -122,8 +143,22 @@ module Reports
       self.summary << data_hash
     end
 
+    # miscellaneous data munging helpers
+
+    # returns a hash where keys are the result of invoking the specified category method
+    # on each list entry and values are the count of list entries for that category
+    def summarize_object_counts_by_category(list, *category_method_and_params)
+      result = {}
+      list.each do |entry|
+        category = (entry.send(*category_method_and_params) || "").capitalize
+        result[category] ||= 0
+        result[category] += 1
+      end
+      result
+    end
+
     # reports can use this to generate their date range conditions
-    # TODO reject invalid date strings so they don't get to the database
+
     def date_condition(field_name, options)
       condition = ""
       values = []
