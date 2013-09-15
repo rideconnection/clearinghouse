@@ -6,11 +6,16 @@ class ReportsTest < ActiveSupport::TestCase
   describe "Reports module" do
     setup do
       $LOAD_PATH << File.join(Rails.root, 'test', 'support')
+      @old_config = Reports::Config.reports_parent_directory
       Reports::Config.reports_parent_directory = File.join(Rails.root, 'test', 'support')
       class ReportsTestController < ApplicationController
         include Reports
       end
       @controller = ReportsTestController.new
+    end
+
+    teardown do
+      Reports::Config.reports_parent_directory = @old_config
     end
 
     it "should automatically include the Reports::Registry module" do
