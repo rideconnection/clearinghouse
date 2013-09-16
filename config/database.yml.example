@@ -1,5 +1,6 @@
 common: &common
   adapter: postgis
+  encoding: unicode
   host: localhost
   username: clearinghouse
   password: clearinghouse
