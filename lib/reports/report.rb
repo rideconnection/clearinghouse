@@ -104,15 +104,15 @@ module Reports
     end
 
     def headers
-      @report_instance.respond_to?(:headers) ? @report_instance.headers : []
+      (@report_instance.respond_to?(:headers) ? @report_instance.headers : []) || []
     end
 
     def rows
-      @report_instance.respond_to?(:rows) ? @report_instance.rows : []
+      (@report_instance.respond_to?(:rows) ? @report_instance.rows : []) || []
     end
 
     def summary
-      @report_instance.respond_to?(:summary) ? @report_instance.summary : []
+      (@report_instance.respond_to?(:summary) ? @report_instance.summary : []) || []
     end
 
     protected
