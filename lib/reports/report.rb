@@ -73,6 +73,8 @@ module Reports
     attr_accessor :report_id, :user, :options, :errors
 
     def initialize(report_id, user, options = {})
+      # note: this follows a sort of Factory of things that subclass the Factory pattern
+      # Report#initialize doesn't need to be called by subclasses with super
       raise ArgumentError, "A valid user is required for generating reports" if user.blank?
       self.report_id = report_id.to_s
       self.user = user
