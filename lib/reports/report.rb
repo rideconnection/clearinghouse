@@ -43,10 +43,16 @@
 # reports/helpers.rb contains helpers that can be used in a view to render reports.
 #
 # Controller Support
-# When this class is included in a controller, the method available_reports is defined which returns an array
+# When this class is included in a controller, the method report_list is defined which returns an array
 # of hashes with the form, { id: "report id", title: "My Report Title", klass: MyReportClass }. This method is
 # defined as a helper method so it is available in views. Also defined are the methods report_title and report_class
 # which accept a report ID parameter and return the title or class of the report. These are also defined as helpers.
+#
+# Config
+# There is one config option. The directory from which report scripts will be loaded can be set with
+# Reports::Config.report_directory after this file is required. Default is location of this file.
+# Each class that includes this module will get its own copy of the list of available reports, so the
+# directory can be changed just prior to using include to load different reports.
 
 require 'reports/helpers'
 require 'reports/registry'
@@ -54,14 +60,13 @@ require 'reports/registry'
 module Reports
   extend ActiveSupport::Concern
 
-  include Reports::Registry
-
   included do
+    include Reports::Registry
     helper Reports::Helpers
   end
 
   module Config
-    mattr_accessor :reports_parent_directory
+    mattr_accessor :report_directory
   end
 
   class Report

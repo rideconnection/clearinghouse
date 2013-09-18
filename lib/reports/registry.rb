@@ -2,37 +2,34 @@ module Reports
   module Registry
     extend ActiveSupport::Concern
 
-    mattr_accessor :report_list
-
     included do
-      if Reports::Registry.report_list.nil?
-        reports_base_dir = Reports::Config.reports_parent_directory || File.join(Rails.root, 'lib')
-        Dir[File.join(reports_base_dir, 'reports', '**', '*_report.rb')].each do |file|
-          require File.join('reports', File.basename(file))
+      cattr_accessor :report_list
+      helper_method :report_title, :report_class, :report_list
+
+      if report_list.nil?
+        report_dir = Reports::Config.report_directory || File.dirname(__FILE__)
+        Rails.logger.debug "Reports::Registry loading reports from: #{report_dir}"
+        Dir[File.join(report_dir, '**', '*_report.rb')].each do |file|
+          require file
         end
-        Reports::Registry.report_list ||= []
+        self.report_list ||= []
         Reports::Report.descendants.each do |report_class|
           report_id = report_class.name.rpartition('::').last.underscore
           report_title = report_class.title if report_class.respond_to?(:title)
           report_title ||= report_id.titleize
-          Reports::Registry.report_list << { id: report_id, title: report_title, klass: report_class }
+          self.report_list << { id: report_id, title: report_title, klass: report_class }
         end
       end
-      helper_method :report_title, :report_class, :available_reports
     end
 
     def report_title(report_id)
-      index = Reports::Registry.report_list.index{|report| report[:id] == report_id }
-      Reports::Registry.report_list[index][:title] if index
+      index = report_list.index{|report| report[:id] == report_id }
+      report_list[index][:title] if index
     end
 
     def report_class(report_id)
-      index = Reports::Registry.report_list.index{|report| report[:id] == report_id }
-      Reports::Registry.report_list[index][:klass] if index
-    end
-
-    def available_reports
-      Reports::Registry.report_list
+      index = report_list.index{|report| report[:id] == report_id }
+      report_list[index][:klass] if index
     end
   end
 end
