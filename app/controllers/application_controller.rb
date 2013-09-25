@@ -1,12 +1,27 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :authenticate_user!
+  
+  # TODO - Should we allow normal caching for any requests? If so, move this 
+  # into individual controllers and use the :only/:except parameters to limit
+  # what actions are affected
+  before_filter :set_cache_buster
 
   rescue_from CanCan::AccessDenied do |exception|
-    redirect_to root_url, :alert => exception.message.gsub(/\bthis\b/, "that")
+    error_message = exception.message.gsub(/\bthis\b/, "that")
+    respond_to do |format|
+      format.html { redirect_to root_url, :alert => error_message }
+      format.json { render json: {errors: {base: [error_message]}}, status: :unprocessable_entity }
+    end
   end
   
   private
+  
+  def set_cache_buster
+    response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
+  end
   
   def admins_only
     raise CanCan::AccessDenied unless current_user && current_user.has_any_role?([:site_admin, :provider_admin])

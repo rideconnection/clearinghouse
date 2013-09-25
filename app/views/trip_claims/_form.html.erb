@@ -13,11 +13,7 @@
 
   <div class="field">
     <%= f.label :claimant_provider_id, "Provider" %>
-    <% if current_user.has_admin_role? and @trip_claim.editable? %>
-      <%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
-    <% else %>
-      <%= @trip_claim.claimant.name %>
-    <% end %>
+    <%= @trip_claim.claimant.name %>
   </div>
   <div class="field">
     <%= f.label :claimant_customer_id, "Customer ID" %>
@@ -47,9 +43,9 @@
         default_pu = DateTime.new(appt.year, appt.month, appt.day, pu.hour, pu.min, pu.sec)
       %>
       <%= f.datetime_select(:proposed_pickup_time,
-                            :order => [:month, :day, :year, :hour, :minute],
                             :default => default_pu,
-                            :ampm => true
+                            :ampm => true,
+                            :minute_step => 15
       ) %>
     <% else %>
       <%= @trip_claim.proposed_pickup_time %>

@@ -5,9 +5,8 @@ class ReportsTest < ActiveSupport::TestCase
 
   describe "Reports module" do
     setup do
-      $LOAD_PATH << File.join(Rails.root, 'test', 'support')
-      @old_config = Reports::Config.reports_parent_directory
-      Reports::Config.reports_parent_directory = File.join(Rails.root, 'test', 'support')
+      @old_config = Reports::Config.report_directory
+      Reports::Config.report_directory = File.join(Rails.root, 'test', 'support')
       class ReportsTestController < ApplicationController
         include Reports
       end
@@ -15,12 +14,12 @@ class ReportsTest < ActiveSupport::TestCase
     end
 
     teardown do
-      Reports::Config.reports_parent_directory = @old_config
+      Reports::Config.report_directory = @old_config
     end
 
     it "should automatically include the Reports::Registry module" do
       ReportsTestController.ancestors.must_include Reports::Registry
-      @controller.must_respond_to(:available_reports)
+      @controller.must_respond_to(:report_list)
       @controller.must_respond_to(:report_title)
       @controller.must_respond_to(:report_class)
     end
@@ -50,7 +49,7 @@ class ReportsTest < ActiveSupport::TestCase
       it "should declare Reports::Registry methods as helpers" do
         ReportsTestController.helpers.must_respond_to(:report_title)
         ReportsTestController.helpers.must_respond_to(:report_class)
-        ReportsTestController.helpers.must_respond_to(:available_reports)
+        ReportsTestController.helpers.must_respond_to(:report_list)
       end
     end
   end

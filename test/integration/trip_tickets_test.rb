@@ -408,7 +408,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   describe "filtering" do
     setup do
       # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
-      @reset_filters_path = "/trip_tickets?trip_ticket_filters=clear"
+      @reset_filters_path = "/trip_tickets/clear_filters"
     end
 
     describe "clear filters" do

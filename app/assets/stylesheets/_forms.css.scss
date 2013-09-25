@@ -12,7 +12,7 @@ $form_label_padding_right: 10px;
   }
 }
 
-#error_explanation {
+.error_explanation, #error_explanation {
   width: 450px;
   border: 2px solid #c00;
   padding: 7px;
