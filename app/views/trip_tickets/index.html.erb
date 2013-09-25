@@ -5,7 +5,7 @@
 <div class="actions-list-holder">
   <ul class="actions-list">
     <% if can? :create, TripTicket %>
-      <li<% if !can?(:create, BulkOperation) %> class="last"<% end %>><%= link_to new_trip_ticket_path do %><span>Add New</span><% end %></li>
+      <li<% if !can?(:create, BulkOperation) %> class="no-clickify last"<% end %>><%= link_to new_trip_ticket_path do %><span>Add New</span><% end %></li>
     <% end %>
     <% if can?(:create, BulkOperation) %>
       <li><%= link_to new_bulk_operation_path(operation_type: :upload) do %><span>Upload</span><% end %></li>
