@@ -1,4 +1,6 @@
 class NotificationMailer < ActionMailer::Base
+  add_template_helper(ApplicationHelper)
+  
   default :from => EMAIL_FROM
 
   def trip_created(recipients, trip)
