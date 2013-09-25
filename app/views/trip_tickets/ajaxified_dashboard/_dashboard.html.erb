@@ -133,7 +133,7 @@
         addTicketToList: function (trip_ticket) {
           var index = dashboard.trip_tickets.indexOf(trip_ticket);
           var view = new dashboard.TripTicketListItemView({ model: trip_ticket });
-          var previousItem = $(".tickets-list li:eq(" + index.toString() + ")");
+          var previousItem = $(".tickets-list>li:eq(" + index.toString() + ")");
           if (previousItem.length) {
             previousItem.before(view.render().el);
           } else {
