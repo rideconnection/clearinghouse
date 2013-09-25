@@ -1,36 +1,34 @@
 <%= content_for :head do %>
-  <%= javascript_include_tag "json2", "underscore-min", "backbone-min", "jstorage" %>
+  <%= javascript_include_tag "dashboard" %>
   <%= javascript_tag do %>
-    // json2.js is required for IE 6/7 support
-    
     var dashboard = {};
     $(function () {
       'use strict';
-      
+
       // We use this frequently
       dashboard.root_url = '<%= j trip_tickets_path %>';
-      
+
       // For state trackings
       dashboard.current_trip_ticket = null;
-      
+
       // The Application
       // ---------------
       dashboard.DashboardView = Backbone.View.extend({
-        
+
         // Instead of generating a new element, bind to the existing skeleton of
         // the App already present in the HTML.
         el: '#main',
-        
+
         // Delegated events for dashboard-wide actions
         events: {
           // 'keypress #new-todo': 'createOnEnter',
           // 'click #clear-completed': 'clearCompleted',
           // 'click #toggle-all': 'toggleAllComplete'
-          
+
           'submit form.form-filter': 'saveFilters',
           // 'click form.form-filter .button-cancel': 'clearFilters',
         },
-        
+
         // At initialization we bind to the relevant events on the TripTickets
         // collection, when items are added or changed. Kick things off by
         // loading any preexisting tickets that match the current filter state
@@ -44,38 +42,38 @@
           // this.listenTo(app.todos, 'change:completed', this.filterOne);
           // this.listenTo(app.todos, 'filter', this.filterAll);
           // this.listenTo(app.todos, 'all', this.render);
-          
+
           // Setup the dashboard and remove the standard view
           this.createDashboard();
-          
+
           // Make some functions public
           dashboard.clickify = this.clickify;
           dashboard.display404Message = this.display404Message;
           dashboard.errorHandler = this.errorHandler;
           dashboard.resetViews = this.resetViews;
           dashboard.resetForm = this.resetForm;
-          
+
           // Make sure we can access the original request URL from any jqXHR objects
           $.ajaxPrefilter('json', function(options, originalOptions, jqXHR) {
             jqXHR.originalRequestOptions = originalOptions;
           });
-          
+
           // Create our global collection of **TripTickets**.
           dashboard.trip_tickets = new TripTickets();
-          
+
           // Initiate a new history and controller class
           dashboard.TripTicketRouter = new TripTicketRouter();
-          
+
           // Kickstart the router
           Backbone.history.start({silent: true});
-                  
+
           // Event listeners
           this.listenTo(dashboard.trip_tickets, 'reset', this.addTicketsToList);
           this.listenTo(dashboard.trip_tickets, 'add', this.addTicketToList);
 
           // Setup our cross-browser local storage object for state tracking
           dashboard.localStorage = $.jStorage;
-          
+
           // Find our initial state
           if (
             window.location.hash.length && 
@@ -93,27 +91,27 @@
           // We do this rather than using the data from the initial request
           // because our JSON requests will return some rendered template data
           dashboard.trip_tickets.fetch({reset: true});
-          
+
           // Poll for changes every 30 seconds
           setInterval(function(){
             dashboard.trip_tickets.fetch();
           }, 30000);
         },
-        
+
         render: function() {
           // Links anywhere in the document that route to the root url should be handled by Backbone
           this.clickify($('a[href^="'+dashboard.root_url+'"]'));
 
           // Reset the scrollbars
           jcf.customForms.replaceAll($('.tickets-holder')[0]);
-          
+
           // Setup the initial trip ticket detail view
           var $el = (dashboard.localStorage.get('initial_trip_ticket_id_on_render')) ? 
             this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('initial_trip_ticket_id_on_render')+'"]').closest('li') :
             this.$('.tickets-list li:first');
           if ($el.length) {
             $el.trigger('click', {trigger: false, replace: true});
-          
+
             // Scroll list element into view
             // We have to do this after `jcf.customForms.replaceAll()`, otherwise
             // the scrollbars get reset and we lose position.
@@ -125,13 +123,13 @@
             this.display404Message(dashboard.localStorage.get('initial_trip_ticket_id_on_render'));
           }
           dashboard.localStorage.deleteKey('initial_trip_ticket_id_on_render');
-          
+
           return this;
         },
-        
+
         // Custom Functions
         // ---------------
-        
+
         addTicketToList: function (trip_ticket) {
           var index = dashboard.trip_tickets.indexOf(trip_ticket);
           var view = new dashboard.TripTicketListItemView({ model: trip_ticket });
@@ -142,30 +140,30 @@
             $('.tickets-list').append(view.render().el);
           }
         },
-        
+
         addTicketsToList: function () {
           this.$('.tickets-list').html('');
           dashboard.trip_tickets.each(this.addTicketToList, this);
           this.render();
         },
-        
+
         createDashboard: function() {
           // Setup the unified view
           $('#standard_ticket_list').html('<!-- ajaxified -->').hide();
           $('#ajaxified_dashboard').show();
-          
+
           /* - Multiple claiming isn't working yet
           // Add the multiple claim button
           $('#main .actions-list-holder .actions-list').prepend('<li><a href="#" class="disabled"><span>Claim Selected</span></a></li>');
           */
-          
+
           // Undo previously applied scrollbar - they won't work properly 
           // since they were hidden in the DOM when the page was rendered
           jcf.customForms.destroyAll();
           $('.scrollable-area-wrapper>.scrollable-area').unwrap();
           $('.scrollable-area').removeAttr('style');
           $('.vscrollbar').remove();
-          
+
           // Reset height of scrollable areas to match available viewport height
           // Eventually the filter multi-selects will be converted to combo-boxes
           // and will have significantly less height, so assume our two content
@@ -176,11 +174,11 @@
           scrollable_height = (scrollable_height < minimum_height) ? minimum_height : scrollable_height;
           $('.tickets-list').css('height', scrollable_height + 'px');
           $('.content-frame').css('height', (scrollable_height - margin_hight_offset) + 'px');
-          
+
           // Now reapply the scrollbars to get the correct sizing
           jcf.customForms.replaceAll($('#ajaxified_dashboard')[0]);
         },
-        
+
         // Ensure that certain links are handled by the dashboard router
         clickify: function($elements) {
           $elements.not('.no-clickify, .clickified').each(function(){
@@ -190,7 +188,7 @@
             $(this).addClass('clickified');
           });
         },
-        
+
         display404Message: function(ticket_id) {
           ticket_id = ticket_id || 0;
           dashboard.resetViews();
@@ -208,14 +206,14 @@
           $('#resource_not_found .clear-trip_ticket-filters').attr('href', clear_filter_url);
           dashboard.current_trip_ticket = null;
         },
-        
+
         display500Message: function() {
           dashboard.resetViews();
           $('#an_error_occurred').show();
           $('#main .trip-tickets li.check').removeClass('check');
           dashboard.current_trip_ticket = null;
         },
-        
+
         displayErrors: function(json_errors) {
           var error_container = $('<div class="error_explanation">');
           error_container.html('<ul></ul>');
@@ -240,7 +238,7 @@
             },
           });
         },
-        
+
         errorHandler: function(jqXHR) {
           console.log('An error occurred', jqXHR);
           if (jqXHR.status == 422) {
@@ -255,7 +253,7 @@
             console.log('Failed to handle an unexpected error code!', jqXHR.status);
           }
         },
-        
+
         saveFilters: function(e) {
           e.preventDefault();
           var form = $(e.currentTarget);
@@ -267,13 +265,13 @@
             _dashboard.errorHandler(jqXHR);
           });
         },
-                
+
         resetViews: function() {
           $('.content-frame').hide();
           $('#resource_not_found').hide();
           $('#an_error_occurred').hide();
         },
-        
+
         resetForm: function(scope) {
           scope.find(':input').not(':button, :submit, :reset, :hidden').each( function() {
             if (this.type == 'text' || this.type == 'textarea') {
@@ -289,10 +287,10 @@
               this.selectedIndex = -1;
             }
           });
-          
+
         },
       });
-      
+
       // Trip Ticket List Item View
       // ---------------
       dashboard.TripTicketListItemView = Backbone.View.extend({
@@ -318,33 +316,33 @@
           this.$el.addClass('status_' + this.model.get('downcased_status'));
           this.$el.html(this.model.get('rendered_partial'));
           this.clickify();
-          
+
           // If this is the currently displayed ticket, re-render the ticket too
           if (dashboard.current_trip_ticket && dashboard.current_trip_ticket.get('id') == this.model.get('id')) {
             dashboard.current_trip_ticket.fetch();
           }
-          
+
           return this;
         },
-        
+
         remove: function() {
           // If this is the currently displayed ticket, destroy that too
           if (dashboard.current_trip_ticket && dashboard.current_trip_ticket.get('id') == this.model.get('id')) {
             dashboard.current_trip_ticket.trigger('remove');
           }
-          
+
           // Call the super method to run the default functionality
           Backbone.View.prototype.remove.call(this);
-          
+
           return this;
         },
-        
+
         clickify: function() {
           dashboard.clickify(this.$el.find('a[href^="'+dashboard.root_url+'"]'));
           this.$el.find('a').css('text-decoration', 'none');
           this.$el.css('cursor', 'pointer');
         },
-        
+
         open: function(navigate_opts) {
           if (!dashboard.current_trip_ticket || this.model.get('id') != dashboard.current_trip_ticket.get('id')) {
             // These allow us to override the default navigate options when we
@@ -352,20 +350,20 @@
             navigate_opts = navigate_opts || {}
             navigate_opts['trigger'] = navigate_opts['trigger'] || true;
             navigate_opts['replace'] = navigate_opts['replace'] || false;
-          
+
             this.$el.siblings('.check').removeClass('check');
             this.$el.addClass('check');
-          
+
             dashboard.TripTicketRouter.navigate(
               this.$el.find('.column:first a:first').attr('href'),
               navigate_opts
             );
-          
+
             dashboard.localStorage.set('current_trip_ticket_id', this.model.get('id'));
           }
         },
       });
-      
+
       // Trip Ticket Detail View
       // ---------------
       dashboard.TripTicketDetailView = Backbone.View.extend({
@@ -395,12 +393,12 @@
           dashboard.clickify(this.$el.find('a[href^="'+dashboard.root_url+'"]'));
           return this;
         },
-        
+
         remove: function () {
           dashboard.display404Message(this.model.get('id'));
           return this;
         },
-        
+
         rescind: function(e) {
           e.preventDefault();
           e.stopPropagation();
@@ -418,19 +416,19 @@
           }
           return this;
         },
-        
+
         comment: function(e) {
           e.preventDefault();
           var view = new dashboard.TripTicketCommentFormView();
           view.render();
         },
-        
+
         claim: function(e) {
           e.preventDefault();
           var view = new dashboard.TripTicketClaimFormView({model: this.model, claim_url: $(e.currentTarget).attr('href')});
           view.render();
         },
-        
+
         showActivity: function(e) {
           e.preventDefault();
           var $this = $(e.currentTarget);
@@ -445,7 +443,7 @@
           });
         },
       });
-      
+
       // Trip Ticket Comment Form View
       // ---------------
       dashboard.TripTicketCommentFormView = Backbone.View.extend({
@@ -481,7 +479,7 @@
             },
           });
         },
-        
+
         submit: function() {
           var _this = this;
           var form = this.$('form').first();
@@ -501,7 +499,7 @@
           dashboard.resetForm(form);
         }
       });
-      
+
       // Trip Ticket Claim Form View
       // ---------------
       dashboard.TripTicketClaimFormView = Backbone.View.extend({
@@ -542,7 +540,7 @@
             _dashboard.errorHandler(jqXHR);
           });
         },
-        
+
         submit: function() {
           var _this = this;
           var form = this.$('form').first();
@@ -560,13 +558,13 @@
           });
         },
       });
-      
+
       // TripTicket Model
       // ---------------
       dashboard.TripTicket = Backbone.Model.extend({
         urlRoot: dashboard.root_url,
       });
-      
+
       // TripTicket Collection
       // ---------------
       var TripTickets = Backbone.Collection.extend({
@@ -575,7 +573,7 @@
 
         // Base URL for operating on this collection
         url: dashboard.root_url,
-        
+
         comparator: function (a, b) {
           if (a.get('primary_ordering_timestamp') < b.get('primary_ordering_timestamp')) {
              return -1;
@@ -592,7 +590,7 @@
           }
         },
       });
-      
+
       // TripTicket Router
       // ---------------
       var TripTicketRouter = Backbone.Router.extend({
@@ -600,7 +598,7 @@
           // catch-all for undefined routes
           "*notfound" : "notfound",
         },
-        
+
         initialize: function(options) {
           var root_url = dashboard.root_url.replace(/^\//, '');
           this.route(root_url, 'index');
@@ -613,12 +611,12 @@
           this.route(root_url + "/:id", 'show');
           this.route(root_url + "/clear_filters", 'clearFilters');
         },
-        
+
         index: function() {
           dashboard.trip_tickets.fetch({reset: true});
           return this;
         },
-        
+
         show: function(id){
           $.getJSON(dashboard.root_url + '/' + id, function(data){
             dashboard.current_trip_ticket = new dashboard.TripTicket(data);
@@ -634,7 +632,7 @@
           });
           return this;
         },
-        
+
         clearFilters: function() {
           $.getJSON(dashboard.root_url + '/clear_filters', function(data){
             dashboard.TripTicketRouter.navigate('#' + dashboard.root_url, {trigger: true, replace: true});
@@ -645,7 +643,7 @@
           });
           return this;
         },
-        
+
         notfound: function(notfound){
           if(notfound) {
             console.log("Route not implemented: " + notfound);
