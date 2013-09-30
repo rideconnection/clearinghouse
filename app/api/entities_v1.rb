@@ -2,7 +2,7 @@ module Clearinghouse
   module Entities
     module V1
       class Role < Grape::Entity
-        expose :name
+        expose :id, :name
       end
 
       class User < Grape::Entity
