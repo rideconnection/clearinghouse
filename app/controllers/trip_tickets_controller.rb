@@ -221,6 +221,7 @@ class TripTicketsController < ApplicationController
     @trip_tickets.each do |trip_ticket|
       trip_tickets << {
         id: trip_ticket.id,
+        updated_at: trip_ticket.updated_at.to_f,
         downcased_status: trip_ticket.status.downcase,
         primary_ordering_timestamp: trip_ticket.appointment_time.to_f,
         secondary_ordering_timestamp: trip_ticket.created_at.to_f,
@@ -233,6 +234,7 @@ class TripTicketsController < ApplicationController
   def trip_ticket_instance_as_json_for_backbone
     {
       id: @trip_ticket.id,
+      updated_at: @trip_ticket.updated_at.to_f,
       rendered_partial: render_to_string(partial: "trip_tickets/ajaxified_dashboard/trip_ticket_details", locals: {trip_ticket: @trip_ticket}, formats: [:html]),
     }.to_json
   end
