@@ -1,0 +1,20 @@
+<div class="description" data-id="<%= trip_ticket.id %>">
+  <div class="column">
+    <%= link_to trip_ticket do %>
+      <strong class="title"><%= trip_ticket.customer_full_name %> <span class="count"><%= trip_ticket.seats_required %></span> <!--img src="/assets/icon01.png" width="16" height="14" alt="" /--></strong>
+    <% end %>
+    <address><%= trip_ticket.pick_up_location.try(:address_and_city, ', ') %></address>
+    <% trip_status = trip_ticket.status_for(current_user) %>
+    <div class="status <%= underscore_status(trip_status) %>"><%= trip_status %></div>
+  </div>
+  <div class="column">
+    <em class="date"><%= trip_ticket.appointment_time.strftime "%I:%M %p" %><span><%= trip_ticket.appointment_time.strftime "%b %d" %></span> <%= load_unload_time_warning(trip_ticket.customer_boarding_time, trip_ticket.customer_deboarding_time) %></em>
+    <address><%= trip_ticket.drop_off_location.try(:address_and_city, ', ') %></address>
+    <ul class="icons-list">
+      <% trip_ticket.icon_list.each do |icon| %>
+      <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
+      <% end %>
+    </ul>
+  </div>
+</div>
+<span class="checked-status checked"></span>

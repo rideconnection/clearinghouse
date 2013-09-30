@@ -1,10 +1,12 @@
-$("#activities-dialog").html('<%= escape_javascript(render("shared/audit_trail", :record => @trip_ticket, :no_header => true)) %>');
-$("#activities-dialog").dialog({
+$("#modal-dialog").html('<%= escape_javascript(render("shared/audit_trail", :record => @trip_ticket, :no_header => true)) %>');
+$("#modal-dialog").dialog({
   title: "Change History",
   width: 1062,
   modal: true,
+  draggable: false,
+  resizable: false,
   buttons: {
-    Cancel: function() {
+    OK: function() {
       $( this ).dialog( "close" );
     }
   }

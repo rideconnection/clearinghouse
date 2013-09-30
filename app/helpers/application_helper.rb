@@ -40,4 +40,12 @@ module ApplicationHelper
     end
     data.blank? ? "[an empty value]" : data.to_s
   end
+  
+  def ajaxified_trip_ticket_path(trip_ticket)
+    trip_tickets_path(:anchor => trip_ticket_path(trip_ticket))
+  end
+  
+  def ajaxified_trip_ticket_url(trip_ticket)
+    trip_tickets_url(:anchor => trip_ticket_path(trip_ticket))
+  end
 end

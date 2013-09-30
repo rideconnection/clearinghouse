@@ -75,7 +75,7 @@ class FiltersController < ApplicationController
     respond_to do |format|
       format.html do
         if params[:return_to] == 'trip_tickets'
-          redirect_to trip_tickets_url(trip_ticket_filters: 'clear'), notice: 'Filter was successfully deleted.'
+          redirect_to clear_filters_trip_tickets_url, notice: 'Filter was successfully deleted.'
         else
           redirect_to filters_url
         end

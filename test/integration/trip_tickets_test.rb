@@ -57,14 +57,15 @@ class TripTicketsTest < ActionController::IntegrationTest
     it "should be displayed in the trip ticket index" do
       trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
       visit trip_tickets_path
-      assert page.find(".tickets-list").has_content?("No Claims")
+      assert page.find("#standard_ticket_list").has_content?("No Claims")
     end
 
-    it "should be displayed in the trip ticket unified view" do
-      trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
-      visit trip_tickets_path
-      assert page.find(".content-frame>.heading:first").has_content?("No Claims")
-    end
+    ## No longer valid since the unified view has been swapped out for an AJAX dashboard that is rendered at run-time
+    # it "should be displayed in the trip ticket unified view" do      
+    #   trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
+    #   visit trip_tickets_path
+    #   assert page.find(".content-frame>.heading:first").has_content?("No Claims")
+    # end
 
     it "should be displayed in the trip ticket show action" do
       trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
@@ -408,7 +409,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   describe "filtering" do
     setup do
       # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
-      @reset_filters_path = "/trip_tickets?trip_ticket_filters=clear"
+      @reset_filters_path = "/trip_tickets/clear_filters"
     end
 
     describe "clear filters" do

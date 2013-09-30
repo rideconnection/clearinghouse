@@ -130,7 +130,7 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  default_scope order('appointment_time ASC')
+  default_scope order('appointment_time ASC, created_at DESC')
 
   scope :originated_or_claimed_by, ->(provider) do
     subquery = TripClaim.unscoped.select(:trip_ticket_id).where(claimant_provider_id: provider.id).uniq.to_sql
@@ -588,7 +588,7 @@ class TripTicket < ActiveRecord::Base
       
       return affected_tickets.flatten.sort_by(&:id)
     end
-
+    
     private
 
     def fuzzy_string_search(field, value)

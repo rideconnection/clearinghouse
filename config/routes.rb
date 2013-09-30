@@ -27,6 +27,7 @@ Clearinghouse::Application.routes.draw do
   resources :trip_claims, :only => :dashboard
   
   resources :trip_tickets do
+    get 'clear_filters', :on => :collection
     post 'search', :on => :collection
     member do
       post 'rescind'

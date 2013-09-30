@@ -24,9 +24,10 @@ jcf = {
         }
       }
     },
-    replaceAll: function() {
+    replaceAll: function(scope) {
+      scope = scope || document;
       for(var k in jcf.modules) {
-        var els = jcf.lib.queryBySelector(jcf.modules[k].prototype.selector);
+        var els = jcf.lib.queryBySelector(jcf.modules[k].prototype.selector, scope);
         for(var i = 0; i<els.length; i++) {
           if(els[i].jcf) {
             // refresh form element state

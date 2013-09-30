@@ -12,7 +12,7 @@ set :whenever_roles, [:db, :app]
 require "whenever/capistrano"
 
 set :application, "Clearinghouse"
-set :repository,  "http://github.com/rideconnection/clearinghouse.git"
+set :repository,  "https://github.com/rideconnection/clearinghouse.git"
 
 set :scm, :git
 set :deploy_via, :remote_cache
