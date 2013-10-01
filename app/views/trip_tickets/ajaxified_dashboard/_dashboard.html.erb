@@ -14,10 +14,10 @@
       last_activity_at: new Date(),
       current_refresh_rate: null,
       normal_refresh_rate:       30000, // in miliseconds (30 seconds)
-      throttle_threshold:       300000, // in miliseconds (5 minutes)
+      throttle_threshold:       900000, // in miliseconds (15 minutes)
       throttled_refresh_rate:    60000, // in miliseconds (60 seconds)
-      pause_threshold:          900000, // in miliseconds (15 minutes)
-      stop_threshold:          1800000, // in miliseconds (30 minutes), at
+      pause_threshold:         1800000, // in miliseconds (30 minutes)
+      stop_threshold:          3600000, // in miliseconds (60 minutes), at
                                         // some point we might want to tie
                                         // this to the app's session timeout
                                         // limit
