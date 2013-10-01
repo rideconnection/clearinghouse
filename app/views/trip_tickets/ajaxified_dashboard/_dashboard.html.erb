@@ -8,6 +8,21 @@
       // For state trackings
       current_trip_ticket: null,
       current_trip_ticket_detail_view: null,
+      
+      // Background polling
+      last_refresh_at: new Date(),
+      last_activity_at: new Date(),
+      current_refresh_rate: null,
+      normal_refresh_rate:       30000, // in miliseconds (30 seconds)
+      throttle_threshold:       300000, // in miliseconds (5 minutes)
+      throttled_refresh_rate:    60000, // in miliseconds (60 seconds)
+      pause_threshold:          900000, // in miliseconds (15 minutes)
+      stop_threshold:          1800000, // in miliseconds (30 minutes), at
+                                        // some point we might want to tie
+                                        // this to the app's session timeout
+                                        // limit
+      refresh_paused: false,
+      refresh_stopped: false,
     };
     $(function () {
       'use strict';
@@ -22,6 +37,7 @@
 
         // Delegated events for dashboard-wide actions
         events: {
+          'click': 'updateLastActivityAt',
           'submit form.form-filter': 'saveFilters',
           // 'click form.form-filter .button-cancel': 'clearFilters',
         },
@@ -40,6 +56,7 @@
           dashboard.errorHandler = this.errorHandler;
           dashboard.resetViews = this.resetViews;
           dashboard.resetForm = this.resetForm;
+          dashboard.refresh = this.refresh;
 
           // Make sure we can access the original request URL from any jqXHR objects
           $.ajaxPrefilter('json', function(options, originalOptions, jqXHR) {
@@ -80,10 +97,10 @@
           // because our JSON requests will return some rendered template data
           dashboard.trip_tickets.fetch({reset: true});
 
-          // Poll for changes every 30 seconds
+          // Call refresh() at intervals
           setInterval(function(){
-            dashboard.trip_tickets.fetch();
-          }, 30000);
+            dashboard.refresh();
+          }, 2500); // 2.5 seconds
         },
 
         render: function() {
@@ -277,7 +294,47 @@
               this.selectedIndex = -1;
             }
           });
-
+        },
+        
+        refresh: function() {
+          var timestamp = new Date();
+          var activity_offset = timestamp.valueOf() - dashboard.last_activity_at.valueOf();
+          var refresh_offset = timestamp.valueOf() - dashboard.last_refresh_at.valueOf();
+          if (activity_offset > dashboard.stop_threshold) {
+            // TODO - stop polling, display message, and require page refresh
+            // in order to continue
+            // dashboard.refresh_stopped = true;
+            // dashboard.refresh_paused = true;
+            console.log("TODO - stop_threshold reached");
+          }
+          else if (activity_offset > dashboard.pause_threshold) {
+            // TODO - pause polling, display message, prompt to resume
+            // dashboard.refresh_paused = true;
+            console.log("TODO - pause_threshold reached");
+          }
+          else if (activity_offset > dashboard.throttle_threshold) {
+            // Throttle refresh rate to every {throttled_refresh_rate} miliseconds
+            dashboard.current_refresh_rate = dashboard.throttled_refresh_rate;
+            console.log("throttle_threshold reached");
+          }
+          else {
+            // Refresh every {normal_refresh_rate} miliseconds
+            dashboard.current_refresh_rate = dashboard.normal_refresh_rate;
+          }
+          
+          // Check if refresh is required
+          if (dashboard.refresh_stopped == false && dashboard.refresh_paused == false && refresh_offset > dashboard.current_refresh_rate) {
+            dashboard.trip_tickets.fetch();
+            dashboard.last_refresh_at = new Date();
+          }
+        },
+        
+        updateLastActivityAt: function() {
+          if (dashboard.refresh_stopped == false) {
+            console.log('updating last_activity_at');
+            dashboard.last_activity_at = new Date();
+            dashboard.refresh_paused = false;
+          }
         },
       });
 
