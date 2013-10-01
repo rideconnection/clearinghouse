@@ -5,24 +5,31 @@
       // We use this frequently
       root_url: '<%= j trip_tickets_path %>',
 
-      // For state trackings
+      // For current state trackings
       current_trip_ticket: null,
       current_trip_ticket_detail_view: null,
       
       // Background polling
-      last_refresh_at: new Date(),
-      last_activity_at: new Date(),
-      current_refresh_rate: null,
-      normal_refresh_rate:       30000, // in miliseconds (30 seconds)
-      throttle_threshold:       900000, // in miliseconds (15 minutes)
-      throttled_refresh_rate:    60000, // in miliseconds (60 seconds)
-      pause_threshold:         1800000, // in miliseconds (30 minutes)
-      stop_threshold:          3600000, // in miliseconds (60 minutes), at
-                                        // some point we might want to tie
-                                        // this to the app's session timeout
-                                        // limit
-      refresh_paused: false,
-      refresh_stopped: false,
+      polling: {
+        idler: null,
+        last_refresh_at: new Date(),
+        refresh_rate:    30000, // in miliseconds (30 seconds)
+        away_threshold: 300000, // in miliseconds (5 minutes)
+        refresh_paused:  false,
+        refresh_stopped: false, // TODO
+        
+        idlePause: function() {
+          console.log('idlePause');
+          dashboard.polling.refresh_paused = true;
+          // TODO - display message
+        },
+        
+        idleResume: function() {
+          console.log('idleResume');
+          dashboard.polling.refresh_paused = false;
+          dashboard.refresh(true);
+        },
+      },
     };
     $(function () {
       'use strict';
@@ -37,7 +44,6 @@
 
         // Delegated events for dashboard-wide actions
         events: {
-          'click': 'updateLastActivityAt',
           'submit form.form-filter': 'saveFilters',
           // 'click form.form-filter .button-cancel': 'clearFilters',
         },
@@ -96,11 +102,19 @@
           // We do this rather than using the data from the initial request
           // because our JSON requests will return some rendered template data
           dashboard.trip_tickets.fetch({reset: true});
+          
+          dashboard.polling.idler = new Idle({
+            onHidden:    dashboard.polling.idlePause,
+            onAway:      dashboard.polling.idlePause,
+            onVisible:   dashboard.polling.idleResume,
+            onAwayBack:  dashboard.polling.idleResume,
+            awayTimeout: dashboard.polling.away_threshold,
+          });
 
-          // Call refresh() at intervals
+          // Call refresh() every 2 seconds
           setInterval(function(){
             dashboard.refresh();
-          }, 2500); // 2.5 seconds
+          }, 2000);
         },
 
         render: function() {
@@ -194,6 +208,7 @@
           });
         },
 
+        // TODO - convert this to a Backbone view
         display404Message: function(ticket_id) {
           ticket_id = ticket_id || 0;
           dashboard.resetViews($('#resource_not_found'));
@@ -211,12 +226,14 @@
           dashboard.current_trip_ticket = null;
         },
 
+        // TODO - convert this to a Backbone view
         display500Message: function() {
           dashboard.resetViews($('#an_error_occurred'));
           $('#main .trip-tickets li.check').removeClass('check');
           dashboard.current_trip_ticket = null;
         },
 
+        // TODO - convert this to a Backbone view
         displayErrors: function(json_errors) {
           var error_container = $('<div class="error_explanation">');
           error_container.html('<ul></ul>');
@@ -242,6 +259,7 @@
           });
         },
 
+        // TODO - move this to be a direct descendant of `dashboard`
         errorHandler: function(jqXHR) {
           console.log('An error occurred', jqXHR);
           if (jqXHR.status == 422) {
@@ -272,6 +290,7 @@
           });
         },
 
+        // TODO - move this to be a direct descendant of `dashboard`
         resetViews: function($show) {
           $('.content-frame').hide();
           $('#resource_not_found').hide();
@@ -279,6 +298,7 @@
           $show.show();
         },
 
+        // TODO - move this to be a direct descendant of `dashboard`
         resetForm: function(scope) {
           scope.find(':input').not(':button, :submit, :reset, :hidden').each( function() {
             if (this.type == 'text' || this.type == 'textarea') {
@@ -296,44 +316,17 @@
           });
         },
         
-        refresh: function() {
+        // TODO - move this to be a direct descendant of `dashboard`
+        refresh: function(force) {
+          force = force || false;
           var timestamp = new Date();
-          var activity_offset = timestamp.valueOf() - dashboard.last_activity_at.valueOf();
-          var refresh_offset = timestamp.valueOf() - dashboard.last_refresh_at.valueOf();
-          if (activity_offset > dashboard.stop_threshold) {
-            // TODO - stop polling, display message, and require page refresh
-            // in order to continue
-            // dashboard.refresh_stopped = true;
-            // dashboard.refresh_paused = true;
-            console.log("TODO - stop_threshold reached");
-          }
-          else if (activity_offset > dashboard.pause_threshold) {
-            // TODO - pause polling, display message, prompt to resume
-            // dashboard.refresh_paused = true;
-            console.log("TODO - pause_threshold reached");
-          }
-          else if (activity_offset > dashboard.throttle_threshold) {
-            // Throttle refresh rate to every {throttled_refresh_rate} miliseconds
-            dashboard.current_refresh_rate = dashboard.throttled_refresh_rate;
-            console.log("throttle_threshold reached");
-          }
-          else {
-            // Refresh every {normal_refresh_rate} miliseconds
-            dashboard.current_refresh_rate = dashboard.normal_refresh_rate;
-          }
-          
+          var refresh_offset = timestamp.valueOf() - dashboard.polling.last_refresh_at.valueOf();
+
           // Check if refresh is required
-          if (dashboard.refresh_stopped == false && dashboard.refresh_paused == false && refresh_offset > dashboard.current_refresh_rate) {
+          if (dashboard.polling.refresh_paused == false && (force || refresh_offset > dashboard.polling.refresh_rate)) {
+            console.log('refreshing ticket list');
             dashboard.trip_tickets.fetch();
-            dashboard.last_refresh_at = new Date();
-          }
-        },
-        
-        updateLastActivityAt: function() {
-          if (dashboard.refresh_stopped == false) {
-            console.log('updating last_activity_at');
-            dashboard.last_activity_at = new Date();
-            dashboard.refresh_paused = false;
+            dashboard.polling.last_refresh_at = new Date();
           }
         },
       });
