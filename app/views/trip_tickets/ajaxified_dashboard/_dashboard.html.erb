@@ -241,7 +241,10 @@
         },
 
         saveFilters: function(e) {
+          console.log('saveFilters clicked', e);
+          console.trace();
           e.preventDefault();
+          // e.stopPropagation();
           var form = $(e.currentTarget);
           var data = form.find(':input').serialize();
           $.getJSON(dashboard.root_url, data, function(){
@@ -387,7 +390,15 @@
         },
 
         rescind: function(e) {
+          console.log('rescind clicked', e);
+          console.trace();
           e.preventDefault();
+          
+          // We have to prevent this event from bubbling up so that the
+          // onclick event of the link itself doesn't get run. At the end of
+          // this method we'll need to manually trigger the event bubble
+          e.stopPropagation();
+          
           var link = $(e.currentTarget);
           if (!link.data('confirm') || confirm(link.data('confirm'))) {
             $.post(
@@ -400,25 +411,37 @@
               dashboard.errorHandler(jqXHR);
             });
           }
+          
+          // Ensure other backbone event listeners are notified of the click
+          // event
+          link.parent().trigger('click');
+          
           return this;
         },
 
         comment: function(e) {
+          console.log('comment clicked', e);
+          console.trace();
           e.preventDefault();
+          // e.stopPropagation();
           var view = new dashboard.TripTicketCommentFormView();
           view.render();
         },
 
         claim: function(e) {
           console.log('claim clicked', e);
+          console.trace();
           e.preventDefault();
+          // e.stopPropagation();
           var view = new dashboard.TripTicketClaimFormView({model: this.model, claim_url: $(e.currentTarget).attr('href')});
           view.render();
         },
 
         showActivity: function(e) {
-          console.log(e);
+          console.log('showActivity clicked', e);
+          console.trace();
           e.preventDefault();
+          // e.stopPropagation();
           var $this = $(e.currentTarget);
           var url = null;
           if ($this.data('activity-type') == 'trip_result') {
