@@ -3,4 +3,4 @@
 //= require underscore-min
 //= require backbone-min
 //= require jstorage
-//= require idle.min
+//= require idle

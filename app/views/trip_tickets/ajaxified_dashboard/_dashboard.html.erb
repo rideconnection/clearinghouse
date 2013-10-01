@@ -13,19 +13,14 @@
       polling: {
         idler: null,
         last_refresh_at: new Date(),
-        refresh_rate:    30000, // in miliseconds (30 seconds)
-        away_threshold: 300000, // in miliseconds (5 minutes)
+        refresh_rate:    30000, // in milliseconds (30 seconds)
+        away_threshold: 300000, // in milliseconds (5 minutes)
         refresh_paused:  false,
-        refresh_stopped: false, // TODO
-        
         idlePause: function() {
-          console.log('idlePause');
           dashboard.polling.refresh_paused = true;
           // TODO - display message
         },
-        
         idleResume: function() {
-          console.log('idleResume');
           dashboard.polling.refresh_paused = false;
           dashboard.refresh(true);
         },
@@ -103,6 +98,7 @@
           // because our JSON requests will return some rendered template data
           dashboard.trip_tickets.fetch({reset: true});
           
+          // Start the idle tracker to pause background polling when not needed
           dashboard.polling.idler = new Idle({
             onHidden:    dashboard.polling.idlePause,
             onAway:      dashboard.polling.idlePause,
@@ -276,8 +272,6 @@
         },
 
         saveFilters: function(e) {
-          console.log('saveFilters clicked', e);
-          console.trace();
           e.preventDefault();
           // e.stopPropagation();
           var form = $(e.currentTarget);
@@ -318,13 +312,15 @@
         
         // TODO - move this to be a direct descendant of `dashboard`
         refresh: function(force) {
+          // TODO - Display a message and require reload after a specific
+          // period of time, i.e. when the session times out
+          
           force = force || false;
           var timestamp = new Date();
           var refresh_offset = timestamp.valueOf() - dashboard.polling.last_refresh_at.valueOf();
 
           // Check if refresh is required
           if (dashboard.polling.refresh_paused == false && (force || refresh_offset > dashboard.polling.refresh_rate)) {
-            console.log('refreshing ticket list');
             dashboard.trip_tickets.fetch();
             dashboard.polling.last_refresh_at = new Date();
           }
@@ -440,8 +436,6 @@
         },
 
         rescind: function(e) {
-          console.log('rescind clicked', e);
-          console.trace();
           e.preventDefault();
           
           // We have to prevent this event from bubbling up so that the
@@ -470,8 +464,6 @@
         },
 
         comment: function(e) {
-          console.log('comment clicked', e);
-          console.trace();
           e.preventDefault();
           // e.stopPropagation();
           var view = new dashboard.TripTicketCommentFormView();
@@ -488,8 +480,6 @@
         },
 
         showActivity: function(e) {
-          console.log('showActivity clicked', e);
-          console.trace();
           e.preventDefault();
           // e.stopPropagation();
           var $this = $(e.currentTarget);
