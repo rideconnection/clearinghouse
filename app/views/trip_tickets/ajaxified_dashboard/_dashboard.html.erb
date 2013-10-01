@@ -40,7 +40,6 @@
         // Delegated events for dashboard-wide actions
         events: {
           'submit form.form-filter': 'saveFilters',
-          // 'click form.form-filter .button-cancel': 'clearFilters',
         },
 
         // At initialization we bind to the relevant events on the TripTickets
@@ -422,8 +421,11 @@
         },
 
         render: function () {
+          dashboard.resetViews(this.$el);
           this.$el.html(this.model.get('rendered_partial'));
           dashboard.clickify(this.$el.find('a[href^="'+dashboard.root_url+'"]'));
+          jcf.customForms.replaceAll(this.$el.closest('.content-holder')[0]);
+          initOpenClose(this.$el);
           return this;
         },
 
@@ -673,16 +675,12 @@
         show: function(id){
           console.log('running show on', id);
           if (dashboard.current_trip_ticket_detail_view != null) {
-            console.log('removing old view', dashboard.current_trip_ticket_detail_view);
             dashboard.current_trip_ticket_detail_view.remove();
           }
           $.getJSON(dashboard.root_url + '/' + id, function(data){
             dashboard.current_trip_ticket = new dashboard.TripTicket(data);
             dashboard.current_trip_ticket_detail_view = new dashboard.TripTicketDetailView({ model: dashboard.current_trip_ticket });
-            dashboard.resetViews($('.content-frame'));
             dashboard.current_trip_ticket_detail_view.render();
-            jcf.customForms.replaceAll($('.content-holder')[0]);
-            initOpenClose($('.content-holder'));
           })
           .fail(function(jqXHR) {
             dashboard.errorHandler(jqXHR);
