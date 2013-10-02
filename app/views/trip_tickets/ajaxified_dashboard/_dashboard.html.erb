@@ -87,9 +87,6 @@
           ) {
             // a hashbang path to a specific trip ticket was present on page load
             dashboard.localStorage.set('initial_trip_ticket_id_on_render', parseInt(window.location.hash.replace('#'+dashboard.root_url+'/', '')));
-          } else if (dashboard.localStorage.get('current_trip_ticket_id') != null) {
-            // there was a localStorage item for the last clicked ticket
-            dashboard.localStorage.set('initial_trip_ticket_id_on_render', dashboard.localStorage.get('current_trip_ticket_id'));
           }
 
           // Fetch the list of tickets, and reset the application view
@@ -120,10 +117,17 @@
           jcf.customForms.replaceAll($('.tickets-holder')[0]);
 
           // Setup the initial trip ticket detail view
-          var $el = (dashboard.localStorage.get('initial_trip_ticket_id_on_render')) ? 
-            this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('initial_trip_ticket_id_on_render')+'"]').closest('li') :
-            this.$('.tickets-list li:first');
-          if ($el.length) {
+          var $el = null, $el_temp;
+          $el = (dashboard.localStorage.get('initial_trip_ticket_id_on_render') && ($el_temp = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('initial_trip_ticket_id_on_render')+'"]').closest('li')) && $el_temp.length) ? $el_temp : null;
+          if ($el == null) $el = (dashboard.localStorage.get('current_trip_ticket_id') && ($el_temp = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('current_trip_ticket_id')+'"]').closest('li')) && $el_temp.length) ? $el_temp : null;
+          if ($el == null) $el = (($el_temp = this.$('.tickets-list li:first')) && $el_temp.length) ? $el_temp : null;
+          
+          // Cleanup current-state items anytime view is reset, i.e. `dashboard.trip_tickets.fetch({reset: true})`
+          dashboard.localStorage.deleteKey('initial_trip_ticket_id_on_render');
+          dashboard.localStorage.deleteKey('current_trip_ticket_id');
+          dashboard.current_trip_ticket = null;
+
+          if ($el) {
             $el.trigger('click', {trigger: false, replace: true});
 
             // Scroll list element into view
@@ -136,8 +140,7 @@
           } else {
             this.display404Message(dashboard.localStorage.get('initial_trip_ticket_id_on_render'));
           }
-          dashboard.localStorage.deleteKey('initial_trip_ticket_id_on_render');
-
+          
           return this;
         },
 
@@ -385,7 +388,7 @@
             navigate_opts = navigate_opts || {}
             navigate_opts['trigger'] = navigate_opts['trigger'] || true;
             navigate_opts['replace'] = navigate_opts['replace'] || false;
-
+            
             this.$el.siblings('.check').removeClass('check');
             this.$el.addClass('check');
 
