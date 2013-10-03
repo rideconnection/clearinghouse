@@ -122,7 +122,7 @@
           dashboard.multiple_select.enabled = false;
           var button = this.$('.actions-list-holder .action-select-multiple');
           button.removeClass('checked').addClass('unchecked');
-          button.closest('ul').find('.multiple-select-action').hide({effect: 'slide', direction: 'right'});
+          button.closest('ul').find('.multiple-select-action').hide({effect: 'slide', speed: 'fast', easing: 'easeInOutCubic', direction: 'right'});
           
           // Links anywhere in the document that route to the root url should be handled by Backbone
           this.clickify($('a[href^="'+dashboard.root_url+'"]'));
@@ -311,7 +311,7 @@
             dashboard.resetViews($('#select_multiple_instructions'));
 
             dashboard.multiple_select.enabled = true;
-            button.closest('ul').find('.multiple-select-action').show({effect: 'slide', direction: 'right'});
+            button.closest('ul').find('.multiple-select-action').show({effect: 'slide', speed: 'fast', easing: 'easeInOutCubic', direction: 'right'});
             button.removeClass('unchecked').addClass('checked');
             
             var $tickets = $('.tickets-list li');
