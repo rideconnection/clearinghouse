@@ -10,7 +10,11 @@
   </h2>
   
   <ul class="actions-list">
-    <li><%= link_to trip_ticket, class: 'activity-view no-clickify' do %><span><% if can?(:edit, trip_ticket) %>Edit<% else %>View<% end %></span><% end %></li>
+    <% if can?(:edit, @trip_ticket) %>
+      <li><%= link_to edit_trip_ticket_path(trip_ticket), :class => "activity-edit no-clickify" do %><span>Edit</span><% end %></li>
+    <% else %>
+      <li><%= link_to trip_ticket, class: 'activity-view no-clickify' do %><span>View</span><% end %></li>
+    <% end %>
     <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
       <li><%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "activity-claim no-clickify" do %><span>Claim</span><% end %></li>
     <% end %>

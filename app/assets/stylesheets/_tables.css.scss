@@ -150,6 +150,18 @@ table {
     }
   }
 
+  &.table-striped-groups-of-two {
+    tbody > tr:nth-child(4n-2) > td, tbody > tr:nth-child(4n-3) > td,
+    tbody > tr:nth-child(4n-2) > th, tbody > tr:nth-child(4n-3) > th {
+      background-color: #f3f3f3;
+    }
+
+    tbody > tr:nth-child(4n) > td, tbody > tr:nth-child(4n-2) > td,
+    tbody > tr:nth-child(4n) > th, tbody > tr:nth-child(4n-2) > th {
+      border-top: 1px dashed #afafaf;
+    }
+  }
+
   tr {
     td {
       ul {

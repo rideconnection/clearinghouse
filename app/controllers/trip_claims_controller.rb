@@ -1,7 +1,6 @@
 class TripClaimsController < ApplicationController
-  load_and_authorize_resource :trip_claim, :only => :dashboard
-  load_and_authorize_resource :trip_ticket, :except => :dashboard
-  load_and_authorize_resource :trip_claim, :through => :trip_ticket, :except => :dashboard
+  load_and_authorize_resource :trip_ticket
+  load_and_authorize_resource :trip_claim, :through => :trip_ticket
   
   # GET /trip_claims
   # GET /trip_claims.json
@@ -50,7 +49,7 @@ class TripClaimsController < ApplicationController
         format.json { head :no_content }
       else
         format.html { render action: "new" }
-        format.json { render json: @trip_claim.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_claim }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
     end
   end
@@ -64,7 +63,7 @@ class TripClaimsController < ApplicationController
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @trip_claim.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_claim }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
     end
   end
@@ -97,8 +96,6 @@ class TripClaimsController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
-  def dashboard; end
   
   private
   

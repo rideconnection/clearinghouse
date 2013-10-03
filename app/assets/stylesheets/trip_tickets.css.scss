@@ -254,7 +254,7 @@ body[data-controller="trip_tickets"] {
             }
           }
 
-          .checked {
+          .checked, .unchecked {
             background:url(image-path("sprite1.png")) no-repeat 0 -625px;
             bottom:8px;
             display:none;
@@ -263,8 +263,12 @@ body[data-controller="trip_tickets"] {
             right:6px;
             width:16px;
           }
+          
+          .unchecked {
+            background:url(image-path("sprite1.png")) no-repeat 0 -610px;
+          }
 
-          .check .checked {
+          .check .checked, .multiple-select-enabled .checked, .multiple-select-enabled .unchecked {
             display:block;
           }
 

@@ -1,16 +1,7 @@
 <%= form_for(@provider) do |f| %>
-  <% if @provider.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@provider.errors.count, "error") %> prohibited this provider from being saved:</h2>
 
-      <ul>
-      <% @provider.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+  <%= render partial: 'shared/error_explanation', locals: { object: @provider } %>
+  
   <div class="field">
     <%= f.label :name %>
     <%= f.text_field :name %>

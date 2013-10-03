@@ -24,11 +24,11 @@ Clearinghouse::Application.routes.draw do
     end
   end
 
-  resources :trip_claims, :only => :dashboard
-  
   resources :trip_tickets do
+    get 'claim_multiple', :on => :collection
+    post 'create_multiple_claims', :on => :collection
     get 'clear_filters', :on => :collection
-    post 'search', :on => :collection
+    post 'search', :on => :collection    
     member do
       post 'rescind'
     end

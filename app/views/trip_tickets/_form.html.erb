@@ -1,15 +1,6 @@
 <%= form_for(@trip_ticket) do |f| %>
-  <% if @trip_ticket.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@trip_ticket.errors.count, "error") %> prohibited this trip_ticket from being saved:</h2>
-
-      <ul>
-      <% @trip_ticket.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  
+  <%= render partial: 'shared/error_explanation', locals: { object: @trip_ticket } %>
 
   <% unless @trip_ticket.new_record? %>
     <fieldset id="status" class="">
@@ -491,26 +482,24 @@
   <% end %>
 <% end %>
 
+<script type="text/javascript">
+  var service_level_autocomplete_data = JSON.parse('<%= escape_javascript(service_level_autocomplete_values.to_json.html_safe) %>');
+  var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
+
+  function setup_autocomplete_fields() {
+    $("input[name^='trip_ticket[customer_service_level]']").autocomplete({ source: service_level_autocomplete_data });
+    $("input[name^='trip_ticket[customer_eligibility_factors]']").autocomplete({ source: eligibility_autocomplete_data });
+  }
+
+  $(document).ready(function(){
+    setup_autocomplete_fields();
+  });
+</script>
+
 <% content_for :sidebar do %>
   <ul class="side-nav">
     <% if @trip_ticket.persisted? && !@trip_ticket.rescinded? && can?(:rescind, @trip_ticket) && @trip_ticket.rescindable? %>
       <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
     <% end %>
   </ul>
-<% end %>
-
-<%= content_for :head do %>
-  <script type="text/javascript">
-    var service_level_autocomplete_data = JSON.parse('<%= escape_javascript(service_level_autocomplete_values.to_json.html_safe) %>');
-    var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
-
-    function setup_autocomplete_fields() {
-      $("input[name^='trip_ticket[customer_service_level]']").autocomplete({ source: service_level_autocomplete_data });
-      $("input[name^='trip_ticket[customer_eligibility_factors]']").autocomplete({ source: eligibility_autocomplete_data });
-    }
-
-    $(document).ready(function(){
-      setup_autocomplete_fields();
-    });
-  </script>
 <% end %>

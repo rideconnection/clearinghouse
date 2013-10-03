@@ -1,46 +1,55 @@
 <div class="padded">
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Status</th>
-        <th>Customer</th>
-        <th>Seats</th>
-        <th>Pickup Location</th>
-        <th>App't Time</th>
-        <th>Drop Off Location</th>
-        <th></th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @trip_tickets.each do |tt| %>
+  <%= form_tag claim_multiple_trip_tickets_path, method: :get do %>
+    <table class="table table-striped">
+      <thead>
         <tr>
-          <td><%= tt.status_for(current_user) %></td>
-          <td><%= tt.customer_full_name %></td>
-          <td><%= tt.seats_required %></td>
-          <td><%= formatted_address_and_city tt.pick_up_location %></td>
-          <td><%= tt.appointment_time.strftime "%b %d %I:%M %p" %> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></td>
-          <td><%= formatted_address_and_city tt.drop_off_location %></td>
-          <td>
-            <ul class="icons-list">
-              <% tt.icon_list.each do |icon| %>
-                <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
-              <% end %>
-            </ul>
-          </td>
-          <td>
-            <ul>
-              <li><%= link_to 'View Ticket', trip_ticket_path(tt) %></li>
-              <% if can?(:create, tt.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && tt.claimable_by?(current_user) %>
-                <li><%= link_to 'Claim', new_trip_ticket_trip_claim_path(tt) %></li>
-              <% end %>
-              <% if !tt.rescinded? && can?(:rescind, tt) && tt.rescindable? %>
-                <li><%= link_to 'Rescind', rescind_trip_ticket_path(tt.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
-              <% end %>
-            </ul>
-          </td>
+          <th></th>
+          <th>Status</th>
+          <th>Customer</th>
+          <th>Seats</th>
+          <th>Pickup Location</th>
+          <th>App't Time</th>
+          <th>Drop Off Location</th>
+          <th></th>
+          <th></th>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <% @trip_tickets.each do |tt| %>
+          <tr>
+            <td><%= check_box_tag "trip_ticket[selected_ids][]", tt.id %></td>
+            <td><%= tt.status_for(current_user) %></td>
+            <td><%= tt.customer_full_name %></td>
+            <td><%= tt.seats_required %></td>
+            <td><%= formatted_address_and_city tt.pick_up_location %></td>
+            <td><%= tt.appointment_time.strftime "%b %d %I:%M %p" %> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></td>
+            <td><%= formatted_address_and_city tt.drop_off_location %></td>
+            <td>
+              <ul class="icons-list">
+                <% tt.icon_list.each do |icon| %>
+                  <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
+                <% end %>
+              </ul>
+            </td>
+            <td>
+              <ul>
+                <li><%= link_to 'View Ticket', trip_ticket_path(tt) %></li>
+                <% if can?(:create, tt.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && tt.claimable_by?(current_user) %>
+                  <li><%= link_to 'Claim', new_trip_ticket_trip_claim_path(tt) %></li>
+                <% end %>
+                <% if !tt.rescinded? && can?(:rescind, tt) && tt.rescindable? %>
+                  <li><%= link_to 'Rescind', rescind_trip_ticket_path(tt.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
+                <% end %>
+              </ul>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="9"><%= submit_tag 'Claim Selected', :name => "", :class => "button" %></td>
+        </tr>
+      </tfoot>
+    </table>
+  <% end %>
 </div>

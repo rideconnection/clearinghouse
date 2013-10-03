@@ -1,0 +1,64 @@
+<% claim_multiple ||= false %>
+
+<div class="field">
+  <%= f.label :claimant_provider_id, "Provider" %>
+  <%= trip_claim.claimant.name %>
+</div>
+<% if !claim_multiple %>
+  <div class="field">
+    <%= f.label :claimant_customer_id, "Customer ID" %>
+    <% if can?(:edit, trip_claim) and trip_claim.editable? %>
+      <%= f.text_field :claimant_customer_id, :readonly => true %>
+    <% else %>
+      <%= trip_claim.claimant_customer_id %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label :claimant_trip_id, "Trip ID" %>
+    <% if can?(:edit, trip_claim) and trip_claim.editable? %>
+      <%= f.text_field :claimant_trip_id, :readonly => true %>
+    <% else %>
+      <%= trip_claim.claimant_trip_id %>
+    <% end %>
+  </div>
+  <div class="field">
+    <%= f.label "Claim status" %> <%= trip_claim.status.to_s.humanize.titlecase %>
+  </div>
+<% end %>
+<div class="field">
+  <%= f.label :proposed_pickup_time %>
+  <% if (can?(:create, trip_claim) || can?(:edit, trip_claim)) and trip_claim.editable? %>
+    <%
+      appt = trip_ticket.appointment_time
+      pu = trip_ticket.requested_pickup_time
+      default_pu = DateTime.new(appt.year, appt.month, appt.day, pu.hour, pu.min, pu.sec)
+    %>
+    <%= f.datetime_select(:proposed_pickup_time,
+                          :default => default_pu,
+                          :ampm => true,
+                          :minute_step => 15
+    ) %>
+  <% else %>
+    <%= trip_claim.proposed_pickup_time %>
+  <% end %>
+  <% if !claim_multiple %>
+    <p><label></label><em>Requested pickup: <%= trip_ticket.requested_pickup_time.strftime('%l:%M %p') %></em></p>
+    <p><label></label><em>Earliest pickup: <%= trip_ticket.earliest_pick_up_time.try(:strftime, '%l:%M %p') || 'n/a' %></em></p>
+  <% end %>
+</div>
+<div class="field">
+  <%= f.label :proposed_fare %>
+  <% if (can?(:create, trip_claim) || can?(:edit, trip_claim)) and trip_claim.editable? %>
+    <%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
+  <% else %>
+    <%= trip_claim.proposed_fare %>
+  <% end %>
+</div>
+<div class="field">
+  <%= f.label :notes %>
+  <% if (can?(:create, trip_claim) || can?(:edit, trip_claim)) and trip_claim.editable? %>
+    <%= f.text_area :notes, rows: 5 %>
+  <% else %>
+    <%= trip_claim.notes %>
+  <% end %>
+</div>

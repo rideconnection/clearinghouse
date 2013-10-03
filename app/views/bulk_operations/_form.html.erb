@@ -1,15 +1,6 @@
 <%= form_for(@bulk_operation) do |f| %>
 
-  <% if @bulk_operation.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@bulk_operation.errors.count, "error") %> prohibited this bulk operation from being saved:</h2>
-      <ul>
-      <% @bulk_operation.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render partial: 'shared/error_explanation', locals: { object: @bulk_operation } %>
 
   <% if @bulk_operation.is_upload? %>
     <div class="field">

@@ -1,15 +1,6 @@
 <%= form_for(@form_path) do |f| %>
-  <% if @eligibility_requirement.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@eligibility_requirement.errors.count, "error") %> prohibited this group from being saved:</h2>
 
-      <ul>
-      <% @eligibility_requirement.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render partial: 'shared/error_explanation', locals: { object: @eligibility_requirement } %>
 
   <div class="field">
     <%= f.label :boolean_type, 'Comparison Type' %>

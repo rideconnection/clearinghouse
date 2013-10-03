@@ -2,10 +2,10 @@ require 'trip_tickets_filter'
 require 'provider_services_filter'
 
 class TripTicketsController < ApplicationController
-  load_and_authorize_resource :except => [:clear_filters]
+  load_and_authorize_resource :except => [:clear_filters, :claim_multiple, :create_multiple_claims]
   before_filter :compact_array_params, :only => [:create, :update]
-  before_filter :providers_for_lists, :except => [:destroy, :index, :rescind, :clear_filters]
-  before_filter :setup_locations, :except => [:index, :rescind, :clear_filters]
+  before_filter :providers_for_lists, :except => [:destroy, :index, :rescind, :clear_filters, :claim_multiple, :create_multiple_claims]
+  before_filter :setup_locations, :except => [:index, :rescind, :clear_filters, :claim_multiple, :create_multiple_claims]
 
   before_filter :only => [:create, :update] do
     allow_blank_time_field(@trip_ticket, :earliest_pick_up_time)
@@ -70,7 +70,15 @@ class TripTicketsController < ApplicationController
     @trip_ticket.originator = current_user.provider
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @trip_ticket }
+      format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/form", formats: [:html]) }.to_json }
+    end
+  end
+  
+  # GET /trip_tickets/1/edit
+  def edit
+    respond_to do |format|
+      format.html { render action: "show" }
+      format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/form", formats: [:html]) }.to_json }
     end
   end
 
@@ -86,7 +94,8 @@ class TripTicketsController < ApplicationController
         format.json { render json: @trip_ticket, status: :created, location: @trip_ticket }
       else
         format.html { render action: "new" }
-        format.json { render json: @trip_ticket.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
+        # format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/form", formats: [:html]) }.to_json }
       end
     end
   end
@@ -100,7 +109,7 @@ class TripTicketsController < ApplicationController
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @trip_ticket.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
     end
   end
@@ -125,7 +134,56 @@ class TripTicketsController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  def claim_multiple
+    selected_ids = Array(params[:trip_ticket].try(:[], :selected_ids))
+    @trip_claims = []
+    TripTicket.accessible_by(current_ability).where(id: selected_ids).select{|t| t.claimable_by?(current_user)}.each do |tt|
+      trip_claim = tt.trip_claims.new
+      trip_claim.claimant = current_user.provider
+      trip_claim.status = :pending
+      @trip_claims << trip_claim
+    end
+    
+    respond_to do |format|
+      format.html # claim_multiple.html.erb
+      format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/claim_multiple", formats: [:html]) }.to_json }
+    end
+  end
 
+  def create_multiple_claims
+    trip_ticket_ids = Array(params[:trip_claim].try(:keys))
+    trip_tickets = TripTicket.accessible_by(current_ability).where(id: trip_ticket_ids).select{|t| t.claimable_by?(current_user)}
+    
+    trip_claim_errors = false
+    @trip_claims = []
+    TripClaim.transaction do
+      trip_tickets.each do |tt|
+        trip_claim = tt.trip_claims.new(params[:trip_claim][tt.id.to_s])
+        trip_claim.claimant = current_user.provider
+        trip_claim.status = :pending
+        @trip_claims << trip_claim
+        unless trip_claim.save
+          trip_claim_errors = true
+        end
+      end
+      
+      raise ActiveRecord::Rollback if trip_claim_errors
+    end
+    
+    respond_to do |format|
+      unless trip_claim_errors
+        format.html { redirect_to trip_tickets_path, notice: 'Selected trips were successfully claimed.' }
+        format.json { head :no_content }
+      else
+        format.html { render action: "claim_multiple", alert: 'Could not save all trip claims.' }
+        format.json { render json: @trip_claims.collect(&:errors).to_json, status: :unprocessable_entity }
+        # format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/claim_multiple", formats: [:html]) }.to_json }
+      end
+    end
+    
+  end
+  
   private
   
   def setup_locations

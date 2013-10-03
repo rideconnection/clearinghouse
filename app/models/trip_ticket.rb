@@ -228,7 +228,7 @@ class TripTicket < ActiveRecord::Base
     elsif trip_status == 'Expired'
       'Unavailable'
     else
-      claim = claims_from(provider).order('created_at DESC').first
+      claim = claims_from(provider).reorder('created_at DESC').first
       if claim.try(:status) == :declined
         'Declined'
       else
