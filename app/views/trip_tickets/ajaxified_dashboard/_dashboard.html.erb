@@ -17,10 +17,12 @@
         away_threshold: 300000, // in milliseconds (5 minutes)
         refresh_paused:  false,
         idlePause: function() {
+          console.debug('background polling paused');
           dashboard.polling.refresh_paused = true;
           dashboard.resetViews($('#background_polling_paused'));
         },
         idleResume: function() {
+          console.debug('background polling resumed');
           dashboard.polling.refresh_paused = false;
           dashboard.refresh(true);
         },
@@ -275,7 +277,7 @@
 
         // TODO - move this to be a direct descendant of `dashboard`
         errorHandler: function(jqXHR) {
-          console.log('An error occurred', jqXHR);
+          console.debug('An error occurred', jqXHR);
           if (jqXHR.status == 422) {
             this.displayErrors($.parseJSON(jqXHR.responseText));
           } else if (jqXHR.status == 404) {
@@ -285,7 +287,7 @@
           } else if (jqXHR.status == 500) {
             this.display500Message();
           } else {
-            console.log('Failed to handle an unexpected error code!', jqXHR.status);
+            console.debug('Failed to handle an unexpected error code!', jqXHR.status);
           }
         },
 
@@ -929,7 +931,7 @@
 
         notfound: function(notfound){
           if(notfound) {
-            console.log("Route not implemented: " + notfound);
+            console.debug("Route not implemented: " + notfound);
           }
         },
       });
