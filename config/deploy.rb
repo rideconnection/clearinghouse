@@ -54,6 +54,8 @@ end
 before "deploy:assets:precompile", :copy_database_yml
 before "deploy:assets:precompile", :link_pids_folder
 before "deploy:assets:precompile", :link_djw_assets_folder
-after  "deploy:stop",    "delayed_job:stop"
-after  "deploy:start",   "delayed_job:start"
-after  "deploy:restart", "delayed_job:restart"
+
+# Using a cron job for this instead
+# after  "deploy:stop",    "delayed_job:stop"
+# after  "deploy:start",   "delayed_job:start"
+# after  "deploy:restart", "delayed_job:restart"
