@@ -41,11 +41,20 @@ module ApplicationHelper
     data.blank? ? "[an empty value]" : data.to_s
   end
   
-  def ajaxified_trip_ticket_path(trip_ticket)
-    trip_tickets_path(:anchor => trip_ticket_path(trip_ticket))
+  def ajaxified_trip_ticket_path(trip_ticket, opts = {})
+    opts ||= {}
+    ajaxified_trip_ticket_url(trip_ticket, opts.merge({:only_path => true}))
   end
   
-  def ajaxified_trip_ticket_url(trip_ticket)
-    trip_tickets_url(:anchor => trip_ticket_path(trip_ticket))
+  def ajaxified_trip_ticket_url(trip_ticket, opts = {})
+    # This is a hack to get around the Rails bugs defined at 
+    # https://github.com/rails/rails/issues/5122 and
+    # https://github.com/rails/rails/issues/4308
+    opts ||= {}
+    relative_url_root = opts.delete(:relative_url_root) || 
+      Clearinghouse::Application.config.relative_url_root ||
+      ""
+    trip_ticket_path = relative_url_root + trip_ticket_path(trip_ticket)
+    trip_tickets_url(opts.merge({:anchor => trip_ticket_path}))
   end
 end
