@@ -374,7 +374,7 @@
 
           // Check if refresh is required
           if (dashboard.polling.refresh_paused == false && (force || refresh_offset > dashboard.polling.refresh_rate)) {
-            dashboard.resetViews($('.content-frame'));
+            // dashboard.resetViews($('.content-frame'));
             dashboard.trip_tickets.fetch();
             dashboard.polling.last_refresh_at = new Date();
           }
@@ -601,8 +601,14 @@
         },
 
         remove: function () {
-          // dashboard.display404Message(this.model.get('id'));
-          this.$el.html('Loading...');
+          console.debug(dashboard.trip_tickets.get(dashboard.current_trip_ticket));
+          if (dashboard.trip_tickets.get(this.model) != undefined) {
+            // Ticket is still in list
+            this.$el.html('Loading...');
+          } else {
+            // Ticket is no longer in the view
+            dashboard.display404Message(this.model.get('id'));
+          }
           this.stopListening(this.model);
           this.undelegateEvents();
           return this;
