@@ -19,17 +19,26 @@
         idlePause: function() {
           console.debug('background polling paused');
           dashboard.polling.refresh_paused = true;
-          dashboard.resetViews($('#background_polling_paused'));
+          if (dashboard.current_trip_ticket) {
+            dashboard.resetViews($('#background_polling_paused'));
+          }
         },
         idleResume: function() {
           console.debug('background polling resumed');
           dashboard.polling.refresh_paused = false;
+          if (dashboard.current_trip_ticket) {
+            dashboard.resetViews($('.content-frame'));
+          }
           dashboard.refresh(true);
         },
       },
       
       multiple_select: {
         enabled: false
+      },
+      
+      error_state: {
+        current_error: null
       },
     };
     $(function () {
@@ -219,20 +228,21 @@
         },
 
         // TODO - convert this to a Backbone view
-        display404Message: function(ticket_id) {
+        display404Message: function(ticket_id, previously_selected) {
           ticket_id = ticket_id || 0;
-          dashboard.resetViews($('#resource_not_found'));
+          var selector = (!!previously_selected) ? '#selected_resource_removed' : '#requested_resource_not_found';
+          dashboard.resetViews($(selector));
           if (!!(ticket_id)) {
-            $('#resource_not_found .ticket-direct-link-wrapper')
+            $(selector + ' .ticket-direct-link-wrapper')
               .show()
               .find('a.ticket-direct-link')
               .attr('href', dashboard.root_url + '/' + ticket_id);
             var clear_filter_url = '<%= j clear_filters_trip_tickets_path %>?return_to=' + encodeURIComponent('<%= j trip_tickets_path %>#' + dashboard.root_url + '/' + ticket_id);
           } else {
-            $('#resource_not_found .ticket-direct-link-wrapper').hide();
+            $(selector + ' .ticket-direct-link-wrapper').hide();
             var clear_filter_url = '<%= j clear_filters_trip_tickets_path %>';
           }
-          $('#resource_not_found .clear-trip_ticket-filters').attr('href', clear_filter_url);
+          $(selector + ' .clear-trip_ticket-filters').attr('href', clear_filter_url);
           dashboard.current_trip_ticket = null;
         },
 
@@ -293,7 +303,6 @@
 
         saveFilters: function(e) {
           e.preventDefault();
-          // e.stopPropagation();
           var form = $(e.currentTarget);
           var data = form.find(':input').serialize();
           $.getJSON(dashboard.root_url, data, function(){
@@ -338,7 +347,8 @@
         // TODO - move this to be a direct descendant of `dashboard`
         resetViews: function($show) {
           $('.content-frame').hide();
-          $('#resource_not_found').hide();
+          $('#selected_resource_removed').hide();
+          $('#requested_resource_not_found').hide();
           $('#an_error_occurred').hide();
           $('#select_multiple_instructions').hide();
           $('#background_polling_paused').hide();
@@ -374,7 +384,6 @@
 
           // Check if refresh is required
           if (dashboard.polling.refresh_paused == false && (force || refresh_offset > dashboard.polling.refresh_rate)) {
-            // dashboard.resetViews($('.content-frame'));
             dashboard.trip_tickets.fetch();
             dashboard.polling.last_refresh_at = new Date();
           }
@@ -607,7 +616,7 @@
             this.$el.html('Loading...');
           } else {
             // Ticket is no longer in the view
-            dashboard.display404Message(this.model.get('id'));
+            dashboard.display404Message(this.model.get('id'), true);
           }
           this.stopListening(this.model);
           this.undelegateEvents();
@@ -644,28 +653,24 @@
 
         comment: function(e) {
           e.preventDefault();
-          // e.stopPropagation();
           var view = new dashboard.TripTicketCommentFormView();
           view.render();
         },
 
         claim: function(e) {
           e.preventDefault();
-          // e.stopPropagation();
           var view = new dashboard.TripTicketClaimFormView({model: this.model, claim_url: $(e.currentTarget).attr('href')});
           view.render();
         },
 
         edit: function(e) {
           e.preventDefault();
-          // e.stopPropagation();
           var view = new dashboard.EditTripTicketFormView({model: this.model});
           view.render();
         },
 
         showActivity: function(e) {
           e.preventDefault();
-          // e.stopPropagation();
           var $this = $(e.currentTarget);
           var url = null;
           if ($this.data('activity-type') == 'trip_result') {
@@ -895,10 +900,6 @@
           var root_url = dashboard.root_url.replace(/^\//, '');
           this.route(root_url, 'index');
 
-          // this.route(root_url + "/:id/trip_claims/new", 'notfound');
-          // this.route(root_url + "/:id/rescind", 'notfound');
-          // this.route(new RegExp("^" + root_url + "/"open$/root_url + "/:id", 'show');
-
           // ORDER IS IMPORTANT!
           this.route(root_url + "/:id", 'show');
           this.route(root_url + "/clear_filters", 'clearFilters');
@@ -957,15 +958,23 @@
         <br><br>
         An error occurred while processing your request.
         <br><br>
-        You can try to <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %> or <%= link_to "reload the page", "javascript:window.location.reload()" %>.
+        You can try to select another ticket, <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %> or <%= link_to "reload the page", "javascript:window.location.reload()" %>.
       </p>
     </div>
-    <div id="resource_not_found" style="display: none" class="padded">
+    <div id="selected_resource_removed" style="display: none" class="padded">
       <p style="text-align: center; font-weight: bold">
         <br><br>
-        This ticket is not available with your currently applied filters.
+        The previously selected ticket is no longer available with your currently applied filters.
         <br><br>
-        You can try to <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %><span style="display: none" class="ticket-direct-link-wrapper"> or try to <%= link_to "view the trip ticket directly", "#", class: "no-clickify ticket-direct-link", style: "text-decoration: underline" %></span>.
+        You can select another ticket, try to <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %><span style="display: none" class="ticket-direct-link-wrapper">, or try to <%= link_to "view the previous trip ticket directly", "#", class: "no-clickify ticket-direct-link", style: "text-decoration: underline" %></span>.
+      </p>
+    </div>
+    <div id="requested_resource_not_found" style="display: none" class="padded">
+      <p style="text-align: center; font-weight: bold">
+        <br><br>
+        The requested ticket is not available with your currently applied filters.
+        <br><br>
+        You can select another ticket, try to <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %><span style="display: none" class="ticket-direct-link-wrapper">, or try to <%= link_to "view the requested trip ticket directly", "#", class: "no-clickify ticket-direct-link", style: "text-decoration: underline" %></span>.
       </p>
     </div>
     <div id="select_multiple_instructions" style="display: none" class="padded">
