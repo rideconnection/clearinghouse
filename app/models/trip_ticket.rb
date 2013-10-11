@@ -320,7 +320,8 @@ class TripTicket < ActiveRecord::Base
       trip_ticket_comments.accessible_by(ability).all +
       [trip_result.present? && trip_result.id.present? && ability.can?(:read, trip_result) ? trip_result : nil] +
       audits.where(action: 'update').where("audited_changes LIKE '%rescinded:%'") +
-      (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes LIKE '%expired:%'") : [])
+      (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes LIKE '%expired:%'") : []) +
+      (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes NOT LIKE '%expired:%' AND audited_changes NOT LIKE '%rescinded:%'") : [])
     ).compact.sort_by(&:created_at)
   end
 
