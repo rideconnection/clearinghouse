@@ -31,6 +31,15 @@
           }
           dashboard.refresh(true);
         },
+        supportsIdleJs: function(){
+          // See: https://github.com/shawnmclean/Idle.js/issues/7
+          return !$.browser.msie || parseInt($.browser.version) > 8;
+        },
+        supportsVisible: function(){
+          // Idle.js interprets page navigation in Firefox as being "away"
+          // See: https://github.com/shawnmclean/Idle.js/issues/9
+          return dashboard.polling.supportsIdleJs() && !$.browser.mozilla;
+        },
       },
       
       multiple_select: {
@@ -115,10 +124,10 @@
           
           // Start the idle tracker to pause background polling when not needed
           dashboard.polling.idler = new Idle({
-            onHidden:    dashboard.polling.idlePause,
-            onAway:      dashboard.polling.idlePause,
-            onVisible:   dashboard.polling.idleResume,
-            onAwayBack:  dashboard.polling.idleResume,
+            onAway:      dashboard.polling.supportsIdleJs()  ? dashboard.polling.idlePause  : jQuery.noop,
+            onAwayBack:  dashboard.polling.supportsIdleJs()  ? dashboard.polling.idleResume : jQuery.noop,
+            onHidden:    dashboard.polling.supportsVisible() ? dashboard.polling.idlePause  : jQuery.noop,
+            onVisible:   dashboard.polling.supportsVisible() ? dashboard.polling.idleResume : jQuery.noop,
             awayTimeout: dashboard.polling.away_threshold,
           });
 
