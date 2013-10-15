@@ -95,7 +95,6 @@ class TripTicketsController < ApplicationController
       else
         format.html { render action: "new" }
         format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
-        # format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/form", formats: [:html]) }.to_json }
       end
     end
   end
@@ -111,18 +110,6 @@ class TripTicketsController < ApplicationController
         format.html { render action: "edit" }
         format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
-    end
-  end
-
-  # DELETE /trip_tickets/1
-  # DELETE /trip_tickets/1.json
-  # TODO: remove, not used
-  def destroy
-    @trip_ticket.destroy
-
-    respond_to do |format|
-      format.html { redirect_to trip_tickets_url }
-      format.json { head :no_content }
     end
   end
 
@@ -178,7 +165,6 @@ class TripTicketsController < ApplicationController
       else
         format.html { render action: "claim_multiple", alert: 'Could not save all trip claims.' }
         format.json { render json: @trip_claims.collect(&:errors).to_json, status: :unprocessable_entity }
-        # format.json { render json: { rendered_partial: render_to_string(partial: "trip_tickets/claim_multiple", formats: [:html]) }.to_json }
       end
     end
     

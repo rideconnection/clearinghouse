@@ -8,7 +8,6 @@ class FiltersController < ApplicationController
     respond_to do |format|
       format.html
       format.json { render json: @filter }
-      format.js
     end
   end
 
