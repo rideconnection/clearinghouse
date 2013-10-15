@@ -324,6 +324,19 @@ class TripTicket < ActiveRecord::Base
       (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes NOT LIKE '%expired:%' AND audited_changes NOT LIKE '%rescinded:%'") : [])
     ).compact.sort_by(&:created_at)
   end
+  
+  def audits_with_associated
+    # The Audited gem includes methods to associate records of parent and child
+    # records, but it doesn't work with polymorphic associations, so we'll 
+    # mimic it here.
+    # See: https://github.com/collectiveidea/audited#associated-audits
+    (
+      self.audits +
+      customer_address.audits.where(action: 'update') +
+      pick_up_location.audits.where(action: 'update') +
+      drop_off_location.audits.where(action: 'update')
+    ).compact.sort_by(&:created_at)
+  end
 
   protected
 

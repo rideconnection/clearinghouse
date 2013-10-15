@@ -1,6 +1,8 @@
 class Location < ActiveRecord::Base
   attr_accessible :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude
   validates_presence_of :address_1, :city, :state, :zip
+  
+  audited
 
   attr_writer :latitude, :longitude
 
