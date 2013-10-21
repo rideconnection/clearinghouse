@@ -72,7 +72,7 @@
     </div>
     <% if can? :edit, @trip_ticket %>
       <%= f.fields_for :customer_address do |af| %>
-        <%= render 'locations/address_form', { :f => af, required_fields: true } %>
+        <%= render 'locations/address_form', { :f => af, required_fields: false } %>
       <% end %>
     <% else %>
       <%= render 'locations/show_fields', :location => @trip_ticket.customer_address %>

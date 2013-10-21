@@ -5,7 +5,7 @@ class TripTicketsController < ApplicationController
   load_and_authorize_resource :except => [:clear_filters, :claim_multiple, :create_multiple_claims]
   before_filter :compact_array_params, :only => [:create, :update]
   before_filter :providers_for_lists, :except => [:destroy, :index, :rescind, :clear_filters, :claim_multiple, :create_multiple_claims]
-  before_filter :setup_locations, :except => [:index, :rescind, :clear_filters, :claim_multiple, :create_multiple_claims]
+  before_filter :setup_locations, :only => [:show, :new, :edit]
 
   before_filter :only => [:create, :update] do
     allow_blank_time_field(@trip_ticket, :earliest_pick_up_time)
@@ -93,6 +93,7 @@ class TripTicketsController < ApplicationController
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully created.' }
         format.json { render json: @trip_ticket, status: :created, location: @trip_ticket }
       else
+        setup_locations
         format.html { render action: "new" }
         format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
@@ -107,6 +108,7 @@ class TripTicketsController < ApplicationController
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully updated.' }
         format.json { head :no_content }
       else
+        setup_locations
         format.html { render action: "edit" }
         format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_ticket }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
