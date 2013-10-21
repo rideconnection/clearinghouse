@@ -15,6 +15,7 @@ module NotificationRecipients
 
   NOTIFICATION_TYPES = {
       trip_created:         'Partner creates a trip ticket',
+      trip_updated:         'Partner updates a trip ticket',
       trip_rescinded:       'Claimed trip ticket rescinded',
       trip_expired:         'Claimed trip ticket expired',
       claim_for_approval:   'New trip claim awaiting approval',

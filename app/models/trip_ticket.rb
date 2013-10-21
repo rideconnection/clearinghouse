@@ -79,6 +79,12 @@ class TripTicket < ActiveRecord::Base
       notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
       notify ->(opts){ originator_and_claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
     end
+    after_update do
+      notify ->(opts){ partner_users(self, opts) }, if: proc{
+          !(rescinded_changed? && rescinded?) &&
+          !(expired_changed? && expired?)
+      }, method: :trip_updated
+    end
   end
 
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
