@@ -33,6 +33,7 @@
               </thead>
               <tbody>
                 <% audit.audited_changes.each do |attribute, change| %>
+                  <% next if change[0].blank? && change[1].blank? %>
                   <tr>
                     <td><%= attribute.humanize %></td>
                     <td><%= formatted_audit_attribute attribute, change[0] %></td>
