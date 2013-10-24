@@ -1000,3 +1000,12 @@ input[type=submit] {
   padding:0 0 0 4px;
 }
 */
+
+table.activity-list td {
+  vertical-align: top;
+  padding-bottom: 10px;
+}
+
+table.activity-list td.activity-info {
+  width: 60px;
+}

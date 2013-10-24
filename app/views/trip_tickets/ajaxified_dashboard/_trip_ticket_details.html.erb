@@ -152,11 +152,11 @@
       <div class="heading">
         <h2>Activity</h2>
       </div>
-      <ul class="activity-list">
+      <table class="activity-list">
         <% trip_ticket.activities_accessible_by(current_ability).each do |activity| %>
           <%= render 'trip_tickets/ajaxified_dashboard/trip_ticket_activity', :activity => activity %>
         <% end %>
-      </ul>
+      </table>
     </div>
   </div>
 </div>

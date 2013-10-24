@@ -68,7 +68,11 @@ module TripTicketsHelper
     else
       ""
     end
-    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
+    raw(
+      "<td class='activity-info' title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p")}</td>" +
+      "<td class='activity-info'>#{activity.created_at.strftime("%b %d")}</td>" + 
+      "<td>#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}</td>"
+    )
   end
   
   def formatted_activity_type(activity)
