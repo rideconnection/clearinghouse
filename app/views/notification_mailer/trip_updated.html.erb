@@ -1,0 +1,31 @@
+A Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %> was just updated:<br><br>
+<table>
+  <caption>Trip Ticket Summary</caption>
+  <tbody>
+    <tr>
+      <th>Originator</th>
+      <td><%= @trip_ticket.originator.name %></td>
+    </tr>
+    <tr>
+      <th>Appointment Time</th>
+      <td><%= @trip_ticket.appointment_time %></td>
+    </tr>
+    <tr>
+      <th>Pickup</th>
+      <td><%= @trip_ticket.requested_pickup_time %><%= " in #{@trip_ticket.pick_up_location.city}, #{@trip_ticket.pick_up_location.state}" if @trip_ticket.pick_up_location.present? %></td>
+    </tr>
+    <tr>
+      <th>Drop-off</th>
+      <td><%= @trip_ticket.requested_drop_off_time %><%= " in #{@trip_ticket.drop_off_location.city}, #{@trip_ticket.drop_off_location.state}" if @trip_ticket.drop_off_location.present? %></td>
+    </tr>
+    <tr>
+      <th>Seats Required</th>
+      <td><%= @trip_ticket.customer_seats_required %></td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<%= link_to 'Full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %>
+<br><br>
+You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.
+To stop receiving notification emails, please <%= link_to 'update your user preferences', preferences_url %>.

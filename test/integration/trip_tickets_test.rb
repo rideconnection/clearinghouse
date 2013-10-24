@@ -1758,13 +1758,6 @@ class TripTicketsTest < ActionController::IntegrationTest
       fill_in "Customer ID", :with => "ABC123"
     end
 
-    within('#customer') do
-      fill_in 'Address Line 1', :with => '123 Some Place'
-      fill_in 'City', :with => 'Some City'
-      fill_in 'State', :with => 'ST'
-      fill_in 'Postal Code', :with => '12345'
-    end
-    
     within('#pick_up_location') do
       fill_in 'Address Line 1', :with => '456 Some Place'
       fill_in 'City', :with => 'Some City'

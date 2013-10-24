@@ -53,5 +53,4 @@ class ActiveSupport::TestCase
     msg.to.must_equal to.is_a?(String) ? to.split(/,\s*/) : to
     msg.subject.must_equal subject
   end
-
 end

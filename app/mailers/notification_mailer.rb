@@ -8,6 +8,11 @@ class NotificationMailer < ActionMailer::Base
     mail(:to => recipients,  :subject => "Ride Connection Clearinghouse: new trip ticket")
   end
 
+  def trip_updated(recipients, trip)
+    @trip_ticket = trip
+    mail(:to => recipients,  :subject => "Ride Connection Clearinghouse: trip ticket updated")
+  end
+
   def trip_rescinded(recipients, trip)
     @trip_ticket = trip
     mail(:to => recipients,  :subject => "Ride Connection Clearinghouse: claimed trip ticket rescinded")

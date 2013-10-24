@@ -66,7 +66,8 @@ class TripTicket < ActiveRecord::Base
     :customer_mobility_factors, :customer_service_animals, :trip_funders,
     :provider_white_list, :provider_black_list, :expire_at, :expired
   
-  accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
+  accepts_nested_attributes_for :pick_up_location, :drop_off_location, :trip_result
+  accepts_nested_attributes_for :customer_address, :reject_if => :all_blank
 
   audited
 
@@ -77,6 +78,12 @@ class TripTicket < ActiveRecord::Base
     after_save do
       notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
       notify ->(opts){ originator_and_claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
+    end
+    after_update do
+      notify ->(opts){ partner_users(self, opts) }, if: proc{
+          !(rescinded_changed? && rescinded?) &&
+          !(expired_changed? && expired?)
+      }, method: :trip_updated
     end
   end
 
@@ -95,7 +102,7 @@ class TripTicket < ActiveRecord::Base
   validates :appointment_time, :timeliness => {:type => :datetime}
   validates :earliest_pick_up_time, :timeliness => {:type => :time, :allow_blank => true}
   validates :expire_at, :timeliness => {:type => :datetime, :allow_blank => true}
-
+  
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
       trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"

@@ -14,6 +14,6 @@ class BulkOperation < ActiveRecord::Base
   end
 
   def self.make_file_name
-    "ride_clearinghouse_download-#{Time.zone.now.strftime("%Y%m%d-%H%M%S")}.csv"
+    "clearinghouse_download_#{Time.zone.now.strftime("%Y%m%d_%H%M%S")}.csv"
   end
 end

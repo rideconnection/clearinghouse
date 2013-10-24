@@ -15,7 +15,6 @@ FactoryGirl.define do
     requested_pickup_time { (appointment_time - 45.minutes).to_s(:time_utc) }
     scheduling_priority "pickup"
     association :originator, :factory => :provider
-    association :customer_address, :factory => :location
     association :pick_up_location, :factory => :location
     association :drop_off_location, :factory => :location
   end

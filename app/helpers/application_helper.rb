@@ -23,10 +23,20 @@ module ApplicationHelper
     end
   end
 
+  def current_page_or_sub?(options)
+    url_string = CGI.unescapeHTML(url_for(options))
+    if url_string.index("?")
+      request_url = request.fullpath
+    else
+      request_url = request.fullpath.split('?').first
+    end
+    request_url.starts_with?(url_string)
+  end
+  
   def main_nav_helper(title, path, li_class = nil)
     opts = { :class => li_class } if li_class.present?
     content_tag(:li, opts) do
-      link_to_unless_current(title, path) do
+      link_to_unless(current_page_or_sub?(path), title, path) do
         link_to(title, path, :class => "active")
       end
     end

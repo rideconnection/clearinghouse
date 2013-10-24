@@ -40,11 +40,17 @@ class TripTicketExportTest < ActiveSupport::TestCase
       exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
       exporter.data.must_match /,originator_name[^\w]/
       exporter.data.must_match /,originator_address_city[^\w]/
-      exporter.data.must_match /,customer_address_city[^\w]/
       exporter.data.must_match /,pick_up_location_city[^\w]/
       exporter.data.must_match /,drop_off_location_city[^\w]/
       exporter.data.must_match /,trip_result_driver_id[^\w]/
       exporter.data.must_match /,_a_driver_[^\w]/
+    end
+
+    it "expands trips to include optional nested models, when present" do
+      @trip_ticket1.customer_address = FactoryGirl.create(:location)
+      @trip_ticket1.save
+      exporter = TripTicketExport.new.tap {|x| x.process(TripTicket.all) }
+      exporter.data.must_match /,customer_address_city[^\w]/
     end
 
     it "should export arrays in postgresql format" do

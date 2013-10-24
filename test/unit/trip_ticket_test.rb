@@ -836,7 +836,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert trip_ticket.valid?
     end
   end
-  
+
   describe "notifications" do
     setup do
       @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
@@ -864,11 +864,28 @@ class TripTicketTest < ActiveSupport::TestCase
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: new trip ticket')
     end
   
+    it "should notify all partner users when a trip is updated" do
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        @trip_ticket.update_attributes(customer_first_name: @trip_ticket.customer_first_name.reverse)
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket updated')
+    end
+  
     it "should notify all claimant users when a trip is rescinded" do
       assert_difference 'ActionMailer::Base.deliveries.size', +1 do
         @trip_ticket.rescind!
       end
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket rescinded')
+    end
+  
+    it "should not notify all claimant that the trip was updated when a trip is rescinded" do
+      # We still expect at least one notification
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        @trip_ticket.rescind!
+      end
+      msg = ActionMailer::Base.deliveries.last
+      msg.wont_be_nil
+      msg.subject.wont_equal 'Ride Connection Clearinghouse: trip ticket updated'      
     end
   
     it "should notify all originator and claimant users when a trip expires" do
@@ -880,5 +897,18 @@ class TripTicketTest < ActiveSupport::TestCase
       end
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: claimed trip ticket expired')
     end
+
+    it "should not notify all claimant that the trip was updated when a trip expires" do
+      # We still expect at least one notification
+      @trip_ticket.update_attributes(expire_at: 2.days.ago)
+      Timecop.freeze(1.days.ago) do
+        assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+          TripTicket.expire_tickets!
+        end
+      end
+      msg = ActionMailer::Base.deliveries.last
+      msg.wont_be_nil
+      msg.subject.wont_equal 'Ride Connection Clearinghouse: trip ticket updated'      
+    end  
   end
 end

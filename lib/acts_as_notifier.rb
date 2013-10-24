@@ -52,7 +52,8 @@ module ActsAsNotifier
 
     included do
       after_create :notifier_create_handler
-      after_save :notifier_save_handler
+      after_save   :notifier_save_handler
+      after_update :notifier_update_handler
     end
 
     # find a notification action matching options and trigger it, ignoring conditions
@@ -70,6 +71,10 @@ module ActsAsNotifier
 
     def notifier_save_handler
       notifier_handler(:after_save) unless ActsAsNotifier::Config.disabled
+    end
+
+    def notifier_update_handler
+      notifier_handler(:after_update) unless ActsAsNotifier::Config.disabled
     end
 
     def notifier_handler(callback_type)
@@ -163,6 +168,11 @@ module ActsAsNotifier
 
     def after_save(&block)
       @current_callback_type = :after_save
+      instance_eval(&block)
+    end
+
+    def after_update(&block)
+      @current_callback_type = :after_update
       instance_eval(&block)
     end
 
