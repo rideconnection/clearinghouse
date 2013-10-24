@@ -57,7 +57,15 @@ module TripTicketsHelper
     else
       activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize
     end
-    activity_action = activity.is_a?(TripResult) ? activity.outcome : ''
+
+    activity_action = case activity
+      when TripResult 
+        activity.outcome
+      when Audited::Adapters::ActiveRecord::Audit
+        activity.try(:auditable_type).to_s.titleize
+      else
+        ""
+    end
 
     activity_user = if activity.respond_to?(:user)
       activity.user.try(:display_name)
