@@ -271,6 +271,22 @@ class TripTicketTest < ActiveSupport::TestCase
       refute_includes results, u4
     end
     
+    it "audits changes to itself and its location" do
+      ticket = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
+    
+      assert_equal 1, ticket.audits_with_associated.length
+
+      ticket.customer_first_name = "Charles"
+      ticket.save!
+      assert_equal 2, ticket.audits_with_associated.length
+
+      location = ticket.pick_up_location
+      location.address_1 = "7000 5000th Avenue"
+      location.save!
+      ticket.reload
+      assert_equal 3, ticket.audits_with_associated.length
+    end
+
     it "has a filter_by_customer_address_or_phone method that matches on the customer address association's address_1 or address_2, or on the customer's primary or emergency phone numbers" do
       l1 = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Oak Street", :address_2 => ""))
       l2 = FactoryGirl.create(:trip_ticket, :customer_address => FactoryGirl.create(:location, :address_1 => "Some Street", :address_2 => "Oak Suite"))

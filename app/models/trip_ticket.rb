@@ -314,15 +314,12 @@ class TripTicket < ActiveRecord::Base
   end
   
   def activities_accessible_by(ability)
-    (
-      [audits.first] +
+    audit_trail = audits_with_associated +
       trip_claims.accessible_by(ability).all +
       trip_ticket_comments.accessible_by(ability).all +
-      [trip_result.present? && trip_result.id.present? && ability.can?(:read, trip_result) ? trip_result : nil] +
-      audits.where(action: 'update').where("audited_changes LIKE '%rescinded:%'") +
-      (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes LIKE '%expired:%'") : []) +
-      (ability.can?(:edit, self) ? audits.where(action: 'update').where("audited_changes NOT LIKE '%expired:%' AND audited_changes NOT LIKE '%rescinded:%'") : [])
-    ).compact.sort_by(&:created_at)
+      [trip_result_for(ability)]
+    
+    audit_trail.compact.sort_by(&:created_at)
   end
   
   def audits_with_associated
@@ -331,7 +328,8 @@ class TripTicket < ActiveRecord::Base
     # mimic it here.
     # See: https://github.com/collectiveidea/audited#associated-audits
     (
-      self.audits +
+      [self.audits.first] + 
+      audits.where(action: 'update') +
       customer_address.audits.where(action: 'update') +
       pick_up_location.audits.where(action: 'update') +
       drop_off_location.audits.where(action: 'update')
@@ -339,6 +337,13 @@ class TripTicket < ActiveRecord::Base
   end
 
   protected
+
+  def trip_result_for(ability)
+    present = trip_result.present? && trip_result.id.present?
+    if present && ability.can?(:read, trip_result) 
+      trip_result
+    end
+  end
 
   def can_be_rescinded
     errors.add(:rescinded, "status may not be changed on resolved trip tickets") unless rescindable?
