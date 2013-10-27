@@ -244,12 +244,13 @@
 
 footer {
   @include clearfix;
-  background:#ccc;
-  border-top:2px solid #707070;
+  background: #ccc;
+  border-top: 2px solid #707070;
+  border-bottom: 2px solid #707070;
   height: 100px;
-  margin-top:20px;
-  padding:10px;
-  text-align:center;
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
 }
 
 p.error {

@@ -323,6 +323,7 @@ body[data-controller="trip_tickets"] {
 
               &.rescinded       { color: gray }
               &.expired         { color: gray }
+              &.no_claims       { color: gray }
               &.unavailable     { color: gray }
               &.declined        { color: gray }
               &.pending         { color: blue }
