@@ -33,6 +33,10 @@ class TripClaimsController < ApplicationController
 
   # GET /trip_claims/1/edit
   def edit
+    respond_to do |format|
+      format.html 
+      format.json { render json: {rendered_partial: render_to_string(partial: "popup_form", locals: { object: @trip_claim }, formats: [:html])}.to_json }
+    end
   end
 
   # POST /trip_claims

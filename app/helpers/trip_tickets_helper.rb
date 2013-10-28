@@ -76,10 +76,19 @@ module TripTicketsHelper
     else
       ""
     end
+
+    description = "#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
+
+    if activity.is_a?(TripClaim) and can?(:rescind, activity) and activity.editable?
+      rescind_link = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+      edit_link = edit_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+      description = link_to(description, edit_link, {class: "claim-rescind no-clickify", data: {rescind: rescind_link}})
+    end
+
     raw(
       "<td class='activity-info' title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p")}</td>" +
       "<td class='activity-info'>#{activity.created_at.strftime("%b %d")}</td>" + 
-      "<td>#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}</td>"
+      "<td>#{description}</td>"
     )
   end
   
