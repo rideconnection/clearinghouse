@@ -335,7 +335,7 @@ class TripTicket < ActiveRecord::Base
     # mimic it here.
     # See: https://github.com/collectiveidea/audited#associated-audits
     (
-      [self.audits.first] + 
+      [audits.first] + 
       audits.where(action: 'update') +
       customer_address.audits.where(action: 'update') +
       pick_up_location.audits.where(action: 'update') +

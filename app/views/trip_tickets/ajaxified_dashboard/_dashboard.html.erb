@@ -601,6 +601,7 @@
           'click a.activity-claim'   : 'claim',
           'click a.activity-edit'    : 'edit',
           'click a.claim-rescind'    : 'rescindClaim',
+          'click a.claim-approve'    : 'approveClaim',
           'click .activity-list a'   : 'showActivity',
         },
 
@@ -678,6 +679,17 @@
             model: this.model, 
             claim_url: $(e.currentTarget).attr('href'),
             rescind_url: $(e.currentTarget).attr('data-rescind'),
+          });
+          view.render();
+        },
+
+        approveClaim: function(e) {
+          e.preventDefault();
+          var view = new dashboard.ApproveTripClaimFormView({
+            model: this.model, 
+            claim_url: $(e.currentTarget).attr('href'),
+            approve_url: $(e.currentTarget).attr('data-approve'),
+            decline_url: $(e.currentTarget).attr('data-decline'),
           });
           view.render();
         },
@@ -817,7 +829,73 @@
         },
       });
 
-      // Edit Trip Claim Form View
+      // Approve Trip Claim Form View
+      // ---------------
+      dashboard.ApproveTripClaimFormView = Backbone.View.extend({
+        tagName:  'div',
+        className: 'form-holder',
+
+        initialize: function() {
+          this.listenTo(Backbone, "ApproveTripClaimForm:submit", this.submit);
+        },
+
+        render: function () {
+          var _this = this;
+          $.getJSON(this.options.claim_url, function(data){
+            _this.$el.html(data.rendered_partial).dialog({
+              title: "Update Claim",
+              width: 625,
+              modal: true,
+              draggable: false,
+              resizable: false,
+              buttons: {
+                Approve: function() {
+                  if (window.confirm('Are you sure you want to APPROVE this claim?')) {
+                    Backbone.trigger('ApproveTripClaimForm:submit', 'approve');
+                  }
+                },
+                Decline: function() {
+                  if (window.confirm('Are you sure you want to DECLINE this claim?')) {
+                    Backbone.trigger('ApproveTripClaimForm:submit', 'decline');
+                  }
+                },
+                Cancel: function() {
+                  $(this).dialog('close');
+                }
+              },
+              create: function() {
+                $(this).find('.buttons-holder').remove();
+              },
+              close: function() {
+                $(this).dialog('destroy');
+                _this.remove();
+              },
+            });
+          })
+          .fail(function(jqXHR) {
+            dashboard.errorHandler(jqXHR);
+          });
+        },
+
+        submit: function(action) {
+          var actionURL = (action == "approve") ? this.options.approve_url : this.options.decline_url;
+          var _this = this;
+          var form = this.$('form').first();
+          $.post(
+            actionURL,
+            // form.find(':input').serialize(),
+            function(data, status, jqXHR) {
+              dashboard.trip_tickets.fetch();
+              _this.$el.dialog('close');
+            },
+            'json'
+          ).fail(function(jqXHR) {
+            dashboard.errorHandler(jqXHR);
+          });
+        },
+      });
+
+      // Rescind Trip Claim Form View
       // ---------------
       dashboard.RescindTripClaimFormView = Backbone.View.extend({
         tagName:  'div',

@@ -38,6 +38,7 @@ Clearinghouse::Application.routes.draw do
         post 'approve'
         post 'decline'
         post 'rescind'
+        get 'popup_info'
       end
     end
     

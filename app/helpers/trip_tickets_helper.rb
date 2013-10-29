@@ -70,7 +70,7 @@ module TripTicketsHelper
     activity_user = if activity.respond_to?(:user)
       activity.user.try(:display_name)
     elsif activity.is_a?(TripClaim)
-      activity.claimant.name
+      activity.claimant.name + " (#{activity.status})"
     elsif activity.respond_to?(:auditable)
       activity.audits.first.try(:user).try(:display_name)
     else
@@ -79,10 +79,17 @@ module TripTicketsHelper
 
     description = "#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
 
-    if activity.is_a?(TripClaim) and can?(:rescind, activity) and activity.editable?
-      rescind_link = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
-      edit_link = edit_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
-      description = link_to(description, edit_link, {class: "claim-rescind no-clickify", data: {rescind: rescind_link}})
+    if activity.is_a?(TripClaim) && activity.editable?
+      edit_link = popup_info_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+
+      if can?(:rescind, activity) 
+        rescind_link = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        description = link_to(description, edit_link, {:class => "claim-rescind no-clickify", "data" => {rescind: rescind_link}})
+      elsif can?(:approve, activity) && can?(:decline, activity)
+        approve_link = approve_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        decline_link = decline_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        description = link_to(description, edit_link, {:class => "claim-approve no-clickify", "data" => {approve: approve_link, decline: decline_link}})
+      end
     end
 
     raw(

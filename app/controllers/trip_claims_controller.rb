@@ -1,6 +1,7 @@
 class TripClaimsController < ApplicationController
   load_and_authorize_resource :trip_ticket
   load_and_authorize_resource :trip_claim, :through => :trip_ticket
+  skip_authorize_resource :trip_claim, :only => :popup_info
   
   # GET /trip_claims
   # GET /trip_claims.json
@@ -35,7 +36,13 @@ class TripClaimsController < ApplicationController
   def edit
     respond_to do |format|
       format.html 
-      format.json { render json: {rendered_partial: render_to_string(partial: "popup_form", locals: { object: @trip_claim }, formats: [:html])}.to_json }
+    end
+  end
+
+  def popup_info
+    respond_to do |format|
+      data = render_to_string(partial: "popup_form", locals: { object: @trip_claim }, formats: [:html])
+      format.json { render json: {rendered_partial: data }.to_json }
     end
   end
 
