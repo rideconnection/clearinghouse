@@ -69,7 +69,6 @@
 
         // Delegated events for dashboard-wide actions
         events: {
-          /* 'change form.form-filter :input': 'changeFilters', */
           'submit form.form-filter': 'saveFilters',
           'click .actions-list-holder .action-select-multiple': 'toggleSelectMultiple',
           'click .actions-list-holder .multiple-select-claim-selected': 'claimSelected',
@@ -318,27 +317,6 @@
           }
         },
 
-        /*
-        // We don't need this anymore because we're just returning partials from the controller,
-        // but I want to check this in at least once since this comparison method may
-        // be useful in the future.
-        changeFilters: function(e) {
-          var form_filters = null, cookie_filters = null, last_used_filter = null;
-          try { form_filters = $(".form-filter :input").serializeJSON().trip_ticket_filters; } catch(e) {}
-          try { cookie_filters = $.cookie("last_used_filters").trip_ticket_filters; } catch(e) {}
-          try { last_used_filter = $.cookie("last_used_filters").last_used_filter; } catch(e) {}
-          
-          if (form_filters && cookie_filters && !_.isEqual(form_filters, cookie_filters)) {
-            if (last_used_filter) {
-              // Show the update filter form
-            }
-            else {
-              // Show the save filter form
-            }
-          }
-        },
-        */
-        
         saveFilters: function(e) {
           e.preventDefault();
           var form = $(e.currentTarget);
