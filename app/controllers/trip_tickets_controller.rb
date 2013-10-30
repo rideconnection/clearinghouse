@@ -2,7 +2,7 @@ require 'trip_tickets_filter'
 require 'provider_services_filter'
 
 class TripTicketsController < ApplicationController
-  load_and_authorize_resource :except => [:clear_filters, :claim_multiple, :create_multiple_claims]
+  load_and_authorize_resource :except => [:clear_filters, :apply_filters, :claim_multiple, :create_multiple_claims]
   before_filter :compact_array_params, :only => [:create, :update]
   before_filter :providers_for_lists, :except => [:destroy, :index, :rescind, :clear_filters, :claim_multiple, :create_multiple_claims]
   before_filter :setup_locations, :only => [:show, :new, :edit]
@@ -21,9 +21,9 @@ class TripTicketsController < ApplicationController
   # GET /trip_tickets
   # GET /trip_tickets.json
   def index
+    restore_last_used_filters
     apply_requested_saved_filter
-    restore_or_save_last_used_filters
-
+    
     @providers_for_filters = Provider.accessible_by(current_ability)
     @trip_tickets = trip_tickets_filter(@trip_tickets, current_user.provider)
 
@@ -46,11 +46,27 @@ class TripTicketsController < ApplicationController
   # to be easier in the long run since we need to both redirect here from the
   # FiltersController, and send AJAX requests here from the dashboard.
   def clear_filters
-    params[:trip_ticket_filters] = 'clear'
-    save_last_used_filters
+    cookies.delete(:last_used_filters)
+    
     return_to = params[:return_to] || trip_tickets_url
     respond_to do |format|
       format.html { redirect_to return_to, notice: 'Trip ticket filters cleared.' }
+      format.json { head :no_content }
+    end    
+  end
+
+  # GET /trip_tickets/apply_filters
+  # GET /trip_tickets/apply_filters.json
+  # While it isn't optimal to be changing state via a GET request, it is going
+  # to be easier in the long run since we need to both redirect here from the
+  # FiltersController, and send AJAX requests here from the dashboard.
+  def apply_filters
+    apply_requested_saved_filter
+    save_last_used_filters
+
+    return_to = params[:return_to] || trip_tickets_url
+    respond_to do |format|
+      format.html { redirect_to return_to }
       format.json { head :no_content }
     end    
   end
@@ -199,27 +215,9 @@ class TripTicketsController < ApplicationController
     end
   end
 
-  def restore_or_save_last_used_filters
-    if params[:trip_ticket_filters].present? || params[:saved_filter].present?
-      save_last_used_filters
-    else
-      restore_last_used_filters
-      apply_requested_saved_filter
-    end
-  end
-
   def save_last_used_filters
-    if params[:trip_ticket_filters] == 'clear'
-      # TODO - Move this into the clear_filters action - all requests to clear
-      # filters should be handled by that method now so that we can redirect
-      # properly afterward.
-      logger.debug "Clearing last_used_filters cookie"
-      cookies.delete(:last_used_filters)
-      params[:trip_ticket_filters] = nil
-    else
-      # TODO - Ideally saving a new filter should redirect back to the index
-      # action so that we don't have a messy URL on redisplay, mainly for
-      # vanity sake with the AJAX dashboard and it's hashbang URL scheme.
+    # This shouldn't ever be true, but just in case
+    unless params[:trip_ticket_filters] == 'clear'
       values = {}
       values[:trip_ticket_filters] = params[:trip_ticket_filters] if params[:trip_ticket_filters].present?
       values[:saved_filter] = params[:saved_filter] if params[:saved_filter].present?

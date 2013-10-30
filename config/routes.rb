@@ -28,6 +28,7 @@ Clearinghouse::Application.routes.draw do
     get 'claim_multiple', :on => :collection
     post 'create_multiple_claims', :on => :collection
     get 'clear_filters', :on => :collection
+    get 'apply_filters', :on => :collection
     post 'search', :on => :collection    
     member do
       post 'rescind'
