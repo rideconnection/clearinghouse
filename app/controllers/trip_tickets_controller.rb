@@ -51,7 +51,11 @@ class TripTicketsController < ApplicationController
     return_to = params[:return_to] || trip_tickets_url
     respond_to do |format|
       format.html { redirect_to return_to, notice: 'Trip ticket filters cleared.' }
-      format.json { head :no_content }
+      format.json { render json: {
+        saved_filter_form: {
+          rendered_partial: view_context.filter_mini_form("Save current filters")
+        }
+      }.to_json }
     end    
   end
 
@@ -66,8 +70,13 @@ class TripTicketsController < ApplicationController
 
     return_to = params[:return_to] || trip_tickets_url
     respond_to do |format|
+      
       format.html { redirect_to return_to }
-      format.json { head :no_content }
+      format.json { render_with_format json: {
+        saved_filter_form: {
+          rendered_partial: view_context.filter_mini_form(@filter.present? ? "Update saved filter" : "Save current filters")
+        }
+      }.to_json }
     end    
   end
 

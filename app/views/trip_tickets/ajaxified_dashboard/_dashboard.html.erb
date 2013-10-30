@@ -49,9 +49,15 @@
       error_state: {
         current_error: null
       },
+      
+      filters : {
+        savedFilterForm: null
+      },
     };
     $(function () {
       'use strict';
+      
+      $.cookie.json = true
       
       // The Application
       // ---------------
@@ -63,6 +69,7 @@
 
         // Delegated events for dashboard-wide actions
         events: {
+          /* 'change form.form-filter :input': 'changeFilters', */
           'submit form.form-filter': 'saveFilters',
           'click .actions-list-holder .action-select-multiple': 'toggleSelectMultiple',
           'click .actions-list-holder .multiple-select-claim-selected': 'claimSelected',
@@ -81,6 +88,7 @@
           dashboard.displayErrors = this.displayErrors;
           dashboard.display404Message = this.display404Message;
           dashboard.display500Message = this.display500Message;
+          dashboard.resetSavedFilterForm = this.resetSavedFilterForm;
           dashboard.errorHandler = this.errorHandler;
           dashboard.resetViews = this.resetViews;
           dashboard.resetForm = this.resetForm;
@@ -106,7 +114,7 @@
 
           // Setup our cross-browser local storage object for state tracking
           dashboard.localStorage = $.jStorage;
-
+          
           // Find our initial state
           if (
             window.location.hash.length && 
@@ -310,12 +318,34 @@
           }
         },
 
+        /*
+        // We don't need this anymore because we're just returning partials from the controller,
+        // but I want to check this in at least once since this comparison method may
+        // be useful in the future.
+        changeFilters: function(e) {
+          var form_filters = null, cookie_filters = null, last_used_filter = null;
+          try { form_filters = $(".form-filter :input").serializeJSON().trip_ticket_filters; } catch(e) {}
+          try { cookie_filters = $.cookie("last_used_filters").trip_ticket_filters; } catch(e) {}
+          try { last_used_filter = $.cookie("last_used_filters").last_used_filter; } catch(e) {}
+          
+          if (form_filters && cookie_filters && !_.isEqual(form_filters, cookie_filters)) {
+            if (last_used_filter) {
+              // Show the update filter form
+            }
+            else {
+              // Show the save filter form
+            }
+          }
+        },
+        */
+        
         saveFilters: function(e) {
           e.preventDefault();
           var form = $(e.currentTarget);
           var data = form.find(':input').serialize();
-          $.getJSON(dashboard.root_url, data, function(){
+          $.getJSON(form.attr('action'), data, function(){
             dashboard.trip_tickets.fetch({reset: true});
+            dashboard.resetSavedFilterForm(data.saved_filter_form.rendered_partial);
           })
           .fail(function(jqXHR) {
             dashboard.errorHandler(jqXHR);
@@ -379,6 +409,20 @@
             else if (this.type == 'select-multiple') {
               this.selectedIndex = -1;
             }
+          });
+        },
+
+        // TODO - move this to be a direct descendant of `dashboard`
+        resetSavedFilterForm: function(partial) {
+          dashboard.resetForm($('form.apply-filter'));
+          window.dirtyFilterForm = false;
+          $('.saved-filter-form').html(partial);
+          $('.saved-filter-form').openClose({
+            activeClass: 'active',
+            opener: '.opener',
+            slider: '.slide',
+            animSpeed: 400,
+            effect: 'slide'
           });
         },
         
@@ -937,6 +981,7 @@
           $.getJSON(dashboard.root_url + '/clear_filters', function(data){
             dashboard.TripTicketRouter.navigate('#' + dashboard.root_url, {trigger: true, replace: true});
             dashboard.resetForm($('form.form-filter'));
+            dashboard.resetSavedFilterForm(data.saved_filter_form.rendered_partial);
           })
           .fail(function(jqXHR) {
             dashboard.errorHandler(jqXHR);

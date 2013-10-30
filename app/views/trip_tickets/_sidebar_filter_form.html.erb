@@ -16,7 +16,7 @@
     <div class="saved-filter-form">
       <% if @filter.present? %>
         <%= filter_mini_form('Update saved filter') %>
-      <% elsif trip_ticket_filters_present? %>
+      <% else %>
         <%= filter_mini_form('Save current filters') %>
       <% end %>
     </div>
