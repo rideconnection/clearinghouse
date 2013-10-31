@@ -49,7 +49,7 @@ class FiltersController < ApplicationController
       if @filter.update_attributes(params[:filter])
         format.html do
           if params[:return_to] == 'trip_tickets'
-            redirect_to trip_tickets_url(saved_filter: @filter.name), notice: 'Filter was successfully updated.'
+            redirect_to apply_filters_trip_tickets_url(saved_filter: @filter.name), notice: 'Filter was successfully updated.'
           else
             redirect_to @filter, notice: 'Filter was successfully updated.'
           end

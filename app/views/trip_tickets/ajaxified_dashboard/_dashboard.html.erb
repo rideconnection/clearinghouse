@@ -49,6 +49,10 @@
       error_state: {
         current_error: null
       },
+      
+      filters : {
+        savedFilterForm: null
+      },
     };
     $(function () {
       'use strict';
@@ -81,6 +85,7 @@
           dashboard.displayErrors = this.displayErrors;
           dashboard.display404Message = this.display404Message;
           dashboard.display500Message = this.display500Message;
+          dashboard.resetSavedFilterForm = this.resetSavedFilterForm;
           dashboard.errorHandler = this.errorHandler;
           dashboard.resetViews = this.resetViews;
           dashboard.resetForm = this.resetForm;
@@ -106,7 +111,7 @@
 
           // Setup our cross-browser local storage object for state tracking
           dashboard.localStorage = $.jStorage;
-
+          
           // Find our initial state
           if (
             window.location.hash.length && 
@@ -314,8 +319,9 @@
           e.preventDefault();
           var form = $(e.currentTarget);
           var data = form.find(':input').serialize();
-          $.getJSON(dashboard.root_url, data, function(){
+          $.getJSON(form.attr('action'), data, function(){
             dashboard.trip_tickets.fetch({reset: true});
+            dashboard.resetSavedFilterForm(data.saved_filter_form.rendered_partial);
           })
           .fail(function(jqXHR) {
             dashboard.errorHandler(jqXHR);
@@ -379,6 +385,20 @@
             else if (this.type == 'select-multiple') {
               this.selectedIndex = -1;
             }
+          });
+        },
+
+        // TODO - move this to be a direct descendant of `dashboard`
+        resetSavedFilterForm: function(partial) {
+          dashboard.resetForm($('form.apply-filter'));
+          window.dirtyFilterForm = false;
+          $('.saved-filter-form').html(partial);
+          $('.saved-filter-form').openClose({
+            activeClass: 'active',
+            opener: '.opener',
+            slider: '.slide',
+            animSpeed: 400,
+            effect: 'slide'
           });
         },
         
@@ -1086,6 +1106,7 @@
           $.getJSON(dashboard.root_url + '/clear_filters', function(data){
             dashboard.TripTicketRouter.navigate('#' + dashboard.root_url, {trigger: true, replace: true});
             dashboard.resetForm($('form.form-filter'));
+            dashboard.resetSavedFilterForm(data.saved_filter_form.rendered_partial);
           })
           .fail(function(jqXHR) {
             dashboard.errorHandler(jqXHR);

@@ -55,4 +55,16 @@ class ApplicationController < ActionController::Base
       object.send("#{param_name}=", nil) if object
     end
   end
+
+  def render_with_format(hash)
+    format = hash.delete(:format)
+    logger.debug format
+    original_format = @template_format
+    @template_format = format
+    begin
+      render(hash)
+    ensure
+      @template_format = original_format
+    end
+  end
 end

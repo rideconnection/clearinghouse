@@ -82,20 +82,21 @@ class window.TripTicketsMap
     });
 
 $ ->
-  dirtyFilterForm = false
+  # Make this a global variable so we can reset it from the AJAX dashboard
+  window.dirtyFilterForm = false
 
   $('form.apply-filter input[type="submit"]').css({ position: 'absolute', left: '-9999px'})
 
   $('form.apply-filter select').change ->
     $(this).parent('form').submit()
 
-  $('form.form-filter input,form.form-filter select').change (evt) ->
-    dirtyFilterForm = true
+  $('form.form-filter input, form.form-filter select').change (evt) ->
+    window.dirtyFilterForm = true
 
   # when the saved filter form is submitted, make sure any modified values in the
   # ad-hoc form are included by wiping out the old hidden fields and replacing them
   $('div.saved-filter-form form').submit (evt) ->
-    if dirtyFilterForm == true
+    if window.dirtyFilterForm == true
       $saved_filter_form = $(this)
       $saved_filter_form.children('input[name^="filter[data]"]').remove()
       $.each $('form.form-filter').serializeArray(), (i, field) ->
