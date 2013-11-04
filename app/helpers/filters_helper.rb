@@ -10,7 +10,6 @@ module FiltersHelper
     <div class="slide">
       #{render(partial: 'filters/form', locals: {return_to: controller_name}, formats: [:html])}
     </div>
-    <hr>
     EOS
   end
 

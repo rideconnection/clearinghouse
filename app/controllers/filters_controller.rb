@@ -25,7 +25,7 @@ class FiltersController < ApplicationController
       if @filter.save
         format.html do
           if params[:return_to] == 'trip_tickets'
-            redirect_to trip_tickets_url(saved_filter: @filter.name), notice: 'Filter was successfully created.'
+            redirect_to apply_filters_trip_tickets_url(saved_filter: @filter.name), notice: 'Filter was successfully created.'
           else
             redirect_to @filter, notice: 'Filter was successfully created.'
           end

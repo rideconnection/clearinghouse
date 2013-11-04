@@ -410,6 +410,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     setup do
       # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
       @reset_filters_path = "/trip_tickets/clear_filters"
+      @apply_filters_path = "/trip_tickets/apply_filters"
     end
 
     describe "clear filters" do
@@ -605,7 +606,7 @@ class TripTicketsTest < ActionController::IntegrationTest
 
         assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
 
-        visit current_url + "&trip_ticket_filters[customer_name]=xyz"
+        visit @apply_filters_path + "?saved_filter=customers+on+oak&trip_ticket_filters[customer_name]=xyz"
 
         assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
         assert page.has_field?("trip_ticket_filters_customer_name", :with => 'xyz')

@@ -53,7 +53,7 @@ class TripTicketsController < ApplicationController
       format.html { redirect_to return_to, notice: 'Trip ticket filters cleared.' }
       format.json { render json: {
         saved_filter_form: {
-          rendered_partial: view_context.filter_mini_form("Save current filters")
+          rendered_partial: ""
         }
       }.to_json }
     end    

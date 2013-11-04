@@ -16,10 +16,11 @@
     <div class="saved-filter-form">
       <% if @filter.present? %>
         <%= filter_mini_form('Update saved filter') %>
-      <% else %>
+      <% elsif trip_ticket_filters_present? %>
         <%= filter_mini_form('Save current filters') %>
       <% end %>
     </div>
+    <hr>
   </div>
 
   <%= form_tag apply_filters_trip_tickets_path, :method => :get, :class => "form-filter" do %>
