@@ -1,5 +1,5 @@
 A Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %> was just updated:<br><br>
-<table>
+<table class="table table-condensed">
   <caption>Trip Ticket Summary</caption>
   <tbody>
     <tr>
@@ -24,6 +24,8 @@ A Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket
     </tr>
   </tbody>
 </table>
+<br>
+<%= render 'shared/audit_trail', :audits => [@trip_ticket.audits.last], no_header: true %>
 <br>
 <%= link_to 'Full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %>
 <br><br>

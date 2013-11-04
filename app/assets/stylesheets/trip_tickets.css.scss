@@ -384,6 +384,20 @@ body[data-controller="trip_tickets"] {
                 width:105px;
               }
             }
+            
+            td {
+              vertical-align: top;
+              padding-bottom: 10px;
+
+              &.activity-info {
+                width: 60px;
+              }
+            }
+
+            a {
+              text-decoration: underline;
+              color: blue;
+            }
           }
 
           /* Trip Ticket */
