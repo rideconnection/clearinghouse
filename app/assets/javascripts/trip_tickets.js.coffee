@@ -95,7 +95,7 @@ $ ->
 
   # when the saved filter form is submitted, make sure any modified values in the
   # ad-hoc form are included by wiping out the old hidden fields and replacing them
-  $('div.saved-filter-form form').submit (evt) ->
+  $(document).on "submit", 'div.saved-filter-form form', (evt) ->
     if window.dirtyFilterForm == true
       $saved_filter_form = $(this)
       $saved_filter_form.children('input[name^="filter[data]"]').remove()
