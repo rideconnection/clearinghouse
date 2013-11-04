@@ -70,7 +70,6 @@ class TripTicketsController < ApplicationController
 
     return_to = params[:return_to] || trip_tickets_url
     respond_to do |format|
-      
       format.html { redirect_to return_to }
       format.json { render_with_format json: {
         saved_filter_form: {

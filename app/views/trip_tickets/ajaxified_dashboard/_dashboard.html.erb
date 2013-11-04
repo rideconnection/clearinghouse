@@ -319,7 +319,7 @@
           e.preventDefault();
           var form = $(e.currentTarget);
           var data = form.find(':input').serialize();
-          $.getJSON(form.attr('action'), data, function(){
+          $.getJSON(form.attr('action'), data, function(data){
             dashboard.trip_tickets.fetch({reset: true});
             dashboard.resetSavedFilterForm(data.saved_filter_form.rendered_partial);
           })
