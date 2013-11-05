@@ -156,13 +156,25 @@
           jcf.customForms.replaceAll($('.tickets-holder')[0]);
 
           // Setup the initial trip ticket detail view
-          var $el = null, $el_temp;
-          $el = (dashboard.localStorage.get('initial_trip_ticket_id_on_render') && ($el_temp = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('initial_trip_ticket_id_on_render')+'"]').closest('li')) && $el_temp.length) ? $el_temp : null;
-          if ($el == null) $el = (dashboard.localStorage.get('current_trip_ticket_id') && ($el_temp = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('current_trip_ticket_id')+'"]').closest('li')) && $el_temp.length) ? $el_temp : null;
-          if ($el == null) $el = (($el_temp = this.$('.tickets-list li:first')) && $el_temp.length) ? $el_temp : null;
+          var $el = null;
+          if (dashboard.localStorage.get('initial_trip_ticket_id_on_render')) {
+            $el = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('initial_trip_ticket_id_on_render')+'"]').closest('li');
+            if (!$el.length) {
+              $el = null;
+            }
+          }
+          else if (dashboard.localStorage.get('current_trip_ticket_id')) {
+            $el = this.$('.tickets-list li [data-id="'+dashboard.localStorage.get('current_trip_ticket_id')+'"]').closest('li');
+            if (!$el.length) {
+              $el = this.$('.tickets-list li:first');
+              if (!$el.length) {
+                $el = null;
+              }
+            }
+          }
           
           // Cleanup current-state items anytime view is reset, i.e. `dashboard.trip_tickets.fetch({reset: true})`
-          dashboard.localStorage.deleteKey('initial_trip_ticket_id_on_render');
+          // Leave key 'initial_trip_ticket_id_on_render' set until after we evaluate `$el`
           dashboard.localStorage.deleteKey('current_trip_ticket_id');
           dashboard.current_trip_ticket = null;
 
@@ -180,6 +192,9 @@
             this.display404Message(dashboard.localStorage.get('initial_trip_ticket_id_on_render'));
           }
           
+          // Finish cleaning up current-state
+          dashboard.localStorage.deleteKey('initial_trip_ticket_id_on_render');
+
           return this;
         },
 
