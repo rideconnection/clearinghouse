@@ -25,9 +25,7 @@ A Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket
   </tbody>
 </table>
 <br>
-<%= render 'shared/audit_trail', :audits => [@trip_ticket.audits.last], no_header: true %>
-<br>
-<%= link_to 'Full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %>
+View the <%= link_to 'full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %> to see the complete change history of this ticket.
 <br><br>
 You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.
 To stop receiving notification emails, please <%= link_to 'update your user preferences', preferences_url %>.

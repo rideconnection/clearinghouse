@@ -16,7 +16,7 @@
     <% audits.try(:each) do |audit| -%>
       <tr>
         <td><%= audit.created_at.to_s(:long) %></td>
-        <td><% if audit.user %><%= link_to_if (defined?(can?) && can?(:read, audit.user)), audit.user.display_name, audit.user %><% end %></td>
+        <td><% if audit.user %><%= link_to_if can?(:read, audit.user), audit.user.display_name, audit.user %><% end %></td>
         <td>
           <% if audit.action == "create" %>
             Record created
