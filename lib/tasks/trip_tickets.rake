@@ -8,6 +8,9 @@ namespace :clearinghouse do
     end
 
     namespace :development do
+      desc "Run all clearinghouse:trip_tickets:development tasks"
+      task :reset => ["clearinghouse:trip_tickets:development:unrescind", "clearinghouse:trip_tickets:development:unexpire", "clearinghouse:trip_tickets:development:rebase_appointment_and_expiration_dates"]
+
       desc 'Reset the rescinded flag, or pass in an ID to reset a single ticket. Ex: `rake clearinghouse:trip_tickets:development:unrescind[123]`'
       task :unrescind, [:id] => [:environment] do |t, args|
         args.with_defaults(:id => nil)

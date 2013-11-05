@@ -326,7 +326,7 @@ class TripTicket < ActiveRecord::Base
       trip_ticket_comments.accessible_by(ability).all +
       [trip_result_for(ability)]
     
-    audit_trail.compact.sort_by(&:created_at)
+    audit_trail.compact.sort_by(&:created_at).reverse # Descending order
   end
   
   def audits_with_associated
@@ -340,7 +340,7 @@ class TripTicket < ActiveRecord::Base
       customer_address.audits.where(action: 'update') +
       pick_up_location.audits.where(action: 'update') +
       drop_off_location.audits.where(action: 'update')
-    ).compact.sort_by(&:created_at)
+    ).compact.sort_by(&:created_at).reverse # Descending order
   end
 
   protected

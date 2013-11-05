@@ -38,7 +38,7 @@ module TripTicketsHelper
     end
   end
   
-  def formatted_activity_line(activity)
+  def formatted_activity(activity)
     activity_type = if activity.respond_to?(:auditable) 
       if activity.audited_changes.first[0] == 'rescinded'
         activity.audited_changes.first[1][1] ? 'Rescinded' : 'Unrescinded'
@@ -78,24 +78,29 @@ module TripTicketsHelper
     end
 
     description = "#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
-
+    html_opts = {class: ["no-clickify"], data: {:"activity-type" => formatted_activity_type(activity)}}
+    
     if activity.is_a?(TripClaim) && activity.editable?
-      edit_link = popup_info_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+      link = popup_info_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
 
       if can?(:rescind, activity) 
-        rescind_link = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
-        description = link_to(description, edit_link, {:class => "claim-rescind no-clickify", "data" => {rescind: rescind_link}})
+        html_opts[:data][:rescind] = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:class] << "claim-rescind"
       elsif can?(:approve, activity) && can?(:decline, activity)
-        approve_link = approve_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
-        decline_link = decline_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
-        description = link_to(description, edit_link, {:class => "claim-approve no-clickify", "data" => {approve: approve_link, decline: decline_link}})
+        html_opts[:data][:approve] = approve_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:data][:decline] = decline_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:class] << "claim-approve"
       end
+    else
+      link = activity_path(activity)
     end
-
+    
+    html_opts[:class] = html_opts[:class].join(" ")
+    
     raw(
       "<td class='activity-info' title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p")}</td>" +
       "<td class='activity-info'>#{activity.created_at.strftime("%b %d")}</td>" + 
-      "<td>#{description}</td>"
+      "<td>#{link_to(description, link, html_opts)}</td>"
     )
   end
   
