@@ -871,6 +871,17 @@ class TripTicketTest < ActiveSupport::TestCase
       validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket updated')
     end
   
+    it "should include a summary of changes when a trip is updated" do
+      original_first_name = @trip_ticket.customer_first_name
+      new_first_name      = @trip_ticket.customer_first_name.reverse
+      @trip_ticket.update_attributes(customer_first_name: new_first_name)
+      
+      msg = ActionMailer::Base.deliveries.last
+      msg.wont_be_nil
+      msg.body.must_include(original_first_name)
+      msg.body.must_include(new_first_name)
+    end
+  
     it "should notify all claimant users when a trip is rescinded" do
       assert_difference 'ActionMailer::Base.deliveries.size', +1 do
         @trip_ticket.rescind!

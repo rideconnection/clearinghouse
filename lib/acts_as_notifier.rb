@@ -119,15 +119,28 @@ module ActsAsNotifier
       recipient_list
     end
 
+    def notifier_context(action)
+      context = action[:context]
+      context = case context
+        when Proc
+          instance_exec(action, &context)
+        when Symbol
+          self.send(context)
+        else
+          self
+      end
+    end
+
     def notifier_send(action)
-      if  (recipients = notifier_recipients(action)).present?
+      if (recipients = notifier_recipients(action)).present?
         mailer, method = notifier_get_mailer(action)
+        context = notifier_context(action)
         if ActsAsNotifier::Config.use_delayed_job && mailer.respond_to?(:delay)
           Rails.logger.debug "ActsAsNotifier sending message with #{mailer.to_s}.delay.#{method}"
-          mailer.delay.send(method, recipients, self)
+          mailer.delay.send(method, recipients, context)
         else
           Rails.logger.debug "ActsAsNotifier sending message with #{mailer.to_s}.#{method}"
-          mailer.send(method, recipients, self).deliver
+          mailer.send(method, recipients, context).deliver
         end
       end
     end

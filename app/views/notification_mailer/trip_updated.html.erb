@@ -25,6 +25,27 @@ A Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket
   </tbody>
 </table>
 <br>
+<table class="table table-condensed">
+  <caption>Change History</caption>
+  <thead>
+    <tr>
+      <th width="30%">Attribute</th>
+      <th width="35%">From</th>
+      <th width="35%">To</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trip_changes.each do |attribute, change| %>
+      <% next if (change[0].blank? && change[1].blank?) || %w(created_at updated_at).include?(attribute) %>
+      <tr>
+        <td><%= attribute.humanize %></td>
+        <td><%= formatted_audit_attribute attribute, change[0] %></td>
+        <td><%= formatted_audit_attribute attribute, change[1] %></td>
+      </tr>
+    <% end -%>
+  </tbody>
+</table>
+<br>
 View the <%= link_to 'full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %> to see the complete change history of this ticket.
 <br><br>
 You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.

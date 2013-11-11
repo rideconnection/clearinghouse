@@ -8,8 +8,9 @@ class NotificationMailer < ActionMailer::Base
     mail(:to => recipients, :subject => "Ride Connection Clearinghouse: new trip ticket")
   end
 
-  def trip_updated(recipients, trip)
-    @trip_ticket = trip
+  def trip_updated(recipients, trip_hash)
+    @trip_ticket = trip_hash[:trip_ticket]
+    @trip_changes = trip_hash[:changes]
     mail(:to => recipients, :subject => "Ride Connection Clearinghouse: trip ticket updated")
   end
 

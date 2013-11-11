@@ -83,7 +83,7 @@ class TripTicket < ActiveRecord::Base
       notify ->(opts){ partner_users(self, opts) }, if: proc{
           !(rescinded_changed? && rescinded?) &&
           !(expired_changed? && expired?)
-      }, method: :trip_updated
+      }, method: :trip_updated, context: proc{ { trip_ticket: self, changes: changes } }
     end
   end
 
