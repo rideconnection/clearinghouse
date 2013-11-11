@@ -82,8 +82,9 @@ class TripTicket < ActiveRecord::Base
     after_update do
       notify ->(opts){ partner_users(self, opts) }, if: proc{
           !(rescinded_changed? && rescinded?) &&
-          !(expired_changed? && expired?)
-      }, method: :trip_updated, context: proc{ { trip_ticket: self, changes: changes } }
+          !(expired_changed? && expired?) &&
+          filtered_changes.any?
+      }, method: :trip_updated, context: proc{ { trip_ticket: self, changes: filtered_changes } }
     end
   end
 
@@ -625,5 +626,11 @@ class TripTicket < ActiveRecord::Base
         dmetaphone_alt(%s) = dmetaphone(?) OR 
         dmetaphone_alt(%s) = dmetaphone_alt(?))))" % [field, field, field, field, field]
     end
+  end
+  
+  private 
+  
+  def filtered_changes
+    changes.reject{|k,v| %w(created_at updated_at).include?(k.to_s)}
   end
 end
