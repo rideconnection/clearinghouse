@@ -50,11 +50,8 @@ class UserTest < ActiveSupport::TestCase
     end
 
     describe "password" do
-      it "requires a complex password" do
-        # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical
-        
-        # Character requirements not met
-        # H/T to http://www.ruby-doc.org/core-2.1.0/Array.html#method-i-combination
+      it "must be a minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical" do
+        # Character requirements not met (H/T to http://www.ruby-doc.org/core-2.1.0/Array.html#method-i-combination)
         assert_does_not_accept_values(@user, :password, "aaaaaaaa")
         assert_does_not_accept_values(@user, :password, "AAAAAAAA")
         assert_does_not_accept_values(@user, :password, "11111111")
@@ -78,11 +75,26 @@ class UserTest < ActiveSupport::TestCase
         assert_does_not_accept_values(@user, :password, "aA1!aA1!aA1!aA1!aA1!a")
         assert_does_not_accept_values(@user, :password, "aA1!!!!!!!!!!!!!!!!!!")
 
-        # Goldilocks
+        # Just right
         assert_accepts_values(@user, :password, "aA1!aA1!")
         assert_accepts_values(@user, :password, "aA1 aA1 ")
         assert_accepts_values(@user, :password, "aA1!aA1!aA1!aA1!aA1!")
         assert_accepts_values(@user, :password, "aA1                 ")
+      end
+    
+      it "cannot be reused until being changed 5 times" do
+        @user.password = @user.password_confirmation = "Password 1"
+        @user.valid?.must_equal false
+        @user.errors.keys.must_include :password
+
+        # Change the password 5 times
+        Array(2..6).each do |i|
+          @user.password = @user.password_confirmation = "Password #{i}"
+          @user.save!
+        end
+        
+        @user.password = @user.password_confirmation = "Password 1"
+        @user.valid?.must_equal true
       end
     end
   end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130828140519) do
+ActiveRecord::Schema.define(:version => 20140124151216) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -125,6 +125,16 @@ ActiveRecord::Schema.define(:version => 20130828140519) do
   add_index "nonces", ["created_at"], :name => "index_nonces_on_created_at"
   add_index "nonces", ["nonce", "provider_id"], :name => "index_nonces_on_nonce_and_provider_id", :unique => true
   add_index "nonces", ["provider_id"], :name => "index_nonces_on_provider_id"
+
+  create_table "old_passwords", :force => true do |t|
+    t.string   "encrypted_password",       :null => false
+    t.string   "password_salt"
+    t.string   "password_archivable_type", :null => false
+    t.integer  "password_archivable_id",   :null => false
+    t.datetime "created_at"
+  end
+
+  add_index "old_passwords", ["password_archivable_type", "password_archivable_id"], :name => "index_password_archivable"
 
   create_table "open_capacities", :force => true do |t|
     t.integer  "service_id"
@@ -353,10 +363,12 @@ ActiveRecord::Schema.define(:version => 20130828140519) do
     t.boolean      "active",                   :default => true, :null => false
     t.integer      "role_id"
     t.string_array "notification_preferences"
+    t.datetime     "password_changed_at"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["notification_preferences"], :name => "notification_preferences_index"
+  add_index "users", ["password_changed_at"], :name => "index_users_on_password_changed_at"
   add_index "users", ["provider_id"], :name => "index_users_on_provider_id"
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 

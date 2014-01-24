@@ -131,6 +131,9 @@ GEM
       orm_adapter (~> 0.1)
       railties (~> 3.1)
       warden (~> 1.2.1)
+    devise_security_extension (0.7.2)
+      devise (>= 2.0.0)
+      rails (>= 3.1.1)
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (1.4.0)
@@ -316,6 +319,7 @@ DEPENDENCIES
   delayed_job_active_record (~> 4.0)
   delayed_job_web (~> 1.2)
   devise (~> 2.2)
+  devise_security_extension (~> 0.7)
   factory_girl_rails
   grape (~> 0.2.0)
   jquery-rails (~> 2.1)
