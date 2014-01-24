@@ -5,7 +5,7 @@
 FactoryGirl.define do
   factory :user do
     email {"user.#{Time.now.to_f}@clearinghouse.org"}
-    password "password 1"
+    password "Password 1"
     password_confirmation { |u| u.password }
     provider
     role { Role.find_or_create_by_name("read_only") }

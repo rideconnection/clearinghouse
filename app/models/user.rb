@@ -14,13 +14,16 @@ class User < ActiveRecord::Base
     :title, :notification_preferences
 
   validate do |user|
-    # This pattern should technically work, but it doesn't...
-    # validates_format_of :password, :if => :password_required?,
-    #                     :with => /^(?=.*[0-9])(?=.*[\W_&&[^\s] ])[\w\W&&[^\s] ]{6,20}$/i, # Regexp tested at http://www.rubular.com/r/7peotZQNui
-    #                     :message => "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
-    # So...                    
-    if user.password_required? && (user.password.blank? || !(6..20).include?(user.password.length) || !user.password.match(/\d/) || !user.password.match(/[\W_&&[^\s] ]/))
-      user.errors[:password] << "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
+    # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical
+    if user.password_required? && (
+      user.password.blank?                    || # Cannot be empty
+      !(8..20).include?(user.password.length) || # 8 - 20 characters
+      !user.password.match(/[A-Z]/)           || # at least one lowercase letter
+      !user.password.match(/[a-z]/)           || # at least one uppercase letter
+      !user.password.match(/\d/)              || # at least one number
+      !user.password.match(/[\W_&&[^\s] ]/)      # at least one non-alphanumeric character
+    )
+      user.errors[:password] << "must be 8 to 20 characters in length with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical"
     end
   end
   
