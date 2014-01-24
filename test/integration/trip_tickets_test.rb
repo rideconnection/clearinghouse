@@ -7,7 +7,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   
   setup do
     @provider = FactoryGirl.create(:provider, :name => "Microsoft")
-    @password = "password 1"
+    @password = "Password 1"
 
     @user = FactoryGirl.create(:user, 
       :password => @password, 

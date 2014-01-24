@@ -18,34 +18,12 @@ class AdminUserTest < ActionController::IntegrationTest
     Provider.destroy_all
   end
 
-  test "admin can create a new user and have password sent to user" do  
-    visit "/"
-    click_link "Admin"
-    click_link "Users"
-    click_link "New User"
-    fill_in "user[email]", :with => "test@example.net"
-    fill_in "user[password]", :with => "password 1"
-    fill_in "user[password_confirmation]", :with => "password 1"
-    fill_in "user[name]", :with => "Steve Smith"
-    fill_in "user[title]", :with => "Manager"
-    fill_in "user[phone]", :with => "1231231234"
-    select "Microsoft", :from => "user[provider_id]"
-    click_button "Create User"
-
-    mail = ActionMailer::Base.deliveries.last
-
-    assert page.has_content?("User was successfully created.")
-    assert_equal mail.to.first, "test@example.net" 
-    assert mail.body.include?("password 1")
-  end
-
   test "admin can create a new user and have a password generated" do  
     visit "/"
     click_link "Admin"
     click_link "Users"
     click_link "New User"
     fill_in "user[email]", :with => "test@example.net"
-    check "user[must_generate_password]"
     fill_in "user[name]", :with => "Steve Smith"
     fill_in "user[title]", :with => "Manager"
     fill_in "user[phone]", :with => "1231231234"
@@ -59,10 +37,22 @@ class AdminUserTest < ActionController::IntegrationTest
     assert mail.body.include?("Please set up a password")
   end
 
+  test "admin can edit another user and have a password reset email sent" do  
+    visit "/users/#{@other_user.id}/edit"
+    check "send_reset_password_link"
+    click_button "Update User"
+
+    mail = ActionMailer::Base.deliveries.last
+
+    assert page.has_content?("User was successfully updated.")
+    assert_equal mail.to.first, @other_user.email
+    assert mail.body.include?("Someone has requested a link to change your password")
+  end
+
   test "user can change his password" do
     visit "/users/#{@user.id}/edit"
-    fill_in 'user[password]', :with => 'n3w p4ssw0rd'
-    fill_in 'user[password_confirmation]', :with => 'n3w p4ssw0rd'
+    fill_in 'user[password]', :with => 'n3w p4ssw0rD'
+    fill_in 'user[password_confirmation]', :with => 'n3w p4ssw0rD'
     click_button 'Update User'
     assert page.has_content?('User was successfully updated.')
   end
@@ -72,7 +62,7 @@ class AdminUserTest < ActionController::IntegrationTest
     fill_in 'user[password]', :with => 'hello'
     fill_in 'user[password_confirmation]', :with => 'hello'
     click_button 'Update User'
-    assert page.has_content?('Password is too short')
+    assert page.has_content?('Password does not meet complexity requirements')
   end
 
   test "user can change email" do

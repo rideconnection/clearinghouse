@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
       !user.password.match(/\d/)              || # at least one number
       !user.password.match(/[\W_&&[^\s] ]/)      # at least one non-alphanumeric character
     )
-      user.errors[:password] << "must be 8 to 20 characters in length with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical"
+      user.errors[:password] << "does not meet complexity requirements. Passwords must be 8 to 20 characters in length with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical"
     end
   end
   

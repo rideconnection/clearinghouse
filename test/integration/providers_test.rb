@@ -8,7 +8,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
   setup do
     @provider = FactoryGirl.create(:provider, :name => "Microsoft")
     @provider_2 = FactoryGirl.create(:provider, :name => "Google")
-    @password = "password 1"
+    @password = "Password 1"
 
     @user = FactoryGirl.create(:user, 
       :password => @password, 
