@@ -245,7 +245,6 @@ Devise.setup do |config|
                                       # password 5 being added and password 1 being dropped, and thus able to be used again after
                                       # 5 changes.
 
-
   # Deny old password (true, false, count)
   config.deny_old_passwords = true
 
@@ -270,5 +269,4 @@ Devise.setup do |config|
 
   # Time period for account expiry from last_activity_at
   # config.expire_after = 90.days
-
 end

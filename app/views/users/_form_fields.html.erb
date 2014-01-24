@@ -3,19 +3,32 @@
     <%= f.text_field :email %>
   </div>
   <% if @user.new_record? %>
-    <div class="field field-with-checkbox">
-      <%= check_box_tag "user[must_generate_password]" %>
-      <%= f.label "Send activation link instead of setting password" %>
+    <div class="field">
+      <%= f.label :password %>
+      <div>
+        The user will be sent an activation link with a generated password
+        <%= hidden_field_tag "user[must_generate_password]", "1" %>
+      </div>
+    </div>
+  <% elsif current_user.id != @user.id %>
+    <div class="field">
+      <%= f.label :password %>
+      <div>
+        <%= label_tag("send_reset_password_link") do %>
+          <%= check_box_tag "send_reset_password_link" %> Send a link to reset their password
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="field">
+      <%= f.label :password, "New password" %>
+      <%= f.password_field :password %>
+    </div>
+    <div class="field">
+      <%= f.label :password_confirmation, "Confirm new password" %>
+      <%= f.password_field :password_confirmation %>
     </div>
   <% end %>
-  <div class="field">
-    <%= f.label :password %>
-    <%= f.password_field :password %>
-  </div>
-  <div class="field">
-    <%= f.label :password_confirmation %>
-    <%= f.password_field :password_confirmation %>
-  </div>
   <div class="field">
     <%= f.label :name %>
     <%= f.text_field :name %>
@@ -29,7 +42,6 @@
     <%= f.text_field :phone %>
   </div>
   <% if @provider.present? && @user.provider_id == @provider.id %>
-    <%#= f.hidden_field :provider_id %>
     <%= f.hidden_field :role_id %>
   <% else %>
     <div class="field">

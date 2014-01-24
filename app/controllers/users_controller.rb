@@ -59,6 +59,7 @@ class UsersController < ApplicationController
     if !current_user.has_admin_role?
       @user.provider = current_user.provider
     end
+    
     if params[:user].has_key?(:role_id)
       if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, User
@@ -69,7 +70,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        NewUserMailer.delay.welcome(@user, @user.password, @user.need_to_generate_password?)
+        NewUserMailer.delay.welcome(@user, nil, @user.need_to_generate_password?)
         destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
@@ -86,6 +87,7 @@ class UsersController < ApplicationController
     if params[:user].has_key?(:provider_id)
       authorize! :set_provider, @user
     end
+    
     if params[:user].has_key?(:role_id)
       if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, @user
@@ -93,18 +95,24 @@ class UsersController < ApplicationController
         authorize! :set_any_role, @user
       end
     end
+    
     if params[:user][:password].blank?
       params[:user].delete("password")
       params[:user].delete("password_confirmation")
       need_relogin = false
     elsif @user == current_user
       need_relogin = true
+    else
+      need_relogin = false
     end
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
         # Devise logs users out on password change
         sign_in(@user, :bypass => true) if need_relogin
+        
+        @user.send_reset_password_instructions if params[:send_reset_password_link]
+        
         format.html { redirect_to :back, notice: 'User was successfully updated.' }
         format.json { head :no_content }
       else
