@@ -99,4 +99,16 @@ class AdminUserTest < ActionController::IntegrationTest
     visit "/users"
     assert !page.has_content?("Muffin Bon Visor")
   end
+  
+  test "admin can enable an account that was previously disabled due to too many failed logins" do
+    @other_user.update_attributes(locked_at: 1.day.ago)
+    visit "/users/#{@other_user.id}/edit"
+    check "unlock_account"
+    click_button "Update User"
+    assert page.has_content?('User was successfully updated.')
+
+    @other_user.reload
+    assert_equal 0, @other_user.failed_attempts
+    assert_nil @other_user.locked_at
+  end
 end

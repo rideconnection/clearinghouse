@@ -10,7 +10,7 @@
         <%= hidden_field_tag "user[must_generate_password]", "1" %>
       </div>
     </div>
-  <% elsif current_user.id != @user.id %>
+  <% elsif can? :send_reset_password_link, @user and @user != current_user %>
     <div class="field">
       <%= f.label :password %>
       <div>
@@ -68,5 +68,24 @@
         <%= collection_select :user, :role_id, Role.provider_roles, :id, :name %>
       </div>
     <% end %>
+  <% end %>
+  <% if can? :unlock, @user %>
+    <div class="field">
+      <%= f.label :failed_attempts, "Failed login Attempts" %>
+      <div><%= @user.failed_attempts.to_i %></div>
+    </div>
+    <div class="field">
+      <%= f.label :locked_at, "Account locked at" %>
+      <div>
+        <%= @user.locked_at.try(:strftime, "%a %Y-%m-%d %I:%M %P") || "[not locked]" %>
+        <% if @user.locked_at.present? %>
+          <div>
+            <%= label_tag("unlock_account") do %>
+              <%= check_box_tag "unlock_account" %> Unlock account (will not notify user)
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
   <% end %>
   <%= notification_preferences_checkboxes(@user) %>

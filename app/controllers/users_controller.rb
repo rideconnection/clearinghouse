@@ -106,6 +106,11 @@ class UsersController < ApplicationController
       need_relogin = false
     end
 
+    if params[:unlock_account]
+      params[:user][:failed_attempts] = 0
+      params[:user][:locked_at] = nil
+    end
+
     respond_to do |format|
       if @user.update_attributes(params[:user])
         # Devise logs users out on password change
