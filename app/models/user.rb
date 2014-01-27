@@ -1,6 +1,6 @@
 class User < ActiveRecord::Base
   devise :database_authenticatable, :recoverable, :trackable, :validatable,
-    :password_expirable, :password_archivable
+    :password_expirable, :password_archivable, :lockable
 
   belongs_to :provider, inverse_of: :users
   belongs_to :role
@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider_id, :role_id, 
-    :title, :notification_preferences
+    :title, :notification_preferences, :failed_attempts, :locked_at
 
   validate do |user|
     # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical

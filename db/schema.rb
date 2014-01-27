@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140124151216) do
+ActiveRecord::Schema.define(:version => 20140127185420) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -364,6 +364,8 @@ ActiveRecord::Schema.define(:version => 20140124151216) do
     t.integer      "role_id"
     t.string_array "notification_preferences"
     t.datetime     "password_changed_at"
+    t.integer      "failed_attempts",          :default => 0
+    t.datetime     "locked_at"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

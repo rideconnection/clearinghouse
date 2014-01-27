@@ -102,4 +102,20 @@ class UsersTest < ActionController::IntegrationTest
       click_button 'Create Trip ticket comment'
     end
   end
+  
+  test "user will be locked out after X number of failed login attempts" do
+    maximum_attempts = 5
+    
+    # We need to submit one additional time to see the locked error message
+    (maximum_attempts + 1).times do |i|
+      visit "/"
+      fill_in 'Email', :with => @user.email
+      fill_in 'Password', :with => "nope"
+      click_button 'Sign in'
+      current_path.must_equal new_user_session_path
+      assert page.has_content?("Invalid email or password") if i < maximum_attempts
+    end
+    
+    assert page.has_content?("Your account is locked")
+  end
 end
