@@ -43,6 +43,8 @@ Spork.prefork do
 
   # by default, do not send email notifications in test mode
   ActsAsNotifier::Config.disabled = true
+  
+  Devise::Async.enabled = false
 
   Dir[Rails.root.join("test/support/*.rb")].each {|f| require f}
 end
