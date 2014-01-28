@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  before_filter :apply_application_settings
   before_filter :authenticate_user!
   
   # TODO - Should we allow normal caching for any requests? If so, move this 
@@ -16,6 +17,10 @@ class ApplicationController < ActionController::Base
   end
   
   private
+  
+  def apply_application_settings
+    ApplicationSetting.apply!
+  end
   
   def set_cache_buster
     response.headers["Cache-Control"] = "no-cache, no-store, max-age=0, must-revalidate"

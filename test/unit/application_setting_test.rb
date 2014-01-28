@@ -1,0 +1,54 @@
+require 'test_helper'
+
+class ApplicationSettingTest < ActiveSupport::TestCase
+  describe "class methods" do
+    describe "::update_settings" do
+      it "should update only known params" do
+        ApplicationSetting.update_settings({'foo' => "asdf"})
+
+        assert_nil ApplicationSetting['foo']
+      end
+
+      it "should transform devise.expire_password_after to days" do
+        ApplicationSetting.update_settings({'devise.expire_password_after' => 3})
+
+        assert_equal 3.days, ApplicationSetting['devise.expire_password_after']
+      end
+
+      it "should transform devise.timeout_in to minutes" do
+        ApplicationSetting.update_settings({'devise.timeout_in' => 3})
+
+        assert_equal 3.minutes, ApplicationSetting['devise.timeout_in']
+      end
+
+      it "should not change unspecified settings" do
+        ApplicationSetting['devise.timeout_in'] = 3
+
+        ApplicationSetting.update_settings({'devise.expire_password_after' => 3})
+
+        assert_equal 3, ApplicationSetting['devise.timeout_in']
+      end
+    end
+
+    describe "::apply!" do
+      it "should apply all currently saved settings to the application" do
+        Devise.maximum_attempts         = 99
+        Devise.password_archiving_count = 99
+        Devise.expire_password_after    = 99
+        Devise.timeout_in               = 99
+
+        ApplicationSetting['devise.maximum_attempts']         = 1
+        ApplicationSetting['devise.password_archiving_count'] = 2
+        ApplicationSetting['devise.expire_password_after']    = 3
+        ApplicationSetting['devise.timeout_in']               = 4
+        
+        ApplicationSetting.apply!
+
+        assert_equal 1, Devise.maximum_attempts
+        assert_equal 2, Devise.password_archiving_count
+        assert_equal 3, Devise.expire_password_after
+        assert_equal 4, Devise.timeout_in
+      end
+    end
+  end
+end

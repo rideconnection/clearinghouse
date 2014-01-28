@@ -73,5 +73,11 @@ Clearinghouse::Application.routes.draw do
   }
   match 'preferences', :controller => :users, :action => :preferences
 
+  resource :application_settings, :only => [ :edit, :update ] do
+    collection do
+      get :index
+    end
+  end
+
   root :to => 'trip_tickets#index'
 end

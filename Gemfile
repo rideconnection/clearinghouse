@@ -37,13 +37,14 @@ gem "daemons", "~> 1.1"
 gem "delayed_job_active_record", "~> 4.0"
 gem "delayed_job_web", "~> 1.2"
 gem "devise", "~> 2.2"
-gem "devise_security_extension", "~> 0.7"
 gem "devise-async", "~> 0.8"
+gem "devise_security_extension", "~> 0.7"
 gem "jquery-rails", "~> 2.1"
+gem "kaminari"
+gem "rails-settings-cached", "~> 0.2"
 gem "seedbank", "~> 0.2"
 gem "validates_timeliness", "~> 3.0"
 gem "whenever", "~> 0.8", :require => false
-gem "kaminari"
 
 # API web service
 gem "grape", "~> 0.2.0"
@@ -58,11 +59,10 @@ end
 
 group :test, :development do
   gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
-  gem "minitest-rails-capybara",
-    git: "git://github.com/blowmage/minitest-rails-capybara.git"
+  gem "minitest-rails-capybara", git: "git://github.com/blowmage/minitest-rails-capybara.git"
   gem "spork-rails"
-  gem "spork-testunit", git: "git://github.com/sporkrb/spork-testunit.git"
   gem "spork-minitest", git: "git://github.com/semaperepelitsa/spork-minitest.git"
+  gem "spork-testunit", git: "git://github.com/sporkrb/spork-testunit.git"
   gem "turn", :require => false
 end
 

@@ -124,7 +124,7 @@ Devise.setup do |config|
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again. Default is 30 minutes.
-  # config.timeout_in = 30.minutes
+  config.timeout_in = ApplicationSetting['devise.timeout_in']
   
   # If true, expires auth token on session timeout.
   # config.expire_auth_token_on_timeout = false
@@ -147,7 +147,7 @@ Devise.setup do |config|
 
   # Number of authentication tries before locking an account if lock_strategy
   # is failed attempts.
-  config.maximum_attempts = 5
+  config.maximum_attempts = ApplicationSetting['devise.maximum_attempts']
 
   # Time interval to unlock the account if :time is enabled as unlock_strategy.
   # config.unlock_in = 1.hour
@@ -234,16 +234,17 @@ Devise.setup do |config|
   # Configure security extension for devise
 
   # Should the password expire (e.g 3.months)
-  config.expire_password_after = false
+  config.expire_password_after = ApplicationSetting['devise.expire_password_after']
 
   # Need 1 char of A-Z, a-z and 0-9
   # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
 
   # How many passwords to keep in archive
-  config.password_archiving_count = 4 # Note: Changing the password 4 times results in the old_passwords table containing passwords
-                                      # 1, 2, 3, and 4. With a password_archiving_count of 4, changing it a 5th time results in
-                                      # password 5 being added and password 1 being dropped, and thus able to be used again after
-                                      # 5 changes.
+  # Note: Changing the password 4 times results in the old_passwords table containing passwords
+  # 1, 2, 3, and 4. With a password_archiving_count of 4, changing it a 5th time results in
+  # password 5 being added and password 1 being dropped, and thus able to be used again after
+  # 5 changes.
+  config.password_archiving_count = ApplicationSetting['devise.password_archiving_count']
 
   # Deny old password (true, false, count)
   config.deny_old_passwords = true
