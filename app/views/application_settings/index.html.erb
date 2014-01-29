@@ -32,7 +32,7 @@
         <td><%= ApplicationSetting.defaults['devise.expire_password_after'].to_i / 1.day %> days</td>
       </tr>
       <tr>
-        <td>Session timeout in</td>
+        <td>Session timeout in <sup><a href="#fn1" style="cursor: text; text-decoration: none !important">1</a></sup></td>
         <td><%= ApplicationSetting['devise.timeout_in'].to_i / 1.minute %> days</td>
         <td><%= Devise.timeout_in.to_i / 1.minute %> days</td>
         <td><%= ApplicationSetting.defaults['devise.timeout_in'].to_i / 1.minute %> days</td>
@@ -40,6 +40,8 @@
     </tbody>
   </table>
 </div>
+
+<p><small><sup>1</sup> A session timeout setting of zero means session expiration is disabled</small></p>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

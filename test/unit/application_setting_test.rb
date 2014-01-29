@@ -1,6 +1,11 @@
 require 'test_helper'
 
 class ApplicationSettingTest < ActiveSupport::TestCase
+  teardown do
+    ApplicationSetting.update_settings ApplicationSetting.defaults
+    ApplicationSetting.apply!
+  end
+  
   describe "class methods" do
     describe "::update_settings" do
       it "should update only known params" do

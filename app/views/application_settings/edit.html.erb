@@ -27,7 +27,7 @@
       </div>
       <div class="field">
         <%= label_tag :application_setting_devise_timeout_in, "Session timeout in:" %>
-        <%= number_field_tag "application_setting[devise.timeout_in]", @settings['devise.timeout_in'] / 1.minute, in: 0..1440, id: :application_setting_devise_timeout_in %> minutes
+        <%= number_field_tag "application_setting[devise.timeout_in]", @settings['devise.timeout_in'].to_i / 1.minute, in: 0..1440, id: :application_setting_devise_timeout_in %> minutes
         <div class="field-align">
           <small>Setting this to zero will disable session timeouts</small>
         </div>

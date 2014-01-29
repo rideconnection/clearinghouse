@@ -13,6 +13,8 @@ class ApplicationSettingsTest < ActionController::IntegrationTest
 
   teardown do
     User.destroy_all
+    ApplicationSetting.update_settings ApplicationSetting.defaults
+    ApplicationSetting.apply!
   end
   
   test "application settings are applied on every request" do

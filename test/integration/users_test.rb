@@ -104,7 +104,7 @@ class UsersTest < ActionController::IntegrationTest
   end
   
   test "user will be locked out after X number of failed login attempts" do
-    maximum_attempts = 5
+    maximum_attempts = Devise.maximum_attempts
     
     # We need to submit one additional time to see the locked error message
     (maximum_attempts + 1).times do |i|

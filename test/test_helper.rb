@@ -46,10 +46,13 @@ Spork.prefork do
   
   Devise::Async.enabled = false
 
-  Dir[Rails.root.join("test/support/*.rb")].each {|f| require f}
+  Dir[Rails.root.join("test/support/*.rb")].each {|f| require f}  
 end
 
 Spork.each_run do
   DatabaseCleaner.clean
   FactoryGirl.reload
+
+  ApplicationSetting.update_settings ApplicationSetting.defaults
+  ApplicationSetting.apply!
 end
