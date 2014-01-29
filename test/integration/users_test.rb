@@ -16,7 +16,7 @@ class UsersTest < ActionController::IntegrationTest
     @user.role = Role.find_or_create_by_name!("provider_admin")
     @user.save!
   end
-
+  
   test "users can edit their profile using the preferences url" do
     login_as @user, :scope => :user
     visit preferences_path

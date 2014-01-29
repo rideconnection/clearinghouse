@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
   devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
-    :password_expirable, :password_archivable, :lockable, :session_limitable
+    :password_expirable, :password_archivable, :lockable, :session_limitable,
+    :timeoutable
 
   belongs_to :provider, inverse_of: :users
   belongs_to :role

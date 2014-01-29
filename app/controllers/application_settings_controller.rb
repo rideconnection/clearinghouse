@@ -2,7 +2,6 @@ class ApplicationSettingsController < ApplicationController
   before_filter :admins_only
   
   def index
-    @settings = ApplicationSetting.unscoped
   end
 
   def edit
