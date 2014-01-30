@@ -15,14 +15,16 @@ class ApplicationSetting < RailsSettings::CachedSettings
         # a nil value means timeoutable is disabled
         self['devise.timeout_in'] = (timeout_in == 0) ? nil : timeout_in.minutes
       end
+      return true
     end
+    return false
   end
   
   def self.apply!
-    Devise.expire_password_after    = self['devise.expire_password_after']
-    Devise.maximum_attempts         = self['devise.maximum_attempts']
-    Devise.password_archiving_count = self['devise.password_archiving_count']
-    Devise.timeout_in               = self['devise.timeout_in']
+    Devise.expire_password_after    = self.all['devise.expire_password_after']
+    Devise.maximum_attempts         = self.all['devise.maximum_attempts']
+    Devise.password_archiving_count = self.all['devise.password_archiving_count']
+    Devise.timeout_in               = self.all['devise.timeout_in']
     return true
   end
 end

@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   before_filter :apply_application_settings
+  before_filter :do_not_track
   before_filter :authenticate_user!
   
   # TODO - Should we allow normal caching for any requests? If so, move this 
@@ -70,6 +71,14 @@ class ApplicationController < ActionController::Base
       render(hash)
     ensure
       @template_format = original_format
+    end
+  end
+
+  def do_not_track
+    # Devise is supposed to recognize this header, I thought. Unfortunately,
+    # I'm having to check it manually.
+    if request.headers['devise.skip_trackable']
+      request.env['devise.skip_trackable'] = true
     end
   end
 end

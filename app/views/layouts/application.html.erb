@@ -15,6 +15,10 @@
   <%= yield :head %>
 </head>
 <body data-controller="<%= params[:controller] %>" data-action="<%= params[:action] %>">
+<div id="session-timeout-warning" style="display: none;">
+  You will be logged off in <span><!-- countdown place holder --></span>&nbsp;seconds due to inactivity.
+  <a id="session-resume" href="#">Click here to stay logged in.</a>
+</div>
 <header id="header">
   <section class="top-section">
     <nav class="holder">
@@ -58,9 +62,23 @@
     &copy; <script type="text/javascript">
       var theDate = new Date();
       document.write(theDate.getFullYear());
-    </script> | <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %> | 
-    <%= link_to 'Powered by Panoptic Development, Inc.', 'http://www.panopticdev.com' %>
+    </script> | <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %>
   </p>
 </footer>
+<% if current_user %>
+  <%= javascript_tag do %>
+    $(document).ready(function(){
+      sessionTimer = new SessionTimer();
+      sessionTimer.start();
+    });
+    var ClearingHouse = {
+      urls: {
+        check_session: "<%= check_session_path %>",
+        touch_session: "<%= touch_session_path %>",
+        sign_out:      "<%= destroy_user_session_path %>"
+      },
+    };
+  <% end %>
+<% end %>
 </body>
 </html>

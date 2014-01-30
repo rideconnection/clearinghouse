@@ -5,7 +5,7 @@ class ApplicationSettingsController < ApplicationController
   end
 
   def edit
-    @settings = ApplicationSetting.unscoped
+    @settings = ApplicationSetting.all
   end
 
   def update
@@ -14,7 +14,7 @@ class ApplicationSettingsController < ApplicationController
         format.html { redirect_to application_settings_path, notice: 'Application settings were successfully updated.' }
         format.json { head :no_content }
       else
-        @settings = ApplicationSetting.unscoped.merge params[:application_setting]
+        @settings = ApplicationSetting.all.merge(params[:application_setting])
         format.html { render action: :edit }
         format.json { render json: ApplicationSetting.all, status: :unprocessable_entity }
       end

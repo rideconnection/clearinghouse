@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource except: [:check_session, :touch_session]
   before_filter :admins_only, :only => :index
 
   # GET /users
@@ -146,5 +146,19 @@ class UsersController < ApplicationController
       format.html { redirect_to users_url }
       format.json { head :no_content }
     end
+  end
+
+  def check_session
+    last_request_at = session['warden.user.user.session']['last_request_at']
+    timeout_time = last_request_at + (Devise.timeout_in || 365.days) # In case the session timeout has been disabled
+    timeout_in = (timeout_time - Time.current).to_i
+    render :json => {
+      'last_request_at' => last_request_at,
+      'timeout_in' => timeout_in,
+    }
+  end
+
+  def touch_session
+    render :text => 'OK'
   end
 end

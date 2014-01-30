@@ -4,7 +4,11 @@ Clearinghouse::Application.routes.draw do
 
   mount Clearinghouse::API => "/"
   
-  devise_for :users
+  devise_for :users do
+    get '/users/sign_out' => 'devise/sessions#destroy' # allow redirects
+    get 'check_session' => 'users#check_session'
+    get 'touch_session' => 'users#touch_session'
+  end
 
   resources :open_capacities
 
