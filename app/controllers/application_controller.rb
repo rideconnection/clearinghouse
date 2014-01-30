@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   before_filter :apply_application_settings
   before_filter :do_not_track
   before_filter :authenticate_user!
+  after_filter :store_location
   
   # TODO - Should we allow normal caching for any requests? If so, move this 
   # into individual controllers and use the :only/:except parameters to limit
@@ -18,6 +19,21 @@ class ApplicationController < ActionController::Base
   end
   
   private
+  
+  def store_location
+    # store last url - this is needed for post-login redirect to whatever the user last visited.
+    if (request.fullpath != new_user_session_path &&
+        # request.fullpath != "/users/sign_up" &&
+        request.fullpath != user_password_path &&
+        request.fullpath != destroy_user_session_path &&
+        !request.xhr?) # don't store ajax calls
+      cookies.signed[:previous_url] = request.fullpath 
+    end
+  end
+  
+  def after_sign_in_path_for(resource)
+    cookies.signed[:previous_url] || root_path
+  end
   
   def apply_application_settings
     ApplicationSetting.apply!
