@@ -14,10 +14,16 @@ class ApplicationSettingTest < ActiveSupport::TestCase
         assert_nil ApplicationSetting['foo']
       end
 
-      it "should transform devise.expire_password_after to days" do
+      it "should transform devise.expire_password_after to days when > 0" do
         ApplicationSetting.update_settings({'devise.expire_password_after' => 3})
 
         assert_equal 3.days, ApplicationSetting['devise.expire_password_after']
+      end
+
+      it "should set devise.expire_password_after to false when 0 is specified" do
+        ApplicationSetting.update_settings({'devise.expire_password_after' => 0})
+
+        assert_equal false, ApplicationSetting['devise.expire_password_after']
       end
 
       it "should transform devise.timeout_in to minutes when > 0" do

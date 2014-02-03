@@ -26,13 +26,13 @@
         <td><%= ApplicationSetting.defaults['devise.password_archiving_count'] %></td>
       </tr>
       <tr>
-        <td>Expire password after</td>
-        <td><%= ApplicationSetting.all['devise.expire_password_after'].to_i / 1.day %> days</td>
-        <td><%= Devise.expire_password_after.to_i / 1.day %> days</td>
-        <td><%= ApplicationSetting.defaults['devise.expire_password_after'].to_i / 1.day %> days</td>
+        <td>Expire password after <sup><a href="#fn1">1</a></sup></td>
+        <td><%= (ApplicationSetting.all['devise.expire_password_after'] || 0).to_i / 1.day %> days</td>
+        <td><%= (Devise.expire_password_after || 0).to_i / 1.day %> days</td>
+        <td><%= (ApplicationSetting.defaults['devise.expire_password_after'] || 0).to_i / 1.day %> days</td>
       </tr>
       <tr>
-        <td>Session timeout in <sup><a href="#fn1" style="cursor: text; text-decoration: none !important">1</a></sup></td>
+        <td>Session timeout in <sup><a href="#fn2">2</a></sup></td>
         <td><%= ApplicationSetting.all['devise.timeout_in'].to_i / 1.minute %> minutes</td>
         <td><%= Devise.timeout_in.to_i / 1.minute %> minutes</td>
         <td><%= ApplicationSetting.defaults['devise.timeout_in'].to_i / 1.minute %> minutes</td>
@@ -41,7 +41,8 @@
   </table>
 </div>
 
-<p><small><sup>1</sup> A session timeout setting of zero means session expiration is disabled</small></p>
+<p id="fn1"><small><sup>1</sup> A password expiration setting of zero means automatic password expiration is disabled</small></p>
+<p id="fn2"><small><sup>2</sup> A session timeout setting of zero means session expiration is disabled</small></p>
 
 <% content_for :sidebar do %>
   <ul class="side-nav">

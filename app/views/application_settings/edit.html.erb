@@ -23,7 +23,10 @@
       </div>
       <div class="field">
         <%= label_tag :application_setting_devise_expire_password_after, "Expire password after:" %>
-        <%= number_field_tag "application_setting[devise.expire_password_after]", @settings['devise.expire_password_after'].to_i / 1.day, in: 1..365, id: :application_setting_devise_expire_password_after %> days
+        <%= number_field_tag "application_setting[devise.expire_password_after]", (@settings['devise.expire_password_after'] || 0).to_i / 1.day, in: 0..365, id: :application_setting_devise_expire_password_after %> days
+        <div class="field-align">
+          <small>Setting this to zero will disable password expiration</small>
+        </div>
       </div>
       <div class="field">
         <%= label_tag :application_setting_devise_timeout_in, "Session timeout in:" %>
