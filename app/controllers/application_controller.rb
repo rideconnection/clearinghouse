@@ -27,12 +27,15 @@ class ApplicationController < ActionController::Base
         request.fullpath != user_password_path &&
         request.fullpath != destroy_user_session_path &&
         !request.xhr?) # don't store ajax calls
-      cookies.signed[:previous_url] = request.fullpath 
+      cookies.signed[:previous_url] = request.fullpath
+      logger.info "\n=====\ncookies.signed[:previous_url] = #{request.fullpath}\n====="
     end
   end
   
   def after_sign_in_path_for(resource)
-    cookies.signed[:previous_url] || root_path
+    return_path = cookies.signed[:previous_url] || root_path
+    logger.info "\n=====\nreturn_path = #{return_path}\n====="
+    return_path
   end
   
   def apply_application_settings
