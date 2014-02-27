@@ -83,5 +83,7 @@ Clearinghouse::Application.routes.draw do
     end
   end
 
+  get "pages/credits"
+
   root :to => 'trip_tickets#index'
 end
