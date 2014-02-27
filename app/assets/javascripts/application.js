@@ -40,6 +40,7 @@ var SessionTimer = function(user_options) {
   var timer = null;
   var countdown = null;
   var self = this;
+  var page_title = null;
 
   $("#session-resume").bind("click", function(e) {
     e.preventDefault();
@@ -48,10 +49,11 @@ var SessionTimer = function(user_options) {
 
   // Start the timer
   this.start = function() {
+    page_title = document.title;
     self.checkSession(function(session_timeout) {
       var idle_timeout = session_timeout - options.countdown_length -
                          options.session_buffer + 1;
-      timer = window.setTimeout(function() {self.onIdle()}, idle_timeout*1000);
+      timer = window.setTimeout(function() {self.onIdle()}, idle_timeout * 1000);
     });
   };
 
@@ -89,13 +91,14 @@ var SessionTimer = function(user_options) {
     var counter = options.countdown_length;
     $("#session-timeout-warning span").html(counter);
     $("#session-timeout-warning").slideDown();
-
+    
     countdown = window.setInterval(function() {
       if (--counter === 0) {
         window.clearInterval(countdown);
         self.onTimeout();
       } else {
         $("#session-timeout-warning span").html(counter);
+        document.title = "(" + counter + " seconds until you are logged off due to inactivity) " + page_title;
       }
     }, 1000);
   };
@@ -103,6 +106,7 @@ var SessionTimer = function(user_options) {
   this.stopCountdown = function() {
     $("#session-timeout-warning").slideUp();
     window.clearInterval(countdown);
+    document.title = page_title;
     countdown = null;
   };
 
