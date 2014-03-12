@@ -9,25 +9,31 @@ class window.TripTicketsMap
     zoom: 8
     mapTypeId: google.maps.MapTypeId.ROADMAP
   pickUpLocation = null
+  pickUpLocationSet = false
   dropOffLocation = null
+  dropOffLocationSet = false
   
   setPickUpLocation: (location) ->
     pickUpLocation = location
+    pickUpLocationSet = true
 
   setDropOffLocation: (location) ->
     dropOffLocation = location
+    dropOffLocationSet = true
 
   init: (pickUpLocationAddress, dropOffLocationAddress) ->
+    pickUpLocationSet = false
+    dropOffLocationSet = false
     @locateAddress(pickUpLocationAddress, @setPickUpLocation)
-    @locateAddress(dropOffLocationAddress, @setDropOffLocation, true)
-  
+    @locateAddress(dropOffLocationAddress, @setDropOffLocation)
+
   showTwoPoints: ->
-    # console.log "pickUpLocation", pickUpLocation
-    # console.log "dropOffLocation", dropOffLocation
+    console.log "pickUpLocation", pickUpLocation
+    console.log "dropOffLocation", dropOffLocation
     if pickUpLocation? and dropOffLocation?
       mapOptions.center = new google.maps.LatLng(
-        (pickUpLocation.geometry.location.lat()+dropOffLocation.geometry.location.lat())/2,
-        (pickUpLocation.geometry.location.lng()+dropOffLocation.geometry.location.lng())/2
+        (pickUpLocation.geometry.location.lat() + dropOffLocation.geometry.location.lat()) / 2,
+        (pickUpLocation.geometry.location.lng() + dropOffLocation.geometry.location.lng()) / 2
       )
       @showMap()
       directionsService = new google.maps.DirectionsService()
@@ -58,23 +64,22 @@ class window.TripTicketsMap
   locateAddress: (address, setter, lastAddressFetched = false) ->
     geocoder = new google.maps.Geocoder()
     geocoder.geocode address, (results, status) =>
-      # console.log "Looking for:", address
-      # console.log "Found:", results
+      console.log "Looking for:", address
+      console.log "Found:", results
       if status == google.maps.GeocoderStatus.OK
-        # console.log "Returning:", results[0]
+        console.log "Returning:", results[0]
         setter results[0]
       else
-        # console.log "Unable to locate address", status
+        console.log "Unable to locate address", status
         setter null
-        
-      @showTwoPoints() if lastAddressFetched
+      @showTwoPoints() if pickUpLocationSet and dropOffLocationSet
   
   showMap: ->
-    # console.log mapOptions
+    console.log mapOptions
     map = new google.maps.Map $("#map-canvas")[0], mapOptions
     
   setMarker: (position) ->
-    # console.log "setMarker", position
+    console.log "setMarker", position
     marker = new google.maps.Marker({
       map: map,
       position: position.geometry.location,
