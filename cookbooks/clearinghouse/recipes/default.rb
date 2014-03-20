@@ -117,6 +117,10 @@ execute "Create ssh directory" do
   command "mkdir -p /home/#{node[:linuxuser]}/.ssh"
 end
 
+execute "Ensure etc/apache2/certs exists" do
+  command "mkdir -p etc/apache2/certs"
+end
+
 file node[:ssl_cert] do
   owner "root"
   group "root"
