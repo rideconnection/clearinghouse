@@ -53,6 +53,7 @@ open another terminal, `cd` to the project directory, then:
 The next step is to prepare them for our recipes. Copy your public SSH 
 key (probably in `~/.ssh/id_rsa.pub`), then on each of the VM servers:
 
+    sudo su
     mkdir -p /root/.ssh
     touch /root/.ssh/authorized_keys
     vim /root/.ssh/authorized_keys
