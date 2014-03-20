@@ -27,6 +27,51 @@ that you have ruby, chef & knife-solo installed
 
     gem install chef -v 11.4.0
     gem install knife-solo -v 0.2.0
+    
+## Testing your deployment
+
+Prerequisites:
+
+-   Vagrant http://vagrantup.com
+-   VirtualBox http://virtualbox.org
+
+With both installed, do this from the project root:
+
+    vagrant up
+    
+This will download the required Vagrant box (if they haven't been DL'd
+already) and provision a couple local VMs. To access them, open a new
+terminal tab, `cd` to the project directory, then:
+
+    vagrant ssh 33.33.33.10
+    
+That will log you into the VM named "ch_web". To access the other VM,
+open another terminal, `cd` to the project directory, then:
+
+    vagrant ssh 33.33.33.11
+
+The next step is to prepare them for our recipes. Copy your public SSH 
+key (probably in `~/.ssh/id_rsa.pub`), then on each of the VM servers:
+
+    mkdir -p /root/.ssh
+    touch /root/.ssh/authorized_keys
+    vim /root/.ssh/authorized_keys
+    
+Append your public key to the end of that file, then save and quit.
+
+Now you can follow along with the directions below, replacing 
+`<server-hostname>` with the IP address of the VM machine.
+
+> When you get to `knife solo cook root@<server-hostname>`, you will 
+> also need to specify the path to the JSON node file that you want to
+> use on that VM. Ex:
+>     `knife solo cook root@33.33.33.10 nodes/ch.rideconnection.org.json`
+
+TODO change the nodes to use role-based names so that we always have to
+     explicitly specify the node JSON file. Then we can delete the
+     caveat above.
+     
+TODO Revisit everything below here -vvv-
 
 ## Prepare server and deploy:
 
