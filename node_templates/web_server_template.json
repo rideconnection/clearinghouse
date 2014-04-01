@@ -1,9 +1,9 @@
 {
-	"linuxuser": "deployer",
-  "site_url": "ch.clearinghouse.org",
-  "public_directory": "/srv/clearinghouse/current/public",
-  "ssl_cert": "/etc/apache2/certs/ch.rideconnection.org.crt",
-  "ssl_cert_key": "/etc/apache2/certs/ch.rideconnection.org.key",
+	"linuxuser": "someuser",
+  "site_url": "www.whatever.com",
+  "public_directory": "/srv/whatever/current/public",
+  "ssl_cert": "/etc/apache2/certs/www.whatever.com.crt",
+  "ssl_cert_key": "/etc/apache2/certs/www.whatever.com.key",
 	
   "apache":{"listen_ports": ["80", "443"]},
 	"passenger":{"version":"3.0.14", "max_pool_size":"2"},

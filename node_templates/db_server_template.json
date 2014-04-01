@@ -1,0 +1,14 @@
+{
+	"linuxuser": "someuser",
+	"dbuser": "some_username",
+	"dbpass": "some_password",
+	
+	"postgresql":{"password":{"postgres":"password"}},
+	"default_attributes":{"build_essential":{"compiletime": "true"}},
+
+	"run_list": [ 
+		"role[base_server]",
+		"role[db_server]",
+		"recipe[clearinghouse::db]"
+	]
+}

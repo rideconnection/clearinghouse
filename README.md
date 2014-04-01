@@ -1,7 +1,7 @@
 # CLEARINGHOUSE CUSTOM CHEF RECIPE
 
-Uses knife, chef-solo and several cookbooks to create a standalone
-clearinghouse server.
+Uses knife, chef-solo and several cookbooks to create a set of
+servers for the clearinghouse application.
 
 Tested ONLY on Ubuntu 12.04 LTS.
 
@@ -12,11 +12,12 @@ The stack includes:
 -   Phusion Passenger
 
 ## Chef-solo: Further reading:
+
 Find cookbooks http://community.opscode.com/cookbooks
 
 ## Server Requirements
 
-Blank Ubuntu 12.04 server machine with root SSH access. You can set
+Blank Ubuntu 12.04 servers with root SSH access. You can set
 this initial access up by having the root password or by having your
 SSH public key on the target server in /root/.ssh/authorized_keys.
 
@@ -66,7 +67,11 @@ Now you can follow along with the directions below, replacing
 > When you get to `knife solo cook root@<server-hostname>`, you will 
 > also need to specify the path to the JSON node file that you want to
 > use on that VM. Ex:
+>     `knife solo prepare root@33.33.33.10 nodes/ch.rideconnection.org.json`
 >     `knife solo cook root@33.33.33.10 nodes/ch.rideconnection.org.json`
+>     
+>     `knife solo prepare root@33.33.33.11 nodes/173.236.26.186.json`
+>     `knife solo cook root@33.33.33.10 nodes/173.236.26.186.json`
 
 TODO change the nodes to use role-based names so that we always have to
      explicitly specify the node JSON file. Then we can delete the
@@ -76,17 +81,20 @@ TODO Revisit everything below here -vvv-
 
 ## Prepare server and deploy:
 
-    ./deploy.sh root@<server-hostname>
-    knife solo prepare root@<server-hostname>
-    knife solo cook root@<server-hostname>
+For each server to be setup:
+
+    ./deploy.sh root@<server-hostname>         # Will use the empty solo.json file, which is OK
+    knife solo prepare root@<server-hostname>  # Will create the file nodes/<server-hostname>.json if it doesn't exist yet
+    knife solo cook root@<server-hostname>     # Will use the JSON file at nodes/<server-hostname>.json
 
 ## Set up database on target server:
+
 Currently, this is the one primary step that is done manually.
 Typically, you'll load a production database dump when setting up a
 server.
 
 First, create a database backup on another system using the pg_dump
-command, and use scp or a simliar command to get the generated sql file
+command, and use scp or a similar command to get the generated sql file
 onto the target server.
 On the target server, as root:
 
@@ -96,21 +104,16 @@ On the target server, as root:
 
 ## Deploy Code to Server
 
-This is documented in the master branch, but basically, to get things
-going you want to run:
-
-    cap deploy:setup
-    cap deploy:cold
-    cap deploy:migrations
-
-And you're done!
+See the README in the master branch for information on deploying the app
+to the web server.
 
 
 ## SETTING UP NEW SERVERS
 
 Create a new node for a new server:
-    cd nodes
-    cp ../node-templates/webserver_template.json <Server IP>.json
 
-Edit <Server IP>.json file and change username and password to anything
+    cd nodes
+    cp ../node-templates/web_server_template.json <server-hostname>.json
+
+Edit <server-hostname>.json file and change username and password to anything
 you like and remove or add cookbooks if you want.
