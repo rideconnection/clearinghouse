@@ -1,23 +1,38 @@
 {
-	"linuxuser": "someuser",
-  "site_url": "www.whatever.com",
-  "public_directory": "/srv/whatever/current/public",
-  "ssl_cert": "/etc/apache2/certs/www.whatever.com.crt",
-  "ssl_cert_key": "/etc/apache2/certs/www.whatever.com.key",
-	
-  "apache":{"listen_ports": ["80", "443"]},
-	"passenger":{"version":"3.0.14", "max_pool_size":"2"},
-	"default_attributes":{"build_essential":{"compiletime": "true"}},
-	"ruby_installer":{
-		"package_name": "ruby1.9.1",
-		"rubydev_package": "ruby1.9.1-dev",
-		"rubygem_package": false
-	},
-
-	"run_list": [ 
-		"role[base_server]",
-		"role[web_server]",
-		"recipe[sqlite]",
-		"recipe[clearinghouse::web]"
-	]
+    "linuxuser": "deployer",
+    "public_directory": "/srv/clearinghouse/current/public",
+    "site_url": "ch.clearinghouse.org",
+    "ssl_cert": "/etc/apache2/certs/ch.rideconnection.org.crt",
+    "ssl_cert_key": "/etc/apache2/certs/ch.rideconnection.org.key",
+    
+    "apache": {
+        "listen_ports": [
+            "80",
+            "443"
+        ]
+    },
+    
+    "default_attributes": {
+        "build_essential": {
+            "compiletime": "true"
+        }
+    },
+    
+    "passenger": {
+        "max_pool_size": "2",
+        "version": "3.0.14"
+    },
+    
+    "ruby_installer": {
+        "package_name": "ruby1.9.1",
+        "rubydev_package": "ruby1.9.1-dev",
+        "rubygem_package": false
+    },
+    
+    "run_list": [
+        "role[base_server]",
+        "role[web_server]",
+        "recipe[sqlite]",
+        "recipe[clearinghouse::web]"
+    ]
 }

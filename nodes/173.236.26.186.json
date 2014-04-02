@@ -1,14 +1,26 @@
 {
-	"linuxuser": "deployer",
-	"dbuser": "clearinghouse",
-	"dbpass": "clearinghouse",
-	
-	"postgresql":{"password":{"postgres":"password"}},
-	"default_attributes":{"build_essential":{"compiletime": "true"}},
+    "linuxuser": "deployer",
+    "dbpass": "clearinghouse",
+    "dbuser": "clearinghouse",
 
-	"run_list": [ 
-		"role[base_server]",
-		"role[db_server]",
-		"recipe[clearinghouse::db]"
-	]
+    "default_attributes": {
+        "build_essential": {
+            "compiletime": "true"
+        },
+      	"postgresql": {
+          "listen_addresses": "localhost,10.34.32.229"
+        }
+    },
+    
+    "postgresql": {
+        "password": {
+            "postgres": "password"
+        }
+    },
+    
+    "run_list": [
+        "role[base_server]",
+        "role[db_server]",
+        "recipe[clearinghouse::db]"
+    ]
 }

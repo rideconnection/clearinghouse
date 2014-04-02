@@ -259,3 +259,11 @@ package "postgresql-contrib"
 package "postgresql-contrib-8.4"
 
 package "imagemagick"
+
+# Turns out the firewall is disabled on these servers anyway, so no additional
+# rules are required. If we need to add them later, we should use the "firewall"
+# cookbook from chef-ops instead.
+# execute "setup-firewall-rules" do
+#   command "iptables -A OUTPUT -p tcp -s #{node[:web_server_internal_ip_address]} --sport 1024:65535 -d 0/0 --dport 5432 -m state --state NEW,ESTABLISHED -j ACCEPT"
+#   command "iptables -A INPUT -p tcp -s 0/0 --sport 5432 -d #{node[:web_server_internal_ip_address]} --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT"
+# end

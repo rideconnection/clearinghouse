@@ -26,3 +26,12 @@ end
 
 package "postgresql-contrib" 
 package "postgresql-contrib-8.4"
+package "postgresql-8.4-postgis"
+
+# Turns out the firewall is disabled on these servers anyway, so no additional
+# rules are required. If we need to add them later, we should use the "firewall"
+# cookbook from chef-ops instead.
+# execute "setup-firewall-rules" do
+#   command "iptables -A INPUT -p tcp -s #{node[:ip_addresses][:db_server]} --sport 1024:65535 -d #{node[:ip_addresses][:web_server]} --dport 5432 -m state --state NEW,ESTABLISHED -j ACCEPT"
+#   command "iptables -A OUTPUT -p tcp -s #{node[:ip_addresses][:web_server]} --sport 5432 -d #{node[:ip_addresses][:db_server]} --dport 1024:65535 -m state --state ESTABLISHED -j ACCEPT"
+# end
