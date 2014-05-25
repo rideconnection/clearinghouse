@@ -21,21 +21,12 @@ class ApplicationController < ActionController::Base
   private
   
   def store_location
-    # store last url - this is needed for post-login redirect to whatever the user last visited.
-    if (request.fullpath != new_user_session_path &&
-        # request.fullpath != "/users/sign_up" &&
-        request.fullpath != user_password_path &&
-        request.fullpath != destroy_user_session_path &&
-        !request.xhr?) # don't store ajax calls
-      cookies.signed[:previous_url] = request.fullpath
-      logger.info "\n=====\ncookies.signed[:previous_url] = #{request.fullpath}\n====="
+    # store last url - this is needed for post-login redirect to whatever the
+    # user last visited.
+    if !current_user && !self.class.to_s.match(/^Devise::/) && !request.xhr?
+      session["user.return_to"] = request.fullpath
+      logger.info "\n=====\nsession[\"user.return_to\"] = #{request.fullpath}\n====="
     end
-  end
-  
-  def after_sign_in_path_for(resource)
-    return_path = cookies.signed[:previous_url] || root_path
-    logger.info "\n=====\nreturn_path = #{return_path}\n====="
-    return_path
   end
   
   def apply_application_settings
