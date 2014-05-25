@@ -12,11 +12,11 @@ gem "rvm-capistrano"
 gem "activerecord-postgres-hstore", "0.6.0"
 
 # PostgreSQL array support 
-gem "activerecord-postgres-array", "~> 0.0"
+gem "activerecord-postgres-array", "~> 0.0.9"
 
 # Geospatial support
 gem "rgeo"
-gem "activerecord-postgis-adapter", "~> 0.5"
+gem "activerecord-postgis-adapter", "~> 0.6.2"
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -25,32 +25,29 @@ group :assets do
   gem "coffee-rails", "~> 3.2"
 
   # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  # gem "therubyracer", :platforms => :ruby
+  gem "therubyracer", :require => "v8", :platforms => :ruby
 
   gem "uglifier", ">= 1.0"
 end
 
-gem "audited", "~> 3.0"
-gem "audited-activerecord", "~> 3.0"
-gem "cancan", "~> 1.6"
-gem "daemons", "~> 1.1"
-gem "delayed_job_active_record", "~> 4.0"
-gem "delayed_job_web", "~> 1.2"
-gem "devise", "~> 2.2"
-gem "devise-async", "~> 0.8"
-gem "devise_security_extension", "~> 0.7"
-gem "jquery-rails", "~> 2.1"
-gem "kaminari"
-gem "rails-settings-cached", "~> 0.2"
-gem "seedbank", "~> 0.2"
-gem "validates_timeliness", "~> 3.0"
-gem "whenever", "~> 0.8", :require => false
+gem "audited", "~> 3.0.0"
+gem "audited-activerecord", "~> 3.0.0"
+gem "cancan", "~> 1.6.9"
+gem "daemons", "~> 1.1.9"
+gem "delayed_job_active_record", "~> 4.0.0"
+gem "delayed_job_web", "~> 1.2.0"
+gem "devise", "~> 2.2.3"
+gem "devise-async", "~> 0.8.0"
+gem "devise_security_extension", "~> 0.7.2"
+gem "jquery-rails", "~> 2.2.1"
+gem "kaminari", "~> 0.14.1"
+gem "rails-settings-cached", "~> 0.2.4"
+gem "seedbank", "~> 0.2.0"
+gem "validates_timeliness", "~> 3.0.14"
+gem "whenever", "~> 0.8.4", :require => false
 
 # API web service
 gem "grape", "~> 0.2.0"
-
-# Javascript engine
-gem "therubyracer", "~> 0.11"
 
 group :test, :development, :staging do
   gem "debugger"

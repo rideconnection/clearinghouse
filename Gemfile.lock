@@ -307,46 +307,46 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord-postgis-adapter (~> 0.5)
-  activerecord-postgres-array (~> 0.0)
+  activerecord-postgis-adapter (~> 0.6.2)
+  activerecord-postgres-array (~> 0.0.9)
   activerecord-postgres-hstore (= 0.6.0)
-  audited (~> 3.0)
-  audited-activerecord (~> 3.0)
-  cancan (~> 1.6)
+  audited (~> 3.0.0)
+  audited-activerecord (~> 3.0.0)
+  cancan (~> 1.6.9)
   capistrano
   capistrano-ext
   capybara
   coffee-rails (~> 3.2)
-  daemons (~> 1.1)
+  daemons (~> 1.1.9)
   database_cleaner
   debugger
-  delayed_job_active_record (~> 4.0)
-  delayed_job_web (~> 1.2)
-  devise (~> 2.2)
-  devise-async (~> 0.8)
-  devise_security_extension (~> 0.7)
+  delayed_job_active_record (~> 4.0.0)
+  delayed_job_web (~> 1.2.0)
+  devise (~> 2.2.3)
+  devise-async (~> 0.8.0)
+  devise_security_extension (~> 0.7.2)
   factory_girl_rails
   grape (~> 0.2.0)
-  jquery-rails (~> 2.1)
-  kaminari
+  jquery-rails (~> 2.2.1)
+  kaminari (~> 0.14.1)
   launchy
   minitest-rails!
   minitest-rails-capybara!
   pg
   rails (~> 3.2)
   rails-erd
-  rails-settings-cached (~> 0.2)
+  rails-settings-cached (~> 0.2.4)
   rgeo
   rvm-capistrano
   sass-rails (~> 3.2)
-  seedbank (~> 0.2)
+  seedbank (~> 0.2.0)
   spork-minitest!
   spork-rails
   spork-testunit!
-  therubyracer (~> 0.11)
+  therubyracer
   thin
   timecop
   turn
   uglifier (>= 1.0)
-  validates_timeliness (~> 3.0)
-  whenever (~> 0.8)
+  validates_timeliness (~> 3.0.14)
+  whenever (~> 0.8.4)
