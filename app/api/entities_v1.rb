@@ -2,7 +2,7 @@ module Clearinghouse
   module Entities
     module V1
       class Role < Grape::Entity
-        expose :name
+        expose :id, :name
       end
 
       class User < Grape::Entity
@@ -53,18 +53,19 @@ module Clearinghouse
 
         expose :id, :rescinded,
           :origin_provider_id, :origin_customer_id, :origin_trip_id,
-          :claimant_provider_id, :claimant_trip_id,
           :pick_up_location_id, :drop_off_location_id, :customer_address_id,
-          :customer_first_name, :customer_last_name, :customer_middle_name, :customer_dob,
-          :customer_primary_phone, :customer_emergency_phone,
+          :customer_first_name, :customer_last_name, :customer_middle_name,
+          :customer_dob, :customer_primary_phone, :customer_emergency_phone,
           :customer_primary_language, :customer_ethnicity, :customer_race,
-          :customer_information_withheld, :customer_identifiers, :customer_notes,
-          :customer_boarding_time, :customer_deboarding_time, :customer_seats_required,
-          :customer_impairment_description, :customer_mobility_impairments, :customer_assistive_devices,
+          :customer_information_withheld, :customer_identifiers,
+          :customer_notes, :customer_boarding_time, :customer_deboarding_time,
+          :customer_seats_required, :customer_impairment_description,
+          :customer_service_level, :customer_mobility_factors,
           :customer_service_animals, :customer_eligibility_factors,
-          :num_attendants, :num_guests, :guest_or_attendant_service_animals, :guest_or_attendant_assistive_devices,
-          :requested_pickup_time, :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
-          :allowed_time_variance, :trip_purpose_description, :trip_funders, :trip_notes, :scheduling_priority
+          :num_attendants, :num_guests, :requested_pickup_time,
+          :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
+          :allowed_time_variance, :trip_purpose_description, :trip_funders,
+          :trip_notes, :scheduling_priority
 
         expose :created_at, :format_with => :precise_timestamp
         expose :updated_at, :format_with => :precise_timestamp

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130624182706) do
+ActiveRecord::Schema.define(:version => 20140128172852) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -40,6 +40,56 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
+  create_table "bulk_operations", :force => true do |t|
+    t.integer      "user_id"
+    t.boolean      "completed",                              :default => false
+    t.integer      "row_count"
+    t.string       "file_name"
+    t.datetime     "last_exported_timestamp"
+    t.boolean      "is_upload",                              :default => false
+    t.integer      "error_count"
+    t.string_array "row_errors",              :limit => 255
+    t.text         "data"
+    t.datetime     "created_at",                                                :null => false
+    t.datetime     "updated_at",                                                :null => false
+  end
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0, :null => false
+    t.integer  "attempts",   :default => 0, :null => false
+    t.text     "handler",                   :null => false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
+  create_table "eligibility_requirements", :force => true do |t|
+    t.integer  "service_id"
+    t.string   "boolean_type"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
+  add_index "eligibility_requirements", ["service_id"], :name => "index_eligibility_requirements_on_service_id"
+
+  create_table "eligibility_rules", :force => true do |t|
+    t.integer  "eligibility_requirement_id"
+    t.string   "trip_field"
+    t.string   "comparison_type"
+    t.string   "comparison_value"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
+  end
+
+  add_index "eligibility_rules", ["eligibility_requirement_id"], :name => "index_eligibility_rules_on_eligibility_requirement_id"
+
   create_table "filters", :force => true do |t|
     t.integer  "user_id"
     t.string   "name"
@@ -60,9 +110,9 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.spatial  "position",   :limit => {:no_constraints=>true}
+    t.datetime "created_at",                                          :null => false
+    t.datetime "updated_at",                                          :null => false
+    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
   end
 
   create_table "nonces", :force => true do |t|
@@ -75,6 +125,16 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
   add_index "nonces", ["created_at"], :name => "index_nonces_on_created_at"
   add_index "nonces", ["nonce", "provider_id"], :name => "index_nonces_on_nonce_and_provider_id", :unique => true
   add_index "nonces", ["provider_id"], :name => "index_nonces_on_provider_id"
+
+  create_table "old_passwords", :force => true do |t|
+    t.string   "encrypted_password",       :null => false
+    t.string   "password_salt"
+    t.string   "password_archivable_type", :null => false
+    t.integer  "password_archivable_id",   :null => false
+    t.datetime "created_at"
+  end
+
+  add_index "old_passwords", ["password_archivable_type", "password_archivable_id"], :name => "index_password_archivable"
 
   create_table "open_capacities", :force => true do |t|
     t.integer  "service_id"
@@ -119,12 +179,14 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
   create_table "providers", :force => true do |t|
     t.string   "name"
     t.integer  "address_id"
-    t.datetime "created_at",            :null => false
-    t.datetime "updated_at",            :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.string   "api_key"
     t.string   "private_key"
     t.boolean  "active"
     t.string   "primary_contact_email"
+    t.integer  "trip_ticket_expiration_days_before"
+    t.time     "trip_ticket_expiration_time_of_day"
   end
 
   add_index "providers", ["api_key"], :name => "index_providers_on_api_key", :unique => true
@@ -151,15 +213,27 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.string   "name"
     t.integer  "provider_id"
     t.integer  "funding_source_id"
-    t.datetime "created_at",                                            :null => false
-    t.datetime "updated_at",                                            :null => false
+    t.datetime "created_at",                                                    :null => false
+    t.datetime "updated_at",                                                    :null => false
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:no_constraints=>true}
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+    t.string   "service_area_type"
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
+
+  create_table "settings", :force => true do |t|
+    t.string   "var",                      :null => false
+    t.text     "value"
+    t.integer  "thing_id"
+    t.string   "thing_type", :limit => 30
+    t.datetime "created_at",               :null => false
+    t.datetime "updated_at",               :null => false
+  end
+
+  add_index "settings", ["thing_type", "thing_id", "var"], :name => "index_settings_on_thing_type_and_thing_id_and_var", :unique => true
 
   create_table "spatialite_history", :primary_key => "event_id", :force => true do |t|
     t.text "table_name",      :null => false
@@ -195,19 +269,19 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.time     "actual_pick_up_time"
     t.time     "actual_drop_off_time"
     t.integer  "rate_type"
-    t.integer  "rate"
+    t.decimal  "rate",                   :precision => 10, :scale => 2
     t.string   "driver_id"
     t.integer  "vehicle_type"
     t.integer  "vehicle_id"
     t.integer  "fare_type"
-    t.integer  "base_fare"
-    t.integer  "fare"
+    t.decimal  "base_fare",              :precision => 10, :scale => 2
+    t.decimal  "fare",                   :precision => 10, :scale => 2
     t.float    "miles_traveled"
     t.float    "odometer_start"
     t.float    "odometer_end"
     t.float    "billable_mileage"
-    t.datetime "created_at",             :null => false
-    t.datetime "updated_at",             :null => false
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
     t.integer  "extra_securement_count"
   end
 
@@ -224,9 +298,7 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
   add_index "trip_ticket_comments", ["trip_ticket_id"], :name => "index_trip_ticket_comments_on_trip_ticket_id"
 
   create_table "trip_tickets", :force => true do |t|
-    t.integer       "origin_provider_id"
     t.string        "origin_customer_id"
-    t.integer       "claimant_provider_id"
     t.boolean       "customer_information_withheld"
     t.date          "customer_dob"
     t.integer       "customer_address_id"
@@ -238,7 +310,6 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.integer       "customer_seats_required"
     t.text          "customer_notes"
     t.integer       "origin_trip_id"
-    t.integer       "claimant_trip_id"
     t.integer       "pick_up_location_id"
     t.integer       "drop_off_location_id"
     t.string        "scheduling_priority"
@@ -248,8 +319,8 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.string        "trip_purpose_code"
     t.string        "trip_purpose_description"
     t.text          "trip_notes"
-    t.datetime      "created_at",                                                             :null => false
-    t.datetime      "updated_at",                                                             :null => false
+    t.datetime      "created_at",                                                        :null => false
+    t.datetime      "updated_at",                                                        :null => false
     t.string        "customer_primary_language"
     t.string        "customer_first_name"
     t.string        "customer_last_name"
@@ -257,55 +328,61 @@ ActiveRecord::Schema.define(:version => 20130624182706) do
     t.time          "requested_pickup_time"
     t.time          "requested_drop_off_time"
     t.hstore        "customer_identifiers"
-    t.string_array  "customer_mobility_impairments",        :limit => 255
     t.string        "customer_ethnicity"
-    t.string_array  "customer_eligibility_factors",         :limit => 255
-    t.string_array  "customer_assistive_devices",           :limit => 255
-    t.string_array  "customer_service_animals",             :limit => 255
-    t.string_array  "guest_or_attendant_service_animals",   :limit => 255
-    t.string_array  "guest_or_attendant_assistive_devices", :limit => 255
-    t.string_array  "trip_funders",                         :limit => 255
+    t.string_array  "customer_eligibility_factors",    :limit => 255
+    t.string_array  "customer_mobility_factors",       :limit => 255
+    t.string_array  "customer_service_animals",        :limit => 255
+    t.string_array  "trip_funders",                    :limit => 255
     t.string        "customer_race"
     t.time          "earliest_pick_up_time"
     t.datetime      "appointment_time"
     t.integer_array "provider_white_list"
     t.integer_array "provider_black_list"
-    t.boolean       "rescinded",                                           :default => false, :null => false
+    t.integer       "origin_provider_id"
+    t.boolean       "rescinded",                                      :default => false, :null => false
+    t.datetime      "expire_at"
+    t.boolean       "expired",                                        :default => false
+    t.string        "customer_service_level"
   end
 
-  add_index "trip_tickets", ["customer_assistive_devices"], :name => "customer_assistive_devices"
   add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
   add_index "trip_tickets", ["customer_identifiers"], :name => "customer_identifiers"
-  add_index "trip_tickets", ["customer_mobility_impairments"], :name => "customer_mobility_impairments"
+  add_index "trip_tickets", ["customer_mobility_factors"], :name => "customer_mobility_factors"
   add_index "trip_tickets", ["customer_service_animals"], :name => "customer_service_animals"
-  add_index "trip_tickets", ["guest_or_attendant_assistive_devices"], :name => "guest_or_attendant_assistive_devices"
-  add_index "trip_tickets", ["guest_or_attendant_service_animals"], :name => "guest_or_attendant_service_animals"
-  add_index "trip_tickets", ["origin_provider_id"], :name => "index_trip_tickets_on_origin_provider_id"
+  add_index "trip_tickets", ["customer_service_level"], :name => "customer_service_level"
+  add_index "trip_tickets", ["expired"], :name => "index_trip_tickets_on_expired"
   add_index "trip_tickets", ["provider_black_list"], :name => "provider_black_list"
   add_index "trip_tickets", ["provider_white_list"], :name => "provider_white_list"
   add_index "trip_tickets", ["trip_funders"], :name => "trip_funders"
 
   create_table "users", :force => true do |t|
-    t.string   "email"
-    t.string   "name"
-    t.string   "title"
-    t.string   "phone"
-    t.integer  "provider_id"
-    t.datetime "created_at",                               :null => false
-    t.datetime "updated_at",                               :null => false
-    t.string   "encrypted_password",     :default => "",   :null => false
-    t.string   "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.integer  "sign_in_count",          :default => 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.boolean  "active",                 :default => true, :null => false
-    t.integer  "role_id"
+    t.string       "email"
+    t.string       "name"
+    t.string       "title"
+    t.string       "phone"
+    t.integer      "provider_id"
+    t.datetime     "created_at",                                               :null => false
+    t.datetime     "updated_at",                                               :null => false
+    t.string       "encrypted_password",                     :default => "",   :null => false
+    t.string       "reset_password_token"
+    t.datetime     "reset_password_sent_at"
+    t.integer      "sign_in_count",                          :default => 0
+    t.datetime     "current_sign_in_at"
+    t.datetime     "last_sign_in_at"
+    t.string       "current_sign_in_ip"
+    t.string       "last_sign_in_ip"
+    t.boolean      "active",                                 :default => true, :null => false
+    t.integer      "role_id"
+    t.string_array "notification_preferences"
+    t.datetime     "password_changed_at"
+    t.integer      "failed_attempts",                        :default => 0
+    t.datetime     "locked_at"
+    t.string       "unique_session_id",        :limit => 20
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
+  add_index "users", ["notification_preferences"], :name => "notification_preferences_index"
+  add_index "users", ["password_changed_at"], :name => "index_users_on_password_changed_at"
   add_index "users", ["provider_id"], :name => "index_users_on_provider_id"
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 

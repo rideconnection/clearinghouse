@@ -31,7 +31,7 @@ Clearinghouse::Application.configure do
   config.force_ssl = true
 
   # See everything in the log (default is :info)
-  # config.log_level = :debug
+  config.log_level = :debug
 
   # Prepend all log lines with the following tags
   # config.log_tags = [ :subdomain, :uuid ]
@@ -46,11 +46,12 @@ Clearinghouse::Application.configure do
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  # config.assets.precompile += %w( search.js )
-  #
+  config.assets.precompile += %w( dashboard.js notification_mailer.css )
+
   config.action_mailer.default_url_options = {
     :host => 'ridestage.panopticdev.com/clearinghouse',
   }
+  config.action_mailer.asset_host = 'https://ridestage.panopticdev.com/clearinghouse'
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
@@ -70,4 +71,6 @@ Clearinghouse::Application.configure do
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
   
   config.relative_url_root = '/clearinghouse'
+
+  config.bulk_operation_options = { use_delayed_job: false }
 end

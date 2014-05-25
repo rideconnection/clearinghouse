@@ -1,4 +1,8 @@
+require 'notification_recipients'
+
 class TripClaim < ActiveRecord::Base
+  include NotificationRecipients
+
   belongs_to :trip_ticket, :touch => true
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
   
@@ -27,7 +31,19 @@ class TripClaim < ActiveRecord::Base
   validate :trip_ticket_is_not_rescinded, :on => :create
 
   audited
-  
+
+  acts_as_notifier do
+    after_create do
+      notify ->(opts){ provider_users(trip_ticket.originator, opts) }, if: proc{ !can_be_auto_approved? }, method: :claim_for_approval
+      notify ->(opts){ provider_users([trip_ticket.originator, claimant], opts) }, if: proc{ can_be_auto_approved? }, method: :claim_auto_approved
+    end
+    after_save do
+      notify ->(opts){ provider_users(claimant, opts) }, if: proc{ status_changed? && status == :approved && !can_be_auto_approved? }, method: :claim_approved
+      notify ->(opts){ provider_users(claimant, opts) }, if: proc{ status_changed? && status == :declined }, method: :claim_declined
+      notify ->(opts){ provider_users(trip_ticket.originator, opts) }, if: proc{ status_changed? && status == :rescinded }, method: :claim_rescinded
+    end
+  end
+
   default_scope order('created_at ASC')
   
   after_create do

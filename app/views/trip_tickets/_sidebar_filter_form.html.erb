@@ -5,7 +5,7 @@
 
   <div class="saved-filters">
     <% if (collection = Filter.accessible_by(current_ability).order(:name)).length > 0 %>
-      <%= form_tag trip_tickets_path, :method => :get, :class => "apply-filter" do %>
+      <%= form_tag apply_filters_trip_tickets_path, :method => :get, :class => "apply-filter" do %>
         <%= select_tag 'saved_filter', options_from_collection_for_select(collection, :name, :name, @filter.try(:name)), :id => :saved_filter, :prompt => "Saved Filters:", :class => "form-input" %>
         <%= submit_tag 'Apply', :name => '', :class => "button" %>
       <% end %>
@@ -20,27 +20,31 @@
         <%= filter_mini_form('Save current filters') %>
       <% end %>
     </div>
+    <hr>
   </div>
 
-  <%= form_tag trip_tickets_path, :method => :get, :class => "form-filter" do %>
+  <%= form_tag apply_filters_trip_tickets_path, :method => :get, :class => "form-filter" do %>
     <div class="field">
-      <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>
+      <%= select_tag 'trip_ticket_filters[service_filters]', options_for_select([["Do not apply service filters (default)", :ignore_service_filters], ["Apply service filters", :apply_service_filters]], params[:trip_ticket_filters].try(:[], :service_filters)), :id => :trip_ticket_filters_service_filters, :prompt => "Service Filters:", :class => "form-input" %>
     </div>
 
     <div class="field">
-      <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone, :placeholder => "Customer Address or Phone", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location, :placeholder => "Pickup Address", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location, :placeholder => "Dropoff Address", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= text_field_tag 'trip_ticket_filters[customer_identifiers]', params[:trip_ticket_filters].try(:[], :customer_identifiers), :id => :trip_ticket_filters_customer_identifiers, :placeholder => "Customer Identifiers", :class => "form-input" %>
+      <%= label_tag :trip_ticket_filters_ticket_status, "Ticket Status:" %><br>
+      <%= select_tag 'trip_ticket_filters[ticket_status][]', options_for_select([
+        ["Approved", "approved"],
+        ["Available", "available"],
+        ["Awaiting Result", "awaiting result"],
+        ["Cancelled", "cancelled"],
+        ["Claim Pending", "claim pending"],
+        ["Claimed", "claimed"],
+        ["Completed", "completed"],
+        ["Declined", "declined"],
+        ["Expired", "expired"],
+        ["No Claims", "no claims"],
+        ["No-Show", "no-show"],
+        ["Rescinded", "rescinded"],
+        ["Unavailable", "unavailable"]
+      ], params[:trip_ticket_filters].try(:[], :ticket_status)), {:multiple => true, :size => 13, :id => :trip_ticket_filters_ticket_status, :class => "form-input"} %>
     </div>
 
     <div class="field">
@@ -54,21 +58,7 @@
     </div>
 
     <div class="field">
-      <%= select_tag 'trip_ticket_filters[rescinded]', options_for_select([["Hide rescinded (default)", :exclude_rescinded], ["Show rescinded", :include_rescinded], ["Only rescinded", :only_rescinded]], params[:trip_ticket_filters].try(:[], :rescinded)), :id => :trip_ticket_filters_rescinded, :prompt => "Rescinded Trip Tickets", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= select_tag 'trip_ticket_filters[claim_status]', options_for_select([:approved, :pending, :unclaimed], params[:trip_ticket_filters].try(:[], :claim_status)), :id => :trip_ticket_filters_claim_status, :prompt => "Claim Status", :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :prompt => "Scheduling Priority", :id => :trip_ticket_filters_scheduling_priority, :class => "form-input" %>
-    </div>
-
-    <div class="field">
-      <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required:" %><br>
-      <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99, :size => 5, :placeholder => "Min" %>
-      to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99, :size => 5, :placeholder => "Max" %>
+      <%= select_tag 'trip_ticket_filters[rescinded]', options_for_select([["Show rescinded (default)", :include_rescinded], ["Hide rescinded", :exclude_rescinded], ["Only rescinded", :only_rescinded]], params[:trip_ticket_filters].try(:[], :rescinded)), :id => :trip_ticket_filters_rescinded, :prompt => "Rescinded Trip Tickets:", :class => "form-input" %>
     </div>
 
     <div class="field">
@@ -76,9 +66,53 @@
       <%= text_field_tag 'trip_ticket_filters[trip_time][start]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :start), :id => :trip_ticket_filters_trip_time_start, :placeholder => "From: yyyy-mm-dd hh:mm am", :class => "form-input" %><br>
       <%= text_field_tag 'trip_ticket_filters[trip_time][end]', params[:trip_ticket_filters].try(:[], :trip_time).try(:[], :end), :id => :trip_ticket_filters_trip_time_end, :placeholder => "To: yyyy-mm-dd hh:mm am", :class => "form-input" %>
     </div>
+    
+    <% auto_open = params[:trip_ticket_filters].try(:[], :customer_name).present? ||
+                   params[:trip_ticket_filters].try(:[], :customer_address_or_phone).present? ||
+                   params[:trip_ticket_filters].try(:[], :pick_up_location).present? ||
+                   params[:trip_ticket_filters].try(:[], :drop_off_location).present? ||
+                   params[:trip_ticket_filters].try(:[], :customer_identifiers).present? ||
+                   params[:trip_ticket_filters].try(:[], :scheduling_priority).present? ||
+                   params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min).present? ||
+                   params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max).present?
+    %>
+    <div class="field advanced-filters<%= ' active' if auto_open %>">
+      <a class="opener" href="#">Advanced Filters</a>
+      <div class="slide">
+        <div class="field">
+          <%= text_field_tag 'trip_ticket_filters[customer_name]', params[:trip_ticket_filters].try(:[], :customer_name), :id => :trip_ticket_filters_customer_name, :placeholder => "Customer Name", :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= text_field_tag 'trip_ticket_filters[customer_address_or_phone]', params[:trip_ticket_filters].try(:[], :customer_address_or_phone), :id => :trip_ticket_filters_customer_address_or_phone, :placeholder => "Customer Address or Phone", :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= text_field_tag 'trip_ticket_filters[pick_up_location]', params[:trip_ticket_filters].try(:[], :pick_up_location), :id => :trip_ticket_filters_pick_up_location, :placeholder => "Pickup Address", :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= text_field_tag 'trip_ticket_filters[drop_off_location]', params[:trip_ticket_filters].try(:[], :drop_off_location), :id => :trip_ticket_filters_drop_off_location, :placeholder => "Dropoff Address", :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= text_field_tag 'trip_ticket_filters[customer_identifiers]', params[:trip_ticket_filters].try(:[], :customer_identifiers), :id => :trip_ticket_filters_customer_identifiers, :placeholder => "Customer Identifiers", :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= select_tag 'trip_ticket_filters[scheduling_priority]', options_for_select(TripTicket::SCHEDULING_PRIORITY.invert, params[:trip_ticket_filters].try(:[], :scheduling_priority)), :prompt => "Scheduling Priority:", :id => :trip_ticket_filters_scheduling_priority, :class => "form-input" %>
+        </div>
+
+        <div class="field">
+          <%= label_tag :trip_ticket_filters_seats_required_min, "Seats Required:" %><br>
+          <%= number_field_tag 'trip_ticket_filters[seats_required][min]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :min), :id => :trip_ticket_filters_seats_required_min, :min => 1, :max => 99, :size => 5, :placeholder => "Min" %>
+          to <%= number_field_tag 'trip_ticket_filters[seats_required][max]', params[:trip_ticket_filters].try(:[], :seats_required).try(:[], :max), :id => :trip_ticket_filters_seats_required_max, :min => 1, :max => 99, :size => 5, :placeholder => "Max" %>
+        </div>
+      </div>
+    </div>
 
     <div class="buttons-holder">
-      <%= link_to trip_tickets_path(:trip_ticket_filters => 'clear'), :class => "button button-cancel" do %>
+      <%= link_to clear_filters_trip_tickets_path, :class => "button button-cancel" do %>
         <span>Clear</span>
       <% end %>
       <%= submit_tag 'Search', :name => '', :class => "button" %>

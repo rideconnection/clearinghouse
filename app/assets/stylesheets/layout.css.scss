@@ -1,5 +1,22 @@
 @import 'utilities';
 
+#session-timeout-warning {
+  position: fixed;
+  top: 0%;
+  left: 0%;
+  width: 100%;
+  padding: 1.3em 0;
+  font-weight: bold;
+  background: #e5f2ff;
+  text-align: center;
+  border-bottom: 1px solid #598FEF;
+  z-index: 2000;
+
+  span {
+    color: #e5004d;
+  }
+}
+
 #header {
   background:#ccc;
   border-bottom:2px solid #707070;
@@ -244,12 +261,13 @@
 
 footer {
   @include clearfix;
-  background:#ccc;
-  border-top:2px solid #707070;
+  background: #ccc;
+  border-top: 2px solid #707070;
+  border-bottom: 2px solid #707070;
   height: 100px;
-  margin-top:20px;
-  padding:10px;
-  text-align:center;
+  margin-top: 20px;
+  padding: 10px;
+  text-align: center;
 }
 
 p.error {

@@ -1,0 +1,54 @@
+<%= form_tag(create_multiple_claims_trip_tickets_path, method: :post) do %>
+  <table class="table table-striped-groups-of-two">
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Seats</th>
+        <th>Pickup Location</th>
+        <th>App't Time</th>
+        <th>Drop Off Location</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @trip_claims.each do |trip_claim| %>
+        <% trip_ticket = trip_claim.trip_ticket %>
+        <tr>
+          <td><%= trip_ticket.customer_full_name %></td>
+          <td><%= trip_ticket.seats_required %></td>
+          <td><%= formatted_address_and_city trip_ticket.pick_up_location %></td>
+          <td><%= trip_ticket.appointment_time.strftime "%b %d %I:%M %p" %> <%= load_unload_time_warning(trip_ticket.customer_boarding_time, trip_ticket.customer_deboarding_time) %></td>
+          <td><%= formatted_address_and_city trip_ticket.drop_off_location %></td>
+          <td>
+            <ul class="icons-list">
+              <% trip_ticket.icon_list.each do |icon| %>
+                <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
+              <% end %>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="7">
+            <%= render partial: 'shared/error_explanation', locals: { object: trip_claim } %>
+                        
+            <%= fields_for "trip_claim[#{trip_ticket.id}]", trip_claim do |ff| %>
+              <%= render partial: 'trip_claims/form_fields', locals: { f: ff, trip_ticket: trip_ticket, trip_claim: trip_claim, claim_multiple: true } %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="7">
+          <div class="buttons-holder field-align">
+            <%= link_to :back, :class => "button button-cancel" do %>
+              <span>Cancel</span>
+            <% end %>
+            <%= submit_tag "Claim Tickets", :class => "button" %>
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+<% end %>

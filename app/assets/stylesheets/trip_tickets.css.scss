@@ -31,7 +31,7 @@ body[data-controller="trip_tickets"] {
 
       form.delete-filter {
         position: absolute;
-        top: 4px;
+        top: 2px;
         right: 0;
 
         .destroy {
@@ -73,6 +73,28 @@ body[data-controller="trip_tickets"] {
       }
     }
 
+    .advanced-filters {
+      padding:0 0 17px;
+
+      .opener {
+        background:url(image-path("sprite1.png")) no-repeat 2px 4px;
+        font-size:14px;
+        line-height:16px;
+        padding:0 0 0 18px;
+      }
+
+      &.active .opener {
+        background-position:-1px -86px;
+      }
+
+      .slide {
+        padding:20px 0 16px 0;
+      }
+
+      p {
+        margin:0 0 18px;
+      }
+    }
   }
 
   &[data-action="index"] {
@@ -85,40 +107,40 @@ body[data-controller="trip_tickets"] {
         background:#ededed;
         overflow:hidden;
         padding:9px 33px 4px;
+      }
 
-        .actions-list {
-          float:right;
-          font-weight:600;
-          list-style:none;
-          margin:0;
-          padding:0;
+      .actions-list {
+        float:right;
+        font-weight:600;
+        list-style:none;
+        margin:0;
+        padding:0;
 
-          li {
-            float:left;
+        li {
+          float:left;
 
-            a {
-              background:url(image-path("sprite1.png")) no-repeat 0 -520px;
-              color:#666;
+          a {
+            background:url(image-path("sprite1.png")) no-repeat 0 -520px;
+            color:#666;
+            display:block;
+      
+            span {
+              background:url(image-path("separator03.gif")) no-repeat 0 1px;
               display:block;
-        
-              span {
-                background:url(image-path("separator03.gif")) no-repeat 0 1px;
-                display:block;
-                padding:7px 12px 11px 9px;
-              }
+              padding:7px 12px 11px 9px;
             }
-        
-            &:first-child a {
-              background-position:0 -470px;
-            }
-        
-            &.last a {
-              background-position:100% -570px;
-            }
-        
-            &:first-child a span {
-              background:none;
-            }
+          }
+      
+          &:first-child a {
+            background-position:0 -470px;
+          }
+      
+          &.last a {
+            background-position:100% -570px;
+          }
+      
+          &:first-child a span {
+            background:none;
           }
         }
       }
@@ -150,6 +172,11 @@ body[data-controller="trip_tickets"] {
           }
 
           @include icons-list;
+
+          .icons-list {
+            display: inline-block;
+            margin-top: 8px;
+          }
 
           .check {
             background:#f1f4f1;
@@ -227,7 +254,7 @@ body[data-controller="trip_tickets"] {
             }
           }
 
-          .checked {
+          .checked, .unchecked {
             background:url(image-path("sprite1.png")) no-repeat 0 -625px;
             bottom:8px;
             display:none;
@@ -236,8 +263,12 @@ body[data-controller="trip_tickets"] {
             right:6px;
             width:16px;
           }
+          
+          .unchecked {
+            background:url(image-path("sprite1.png")) no-repeat 0 -610px;
+          }
 
-          .check .checked {
+          .check .checked, .multiple-select-enabled .checked, .multiple-select-enabled .unchecked {
             display:block;
           }
 
@@ -265,13 +296,14 @@ body[data-controller="trip_tickets"] {
         width:655px;
       
         .content-frame {
-          height:643px;
-          min-height:643px;
+          height:642px;
+          min-height:642px;
           padding:8px 33px 20px 24px;
 
           .heading {
             margin:0 0 12px;
             position:relative;
+            @include clearfix;
 
             &.alt-heading {
               margin-bottom:26px;
@@ -291,6 +323,7 @@ body[data-controller="trip_tickets"] {
 
               &.rescinded       { color: gray }
               &.expired         { color: gray }
+              &.no_claims       { color: gray }
               &.unavailable     { color: gray }
               &.declined        { color: gray }
               &.pending         { color: blue }
@@ -334,10 +367,13 @@ body[data-controller="trip_tickets"] {
             margin:0 0 0 -4px;
             padding:0;
 
+            /*
             li {
               overflow:hidden;
               padding:0 0 4px;
               vertical-align:top;
+              overflow: hidden;
+              white-space: nowrap;
             
               span {
                 background:url(image-path("separator02.gif")) no-repeat 100% 2px;
@@ -348,6 +384,20 @@ body[data-controller="trip_tickets"] {
                 vertical-align:top;
                 width:105px;
               }
+            }
+            */
+            
+            td {
+              vertical-align: top;
+              padding-bottom: 10px;
+
+              &.activity-info {
+                width: 60px;
+              }
+            }
+
+            a {
+              text-decoration: underline;
             }
           }
 
@@ -448,7 +498,13 @@ body[data-controller="trip_tickets"] {
               
               .gps-data {
                 display:block;
-                padding:2px 0 16px;
+                padding:8px 0 16px;
+                table{
+                  td {
+                    padding-top: 4px;
+                    padding-right: 8px;
+                  }
+                }
               }
               
               p {
@@ -687,4 +743,14 @@ body[data-controller="trip_tickets"] {
     margin:0;
   }
   */
+}
+
+div.edit-claim-popup div {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.edit-claim-popup span.heading {
+  width: 200px;
+  font-weight: bold;
 }

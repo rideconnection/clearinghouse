@@ -1,0 +1,21 @@
+<div class="padded">
+  <header>
+    <h2>Eligibility Requirements Group</h2>
+  </header>
+
+  <section style="margin-left: 1em">
+    <h4 style="margin-bottom:0.5em"><%= EligibilityRequirement::BOOLEAN_TYPES[@eligibility_requirement.boolean_type] %></h4>
+    <div style="margin-left:1em; margin-top:1em">
+      <% @eligibility_rules = @eligibility_requirement.eligibility_rules %>
+      <%= render 'eligibility_rules/list' %>
+    </div>
+  </section>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Provider Details', provider_path(@eligibility_requirement.service.provider) + "#service-#{ @eligibility_requirement.service.id }-eligibility-requirements" %></li>
+    <li><%= link_to 'Edit Group', edit_eligibility_requirement_path(@eligibility_requirement) %></li>
+    <li><%= link_to 'Delete Group', @eligibility_requirement, method: :delete, data: { confirm: 'Are you sure?' } %></li>
+  </ul>
+<% end %>

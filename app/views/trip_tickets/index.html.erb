@@ -1,88 +1,24 @@
-<%= content_for :head do %>
-  <script type="text/javascript">
-    $(document).ready(function(){
-      $('.tickets-list li').each(function() {
-        $(this).find('a').css('text-decoration', 'none');
-        $(this).css('cursor', 'pointer').click(function(){
-          $(this).siblings('.check').removeClass('check');
-          $(this).addClass('check');
-          $(this).find('a')[0].click();
-        });
-      });
-      $('.content-frame').on('click', '.activity-list a', function(event){
-        event.preventDefault();
-        $this = $(this);
-        if ($this.data('activity-type') == 'trip_result') {
-          url = $this.attr('href');
-        } else {
-          url = $this.attr('href').replace(/\/\d+$/, '');
-        }
-        $.getScript(url);
-      });
-      
-    });
-  </script>
-<% end %>
-
 <header>
   <h2>Trip Tickets</h2>
 </header>
 
 <div class="actions-list-holder">
   <ul class="actions-list">
-    <!--li><a href="#"><span>Claim Selected</span></a></li-->
     <% if can? :create, TripTicket %>
-      <li>
-        <%= link_to new_trip_ticket_path do %>
-          <span>Add New</span>
-        <% end %>
-      </li>
+      <li class="action-new <% if !can?(:create, BulkOperation) %>last<% end %>"><%= link_to new_trip_ticket_path, class: "no-clickify" do %><span>Add New</span><% end %></li>
     <% end %>
-    <!--li><a href="#"><span>Upload</span></a></li-->
-    <li class="last"><a href="#"><span>&nbsp;<!--Download--></span></a></li>
+    <% if can?(:create, BulkOperation) %>
+      <li><%= link_to new_bulk_operation_path(operation_type: :upload) do %><span>Upload</span><% end %></li>
+      <li class="last"><%= link_to new_bulk_operation_path(operation_type: :download) do %><span>Download</span><% end %></li>
+    <% end %>
   </ul>
 </div>
 
-<div class="tickets-holder">
-  <div class="scrollable-area">
-    <ul class="tickets-list">
-      <% @trip_tickets.each_with_index do |tt,index| %>
-        <li class="<%= (index == 0) ? "check" : "" %> status_<%= tt.status.downcase %>">
-          <div class="description">
-            <div class="column">
-              <%= link_to tt, :remote => true do %>
-                <strong class="title"><%= tt.customer_full_name %> <span class="count"><%= tt.seats_required %></span> <!--img src="/assets/icon01.png" width="16" height="14" alt="" /--></strong>
-              <% end %>
-              <address><%= tt.pick_up_location.try(:address_and_city, ', ') %></address>
-              <% trip_status = tt.status_for(current_user) %>
-              <div class="status <%= underscore_status(trip_status) %>"><%= trip_status %></div>
-            </div>
-            <div class="column">
-              <em class="date"><%= tt.appointment_time.strftime "%I:%M %p" %><span><%= tt.appointment_time.strftime "%b %d" %></span> <%= load_unload_time_warning(tt.customer_boarding_time, tt.customer_deboarding_time) %></em>
-              <address><%= tt.drop_off_location.try(:address_and_city, ', ') %></address>
-            </div>
-          </div>
-          <ul class="icons-list">
-            <li><!--img src="/assets/icon03.png" width="13" height="18" alt="" /--></li>
-            <li><!--img src="/assets/icon04.png" width="7" height="23" alt="" /--></li>
-            <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
-          </ul>
-          <span class=""></span>
-        </li>
-      <% end %>
-    </ul>
-  </div>
+<div id="standard_ticket_list">
+  <%= render 'standard_ticket_list' %>
 </div>
 
-<div class="content-holder">
-  <div class="scrollable-area">
-    <div class="content-frame">
-      <% unless @trip_tickets.empty? %>
-        <%= render 'unified_trip_ticket_view', :trip_ticket => @trip_tickets.first %>
-      <% end %>
-    </div>
-  </div>
-</div>
+<%= render 'trip_tickets/ajaxified_dashboard/dashboard' %>
 
 <% content_for :sidebar do %>
   <%= render 'sidebar_filter_form' %>

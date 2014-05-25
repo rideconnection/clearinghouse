@@ -9,7 +9,7 @@ module Clearinghouse
           # TODO add all available trip filters as optional params with descriptions so the API is self-documenting
         #end
         get do
-          present trip_tickets_filter(TripTicket.accessible_by(current_ability)), with: Clearinghouse::Entities::V1::TripTicket
+          present trip_tickets_filter(TripTicket.accessible_by(current_ability), current_provider), with: Clearinghouse::Entities::V1::TripTicket
         end
 
         desc "Get detailed list of trips related to requesting provider including all associated objects"
@@ -20,7 +20,7 @@ module Clearinghouse
           params.merge!({ trip_ticket_filters: { updated_at: { start: params[:updated_since] }}}) if params[:updated_since]
           # using accessible_by and trying to chain originated_or_claimed_by does not work because accessible_by only allows originated trips through
           #trips = trip_tickets_filter(TripTicket.accessible_by(current_ability).originated_or_claimed_by(current_provider))
-          trips = trip_tickets_filter(TripTicket.originated_or_claimed_by(current_provider))
+          trips = trip_tickets_filter(TripTicket.originated_or_claimed_by(current_provider), current_provider)
           present trips, with: Clearinghouse::Entities::V1::TripTicketDetailed, current_provider: current_provider
         end
 

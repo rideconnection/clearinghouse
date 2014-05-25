@@ -3,9 +3,18 @@ class Service < ActiveRecord::Base
   has_many :open_capacities
   has_many :operating_hours, :class_name => :OperatingHours
   has_one :funding_source
+  has_many :eligibility_requirements
+
+  SERVICE_AREA_TYPES = {
+    'none' => 'Do not filter trip tickets based on this service area',
+    'pickup' => 'Pickup location must be within service area',
+    'dropoff' => 'Drop-off location must be within service area',
+    'both' => 'Pickup and drop-off must both be within service area',
+    'either' => 'Either pickup or drop-off must be within service area'
+  }
 
   attr_accessible :eligibility, :funding_id, :name, :operating_hours_id,
-    :rate, :req_min_age, :req_veteran, :service_area, :provider_id
+    :rate, :req_min_age, :req_veteran, :service_area, :service_area_type, :provider_id
 
   validates_presence_of :name, :provider
 

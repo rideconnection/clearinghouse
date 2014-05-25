@@ -6,7 +6,7 @@ FactoryGirl.define do
     status :pending
     claimant_service_id 1
     trip_ticket
-    proposed_pickup_time { DateTime.now }
+    proposed_pickup_time { Time.zone.now }
     proposed_fare "$1.23"
   end
 end

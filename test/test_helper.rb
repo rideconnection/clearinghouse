@@ -41,10 +41,18 @@ Spork.prefork do
   Turn.config.format = :pretty
   Turn.config.trace = 30
 
-  Dir[Rails.root.join("test/support/**/*.rb")].each {|f| require f}
+  # by default, do not send email notifications in test mode
+  ActsAsNotifier::Config.disabled = true
+  
+  Devise::Async.enabled = false
+
+  Dir[Rails.root.join("test/support/*.rb")].each {|f| require f}  
 end
 
 Spork.each_run do
   DatabaseCleaner.clean
   FactoryGirl.reload
+
+  ApplicationSetting.update_settings ApplicationSetting.defaults
+  ApplicationSetting.apply!
 end

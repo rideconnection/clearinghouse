@@ -1,5 +1,6 @@
 common: &common
   adapter: postgis
+  encoding: unicode
   host: localhost
   username: clearinghouse
   password: clearinghouse
@@ -23,3 +24,4 @@ staging:
 production:
   <<: *common
   database: clearinghouse_production
+  host: 10.34.32.229

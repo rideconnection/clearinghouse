@@ -1,8 +1,13 @@
+require 'trip_ticket_icons'
+require 'notification_recipients'
+
 class TripTicket < ActiveRecord::Base
+  include TripTicketIcons
+  include NotificationRecipients
+
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
   
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
-  belongs_to :claimant, :foreign_key => :claimant_provider_id, :class_name => :Provider, :validate => true
   belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :pick_up_location,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :drop_off_location, :class_name => :Location, :validate => true, :dependent => :destroy
@@ -30,49 +35,75 @@ class TripTicket < ActiveRecord::Base
   ]
 
   CUSTOMER_IDENTIFIER_ARRAY_FIELDS = {
-    :customer_mobility_impairments => "Mobility Impairment",
     :customer_eligibility_factors => "Eligibility Factor",
-    :customer_assistive_devices => "Assistive Device",
+    :customer_mobility_factors => "Mobility Factors",
     :customer_service_animals => "Service Animal",
-    :guest_or_attendant_service_animals => "Guest or Attendant Service Animal",
-    :guest_or_attendant_assistive_devices => "Guest or Attendant Assistive Device",
     :trip_funders => "Trip Funder",
   }
 
   CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES = CUSTOMER_IDENTIFIER_ARRAY_FIELDS.keys
 
+  CUSTOMER_IDENTIFIER_HSTORE_FIELDS = {
+    :customer_identifiers => "Customer Identifiers",
+  }
+
+  CUSTOMER_IDENTIFIER_HSTORE_FIELD_NAMES = CUSTOMER_IDENTIFIER_HSTORE_FIELDS.keys
+
   attr_accessible :allowed_time_variance, :appointment_time,
-    :claimant_provider_id, :claimant_trip_id, :customer_address_attributes, 
-    :customer_address_id, :customer_boarding_time, :customer_deboarding_time, 
-    :customer_dob, :customer_emergency_phone, :customer_ethnicity, 
-    :customer_first_name, :customer_impairment_description, 
-    :customer_information_withheld, :customer_last_name, :customer_middle_name, 
-    :customer_notes, :customer_primary_language, :customer_primary_phone, 
-    :customer_race, :customer_seats_required, :drop_off_location_attributes,
-    :drop_off_location_id, :earliest_pick_up_time,
-    :num_attendants, :num_guests, :origin_customer_id, :origin_provider_id,
-    :origin_trip_id, :pick_up_location_attributes, :pick_up_location_id,
+    :customer_address_attributes, :customer_address_id,
+    :customer_boarding_time, :customer_deboarding_time, :customer_dob,
+    :customer_emergency_phone, :customer_ethnicity, :customer_first_name,
+    :customer_impairment_description, :customer_information_withheld,
+    :customer_last_name, :customer_middle_name, :customer_notes,
+    :customer_primary_language, :customer_primary_phone, :customer_race,
+    :customer_seats_required, :drop_off_location_attributes,
+    :drop_off_location_id, :earliest_pick_up_time, :num_attendants,
+    :num_guests, :origin_customer_id, :origin_provider_id, :origin_trip_id,
+    :pick_up_location_attributes, :pick_up_location_id,
     :requested_drop_off_time, :requested_pickup_time, :scheduling_priority,
     :trip_notes, :trip_purpose_description, :trip_result_attributes,
-    :customer_identifiers, :customer_mobility_impairments, 
-    :customer_eligibility_factors, :customer_assistive_devices, 
-    :customer_service_animals, :guest_or_attendant_service_animals,
-    :guest_or_attendant_assistive_devices, :trip_funders,
-    :provider_white_list, :provider_black_list
+    :customer_identifiers, :customer_service_level, :customer_eligibility_factors,
+    :customer_mobility_factors, :customer_service_animals, :trip_funders,
+    :provider_white_list, :provider_black_list, :expire_at, :expired
   
-  accepts_nested_attributes_for :customer_address, :pick_up_location, :drop_off_location, :trip_result
+  accepts_nested_attributes_for :pick_up_location, :drop_off_location, :trip_result
+  accepts_nested_attributes_for :customer_address, :reject_if => :all_blank
 
   audited
-  
+
+  acts_as_notifier do
+    after_create do
+      notify ->(opts){ partner_users(self, opts) }, method: :trip_created
+    end
+    after_save do
+      notify ->(opts){ claimant_users(self, opts) }, if: proc{ rescinded_changed? && rescinded? }, method: :trip_rescinded
+      notify ->(opts){ originator_and_claimant_users(self, opts) }, if: proc{ expired_changed? && expired? }, method: :trip_expired
+    end
+    after_update do
+      notify ->(opts){ partner_users(self, opts) }, if: proc{
+          !(rescinded_changed? && rescinded?) &&
+          !(expired_changed? && expired?) &&
+          filtered_changes.any?
+      }, method: :trip_updated, context: proc{ { trip_ticket: self, changes: filtered_changes } }
+    end
+  end
+
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
-    :origin_provider_id, :requested_drop_off_time, :requested_pickup_time, 
-    :appointment_time
+    :origin_provider_id
   
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
-  validate :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
+  validate  :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
 
+  # TODO - are these too restrictive for the data coming in the API?
+  validates :customer_dob, :timeliness => {:type => :date}
+  validates :requested_pickup_time, :timeliness => {:type => :time}
+  validates :requested_drop_off_time, :timeliness => {:type => :time}
+  validates :appointment_time, :timeliness => {:type => :datetime}
+  validates :earliest_pick_up_time, :timeliness => {:type => :time, :allow_blank => true}
+  validates :expire_at, :timeliness => {:type => :datetime, :allow_blank => true}
+  
   validate do |trip_ticket|
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
       trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"
@@ -107,7 +138,7 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  default_scope order('appointment_time ASC')
+  default_scope order('appointment_time ASC, created_at DESC')
 
   scope :originated_or_claimed_by, ->(provider) do
     subquery = TripClaim.unscoped.select(:trip_ticket_id).where(claimant_provider_id: provider.id).uniq.to_sql
@@ -150,11 +181,13 @@ class TripTicket < ActiveRecord::Base
     end
   end
 
-  def status_for(user)
-    user.provider.try(:id) == origin_provider_id ? originator_status(user.provider) : claimant_status(user.provider)
+  def status_for(resource)
+    provider = if resource.is_a?(User) then resource.provider elsif resource.is_a?(Provider) then resource else Provider.new end
+    provider.try(:id) == origin_provider_id ? originator_status(provider) : claimant_status(provider)
   end
 
-  def originator_status(provider)
+  # does not add counts or specific claimant names, used for aggregating reports
+  def simple_originator_status(provider)
     trip_status = status
     case trip_status
       when 'New', 'Rescinded', 'Expired'
@@ -162,10 +195,31 @@ class TripTicket < ActiveRecord::Base
       when 'Resolved'
         trip_result.try(:outcome) || 'Awaiting Result'
       when 'Active'
-        if (claim_count = trip_claims.count) == 0
+        if (claim = approved_claim).present?
+          'Claim Approved'
+        elsif (claim_count = trip_claims.where(status: 'pending').count) == 0
           'No Claims'
-        elsif (claim = approved_claim).present?
+        else
+          'Claims Pending'
+        end
+    end
+  end
+
+  def originator_status(provider)
+    # The TripTicket.filter_by_ticket_status method is (unfortunately) tightly
+    # coupled to this method. If this method changes, that method may need
+    # to be updated as well.
+    trip_status = status
+    case trip_status
+      when 'New', 'Rescinded', 'Expired'
+        trip_status
+      when 'Resolved'
+        trip_result.try(:outcome) || 'Awaiting Result'
+      when 'Active'
+        if (claim = approved_claim).present?
           "#{claim.claimant.try(:name)} Approved"
+        elsif (claim_count = trip_claims.where(status: 'pending').count) == 0
+          'No Claims'
         else
           "#{claim_count} Claim#{claim_count == 1 ? '' : 's'} Pending"
         end
@@ -173,13 +227,16 @@ class TripTicket < ActiveRecord::Base
   end
 
   def claimant_status(provider)
+    # The TripTicket.filter_by_ticket_status method is (unfortunately) tightly
+    # coupled to this method. If this method changes, that method may need
+    # to be updated as well.
     trip_status = status
     if trip_status == 'New'
       'New'
     elsif trip_status == 'Expired'
       'Unavailable'
     else
-      claim = claims_from(provider).order('created_at DESC').first
+      claim = claims_from(provider).reorder('created_at DESC').first
       if claim.try(:status) == :declined
         'Declined'
       else
@@ -219,11 +276,6 @@ class TripTicket < ActiveRecord::Base
     end
   end
 
-  def expired?
-    # TODO per task #1356, TripTicket#expired? should include a date set by provider at which point it is too late to submit a claim
-    appointment_time.past? && !approved?
-  end
-
   def resolved?
     (appointment_time.past? && approved?) || trip_result.present?
   end
@@ -237,7 +289,7 @@ class TripTicket < ActiveRecord::Base
   end
   
   def claimable_by?(user)
-    !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
+    !self.expired? && !self.rescinded? && !self.approved? && (user.has_admin_role? || !self.includes_claim_from?(user.provider))
   end
 
   def claims_from(provider)
@@ -251,7 +303,7 @@ class TripTicket < ActiveRecord::Base
 
   def rescindable?
     # any trip that does not have a result can be rescinded (if customer cancels, claims and approvals are irrelevant)
-    trip_result.nil? || trip_result.new_record?
+    !self.expired? && (trip_result.nil? || trip_result.new_record?)
   end
 
   def rescind!
@@ -269,11 +321,37 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  def activities
-    (trip_claims(true).all + trip_ticket_comments(true).all + Array(trip_result(true))).compact.sort_by(&:created_at) rescue []
+  def activities_accessible_by(ability)
+    audit_trail = audits_with_associated +
+      trip_claims.accessible_by(ability).all +
+      trip_ticket_comments.accessible_by(ability).all +
+      [trip_result_for(ability)]
+    
+    audit_trail.compact.sort_by(&:created_at).reverse # Descending order
+  end
+  
+  def audits_with_associated
+    # The Audited gem includes methods to associate records of parent and child
+    # records, but it doesn't work with polymorphic associations, so we'll 
+    # mimic it here.
+    # See: https://github.com/collectiveidea/audited#associated-audits
+    (
+      [audits.first] + 
+      audits.where(action: 'update') +
+      customer_address.audits.where(action: 'update') +
+      pick_up_location.audits.where(action: 'update') +
+      drop_off_location.audits.where(action: 'update')
+    ).compact.sort_by(&:created_at).reverse # Descending order
   end
 
   protected
+
+  def trip_result_for(ability)
+    present = trip_result.present? && trip_result.id.present?
+    if present && ability.can?(:read, trip_result) 
+      trip_result
+    end
+  end
 
   def can_be_rescinded
     errors.add(:rescinded, "status may not be changed on resolved trip tickets") unless rescindable?
@@ -283,13 +361,17 @@ class TripTicket < ActiveRecord::Base
 
   class << self
     def filter_by_customer_name(customer_name)
-      value = customer_name.strip.downcase
-      sql, values = [], []
-      [:customer_first_name, :customer_middle_name, :customer_last_name].each do |field|
-        sql << fuzzy_string_search(field, value)
-        values.push "%#{value}%", value, value, value, value, value, value
+      parts = customer_name.strip.split(/\s+/)
+      first_name = parts.first
+      last_name = parts.size > 1 ? parts.last : nil
+      if first_name.present? and last_name.present?
+        sql = "LOWER(customer_first_name) LIKE LOWER(?) AND LOWER(customer_last_name) LIKE LOWER(?)"
+        values = ["%#{first_name}%", "%#{last_name}%"]
+      else
+        sql = "LOWER(customer_first_name) LIKE LOWER(?) OR LOWER(customer_last_name) LIKE LOWER(?)"
+        values = ["%#{first_name}%", "%#{first_name}%"]
       end
-      where(sql.join(' OR '), *values)
+      where(sql, *values)
     end
     
     def filter_by_customer_address_or_phone(customer_address_or_phone)
@@ -346,11 +428,22 @@ class TripTicket < ActiveRecord::Base
     end
 
     def filter_by_rescinded(filter)
-      # anything except :only_rescinded results in the default of hiding rescinded
-      if filter.present? && filter.to_sym == :only_rescinded
-        where(rescinded: true)
+      case filter.try(:to_sym)
+        when :exclude_rescinded
+          where(rescinded: false)
+        when :only_rescinded
+          where(rescinded: true)
+        else
+          scoped
+      end
+    end
+
+    def filter_by_expired(filter)
+      # anything except :only_expired results in the default of hiding expired
+      if filter.present? && filter.to_sym == :only_expired
+        where(expired: true)
       else
-        where(rescinded: false)
+        where(expired: false)
       end
     end
 
@@ -379,9 +472,9 @@ class TripTicket < ActiveRecord::Base
 
     def filter_by_trip_time(datetime_start, datetime_end)
       where([
-        '(TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_pickup_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)',
-        '(TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_drop_off_time" as character varying(255)), \'YYYY-MM-DD HH24:MI:SS.US\') BETWEEN ? AND ?)'
-      ].join(' OR '), datetime_start, datetime_end, datetime_start, datetime_end)
+        '((TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_pickup_time" as character varying(255)), \'YYYY-MM-DD HH24:MI\') - interval \'? seconds\') BETWEEN ? AND ?)',
+        '((TO_TIMESTAMP(CAST(DATE("appointment_time") as character varying(255)) || \' \' || CAST("requested_drop_off_time" as character varying(255)), \'YYYY-MM-DD HH24:MI\') - interval \'? seconds\') BETWEEN ? AND ?)'
+      ].join(' OR '), datetime_start.utc_offset, datetime_start, datetime_end, datetime_start.utc_offset, datetime_start, datetime_end)
     end
 
     def filter_by_updated_at(datetime_start, datetime_end)
@@ -403,9 +496,128 @@ class TripTicket < ActiveRecord::Base
       array_concat = (CUSTOMER_IDENTIFIER_ARRAY_FIELD_NAMES + ["CAST(avals(customer_identifiers) || akeys(customer_identifiers) AS character varying[])"]).join(' || ')
       where("LOWER('||' || ARRAY_TO_STRING(#{array_concat}, '||') || '||') LIKE LOWER(?)", "%||%#{customer_identifier}%||%")
     end
-
-    private
     
+    # The ticket_status filter requires that we evaluate the final status of
+    # each ticket, which is often calculated dynamically based on related 
+    # objects' statuses. Because it has the potential to have to instantiate
+    # lots of objects, it's best to run this filter after all other filters
+    # are applied.
+    # 
+    # This method is (unfortunately) tightly coupled to the #claimant_status
+    # and #originator_status methods. If they change, this method may need
+    # to be updated as well.
+    def filter_by_ticket_status(ticket_statuses, provider)
+      ticket_statuses = Array(ticket_statuses).compact.map(&:downcase)
+      if ticket_statuses.any?
+        # This can be a costly filter to apply if the current scope returns
+        # lots of records, so let's make debugging future bottlenecks easy.
+        # You're welcome, future self.
+        logger.debug "-- Filtering #{scoped.count} records through filter_by_ticket_status"
+
+        where(:id => scoped.all.keep_if{ |ticket|
+          ticket_status = ticket.status_for(provider).downcase
+
+          # #originator_status may return "{claimant_name} Approved"
+          ticket_status = "approved" if !(ticket_status =~ /\bapproved$/).nil?
+
+          # #originator_status may return "{claim_count} Claim(s) Pending"
+          ticket_status = "claim pending" if !(ticket_status =~ /\bclaims? pending$/).nil?
+
+          ticket_statuses.include?(ticket_status)
+        }.collect(&:id))
+      else
+        scoped
+      end
+    end
+    
+    def expire_tickets!(alternate_logger = nil)
+      # Hackish but necessary to get the output we need to log to the cron log
+      # when running the rake task, or to display in the console when calling
+      # this method directly
+      logger = alternate_logger || self.logger
+      
+      threshold = Time.zone.now
+      logger.info "- TripTicket#expire_tickets! called at #{threshold.to_s(:rfc822)}"
+
+      # Note: This task is heavily reliant on times, so we are going to round
+      # all times down to the nearest hour.
+      threshold = threshold.change(min: 0)
+      logger.info "- Threshold adjusted to #{threshold.to_s(:rfc822)}"
+      
+      affected_tickets = []
+
+      default_query = TripTicket.unscoped.
+        # Exclude already expired or rescinded tickets
+        where('"trip_tickets"."expired" = ? AND "trip_tickets"."rescinded" = ?', false, false).
+        # Exclude tickets that have an approved claim
+        where('NOT EXISTS(SELECT 1 FROM trip_claims WHERE trip_ticket_id = trip_tickets.id AND status = \'approved\')').
+        # Exclude tickets that have a trip result (currently only possible if the trip is approved or rescinded)
+        where('NOT EXISTS(SELECT 1 FROM trip_results WHERE trip_ticket_id = trip_tickets.id)')
+        
+      # Part 1 - expire tickets with an explicit expire_at date
+      logger.debug "- Expiring tickets across all providers where expire_at <= #{threshold.change(min: 59, sec: 59).to_s(:rfc822)}"
+
+      # A necessary hack. See https://github.com/rails/rails/issues/11894
+      ids_to_update = default_query.where('expire_at <= ?', threshold.change(min: 59, sec: 59)).pluck(:id)
+      updated = TripTicket.update(ids_to_update, Array.new(ids_to_update.size, {expired: true}))
+
+      logger.debug "-- #{updated.size} tickets expired"
+      affected_tickets << updated
+      
+      # Part 2 - use provider default values to look for other tickets eligible for expiration
+      logger.debug "- Preparing to expire tickets for each provider"
+      Provider.unscoped.each do |provider|
+        logger.debug "-- Evaluating tickets for #{provider.name}"
+        logger.debug "--- trip_ticket_expiration_days_before = #{provider.trip_ticket_expiration_days_before || "nil"}"
+        logger.debug "--- trip_ticket_expiration_time_of_day = #{provider.trip_ticket_expiration_time_of_day || "nil"}"
+        if provider.trip_ticket_expiration_days_before.present? && provider.trip_ticket_expiration_time_of_day.present?
+          trip_ticket_expiration_time_of_day_adjusted = Time.zone.parse(provider.trip_ticket_expiration_time_of_day.to_s(:time_utc)).change(min: 0).to_s(:time_utc)
+          logger.debug "--- trip_ticket_expiration_time_of_day adjusted to #{trip_ticket_expiration_time_of_day_adjusted}"
+          logger.debug "--- Checking to see if threshold time >= trip_ticket_expiration_time_of_day_adjusted"
+          # We can safely compare this using >= just in case a previous run failed
+          if threshold.to_s(:time_utc) >= trip_ticket_expiration_time_of_day_adjusted
+            logger.debug "--- #{threshold.to_s(:time_utc)} >= #{trip_ticket_expiration_time_of_day_adjusted}"
+            
+            # Calculate number of days ahead
+            end_date = threshold.to_date
+            logger.debug "--- counting #{provider.trip_ticket_expiration_days_before} weekdays ahead from #{end_date.strftime("%a, %e %b %Y")}"
+            counter = 0
+            while counter < provider.trip_ticket_expiration_days_before do
+              end_date = end_date + 1.day
+              counter += 1 unless [0,6].include?(end_date.wday)
+              logger.debug "--- added #{end_date.strftime("%a, %e %b %Y")}, now at #{counter} weekdays ahead"
+            end
+            logger.debug "--- end date = #{end_date.strftime("%a, %e %b %Y")}"
+            
+            expire_at = end_date.end_of_day
+            logger.debug "--- Expiring tickets for #{provider.name} where appointment_time <= #{expire_at.to_s(:rfc822)}"
+            
+            # A necessary hack. See https://github.com/rails/rails/issues/11894
+            ids_to_update = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND appointment_time <= ?', provider.id, expire_at).pluck(:id)
+            updated = TripTicket.update(ids_to_update, Array.new(ids_to_update.size, {expired: true}))
+            logger.debug "---- #{updated.size} tickets expired"
+            
+            affected_tickets << updated
+          else
+            logger.debug "--- #{threshold.to_s(:time_utc)} < #{trip_ticket_expiration_time_of_day_adjusted}, skipping provider"
+          end
+        else
+          logger.debug "--- Expiring tickets for #{provider.name} where requested_pickup_time <= #{threshold.change(min: 59, sec: 59).to_s(:rfc822)}"
+          
+          # A necessary hack. See https://github.com/rails/rails/issues/11894
+          ids_to_update = default_query.where('origin_provider_id = ? AND expire_at IS NULL AND (TO_TIMESTAMP(CAST(DATE(appointment_time) AS character varying(255)) || \' \' || CAST(requested_pickup_time AS character varying(255)), \'YYYY-MM-DD HH24:MI\') - interval \'? seconds\') <= ?', provider.id, threshold.utc_offset, threshold.change(min: 59, sec: 59)).pluck(:id)
+          updated = TripTicket.update(ids_to_update, Array.new(ids_to_update.size, {expired: true}))
+
+          logger.debug "---- #{updated.size} tickets expired"
+          affected_tickets << updated
+        end
+      end
+      
+      return affected_tickets.flatten.sort_by(&:id)
+    end
+    
+    private
+
     def fuzzy_string_search(field, value)
       "(LOWER(%s) LIKE LOWER(?) OR (
         (dmetaphone(?) <> '' OR dmetaphone_alt(?) <> '') AND (
@@ -414,5 +626,11 @@ class TripTicket < ActiveRecord::Base
         dmetaphone_alt(%s) = dmetaphone(?) OR 
         dmetaphone_alt(%s) = dmetaphone_alt(?))))" % [field, field, field, field, field]
     end
+  end
+  
+  private 
+  
+  def filtered_changes
+    changes.reject{|k,v| %w(created_at updated_at).include?(k.to_s)}
   end
 end

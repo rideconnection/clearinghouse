@@ -24,7 +24,8 @@ class ServicesController < ApplicationController
         end
         format.html { redirect_to provider_path(@service.provider), notice: 'Service was successfully created.' }
         format.json { render json: @service, status: :created, location: @service }
-      rescue ActiveRecord::RecordInvalid
+      rescue ActiveRecord::RecordInvalid => e
+        Rails.logger.debug e.message
         prepare_form
         format.html { render action: "new" }
         format.json { render json: @service.errors, status: :unprocessable_entity }
@@ -42,7 +43,8 @@ class ServicesController < ApplicationController
         end
         format.html { redirect_to provider_path(@service.provider), notice: 'Service was successfully updated.' }
         format.json { head :no_content }
-      rescue ActiveRecord::RecordInvalid
+      rescue ActiveRecord::RecordInvalid => e
+        Rails.logger.debug e.message
         prepare_form
         format.html { render action: "edit" }
         format.json { render json: @service.errors, status: :unprocessable_entity }
@@ -77,15 +79,16 @@ class ServicesController < ApplicationController
           when 'open24'
             day_hours.make_24_hours!
           when 'open'
-            day_hours.open_time = Time.zone.parse(params[:start_hour][day.to_s])
-            day_hours.close_time = Time.zone.parse(params[:end_hour][day.to_s])
+            day_hours.open_time = params[:start_hour][day.to_s]
+            day_hours.close_time = params[:end_hour][day.to_s]
           else
             @service.errors.add :operating_hours,
                                 'must be "closed", "open24", or "open".'
             raise ActiveRecord::RecordInvalid.new(@service)
         end
         day_hours.save!
-      rescue ActiveRecord::RecordInvalid
+      rescue ActiveRecord::RecordInvalid => e
+        Rails.logger.debug e.message
         errors = true
       end
     end
@@ -100,18 +103,27 @@ class ServicesController < ApplicationController
     @start_hours = []
     @end_hours = []
     interval = 30.minutes
+    
+    # We only need the time as a string, but we'll use some temporary Time
+    # objects to help us do some simple time math. The dates returned are
+    # irrelevant
     t1 = OperatingHours::START_OF_DAY
-    t2 = Time.zone.parse('00:00').time_of_day
-    t = t1.time_of_day
-    while t != t2 do
+    t2 = Time.zone.parse('00:00:00')
+    t  = Time.zone.parse(t1)
+    
+    #puts "#{t}"
+    #puts "#{t2}"
+    while t.to_s(:time_utc) != t2.to_s(:time_utc) do
       @start_hours << t
-      t = (t + interval).time_of_day
+      t += interval
+      #puts "#{t}"
     end
-    t = (OperatingHours::START_OF_DAY + interval).time_of_day
+    
+    t = Time.parse(t1) + interval
     while true do
       @end_hours << t
-      break if t == OperatingHours::END_OF_DAY
-      t = (t + interval).time_of_day
+      break if t.to_s(:time_utc) == OperatingHours::END_OF_DAY
+      t += interval
     end
   end
 

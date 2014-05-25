@@ -4,7 +4,7 @@ module TripTicketsHelper
   end
   
   def customer_age(dob)
-    now = Time.now.utc.to_date
+    now = Time.zone.now
     now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
   end
   
@@ -38,8 +38,84 @@ module TripTicketsHelper
     end
   end
   
-  def formatted_activity_line(activity)
-    raw "<span title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p | %b %d")}</span> #{activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize}#{ activity.is_a?(TripResult) ? ' ' + activity.outcome : ''} - #{activity.audits.first.try(:user).try(:display_name)}"
+  def formatted_activity(activity)
+    activity_type = if activity.respond_to?(:auditable) 
+      if activity.audited_changes.first[0] == 'rescinded'
+        activity.audited_changes.first[1][1] ? 'Rescinded' : 'Unrescinded'
+      elsif activity.audited_changes.first[0] == 'expired'
+        activity.audited_changes.first[1][1] ? 'Expired' : 'Unexpired'
+      else
+        case activity.action
+        when "create"
+          "Created"
+        when "update"
+          "Updated"
+        else
+          activity.action.capitalize
+        end
+      end
+    else
+      activity.class.name.underscore.gsub("trip_", "").gsub("ticket_", "").capitalize
+    end
+
+    activity_action = case activity
+      when TripResult 
+        activity.outcome
+      when Audited::Adapters::ActiveRecord::Audit
+        activity.try(:auditable_type).to_s.titleize
+      else
+        ""
+    end
+
+    activity_user = if activity.respond_to?(:user)
+      activity.user.try(:display_name)
+    elsif activity.is_a?(TripClaim)
+      activity.claimant.name + " (#{activity.status})"
+    elsif activity.respond_to?(:auditable)
+      activity.audits.first.try(:user).try(:display_name)
+    else
+      ""
+    end
+
+    description = "#{activity_type} #{activity_action}#{activity_user.blank? ? '' : ' - '}#{activity_user}"
+    html_opts = {class: ["no-clickify"], data: {:"activity-type" => formatted_activity_type(activity)}}
+    
+    if activity.is_a?(TripClaim) && activity.editable?
+      link = popup_info_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+
+      if can?(:rescind, activity) 
+        html_opts[:data][:rescind] = rescind_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:class] << "claim-rescind"
+      elsif can?(:approve, activity) && can?(:decline, activity)
+        html_opts[:data][:approve] = approve_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:data][:decline] = decline_trip_ticket_trip_claim_path(activity.trip_ticket, activity)
+        html_opts[:class] << "claim-approve"
+      end
+    else
+      link = activity_path(activity)
+    end
+    
+    html_opts[:class] = html_opts[:class].join(" ")
+    
+    raw(
+      "<td class='activity-info' title=\"#{activity.created_at.strftime('%a %Y-%m-%d %I:%M %P')}\">#{activity.created_at.strftime("%l:%M %p")}</td>" +
+      "<td class='activity-info'>#{activity.created_at.strftime("%b %d")}</td>" + 
+      "<td>#{link_to(description, link, html_opts)}</td>"
+    )
+  end
+  
+  def formatted_activity_type(activity)
+    activity.class.name.demodulize.underscore
+  end
+  
+  def activity_path(activity)
+    if activity.is_a?(TripResult) 
+      trip_ticket_path(activity.trip_ticket) + '/trip_result'
+    elsif activity.respond_to?(:auditable)
+      trip_ticket_audits_path(activity.auditable)
+    else
+      [activity.trip_ticket, activity]
+    end
   end
 
   # this converts trip status to a simplified snake-cased form in a consistent way
@@ -51,5 +127,18 @@ module TripTicketsHelper
     else
       trip_status.downcase.gsub(' ', '_')
     end
+  end
+
+  def eligibility_autocomplete_values
+    TripTicket.unscoped.accessible_by(current_ability).pluck('DISTINCT unnest(trip_tickets.customer_eligibility_factors)').reject {|x| x.blank?}.sort
+  end
+
+  def service_level_autocomplete_values
+    TripTicket.unscoped.accessible_by(current_ability).pluck(:customer_service_level).reject {|x| x.blank?}.sort
+  end
+
+  def wkt_point_from_location(location)
+    position = location.try(:position)
+    position.presence && "POINT (#{position.x} #{position.y})"
   end
 end

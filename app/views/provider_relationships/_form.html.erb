@@ -1,15 +1,6 @@
 <%= form_for(@provider_relationship) do |f| %>
-  <% if @provider_relationship.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@provider_relationship.errors.count, "error") %> prohibited this provider relationship from being saved:</h2>
 
-      <ul>
-      <% @provider_relationship.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render partial: 'shared/error_explanation', locals: { object: @provider_relationship } %>
 
   <% if @provider_relationship.new_record? && @provider %>
     <%= hidden_field_tag "provider_relationship[requesting_provider_id]", @provider.id %>

@@ -1,0 +1,91 @@
+  <div class="field">
+    <%= f.label :email %>
+    <%= f.text_field :email %>
+  </div>
+  <% if @user.new_record? %>
+    <div class="field">
+      <%= f.label :password %>
+      <div>
+        The user will be sent an activation link with a generated password
+        <%= hidden_field_tag "user[must_generate_password]", "1" %>
+      </div>
+    </div>
+  <% elsif can? :send_reset_password_link, @user and @user != current_user %>
+    <div class="field">
+      <%= f.label :password %>
+      <div>
+        <%= label_tag("send_reset_password_link") do %>
+          <%= check_box_tag "send_reset_password_link" %> Send a link to reset their password
+        <% end %>
+      </div>
+    </div>
+  <% else %>
+    <div class="field">
+      <%= f.label :password, "New password" %>
+      <%= f.password_field :password %>
+    </div>
+    <div class="field">
+      <%= f.label :password_confirmation, "Confirm new password" %>
+      <%= f.password_field :password_confirmation %>
+    </div>
+  <% end %>
+  <div class="field">
+    <%= f.label :name %>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :phone %>
+    <%= f.text_field :phone %>
+  </div>
+  <% if @provider.present? && @user.provider_id == @provider.id %>
+    <%= f.hidden_field :role_id %>
+  <% else %>
+    <div class="field">
+      <%= f.label :provider %>
+      <% if can? :set_provider, User %>
+        <%= collection_select :user, :provider_id, Provider.all, :id, :name,
+                              :include_blank => true %>
+      <% else %>
+        <% if @user.provider.nil? %>
+          <span style="color: #aaa">(none)</span>
+        <% else %>
+          <%= link_to @user.provider.name, provider_path(@user.provider) %>
+        <% end %>
+      <% end %>
+    </div>
+    <% if can? :set_any_role, @user and @user != current_user %>
+      <div class="field">
+        <%= f.label :role %>
+        <%= collection_select :user, :role_id, Role.all, :id, :name %>
+      </div>
+    <% elsif can? :set_provider_role, @user and @user != current_user %>
+      <div class="field">
+        <%= f.label :role %>
+        <%= collection_select :user, :role_id, Role.provider_roles, :id, :name %>
+      </div>
+    <% end %>
+  <% end %>
+  <% if can? :unlock, @user %>
+    <div class="field">
+      <%= f.label :failed_attempts, "Failed login Attempts" %>
+      <div><%= @user.failed_attempts.to_i %></div>
+    </div>
+    <div class="field">
+      <%= f.label :locked_at, "Account locked at" %>
+      <div>
+        <%= @user.locked_at.try(:strftime, "%a %Y-%m-%d %I:%M %P") || "[not locked]" %>
+        <% if @user.locked_at.present? %>
+          <div>
+            <%= label_tag("unlock_account") do %>
+              <%= check_box_tag "unlock_account" %> Unlock account (will not notify user)
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <%= notification_preferences_checkboxes(@user) %>

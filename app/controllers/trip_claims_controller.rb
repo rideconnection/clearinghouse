@@ -1,7 +1,7 @@
 class TripClaimsController < ApplicationController
-  load_and_authorize_resource :trip_claim, :only => :dashboard
-  load_and_authorize_resource :trip_ticket, :except => :dashboard
-  load_and_authorize_resource :trip_claim, :through => :trip_ticket, :except => :dashboard
+  load_and_authorize_resource :trip_ticket
+  load_and_authorize_resource :trip_claim, :through => :trip_ticket
+  skip_authorize_resource :trip_claim, :only => :popup_info
   
   # GET /trip_claims
   # GET /trip_claims.json
@@ -25,31 +25,42 @@ class TripClaimsController < ApplicationController
   # GET /trip_claims/new
   # GET /trip_claims/new.json
   def new
+    @trip_claim.claimant = current_user.provider
     respond_to do |format|
       format.html # new.html.erb
-      format.json { render json: @trip_claim }
+      format.json { render json: new_trip_claim_instance_as_json_for_backbone }
     end
   end
 
   # GET /trip_claims/1/edit
   def edit
+    respond_to do |format|
+      format.html 
+    end
+  end
+
+  def popup_info
+    respond_to do |format|
+      data = render_to_string(partial: "popup_form", locals: { object: @trip_claim }, formats: [:html])
+      format.json { render json: {rendered_partial: data }.to_json }
+    end
   end
 
   # POST /trip_claims
   # POST /trip_claims.json
   def create
-    @trip_claim.claimant = current_user.provider unless current_user.has_admin_role?
+    @trip_claim.claimant = current_user.provider
     @trip_claim.status = :pending
     respond_to do |format|
       if @trip_claim.save
         @trip_claim.reload
         notice = 'Trip claim was successfully created.'
         notice += ' Your claim has been automatically approved.' if @trip_claim.approved?
-        format.html { redirect_to @trip_ticket, notice: notice }
-        format.json { render json: @trip_claim, status: :created, location: @trip_claim }
+        format.html { redirect_to [@trip_ticket, @trip_claim], notice: notice }
+        format.json { head :no_content }
       else
         format.html { render action: "new" }
-        format.json { render json: @trip_claim.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_claim }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
     end
   end
@@ -59,11 +70,11 @@ class TripClaimsController < ApplicationController
   def update
     respond_to do |format|
       if @trip_claim.update_attributes(params[:trip_claim])
-        format.html { redirect_to @trip_ticket, notice: 'Trip claim was successfully updated.' }
+        format.html { redirect_to [@trip_ticket, @trip_claim], notice: 'Trip claim was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
-        format.json { render json: @trip_claim.errors, status: :unprocessable_entity }
+        format.json { render json: {rendered_partial: render_to_string(partial: "shared/error_explanation", locals: { object: @trip_claim }, formats: [:html])}.to_json, status: :unprocessable_entity }
       end
     end
   end
@@ -97,5 +108,11 @@ class TripClaimsController < ApplicationController
     end
   end
   
-  def dashboard; end
+  private
+  
+  def new_trip_claim_instance_as_json_for_backbone
+    @trip_claim.attributes.merge({
+      rendered_partial: render_to_string(partial: "trip_claims/form", formats: [:html]),
+    }).to_json
+  end
 end

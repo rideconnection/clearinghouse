@@ -18,3 +18,13 @@
   <%= f.label :zip, "Postal Code", class: (required_fields ? "required" : "") %>
   <%= f.text_field :zip %>
 </div>
+<% if current_user and current_user.has_any_role?([:site_admin]) %>
+<div class="field">
+  <%= f.label :latitude, "Latitude" %>
+  <%= f.text_field :latitude, :placeholder => "decimal form, e.g.: 45.5282" %>
+</div>
+<div class="field">
+  <%= f.label :longitude, "Longitude" %>
+  <%= f.text_field :longitude, :placeholder => "decimal form, e.g.: -122.6488" %>
+</div>
+<% end %>

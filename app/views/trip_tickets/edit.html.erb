@@ -8,7 +8,7 @@
   </section>
 
   <section id="audit_trail">
-    <%= render 'shared/audit_trail', :record => @trip_ticket %>
+    <%= render 'shared/audit_trail', :audits => @trip_ticket.audits_with_associated %>
   </section>
 </div>
 

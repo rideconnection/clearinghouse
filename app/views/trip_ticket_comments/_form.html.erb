@@ -1,15 +1,6 @@
 <%= form_for([@trip_ticket, @trip_ticket_comment]) do |f| %>
-  <% if @trip_ticket_comment.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@trip_ticket_comment.errors.count, "error") %> prohibited this trip_ticket_comment from being saved:</h2>
 
-      <ul>
-      <% @trip_ticket_comment.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render partial: 'shared/error_explanation', locals: { object: @trip_ticket_comment } %>
 
   <div class="field">
     <%= f.label :user_id %>

@@ -1,8 +1,10 @@
+<% if defined?(no_header) && !no_header %>
 <header>
   <h2>Change History</h2>
 </header>
+<% end %>
 
-<table class="table table-striped">
+<table class="table table-condensed table-striped">
   <thead>
     <tr>
       <th width="15%">Changed at</th>
@@ -11,7 +13,7 @@
     </tr>
   </thead>
   <tbody>
-    <% record.audits.try(:each) do |audit| -%>
+    <% audits.try(:each) do |audit| -%>
       <tr>
         <td><%= audit.created_at.to_s(:long) %></td>
         <td><% if audit.user %><%= link_to_if can?(:read, audit.user), audit.user.display_name, audit.user %><% end %></td>
@@ -31,10 +33,11 @@
               </thead>
               <tbody>
                 <% audit.audited_changes.each do |attribute, change| %>
+                  <% next if change[0].blank? && change[1].blank? %>
                   <tr>
                     <td><%= attribute.humanize %></td>
-                    <td><%= change[0].blank? ? "[an empty value]" : change[0].to_s %></td>
-                    <td><%= change[1].blank? ? "[an empty value]" : change[1].to_s %></td>
+                    <td><%= formatted_audit_attribute attribute, change[0] %></td>
+                    <td><%= formatted_audit_attribute attribute, change[1] %></td>
                   </tr>
                 <% end -%>
               </tbody>

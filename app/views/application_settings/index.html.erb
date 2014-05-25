@@ -1,0 +1,51 @@
+<div class="padded">
+  <header>
+    <h2>Application Settings</h2>
+  </header>
+
+  <table class="table table-striped" id="application_settings_list">
+    <thead>
+      <tr>
+        <th>Setting</th>
+        <th>Configured Value</th>
+        <th>Applied Value</th>
+        <th>Default Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Maximum failed login attempts</td>
+        <td><%= ApplicationSetting.all['devise.maximum_attempts'] %></td>
+        <td><%= Devise.maximum_attempts %></td>
+        <td><%= ApplicationSetting.defaults['devise.maximum_attempts'] %></td>
+      </tr>
+      <tr>
+        <td>Password archiving count</td>
+        <td><%= ApplicationSetting.all['devise.password_archiving_count'] %></td>
+        <td><%= Devise.password_archiving_count %></td>
+        <td><%= ApplicationSetting.defaults['devise.password_archiving_count'] %></td>
+      </tr>
+      <tr>
+        <td>Expire password after <sup><a href="#fn1">1</a></sup></td>
+        <td><%= (ApplicationSetting.all['devise.expire_password_after'] || 0).to_i / 1.day %> days</td>
+        <td><%= (Devise.expire_password_after || 0).to_i / 1.day %> days</td>
+        <td><%= (ApplicationSetting.defaults['devise.expire_password_after'] || 0).to_i / 1.day %> days</td>
+      </tr>
+      <tr>
+        <td>Session timeout in <sup><a href="#fn2">2</a></sup></td>
+        <td><%= ApplicationSetting.all['devise.timeout_in'].to_i / 1.minute %> minutes</td>
+        <td><%= Devise.timeout_in.to_i / 1.minute %> minutes</td>
+        <td><%= ApplicationSetting.defaults['devise.timeout_in'].to_i / 1.minute %> minutes</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p id="fn1"><small><sup>1</sup> A password expiration setting of zero means automatic password expiration is disabled</small></p>
+<p id="fn2"><small><sup>2</sup> A session timeout setting of zero means session expiration is disabled</small></p>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'Edit Settings', edit_application_settings_path %></li>
+  </ul>
+<% end %>

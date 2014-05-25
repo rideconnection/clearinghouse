@@ -1,0 +1,52 @@
+<div class="padded">
+  <header>
+    <h2>Edit Application Settings</h2>
+  </header>
+
+  <section class="form-holder">
+    <%= form_tag(application_settings_path, method: :put ) do %>
+      <div class="field">
+        <%= label_tag :application_setting_devise_maximum_attempts, "Maximum failed login attempts:" %>
+        <%= number_field_tag "application_setting[devise.maximum_attempts]", @settings['devise.maximum_attempts'], in: 1..99, id: :application_setting_devise_maximum_attempts %>
+      </div>
+      <div class="field">
+        <%= label_tag :application_setting_devise_password_archiving_count, "Password archive count:" %>
+        <div>
+          <%= number_field_tag "application_setting[devise.password_archiving_count]", @settings['devise.password_archiving_count'], in: 1..99, id: :application_setting_devise_password_archiving_count %>
+          <div class="field-align">
+            <small>This should be one less than the number of passwords you don't want the user to be able to reuse.
+              For instance, with an archive count of 4, changing the password 4 times results in passwords 1, 2, 3,
+              and 4 being stored in the archive table. Changing it a 5th time results in password 5 being added and
+              password 1 being dropped, and thus able to be used again after 5 changes.</small>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <%= label_tag :application_setting_devise_expire_password_after, "Expire password after:" %>
+        <%= number_field_tag "application_setting[devise.expire_password_after]", (@settings['devise.expire_password_after'] || 0).to_i / 1.day, in: 0..365, id: :application_setting_devise_expire_password_after %> days
+        <div class="field-align">
+          <small>Setting this to zero will disable password expiration</small>
+        </div>
+      </div>
+      <div class="field">
+        <%= label_tag :application_setting_devise_timeout_in, "Session timeout in:" %>
+        <%= number_field_tag "application_setting[devise.timeout_in]", @settings['devise.timeout_in'].to_i / 1.minute, in: 0..1440, id: :application_setting_devise_timeout_in %> minutes
+        <div class="field-align">
+          <small>Setting this to zero will disable session timeouts</small>
+        </div>
+      </div>
+      
+      <div class="buttons-holder field-align">
+        <%= link_to :back, :class => "button button-cancel" do %>
+          <span>Cancel</span>
+        <% end %>
+        <%= submit_tag "Update settings", :class => "button" %>
+      </div>
+    <% end %>
+  </section>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+  </ul>
+<% end %>

@@ -1,22 +1,34 @@
 class Provider < ActiveRecord::Base
   has_many :services
   has_many :nonces
-  has_many :users
+  has_many :users, inverse_of: :provider
   belongs_to :address, :class_name => :Location, :validate => true, :dependent => :destroy
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
-  
+
   # :address_attributes is needed to support mass-assignment of nested attrs
-  attr_accessible :active, :address, :address_attributes, :name,
-                  :primary_contact_email
+  attr_accessible :active, :address, :address_attributes, :name, 
+    :primary_contact_email, :users_attributes, 
+    :trip_ticket_expiration_days_before, :trip_ticket_expiration_time_of_day
+
   accepts_nested_attributes_for :address
-  
+  accepts_nested_attributes_for :users
+
   after_create :generate_initial_api_keys
   
   validates :api_key, uniqueness: true, presence: {on: :update}
   validates :private_key, presence: {on: :update}
   validates_presence_of :name, :address, :primary_contact_email
-  
+  validates :trip_ticket_expiration_days_before, :numericality => {:greater_than_or_equal_to => 0, :allow_blank => true}
+  validates :trip_ticket_expiration_time_of_day, :timeliness => {:type => :time, :allow_blank => true}
+
+  def approved_partners
+    partnerships = approved_partnerships
+    partner_ids = partnerships.map {|ap| ap.requesting_provider_id == id ? nil : ap.requesting_provider_id }.compact
+    partner_ids = partner_ids + partnerships.map {|ap| ap.cooperating_provider_id == id ? nil : ap.cooperating_provider_id }.compact
+    Provider.where(id: partner_ids.uniq)
+  end
+
   def approved_partnerships
     partnerships = ProviderRelationship.where(
       %Q{
@@ -57,7 +69,15 @@ class Provider < ActiveRecord::Base
     end while self.nonces.exists?(nonce: nonce)
     nonce
   end
-  
+
+  def has_any_operating_hours?
+    services
+      .joins(:operating_hours)
+      .where('operating_hours.open_time IS NOT NULL')
+      .where('operating_hours.close_time IS NOT NULL')
+      .exists?
+  end
+
   private
   
   def generate_api_key!

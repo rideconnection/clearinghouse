@@ -52,12 +52,20 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       get "/api/v1/trip_tickets/sync", @minimum_request_params
       response.status.must_equal 200
       response.body.must_include %Q("originator":{)
-      response.body.must_include %Q("customer_address":{)
       response.body.must_include %Q("pick_up_location":{)
       response.body.must_include %Q("drop_off_location":{)
       response.body.must_include %Q("trip_result":null)
       response.body.must_include %Q("trip_claims":[)
       response.body.must_include %Q("trip_ticket_comments":[)
+    end
+
+    it "should return optional nested objects, when present" do
+      @trip_ticket1.customer_address = FactoryGirl.create(:location)
+      @trip_ticket1.save
+
+      get "/api/v1/trip_tickets/sync", @minimum_request_params
+      response.status.must_equal 200
+      response.body.must_include %Q("customer_address":{)
     end
 
     it "should include a field indicating which trips are originated by the requesting provider" do
@@ -156,9 +164,9 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       customer_primary_phone: "555-555-5555",
       customer_seats_required: 1,
       origin_customer_id: "newtrip123",
-      requested_drop_off_time: Time.now,
-      requested_pickup_time: Time.now,
-      appointment_time: Time.now,
+      requested_drop_off_time: "12:00",
+      requested_pickup_time: "12:00",
+      appointment_time: Time.zone.now,
       scheduling_priority: "pickup"
     }}}
 

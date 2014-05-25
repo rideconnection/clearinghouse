@@ -1,10 +1,12 @@
-$("#activities-dialog").html('<%= escape_javascript(render("trip_tickets/trip_ticket_comments", :trip_ticket_comments => @trip_ticket_comments)) %>');
-$("#activities-dialog").dialog({
+$("#modal-dialog").html('<%= escape_javascript(render("trip_tickets/trip_ticket_comments", :trip_ticket_comments => @trip_ticket_comments)) %>');
+$("#modal-dialog").dialog({
   title: "Comments",
   width: 1062,
   modal: true,
+  draggable: false,
+  resizable: false,
   buttons: {
-    Cancel: function() {
+    OK: function() {
       $( this ).dialog( "close" );
     }
   }

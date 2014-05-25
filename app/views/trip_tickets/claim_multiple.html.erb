@@ -1,0 +1,13 @@
+<div class="padded">
+  <header>
+    <h2>Claim Multiple Trip Tickets</h2>
+  </header>
+  
+  <%= render 'claim_multiple' %>
+</div>
+
+<% content_for :sidebar do %>
+  <ul class="side-nav">
+    <li><%= link_to 'All Tickets', trip_tickets_path %></li>
+  </ul>
+<% end %>

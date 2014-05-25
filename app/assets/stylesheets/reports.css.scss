@@ -1,4 +1,42 @@
+table {
+  &.report-table {
+    thead {
+      tr{
+        th {
+          padding: 0.5em 2em 0 0;
+        }
+      }
+    }
+    tbody {
+      tr {
+        &.section-title {}
+        &.subtotals-title {}
+        &.totals-title {}
+        &.subtotals {}
+        &.totals {}
+        td {
+          padding: 0.5em 2em 0 0;
+        }
+      }
+    }
+  }
+  &.report-summary {
+    width:100%;
+    tr {
+      &.section-title {
+      }
+      td {
+        &.label {
+          font-weight: bold;
+          width: 250px;
+        }
+      }
+    }
+  }
+}
+
 body[data-controller="reports"] {
+
   /*
   .reports-list {
     background:#ededed;

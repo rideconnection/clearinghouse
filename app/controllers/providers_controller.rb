@@ -2,6 +2,10 @@ class ProvidersController < ApplicationController
   load_and_authorize_resource
   before_filter :admins_only, :only => :index
 
+  before_filter :only => [:create, :update] do
+    allow_blank_time_field(@provider, :trip_ticket_expiration_time_of_day)
+  end
+
   def index
     respond_to do |format|
       format.html # index.html.erb
@@ -18,6 +22,7 @@ class ProvidersController < ApplicationController
 
   def new
     @provider.build_address
+    create_provider_admin_user_for_forms
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @provider }
@@ -34,6 +39,7 @@ class ProvidersController < ApplicationController
         format.html { redirect_to providers_path, notice: 'Provider was successfully created.' }
         format.json { render json: @provider, status: :created, location: @provider }
       else
+        create_provider_admin_user_for_forms
         format.html { render action: "new" }
         format.json { render json: @provider.errors, status: :unprocessable_entity }
       end
@@ -82,4 +88,15 @@ class ProvidersController < ApplicationController
       end
     end
   end
+
+  protected
+
+  def create_provider_admin_user_for_forms
+    if @provider.new_record?
+      user_params = params[:provider].try(:[], :users_attributes).try(:[], '0') || {}
+      user_params[:role_id] = Role.where(name: 'provider_admin').pluck(:id).first
+      @user = @provider.users.build(user_params)
+    end
+  end
+
 end

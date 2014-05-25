@@ -1,0 +1,10 @@
+@import 'utilities';
+
+form#new_bulk_operation {
+  input#bulk_operation_uploaded_file {
+    height: auto;
+    padding: 0;
+  }
+}
+
+body[data-controller="trip_tickets"] {}

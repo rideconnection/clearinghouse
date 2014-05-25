@@ -1,15 +1,6 @@
 <%= form_for(@trip_ticket) do |f| %>
-  <% if @trip_ticket.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@trip_ticket.errors.count, "error") %> prohibited this trip_ticket from being saved:</h2>
-
-      <ul>
-      <% @trip_ticket.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  
+  <%= render partial: 'shared/error_explanation', locals: { object: @trip_ticket } %>
 
   <% unless @trip_ticket.new_record? %>
     <fieldset id="status" class="">
@@ -38,27 +29,6 @@
         <%= f.text_field :origin_trip_id %>
       </div>
     <% end %>
-  </fieldset>
-
-  <fieldset id="claimant" class="">
-    <legend>Claimant</legend>
-
-    <div class="field">
-      <%= f.label :claimant_provider_id, "Provider" %>
-      <% if can? :edit, @trip_ticket %>
-        <%= f.collection_select :claimant_provider_id, Provider.all, :id, :name, :include_blank => true %>
-      <% else %>
-        <%= @trip_ticket.claimant.name if @trip_ticket.claimant.present? %>
-      <% end %>
-    </div>
-    <div class="field">
-      <%= f.label :claimant_trip_id, "Trip ID" %>
-      <% if can? :edit, @trip_ticket %>
-        <%= f.text_field :claimant_trip_id, :readonly => true %>
-      <% else %>
-        <%= @trip_ticket.claimant_trip_id %>
-      <% end %>
-    </div>
   </fieldset>
 
   <fieldset id="customer" class="">
@@ -93,8 +63,8 @@
         <%= f.date_select(:customer_dob,
                           :order => [:month, :day, :year],
                           :prompt => { :day => 'Select day', :month => 'Select month', :year => 'Select year' },
-                          :start_year => Time.now.year - 100,
-                          :end_year => Time.now.year
+                          :start_year => Time.zone.now.year - 100,
+                          :end_year => Time.zone.now.year
         ) %>
       <% else %>
         <%= @trip_ticket.customer_dob %>
@@ -102,7 +72,7 @@
     </div>
     <% if can? :edit, @trip_ticket %>
       <%= f.fields_for :customer_address do |af| %>
-        <%= render 'locations/address_form', { :f => af, required_fields: true } %>
+        <%= render 'locations/address_form', { :f => af, required_fields: false } %>
       <% end %>
     <% else %>
       <%= render 'locations/show_fields', :location => @trip_ticket.customer_address %>
@@ -159,6 +129,14 @@
         <%= f.text_field :customer_impairment_description %>
       <% else %>
         <%= @trip_ticket.customer_impairment_description %>
+      <% end %>
+    </div>
+    <div class="field">
+      <%= f.label :customer_service_level, "Service Level" %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.text_field :customer_service_level %>
+      <% else %>
+        <%= @trip_ticket.customer_service_level %>
       <% end %>
     </div>
     <div class="field">
@@ -248,8 +226,8 @@
         </ul>
       <% end %>
     </div>
-    
-    <% 
+
+    <%
       field_indexes = {}
       TripTicket::CUSTOMER_IDENTIFIER_ARRAY_FIELDS.each do |field_sym, legend| 
     %>
@@ -260,7 +238,7 @@
             <% field_indexes[field_sym] = 0 %>
             <% @trip_ticket.send(field_sym).try(:each_with_index) do |v,index| %>
               <div class="field pgStringArray">
-                <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New mobility impairment', :class => "pgStringArrayValue", :size => 30 %>
+                <%= text_field_tag "trip_ticket[#{field_sym.to_s}][]", v, :id => "trip_ticket_#{field_sym.to_s}_#{index.to_s}", :placeholder => 'New eligibility factor', :class => "pgStringArrayValue", :size => 30 %>
                 <a href="#" class='removePgStringArray'>X</a>
               </div>
               <% field_indexes[field_sym] += 1 %>
@@ -292,6 +270,7 @@
                 $(this).parent().before('<%= j raw(field_html) %>'.replace('?', window.field_indexes_<%= field_sym.to_s %>));
                 $('#trip_ticket_<%= field_sym.to_s %>_?'.replace('?', window.field_indexes_<%= field_sym.to_s %>)).focus();
                 blankify_<%= field_sym.to_s %>();
+                setup_autocomplete_fields();
               });
 
               function blankify_<%= field_sym.to_s %>() {
@@ -464,6 +443,14 @@
         <%= @trip_ticket.trip_notes %>
       <% end %>
     </div>
+    <div class="field">
+      <%= f.label :expire_at, "Trip Expires At" %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.datetime_select :expire_at, :ampm => true, :minute_step => 60, :include_blank => true %>
+      <% else %>
+        <%= @trip_ticket.expire_at %>
+      <% end %>
+    </div>
   </fieldset>
 
   <fieldset id="info" class="">
@@ -477,6 +464,12 @@
       <%= f.label :updated_at, "Updated" %>
       <%= @trip_ticket.updated_at %>
     </div>
+    <% if can? :edit, @trip_ticket %>
+      <div class="field">
+        <%= f.label :expired, "Expired?" %>
+        <%= @trip_ticket.expired? ? "True" : "False" %>
+      </div>
+    <% end %>
   </fieldset>
 
   <% if can? :edit, @trip_ticket %>
@@ -489,9 +482,23 @@
   <% end %>
 <% end %>
 
+<script type="text/javascript">
+  var service_level_autocomplete_data = JSON.parse('<%= escape_javascript(service_level_autocomplete_values.to_json.html_safe) %>');
+  var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
+
+  function setup_autocomplete_fields() {
+    $("input[name^='trip_ticket[customer_service_level]']").autocomplete({ source: service_level_autocomplete_data });
+    $("input[name^='trip_ticket[customer_eligibility_factors]']").autocomplete({ source: eligibility_autocomplete_data });
+  }
+
+  $(document).ready(function(){
+    setup_autocomplete_fields();
+  });
+</script>
+
 <% content_for :sidebar do %>
   <ul class="side-nav">
-    <% if @trip_ticket.persisted? && can?(:rescind, @trip_ticket) && @trip_ticket.rescindable? %>
+    <% if @trip_ticket.persisted? && !@trip_ticket.rescinded? && can?(:rescind, @trip_ticket) && @trip_ticket.rescindable? %>
       <li><%= link_to 'Rescind', rescind_trip_ticket_path(@trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' } %></li>
     <% end %>
   </ul>

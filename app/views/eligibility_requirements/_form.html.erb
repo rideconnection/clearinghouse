@@ -1,0 +1,56 @@
+<%= form_for(@form_path) do |f| %>
+
+  <%= render partial: 'shared/error_explanation', locals: { object: @eligibility_requirement } %>
+
+  <div class="field">
+    <%= f.label :boolean_type, 'Comparison Type' %>
+    <%= f.select :boolean_type, EligibilityRequirement::BOOLEAN_TYPES.invert %>
+  </div>
+
+  <fieldset>
+    <legend>Eligibility Requirements</legend>
+    <table id="eligibility-requirements-list" cellpadding="2" style="margin:8px 0">
+      <thead>
+        <tr>
+          <th>Trip Ticket Field</th>
+          <th>Comparison</th>
+          <th>Value</th>
+          <th>Delete?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @eligibility_requirement.eligibility_rules.build %>
+        <%= f.fields_for :eligibility_rules do |er_fields| %>
+        <tr>
+          <td><%= er_fields.select :trip_field, EligibilityRule::TRIP_TICKET_FIELDS.invert %></td>
+          <td><%= er_fields.select :comparison_type, EligibilityRule::COMPARISON_TYPES.invert %></td>
+          <td><%= er_fields.text_field :comparison_value %></td>
+          <td style="text-align:center"><%= er_fields.check_box :_destroy, style: "float:none;width:auto;margin:0" %></td>
+        </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <%= link_to 'Add Row', nil, id: 'eligibility-requirements-list-add' %>
+  </fieldset>
+
+  <div class="buttons-holder">
+    <%= link_to :back, :class => "button button-cancel" do %>
+      <span>Cancel</span>
+    <% end %>
+    <%= f.submit :id => "eligibility-requirements-list-submit", :class => "button" %>
+  </div>
+<% end %>
+
+<%= content_for :head do %>
+  <script type="text/javascript">
+    var eligibility_autocomplete_data = JSON.parse('<%= escape_javascript(eligibility_autocomplete_values.to_json.html_safe) %>');
+
+    function setup_autocomplete_fields() {
+          $("input[name^='eligibility_requirement[eligibility_rules_attributes]']").autocomplete({ source: eligibility_autocomplete_data });
+    }
+
+    $(document).ready(function(){
+      setup_autocomplete_fields();
+    });
+  </script>
+<% end %>

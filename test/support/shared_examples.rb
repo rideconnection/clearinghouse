@@ -15,7 +15,7 @@ module Kernel
     MiniTest::Spec.shared_examples[desc] = block
   end
 
-  def include_examples(desc, options = {})
-    self.instance_exec(options, &MiniTest::Spec.shared_examples[desc])
+  def include_examples(desc, *options)
+    self.instance_exec(*options, &MiniTest::Spec.shared_examples[desc])
   end
 end

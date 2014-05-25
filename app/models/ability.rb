@@ -74,7 +74,17 @@ class Ability
       # TODO - add a :cancel, :rescind, or similar action for waypoints
       # TODO - add appropriate tests once waypoint functionality has been better defined
       can [:create, :read, :update], Waypoint, :open_capacity => { :service => { :provider_id => user.provider_id } }
-              
+
+    end
+
+    if user.has_any_role? [:site_admin, :provider_admin, :scheduler]
+
+      # bulk operations are a history of user uploads and downloads, the API does not need to use this table
+      # bulk operations may only be accessed by the user that created them
+      # bulk operations should only be created and read, not updated or destroyed
+      can [:create, :read], BulkOperation, :user_id => user.id
+      can :download, BulkOperation, :user_id => user.id, :is_upload => false
+
     end
 
     if user.has_any_role? [:api]
@@ -108,7 +118,7 @@ class Ability
       can :activate, ProviderRelationship, :cooperating_provider_id => user.provider_id
             
       # Provider admins and above can create, update and deactivate users belonging to their own provider
-      can [:create, :update, :activate, :deactivate, :set_provider_role], User, :provider_id => user.provider_id
+      can [:create, :update, :activate, :deactivate, :set_provider_role, :preferences, :send_reset_password_link, :unlock], User, :provider_id => user.provider_id
       
       # Provider admins and above can update and work with the keys of their own provider
       can [:update, :keys, :reset_keys], Provider, :id => user.provider_id
@@ -119,7 +129,9 @@ class Ability
               
       # Provider admins and above can update trip ticket comments associated with trip tickets belonging to their own provider
       can :update, TripTicketComment, :trip_ticket => { :origin_provider_id => user.provider_id }
-      
+
+      can :manage, EligibilityRequirement, :service => { :provider_id => user.provider_id }
+      can :manage, EligibilityRule, :service => { :provider_id => user.provider_id }
     end
 
     # All users can read open capacities that belonging to their own provider or providers they have an approved relationship with
@@ -166,7 +178,7 @@ class Ability
     can :read, User, :provider_id => user.provider_id
 
     # All users can update their own profile
-    can :update, User, :id => user.id
+    can [:update, :preferences], User, :id => user.id
 
     # No user can deactivate themselves
     cannot :deactivate, User, :id => user.id

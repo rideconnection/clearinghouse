@@ -37,7 +37,7 @@ else
     trip_ticket_6  = FactoryGirl.create(:trip_ticket, :originator => provider_3)
     FactoryGirl.create(:trip_claim, :trip_ticket => trip_ticket_6, :claimant => provider_2, :status => :approved)
   
-    user_password = "password 1"
+    user_password = "Password 1"
 
     site_admin_role = Role.find_by_name("site_admin")
     site_admin = FactoryGirl.create(:user, 

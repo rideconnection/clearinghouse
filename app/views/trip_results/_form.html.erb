@@ -14,15 +14,15 @@
   </div>
   <div class="field">
     <%= f.label :rate %>
-    <%= f.number_field :rate, :min => 0, :max => 1000000 %>
+    <%= f.number_field :rate, :min => 0, :max => 1000000, :step => 'any'  %>
   </div>
   <div class="field">
     <%= f.label :base_fare %>
-    <%= f.number_field :base_fare, :min => 0, :max => 1000000 %>
+    <%= f.number_field :base_fare, :min => 0, :max => 1000000, :step => 'any'  %>
   </div>
   <div class="field">
     <%= f.label :fare %>
-    <%= f.number_field :fare, :min => 0, :max => 1000000 %>
+    <%= f.number_field :fare, :min => 0, :max => 1000000, :step => 'any' %>
   </div>
   <div class="field">
     <%= f.label :driver_id %>

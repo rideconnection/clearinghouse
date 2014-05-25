@@ -1,73 +1,10 @@
 <%= form_for([@trip_ticket, @trip_claim]) do |f| %>
-  <% if @trip_claim.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@trip_claim.errors.count, "error") %> prohibited this trip_claim from being saved:</h2>
+  
+  <%= render partial: 'shared/error_explanation', locals: { object: @trip_claim } %>
 
-      <ul>
-      <% @trip_claim.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render partial: 'form_fields', locals: { f: f, trip_ticket: @trip_ticket, trip_claim: @trip_claim } %>
 
-  <div class="field">
-    <%= f.label :claimant_provider_id, "Provider" %>
-    <% if current_user.has_admin_role? %>
-      <%= f.collection_select :claimant_provider_id, Provider.where('id <> ?', @trip_ticket.originator.id), :id, :name, :include_blank => true %>
-    <% else %>
-      <%= @trip_claim.claimant.name %>
-    <% end %>
-  </div>
-  <div class="field">
-    <%= f.label :claimant_customer_id, "Customer ID" %>
-    <% if can? :edit, @trip_claim %>
-      <%= f.text_field :claimant_customer_id, :readonly => true %>
-    <% else %>
-      <%= @trip_claim.claimant_customer_id %>
-    <% end %>
-  </div>
-  <div class="field">
-    <%= f.label :claimant_trip_id, "Trip ID" %>
-    <% if can? :edit, @trip_claim %>
-      <%= f.text_field :claimant_trip_id, :readonly => true %>
-    <% else %>
-      <%= @trip_claim.claimant_trip_id %>
-    <% end %>
-  </div>
-  <div class="field">
-    <%= f.label "Claim status" %> <%= @trip_claim.status.to_s.humanize.titlecase %>
-  </div>
-  <div class="field">
-    <%= f.label :proposed_pickup_time %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
-      <%= f.datetime_select(:proposed_pickup_time, 
-                            :order => [:month, :day, :year, :hour, :minute],
-                            :default => DateTime.current,
-                            :ampm => true
-      ) %>
-    <% else %>
-      <%= @trip_claim.proposed_pickup_time %>
-    <% end %>
-  </div>
-  <div class="field">
-    <%= f.label :proposed_fare %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
-      <%= f.text_field :proposed_fare, :placeholder => "$1.23" %>
-    <% else %>
-      <%= @trip_claim.proposed_fare %>
-    <% end %>
-  </div>
-  <div class="field">
-    <%= f.label :notes %>
-    <% if can?(:create, @trip_claim) || can?(:edit, @trip_claim) %>
-      <%= f.text_area :notes %>
-    <% else %>
-      <%= @trip_claim.notes %>
-    <% end %>
-  </div>
-
-  <% if can? :edit, @trip_claim %>
+  <% if can?(:edit, @trip_claim) and @trip_claim.editable? %>
     <div class="buttons-holder field-align">
       <%= link_to :back, :class => "button button-cancel" do %>
         <span>Cancel</span>

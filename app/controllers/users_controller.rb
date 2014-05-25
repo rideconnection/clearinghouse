@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  load_and_authorize_resource
+  load_and_authorize_resource except: [:check_session, :touch_session]
   before_filter :admins_only, :only => :index
 
   # GET /users
@@ -47,6 +47,11 @@ class UsersController < ApplicationController
   def edit
   end
 
+  # GET /preferences
+  def preferences
+    redirect_to edit_user_url(current_user)
+  end
+
   # POST /users
   # POST /users.json
   def create    
@@ -54,6 +59,7 @@ class UsersController < ApplicationController
     if !current_user.has_admin_role?
       @user.provider = current_user.provider
     end
+    
     if params[:user].has_key?(:role_id)
       if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, User
@@ -64,7 +70,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        NewUserMailer.welcome(@user).deliver
+        NewUserMailer.delay.welcome(@user, nil, @user.need_to_generate_password?)
         destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
@@ -81,6 +87,7 @@ class UsersController < ApplicationController
     if params[:user].has_key?(:provider_id)
       authorize! :set_provider, @user
     end
+    
     if params[:user].has_key?(:role_id)
       if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, @user
@@ -88,18 +95,29 @@ class UsersController < ApplicationController
         authorize! :set_any_role, @user
       end
     end
+    
     if params[:user][:password].blank?
       params[:user].delete("password")
       params[:user].delete("password_confirmation")
       need_relogin = false
     elsif @user == current_user
       need_relogin = true
+    else
+      need_relogin = false
+    end
+
+    if params[:unlock_account]
+      params[:user][:failed_attempts] = 0
+      params[:user][:locked_at] = nil
     end
 
     respond_to do |format|
       if @user.update_attributes(params[:user])
         # Devise logs users out on password change
         sign_in(@user, :bypass => true) if need_relogin
+        
+        @user.send_reset_password_instructions if params[:send_reset_password_link]
+        
         format.html { redirect_to :back, notice: 'User was successfully updated.' }
         format.json { head :no_content }
       else
@@ -128,5 +146,19 @@ class UsersController < ApplicationController
       format.html { redirect_to users_url }
       format.json { head :no_content }
     end
+  end
+
+  def check_session
+    last_request_at = session['warden.user.user.session']['last_request_at']
+    timeout_time = last_request_at + (Devise.timeout_in || 365.days) # In case the session timeout has been disabled
+    timeout_in = (timeout_time - Time.current).to_i
+    render :json => {
+      'last_request_at' => last_request_at,
+      'timeout_in' => timeout_in,
+    }
+  end
+
+  def touch_session
+    render :text => 'OK'
   end
 end

@@ -7,7 +7,7 @@ class TripTicketsTest < ActionController::IntegrationTest
   
   setup do
     @provider = FactoryGirl.create(:provider, :name => "Microsoft")
-    @password = "password 1"
+    @password = "Password 1"
 
     @user = FactoryGirl.create(:user, 
       :password => @password, 
@@ -24,7 +24,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     # For selectively enabling selenium driven tests
     # Capybara.current_driver = nil # reset
   end
-  
+
   test "provider admins can create new trip tickets" do
     click_link "Tickets"
     click_link "Add New"
@@ -57,14 +57,15 @@ class TripTicketsTest < ActionController::IntegrationTest
     it "should be displayed in the trip ticket index" do
       trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
       visit trip_tickets_path
-      assert page.find(".tickets-list").has_content?("No Claims")
+      assert page.find("#standard_ticket_list").has_content?("No Claims")
     end
 
-    it "should be displayed in the trip ticket unified view" do
-      trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
-      visit trip_tickets_path
-      assert page.find(".content-frame>.heading:first").has_content?("No Claims")
-    end
+    ## No longer valid since the unified view has been swapped out for an AJAX dashboard that is rendered at run-time
+    # it "should be displayed in the trip ticket unified view" do      
+    #   trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
+    #   visit trip_tickets_path
+    #   assert page.find(".content-frame>.heading:first").has_content?("No Claims")
+    # end
 
     it "should be displayed in the trip ticket show action" do
       trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => 20.days.from_now)
@@ -91,10 +92,15 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "should return Expired if trip ticket is expired" do
-        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Expired'
+        @trip_ticket.tap {|t| t.expired = true }.status_for(@user).must_equal 'Expired'
       end
 
       it "should return No Claims if trip ticket has no claims" do
+        @trip_ticket.status_for(@user).must_equal 'No Claims'
+      end
+
+      it "should return No Claims if trip ticket has only rescinded claims" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :rescinded)
         @trip_ticket.status_for(@user).must_equal 'No Claims'
       end
 
@@ -103,6 +109,12 @@ class TripTicketsTest < ActionController::IntegrationTest
         @trip_ticket.status_for(@user).must_equal '1 Claim Pending'
         FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
         @trip_ticket.status_for(@user).must_equal '2 Claims Pending'
+      end
+
+      it "should not count rescinded claims in Claims Pending" do
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket)
+        FactoryGirl.create(:trip_claim, :trip_ticket => @trip_ticket, :status => :rescinded)
+        @trip_ticket.status_for(@user).must_equal '1 Claim Pending'
       end
 
       it "should return Approved with the name of the claimant if trip ticket has an approved claim" do
@@ -166,7 +178,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "should return Unavailable if trip ticket is expired" do
-        @trip_ticket.tap {|t| t.appointment_time = 1.minutes.ago }.status_for(@user).must_equal 'Unavailable'
+        @trip_ticket.tap {|t| t.expired = true }.status_for(@user).must_equal 'Unavailable'
       end
 
       it "should return Unavailable if trip ticket is resolved and has no claims from user's provider" do
@@ -393,11 +405,12 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
   end
-  
+
   describe "filtering" do
     setup do
-      # because we use a cookie to restore previous filters, to start fresh we need trip_ticket_filters=clear
-      @trip_tickets_path = "/trip_tickets?trip_ticket_filters=clear"
+      # because we use a cookie to restore previous filters, to start fresh we need to set trip ticket filters explicitly
+      @reset_filters_path = "/trip_tickets/clear_filters"
+      @apply_filters_path = "/trip_tickets/apply_filters"
     end
 
     describe "clear filters" do
@@ -406,7 +419,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "provides a link to clear the search results" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'BOB'
@@ -430,7 +443,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "restores the previously-used filters" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Bob'
@@ -454,7 +467,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "allows a user to save their current filters" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Jim'
@@ -478,7 +491,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       it "includes any unapplied filter changes in the saved filter" do
         skip "Test requires javascript support"
 
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Jim'
@@ -504,7 +517,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       it "allows a user to update saved filter conditions" do
         skip "Test requires javascript support"
 
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Jim'
@@ -530,7 +543,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "allows a user to change the name of a saved filter" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Jim'
@@ -556,7 +569,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
 
       it "allows a user to delete a saved filter" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
 
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'Jim'
@@ -577,21 +590,61 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_select?('saved_filter')
       end
 
-      it "supports combining a saved filter with ad-hoc filters"
-      it "restores the previously-used named filter"
+      it "supports combining a saved filter with ad-hoc filters" do
+        visit @reset_filters_path
+
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_customer_address_or_phone", :with => 'Oak'
+          click_button "Search"
+        end
+
+        click_link "Save current filters"
+        within('#new_filter') do
+          fill_in "filter_name", :with => 'customers on oak'
+          click_button "Save"
+        end
+
+        assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
+
+        visit @apply_filters_path + "?saved_filter=customers+on+oak&trip_ticket_filters[customer_name]=xyz"
+
+        assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
+        assert page.has_field?("trip_ticket_filters_customer_name", :with => 'xyz')
+      end
+
+      it "restores the previously-used named filter" do
+        visit @reset_filters_path
+
+        within('#trip_ticket_filters') do
+          fill_in "trip_ticket_filters_customer_address_or_phone", :with => 'Oak'
+          click_button "Search"
+        end
+
+        click_link "Save current filters"
+        within('#new_filter') do
+          fill_in "filter_name", :with => 'customers on oak'
+          click_button "Save"
+        end
+
+        assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
+
+        visit "/trip_tickets"
+
+        assert page.has_select?('saved_filter', :selected => 'customers on oak')
+        assert page.has_field?("trip_ticket_filters_customer_address_or_phone", :with => 'Oak')
+      end
     end
 
     describe "customer name filter" do
       setup do
         @u1 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob', :originator => @provider)
-        @u2 = FactoryGirl.create(:trip_ticket, :customer_middle_name => 'Bob', :originator => @provider)
-        @u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob', :originator => @provider)
-        @u4 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim', :originator => @provider)
-        @u5 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
+        @u2 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Bob', :originator => @provider)
+        @u3 = FactoryGirl.create(:trip_ticket, :customer_last_name   => 'Jim', :originator => @provider)
+        @u4 = FactoryGirl.create(:trip_ticket, :customer_first_name  => 'Bob')
       end
     
       it "returns trip tickets accessible by the current user with a matching first, middle, or last customer name" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_name", :with => 'BOB'
@@ -600,9 +653,8 @@ class TripTicketsTest < ActionController::IntegrationTest
 
         assert page.has_link?("", {:href => trip_ticket_path(@u1)})
         assert page.has_link?("", {:href => trip_ticket_path(@u2)})
-        assert page.has_link?("", {:href => trip_ticket_path(@u3)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@u3)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@u4)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@u5)})
       end
     end
     
@@ -617,7 +669,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with a matching customer street address or phone numbers" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_address_or_phone", :with => 'OAK'
@@ -642,7 +694,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with a matching pick up location address" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_pick_up_location", :with => 'OAK'
@@ -665,7 +717,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with a matching drop off location address" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_drop_off_location", :with => 'OAK'
@@ -700,7 +752,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with matching originating providers" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           select "Microsoft", :from => "Originating Provider"
@@ -744,7 +796,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with matching claiming providers" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           select "Microsoft", :from => "Claiming Provider"
@@ -758,121 +810,7 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t4)})
       end
     end
-    
-    describe "trip ticket status filter" do
-      before do
-        # unclaimed
-        @t1_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        @t1_2 = FactoryGirl.create(:trip_ticket)
 
-        # one claim, not approved
-        @t2_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2_1)
-        
-        @t2_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t2_2)
-        
-        @t3_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3_1)
-
-        @t3_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t3_2)
-
-        # multiple claims, none approved
-        @t4_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4_1)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4_1)
-
-        @t4_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t4_2)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t4_2)
-
-        # multiple claims, one approved
-        @t5_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_1)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5_1)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_1).approve!
-
-        @t5_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_2)
-        FactoryGirl.create(:trip_claim, :status => :declined, :trip_ticket => @t5_2)
-        FactoryGirl.create(:trip_claim, :status => :pending,  :trip_ticket => @t5_2).approve!
-
-        # one claim, approved
-        @t6_1 = FactoryGirl.create(:trip_ticket, :originator => @provider)
-        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6_1).approve!
-
-        @t6_2 = FactoryGirl.create(:trip_ticket)
-        FactoryGirl.create(:trip_claim, :status => :pending, :trip_ticket => @t6_2).approve!
-      end
-      
-      it "returns trip tickets accessible by the current user which have approved claims" do
-        visit @trip_tickets_path
-      
-        within('#trip_ticket_filters') do
-          select "approved", :from => "trip_ticket_filters_claim_status"
-          click_button "Search"
-        end
-        
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t5_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t6_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
-      end
-      
-      it "returns trip tickets accessible by the current user which have pending claims" do
-        visit @trip_tickets_path
-      
-        within('#trip_ticket_filters') do
-          select "pending", :from => "trip_ticket_filters_claim_status"
-          click_button "Search"
-        end        
-        
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t2_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t4_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
-      end
-      
-      it "returns trip tickets accessible by the current user which have no claims on them or which have only declined claims" do
-        visit @trip_tickets_path
-      
-        within('#trip_ticket_filters') do
-          select "unclaimed", :from => "trip_ticket_filters_claim_status"
-          click_button "Search"
-        end
-        
-        assert page.has_link?("",    {:href => trip_ticket_path(@t1_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t1_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t2_2)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t3_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t3_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t4_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t5_2)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_1)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t6_2)})
-      end
-    end
-    
     describe "trip ticket seats required filter" do
       before do
         @t01 = FactoryGirl.create(:trip_ticket, :num_attendants => 0, :customer_seats_required => 0, :num_guests => 0, :originator => @provider)
@@ -889,7 +827,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
       
       it "returns trip tickets accessible by the current user that have no claims on them" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_seats_required_min", :with => "3"
@@ -936,7 +874,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     
       it "returns trip tickets accessible by the current user with a matching scheduling priority" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           select "Drop-off", :from => 'trip_ticket_filters_scheduling_priority'
@@ -962,16 +900,16 @@ class TripTicketsTest < ActionController::IntegrationTest
 
     describe "trip time filter" do
       setup do
-        @t1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
-        @t2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => Time.zone.parse('10:00'), :requested_drop_off_time => Time.zone.parse('23:00'))
-        @t3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-03-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
-        @t4 = FactoryGirl.create(:trip_ticket,                           :appointment_time => Time.zone.parse('2012-04-01'), :requested_pickup_time => Time.zone.parse('11:00'), :requested_drop_off_time => Time.zone.parse('22:00'))
+        @t1 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
+        @t2 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-01-01'), :requested_pickup_time => '10:00', :requested_drop_off_time => '23:00')
+        @t3 = FactoryGirl.create(:trip_ticket, :originator => @provider, :appointment_time => Time.zone.parse('2012-03-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
+        @t4 = FactoryGirl.create(:trip_ticket,                           :appointment_time => Time.zone.parse('2012-04-01'), :requested_pickup_time => '11:00', :requested_drop_off_time => '22:00')
       end
     
       it "returns trip tickets accessible by the current user with a requested_pickup_time or requested_drop_off_time between the selected times" do
         skip "Need to update backend to accept datetime string"
         
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           select "2012", :from => 'trip_ticket_filters_trip_time_start_year'
@@ -1018,24 +956,18 @@ class TripTicketsTest < ActionController::IntegrationTest
     describe "customer identifiers filter" do
       setup do
         @t01 = FactoryGirl.create(:trip_ticket, :customer_identifiers                 => {'a' => 'b', 'c' => 'd'}, :originator => @provider)
-        @t02 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['a', 'b'], :originator => @provider)
-        @t03 = FactoryGirl.create(:trip_ticket, :customer_mobility_impairments        => ['b', 'c'])
-        @t04 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['c', 'a'], :originator => @provider)
-        @t05 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['a', 'b'])
-        @t06 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['b', 'c'], :originator => @provider)
-        @t07 = FactoryGirl.create(:trip_ticket, :customer_assistive_devices           => ['c', 'a'])
-        @t08 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['a', 'b'], :originator => @provider)
-        @t09 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['b', 'c'])
-        @t10 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['c', 'a'], :originator => @provider)
-        @t11 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_service_animals   => ['a', 'b'])
-        @t12 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['b', 'c'], :originator => @provider)
-        @t13 = FactoryGirl.create(:trip_ticket, :guest_or_attendant_assistive_devices => ['c', 'a'])
-        @t14 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['a', 'b'], :originator => @provider)
-        @t15 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['b', 'c'])
+        @t02 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['c', 'a'], :originator => @provider)
+        @t03 = FactoryGirl.create(:trip_ticket, :customer_eligibility_factors         => ['a', 'b'])
+        @t04 = FactoryGirl.create(:trip_ticket, :customer_mobility_factors            => ['b', 'c'], :originator => @provider)
+        @t05 = FactoryGirl.create(:trip_ticket, :customer_mobility_factors            => ['c', 'a'])
+        @t06 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['a', 'b'], :originator => @provider)
+        @t07 = FactoryGirl.create(:trip_ticket, :customer_service_animals             => ['b', 'c'])
+        @t08 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['a', 'b'], :originator => @provider)
+        @t09 = FactoryGirl.create(:trip_ticket, :trip_funders                         => ['b', 'c'])
       end
     
       it "returns trip tickets accessible by the current user with a matching scheduling priority" do
-        visit @trip_tickets_path
+        visit @reset_filters_path
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_identifiers", :with => "a"
@@ -1045,18 +977,12 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t06)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t06)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t10)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t12)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t14)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_identifiers", :with => "b"
@@ -1064,20 +990,14 @@ class TripTicketsTest < ActionController::IntegrationTest
         end
 
         assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t05)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t06)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
         assert page.has_link?("",    {:href => trip_ticket_path(@t08)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t12)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
-        assert page.has_link?("",    {:href => trip_ticket_path(@t14)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
       
         within('#trip_ticket_filters') do
           fill_in "trip_ticket_filters_customer_identifiers", :with => "d"
@@ -1093,12 +1013,741 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_no_link?("", {:href => trip_ticket_path(@t07)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t08)})
         assert page.has_no_link?("", {:href => trip_ticket_path(@t09)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t10)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t11)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t12)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t13)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t14)})
-        assert page.has_no_link?("", {:href => trip_ticket_path(@t15)})
+      end
+    end
+
+    describe "trip ticket rescinded status filter" do
+      setup do
+        @t01 = FactoryGirl.create(:trip_ticket, :rescinded => false, :originator => @provider)
+        @t02 = FactoryGirl.create(:trip_ticket, :rescinded => false, :originator => @provider)
+        @t03 = FactoryGirl.create(:trip_ticket, :rescinded => true, :originator => @provider)
+      end
+
+      it "should not filter out rescinded trips by default" do
+        visit @reset_filters_path
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow the rescinded trip filter to be explicitly enabled" do
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Hide rescinded", :from => "trip_ticket_filters_rescinded"
+          click_button "Search"
+        end
+
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow the rescinded trip filter to be disabled" do
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Show rescinded (default)", :from => "trip_ticket_filters_rescinded"
+          click_button "Search"
+        end
+
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow the user to filter out all except rescinded trips" do
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Only rescinded", :from => "trip_ticket_filters_rescinded"
+          click_button "Search"
+        end
+
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+      end
+    end
+
+    # Provider Service Filters
+
+    describe "trip ticket eligibility requirements" do
+      setup do
+        @provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_2
+        )
+        relationship.approve!
+        @service = FactoryGirl.create(:service, :provider => @provider)
+        @eligibility_requirement_1 = FactoryGirl.create(:eligibility_requirement, :boolean_type => 'or', :service => @service)
+      end
+
+      describe "eligibility factors filter" do
+        setup do
+          @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_eligibility_factors => ['Veteran', 'Disabled'])
+          @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_eligibility_factors => ['Veteran'])
+          @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_eligibility_factors => ['Disabled'])
+          @t04 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_eligibility_factors => nil)
+        end
+
+        let(:eligibility_rule_1) {
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_eligibility_factors',
+            :comparison_type => 'equal',
+            :comparison_value => 'veteran',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+        }
+        let(:eligibility_rule_2) {
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_eligibility_factors',
+            :comparison_type => 'equal',
+            :comparison_value => 'disabled',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+        }
+
+        it "should not filter out trips the provider is ineligible to fulfill by default" do
+          eligibility_rule_1
+          visit @reset_filters_path
+          assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+          eligibility_rule_2
+          visit @reset_filters_path
+          assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should allow the eligibility filter to be explicitly enabled" do
+          eligibility_rule_1
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'must not equal' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_eligibility_factors',
+            :comparison_type => 'not_equal',
+            :comparison_value => 'disabled',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'must contain' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_eligibility_factors',
+            :comparison_type => 'contain',
+            :comparison_value => 'vet',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'must not contain' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_eligibility_factors',
+            :comparison_type => 'not_contain',
+            :comparison_value => 'vet',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should allow the eligibility filter to be disabled" do
+          eligibility_rule_1
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should not cause any errors if an eligibility requirement contains no eligibility rules" do
+          visit @reset_filters_path
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should never filter out a provider's own trip tickets" do
+          own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider, :customer_eligibility_factors => nil)
+          eligibility_rule_1
+          visit @reset_filters_path
+          assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
+        end
+      end
+
+      describe "service level filter" do
+        setup do
+          @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => nil)
+          @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => 'Stretcher')
+          @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => 'Needs Stretcher')
+        end
+
+        it "should support 'must equal' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'equal',
+            :comparison_value => 'stretcher',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        end
+
+        it "should support 'must not equal' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'not_equal',
+            :comparison_value => 'stretcher',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        end
+
+        it "should support 'must contain' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'contain',
+            :comparison_value => 'stretch',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        end
+
+        it "should support 'must not contain' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'not_contain',
+            :comparison_value => 'needs',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        end
+      end
+
+      describe "greater than/less than filtering" do
+        setup do
+          @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => nil)
+          @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => '1')
+          @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_service_level => '2')
+        end
+
+        it "should support 'greater than' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'greater_than',
+            :comparison_value => '1',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        end
+
+        it "should support 'less than' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_service_level',
+            :comparison_type => 'less_than',
+            :comparison_value => '2',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        end
+      end
+
+      describe "customer age filter" do
+        setup do
+          @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_dob => Date.parse('July 31, 1953')) # age 60, b-day yesterday
+          @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_dob => Date.parse('August 1, 1953')) # age 60, b-day today
+          @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_dob => Date.parse('July 31, 1954')) # age 59, b-day yesterday
+          @t04 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :customer_dob => Date.parse('August 2, 1952')) # age 60, b-day tomorrow
+          Timecop.freeze(Time.parse("Thu, 01 Aug 2013 12:00:00 +0000").in_time_zone)
+        end
+
+        after do
+          Timecop.return
+        end
+
+        it "should support 'must equal' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_dob',
+            :comparison_type => 'equal',
+            :comparison_value => '60',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'must not equal' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_dob',
+            :comparison_type => 'not_equal',
+            :comparison_value => '60',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'greater than' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_dob',
+            :comparison_type => 'greater_than',
+            :comparison_value => '59',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t04)})
+        end
+
+        it "should support 'less than' filtering" do
+          FactoryGirl.create(
+            :eligibility_rule,
+            :trip_field => 'customer_dob',
+            :comparison_type => 'less_than',
+            :comparison_value => '60',
+            :eligibility_requirement => @eligibility_requirement_1
+          )
+
+          visit @reset_filters_path
+          within('#trip_ticket_filters') do
+            select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+            click_button "Search"
+          end
+
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+          assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+          assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+        end
+      end
+    end
+
+    describe "trip ticket operating hours filter" do
+      setup do
+        @provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_2
+        )
+        relationship.approve!
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
+                                  :appointment_time => Time.zone.parse('Sat, 27 Jul 2013 16:00'),
+                                  :requested_pickup_time => '15:00',
+                                  :requested_drop_off_time => '17:00')
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
+                                  :appointment_time => Time.zone.parse('Sat, 27 Jul 2013 22:00'),
+                                  :requested_pickup_time => '21:00',
+                                  :requested_drop_off_time => '23:00')
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
+                                  :appointment_time => Time.zone.parse('Sun, 28 Jul 2013 16:00'),
+                                  :requested_pickup_time => '15:00',
+                                  :requested_drop_off_time => '17:00')
+        @service = FactoryGirl.create(:service, :provider => @provider)
+      end
+
+      let(:operating_hours_1) {
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: "09:00", close_time: "22:00", :service => @service)
+      }
+      let(:nil_operating_hours) {
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: nil, close_time: nil, :service => @service)
+      }
+
+      it "should not filter out trips that are outside the provider's service hours by default" do
+        operating_hours_1
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should allow service hour filtering to be explicitly enabled via the eligibility filter control" do
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should filter out no trips if 24-hour service is specified" do
+        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: "00:00", close_time: "00:00", :service => @service)
+        FactoryGirl.create(:operating_hours, day_of_week: 6, open_time: "00:00", close_time: "00:00", :service => @service)
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should handle the case where service operating hours end after midnight" do
+        FactoryGirl.create(:operating_hours, day_of_week: 0, open_time: "06:00", close_time: "02:00", :service => @service)
+
+        t04 = FactoryGirl.create(:trip_ticket, :originator => @provider_2,
+                                  :appointment_time => Time.zone.parse('Sun, 28 Jul 2013 01:00'),
+                                  :requested_pickup_time => '11:00',
+                                  :requested_drop_off_time => '01:00')
+
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("",    {:href => trip_ticket_path(t04)})
+      end
+
+      it "should allow service hour filtering to be disabled via the eligibility filter control" do
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Do not apply service filters (default)", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not cause any errors if a service contains no operating hours" do
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not cause any errors if a service contains nil operating hours" do
+        nil_operating_hours
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not filter out any trips if a service contains nil operating hours" do
+        nil_operating_hours
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should not affects other service filters if a service contains nil operating hours" do
+        nil_operating_hours
+        operating_hours_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+      end
+
+      it "should never filter out a provider's own trip tickets" do
+        own_trip = FactoryGirl.create(:trip_ticket, :originator => @provider,
+                                      :appointment_time => Time.zone.parse('Mon, 29 Jul 2013 22:00'),
+                                      :requested_pickup_time => '21:00',
+                                      :requested_drop_off_time => '23:00')
+        operating_hours_1
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(own_trip)})
+      end
+    end
+
+    describe "trip ticket service area filter" do
+      setup do
+        @provider_2 = FactoryGirl.create(:provider)
+        relationship = ProviderRelationship.create!(
+          :requesting_provider => @provider,
+          :cooperating_provider => @provider_2
+        )
+        relationship.approve!
+
+        @service_area = "POLYGON ((-70.6365966796875 42.60377635247125, -70.9991455078125 42.026989870279486, -71.3825439453125 42.25804908709509, -70.6365966796875 42.60377635247125))"
+        @location_in_area = FactoryGirl.create(:location, :position => "POINT (-71.06266021728516 42.35664962372854)")
+        @location_outside_area = FactoryGirl.create(:location, :position => "POINT (-72.0 42.0)")
+
+        @t01 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :pick_up_location => @location_in_area, :drop_off_location => @location_in_area)
+        @t02 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :pick_up_location => @location_in_area, :drop_off_location => @location_outside_area)
+        @t03 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :pick_up_location => @location_outside_area, :drop_off_location => @location_in_area)
+        @t04 = FactoryGirl.create(:trip_ticket, :originator => @provider_2, :pick_up_location => @location_outside_area, :drop_off_location => @location_outside_area)
+      end
+
+      let(:service_1) {
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'pickup')
+      }
+      let(:service_2) {
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'dropoff')
+      }
+      let(:service_3) {
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'both')
+      }
+      let(:service_4) {
+        FactoryGirl.create(:service, :provider => @provider, :service_area => @service_area, :service_area_type => 'either')
+      }
+
+      it "should not filter trips that are outside the provider's service area by default" do
+        service_3
+        visit @reset_filters_path
+        assert page.has_link?("", {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_link?("", {:href => trip_ticket_path(@t04)})
+      end
+
+      it "should filter trips where pickup address is not in the provider's service area" do
+        service_1
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+      end
+
+      it "should filter trips where drop-off address is not in the provider's service area" do
+        service_2
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+      end
+
+      it "should filter trips where pickup address or drop-off address is not in the provider's service area" do
+        service_3
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t02)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+      end
+
+      it "should filter trips where pickup address or drop-off address is not in the provider's service area" do
+        service_4
+        visit @reset_filters_path
+        within('#trip_ticket_filters') do
+          select "Apply service filters", :from => "trip_ticket_filters_service_filters"
+          click_button "Search"
+        end
+        assert page.has_link?("",    {:href => trip_ticket_path(@t01)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t02)})
+        assert page.has_link?("",    {:href => trip_ticket_path(@t03)})
+        assert page.has_no_link?("", {:href => trip_ticket_path(@t04)})
+      end
+    end
+  end
+
+  describe "notifications" do
+    setup do
+      @partner = FactoryGirl.create(:provider, :name => "Macrohard")
+      @relationship = ProviderRelationship.create!(
+        :requesting_provider => @provider,
+        :cooperating_provider => @partner
+      )
+      @relationship.approve!
+      @partner_user = FactoryGirl.create(:user,
+                                         :provider => @partner,
+                                         :role => Role.find_or_create_by_name!("provider_admin"),
+                                         :notification_preferences => NotificationRecipients::NOTIFICATION_TYPES.stringify_keys.keys)
+      @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disabled
+      ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
+    end
+
+    it "should notify partner users of new trips" do
+      click_link "Tickets"
+      click_link "Add New"
+      fill_in_minimum_required_trip_ticket_fields
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        click_button "Create Trip ticket"
+      end
+      validate_last_delivery(@partner_user.email, 'Ride Connection Clearinghouse: new trip ticket')
+    end
+
+    it "should not notify users for partners in blacklist of new trips" do
+      click_link "Tickets"
+      click_link "Add New"
+      fill_in_minimum_required_trip_ticket_fields
+      select "Macrohard", :from => "Provider black list"
+      assert_no_difference 'ActionMailer::Base.deliveries.size' do
+        click_button "Create Trip ticket"
       end
     end
   end
@@ -1110,13 +1759,6 @@ class TripTicketsTest < ActionController::IntegrationTest
       fill_in "Customer ID", :with => "ABC123"
     end
 
-    within('#customer') do
-      fill_in 'Address Line 1', :with => '123 Some Place'
-      fill_in 'City', :with => 'Some City'
-      fill_in 'State', :with => 'ST'
-      fill_in 'Postal Code', :with => '12345'
-    end
-    
     within('#pick_up_location') do
       fill_in 'Address Line 1', :with => '456 Some Place'
       fill_in 'City', :with => 'Some City'
@@ -1136,7 +1778,7 @@ class TripTicketsTest < ActionController::IntegrationTest
     fill_in 'Primary Phone Number', :with => '555-1212'
     select 'No', :from => 'Information Withheld?'    
     select_date 30.years.ago, :from => :trip_ticket_customer_dob
-    select_datetime Time.parse(Time.current.strftime("%F")), :from => :trip_ticket_appointment_time
+    select_datetime Time.zone.now.change(min: 0), :from => :trip_ticket_appointment_time
     select 'Pickup', :from => 'Scheduling priority'
   end
 

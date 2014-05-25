@@ -13,7 +13,7 @@ class ProviderTest < ActiveSupport::TestCase
         :cooperating_provider => provider_2,
         :automatic_requester_approval => false,
         :automatic_cooperator_approval => true,
-        :approved_at => Time.now
+        :approved_at => Time.zone.now
       )
       @provider.can_auto_approve_for?(provider_2).must_equal false
       provider_2.can_auto_approve_for?(@provider).must_equal true
@@ -100,7 +100,6 @@ class ProviderTest < ActiveSupport::TestCase
     end
   end
 
-
   describe "with an unapproved partnership" do
     before do
       @partner = FactoryGirl.create(:provider)
@@ -122,6 +121,45 @@ class ProviderTest < ActiveSupport::TestCase
 
       assert_equal @partner.partnerships_awaiting_its_approval, [@partnership]
       assert_equal @partner.pending_partnerships_initiated_by_it, []
+    end
+
+    describe "#approved_partners" do
+      it "should return a list of providers with approved partnerships" do
+        assert @provider.approved_partners.empty?
+        @partnership.approve!
+        @provider.approved_partners.must_include(@partner)
+      end
+    end
+  end
+
+
+  describe "trip_ticket_expiration_days_before" do
+    it "is not required" do
+      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_days_before => "")
+      assert provider.valid?
+    end
+    
+    it "must be greater than or equal to 0 if specified" do
+      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_days_before => -1)
+      refute provider.valid?
+
+      provider.trip_ticket_expiration_days_before = 0
+      assert provider.valid?
+    end
+  end
+
+  describe "trip_ticket_expiration_time_of_day" do
+    it "is not required" do
+      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_time_of_day => "")
+      assert provider.valid?
+    end
+    
+    it "must be a valid time string" do
+      provider = FactoryGirl.build(:provider, :trip_ticket_expiration_time_of_day => "-25:61")
+      refute provider.valid?
+
+      provider.trip_ticket_expiration_time_of_day = "23:59"
+      assert provider.valid?
     end
   end
 

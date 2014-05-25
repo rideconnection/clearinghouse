@@ -10,6 +10,10 @@
   <ul class="side-nav">
     <li><%= link_to 'Providers', providers_path %></li>
     <li><%= link_to 'Users', users_path %></li>
+    <% if current_user.has_admin_role? %>
+      <li><%= link_to 'Application Settings', application_settings_path %></li>
+      <li><%= link_to 'Job Queue', job_queue_path, :target => '_blank' %></li>
+    <% end %>
   </ul>
 <% end %>
 

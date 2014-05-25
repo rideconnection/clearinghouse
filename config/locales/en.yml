@@ -2,4 +2,17 @@
 # See https://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
 en:
-  hello: "Hello world"
+  helpers:
+    submit:
+      eligibility_requirement:
+        create: "Create Eligibility Requirements Group"
+        update: "Update Eligibility Requirements Group"
+  activerecord:
+    errors:
+      models:
+        trip_ticket:
+          attributes:
+            customer_dob:
+              invalid_date: "must be a valid date"
+            appointment_time:
+              invalid_datetime: "must be a valid date and time"

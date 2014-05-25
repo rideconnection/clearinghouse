@@ -15,6 +15,10 @@
   <%= yield :head %>
 </head>
 <body data-controller="<%= params[:controller] %>" data-action="<%= params[:action] %>">
+<div id="session-timeout-warning" style="display: none;">
+  You will be logged off in <span><!-- countdown place holder --></span>&nbsp;seconds due to inactivity.
+  <a id="session-resume" href="#">Click here to stay logged in.</a>
+</div>
 <header id="header">
   <section class="top-section">
     <nav class="holder">
@@ -29,13 +33,16 @@
   <nav class="nav-holder">
     <h1 class="logo"><%= link_to "Ride Connection", root_path %></h1>
     <ul id="nav">
-      <li><%= main_nav_helper 'Tickets', trip_tickets_path %></li>
-      <li><%= main_nav_helper 'Open Capacities', open_capacities_path %></li>
-      <% if current_user and current_user.has_any_role?([:site_admin, :provider_admin]) %>
-        <li><%= main_nav_helper 'Reports', reports_path %></li>
-        <li class="last"><%= main_nav_helper 'Admin', admin_path %></li>
-      <% else %>
-        <li class="last"><%= main_nav_helper 'Reports', reports_path %></li>
+      <%= main_nav_helper 'Tickets', trip_tickets_path %>
+      <%= main_nav_helper 'Open Capacities', open_capacities_path %>
+      <% show_bulk = current_user and !current_user.has_read_only_role? %>
+      <% show_admin = current_user and current_user.has_any_role?([:site_admin, :provider_admin]) %>
+      <%= main_nav_helper 'Reports', reports_path, show_bulk || show_admin ? nil : 'last' %>
+      <% if show_bulk %>
+        <%= main_nav_helper 'Bulk Operations', bulk_operations_path, show_admin ? nil : 'last' %>
+      <% end %>
+      <% if show_admin %>
+        <%= main_nav_helper 'Admin', admin_path, 'last' %>
       <% end %>
     </ul>
   </nav>
@@ -56,7 +63,23 @@
       var theDate = new Date();
       document.write(theDate.getFullYear());
     </script> | <%= link_to 'Ride Connection', 'http://www.rideconnection.org/' %>
+    | <%= link_to 'Credits', pages_credits_path  %>
   </p>
 </footer>
+<% if current_user %>
+  <%= javascript_tag do %>
+    $(document).ready(function(){
+      sessionTimer = new SessionTimer();
+      sessionTimer.start();
+    });
+    var ClearingHouse = {
+      urls: {
+        check_session: "<%= check_session_path %>",
+        touch_session: "<%= touch_session_path %>",
+        sign_out:      "<%= destroy_user_session_path %>"
+      },
+    };
+  <% end %>
+<% end %>
 </body>
 </html>

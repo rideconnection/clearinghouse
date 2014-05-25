@@ -51,4 +51,37 @@ class TripTicketTest < ActiveSupport::TestCase
     user.provider = @third_party_provider
     assert !@result.can_be_edited_by?(user)
   end
+
+  it "should have a claimant method which returns the provider who submitted the result" do
+    @claim.approve!
+    @result.trip_ticket = @ticket
+    @result.save!
+    @result.must_respond_to :claimant
+    @result.claimant.must_equal @claimant
+  end
+
+  describe "notifications" do
+    setup do
+      @acts_as_notifier_disbled = ActsAsNotifier::Config.disabled
+      @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job
+      ActsAsNotifier::Config.disabled = false
+      ActsAsNotifier::Config.use_delayed_job = false
+      @recipients = 'aaa@example.com, bbb@example.com'
+      TripResult.all_instances.stub(:provider_users, @recipients)
+    end
+
+    teardown do
+      ActsAsNotifier::Config.disabled = @acts_as_notifier_disbled
+      ActsAsNotifier::Config.use_delayed_job = @acts_as_notifier_use_delayed_job
+      TripResult.all_instances.unstub(:provider_users)
+    end
+
+    it "should notify trip ticket originator and claimant users when a trip result is submitted" do
+      assert_difference 'ActionMailer::Base.deliveries.size', +1 do
+        @claim.approve!
+        result = TripResult.create(:trip_ticket_id => @ticket.id, :outcome => "Completed")
+      end
+      validate_last_delivery(@recipients, 'Ride Connection Clearinghouse: trip ticket result submitted')
+    end
+  end
 end

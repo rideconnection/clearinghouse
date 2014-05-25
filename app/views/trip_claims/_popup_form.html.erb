@@ -1,0 +1,22 @@
+<div class="edit-claim-popup">
+  <div>
+    <span class="heading">Claimant:</span> 
+    <span><%= @trip_claim.claimant.name %></span>
+  </div>
+
+  <div>
+    <span class="heading">Status:</span> 
+    <span><%= @trip_claim.status.to_s.humanize.titlecase %></span>
+  </div>
+
+  <div>
+    <span class="heading">Pickup Time:</span> 
+    <span><%= @trip_claim.proposed_pickup_time.blank? ? "" : @trip_claim.proposed_pickup_time.to_s(:long) %></span>
+  </div>
+
+  <div>
+    <span class="heading">Proposed Fare:</span> 
+    <span><%= number_to_currency @trip_claim.proposed_fare %></span>
+  </div>
+</div>
+

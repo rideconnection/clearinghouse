@@ -1,25 +1,28 @@
 class User < ActiveRecord::Base
-  # Include default devise modules. Others available are:
-  # :token_authenticatable, :confirmable, :lockable, :rememberable,
-  # :registerable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :recoverable, :trackable, :validatable
+  devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
+    :password_expirable, :password_archivable, :lockable, :session_limitable,
+    :timeoutable
 
-  belongs_to :provider
+  belongs_to :provider, inverse_of: :users
   belongs_to :role
   has_many :filters
+  has_many :bulk_operations
 
   attr_accessible :active, :email, :name, :password, :password_confirmation,
     :must_generate_password, :phone, :provider_id, :role_id, 
-    :title
+    :title, :notification_preferences, :failed_attempts, :locked_at
 
   validate do |user|
-    # This pattern should technically work, but it doesn't...
-    # validates_format_of :password, :if => :password_required?,
-    #                     :with => /^(?=.*[0-9])(?=.*[\W_&&[^\s] ])[\w\W&&[^\s] ]{6,20}$/i, # Regexp tested at http://www.rubular.com/r/7peotZQNui
-    #                     :message => "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
-    # So...                    
-    if user.password_required? && (user.password.blank? || !(6..20).include?(user.password.length) || !user.password.match(/\d/) || !user.password.match(/[\W_&&[^\s] ]/))
-      user.errors[:password] << "must be 6 to 20 characters in length and have at least one number and one non-alphanumeric character"
+    # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical
+    if user.password_required? && (
+      user.password.blank?                    || # Cannot be empty
+      !(8..20).include?(user.password.length) || # 8 - 20 characters
+      !user.password.match(/[A-Z]/)           || # at least one lowercase letter
+      !user.password.match(/[a-z]/)           || # at least one uppercase letter
+      !user.password.match(/\d/)              || # at least one number
+      !user.password.match(/[\W_&&[^\s] ]/)      # at least one non-alphanumeric character
+    )
+      user.errors[:password] << "does not meet complexity requirements. Passwords must be 8 to 20 characters in length with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical"
     end
   end
   
@@ -34,7 +37,7 @@ class User < ActiveRecord::Base
     reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC')
 
   # Temporary attribute for auto-generated password tokens
-  attr_accessor :must_generate_password 
+  attr_accessor :must_generate_password
 
   def partner_provider_ids_for_tickets
     [self.provider_id] + 
@@ -47,6 +50,10 @@ class User < ActiveRecord::Base
   
   def has_admin_role?
     self.role.is_admin_role?
+  end
+
+  def has_read_only_role?
+    self.role.is_read_only_role?
   end
 
   def active_for_authentication?
@@ -68,15 +75,19 @@ class User < ActiveRecord::Base
       name
     end
   end
-
+  
   private
 
   def generate_a_password
     if need_to_generate_password?
-      temp_token = Devise.friendly_token.first(10) + "!1"
+      temp_token = (Devise.friendly_token.first(16) +
+        Array("a".."z").shuffle.first +
+        Array("A".."Z").shuffle.first +
+        Array("0".."9").shuffle.first +
+        "!@\#$%^&*".split("").shuffle.first).split("").shuffle.join("")
       self.password = self.password_confirmation = temp_token
       self.reset_password_token = User.reset_password_token
-      self.reset_password_sent_at = Time.now
+      self.reset_password_sent_at = Time.zone.now
     end
   end
 end

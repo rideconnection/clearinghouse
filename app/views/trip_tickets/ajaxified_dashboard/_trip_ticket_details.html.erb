@@ -1,6 +1,6 @@
 <div class="heading">
   <h2>
-    <%= link_to trip_ticket do %>
+    <%= link_to trip_ticket, class: 'no-clickify' do %>
       <%= trip_ticket.customer_full_name %>
     <% end %>
     <span class="count"><%= trip_ticket.seats_required %></span>
@@ -8,11 +8,21 @@
     <% trip_status = trip_ticket.status_for(current_user) %>
     <span class="trip-status <%= underscore_status(trip_status) %>"><%= trip_status %></span>
   </h2>
-  <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
-    <%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "btn-request" do %>
-      <span>Claim</span>
+  
+  <ul class="actions-list">
+    <% if can?(:edit, @trip_ticket) %>
+      <li><%= link_to edit_trip_ticket_path(trip_ticket), :class => "activity-edit no-clickify" do %><span>Edit</span><% end %></li>
+    <% else %>
+      <li><%= link_to trip_ticket, class: 'activity-view no-clickify' do %><span>View</span><% end %></li>
     <% end %>
-  <% end %>
+    <% if can?(:create, trip_ticket.trip_claims.build(:claimant_provider_id => current_user.provider.try(:id))) && trip_ticket.claimable_by?(current_user) %>
+      <li><%= link_to new_trip_ticket_trip_claim_path(trip_ticket), :class => "activity-claim no-clickify" do %><span>Claim</span><% end %></li>
+    <% end %>
+    <% if !trip_ticket.rescinded? && can?(:rescind, trip_ticket) && trip_ticket.rescindable? %>
+      <li><%= link_to rescind_trip_ticket_path(trip_ticket.id), method: :post, data: { confirm: 'Are you sure you want to RESCIND this trip ticket?' }, :class => "activity-rescind no-clickify" do %><span>Rescind</span><% end %></li>
+    <% end %>
+    <li class="last"><%= link_to new_trip_ticket_trip_ticket_comment_path(trip_ticket), class: 'activity-comment no-clickify' do %><span>Comment</span><% end %></li>
+  </ul>
 </div>
 <div class="twocolumns">
   <div class="add-info">
@@ -37,9 +47,9 @@
       </div>
     </div>
     <ul class="icons-list">
-      <li><!--img src="/assets/icon03.png" width="13" height="18" alt="" /--></li>
-      <li><!--img src="/assets/icon04.png" width="7" height="23" alt="" /--></li>
-      <li><!--img src="/assets/icon05.png" width="16" height="14" alt="" /--></li>
+      <% trip_ticket.icon_list.each do |icon| %>
+      <li><%= image_tag icon[:file], :alt => icon[:alt] %></li>
+      <% end %>
     </ul>
     <div class="image-holder" style="width: 275px; height: 201px">
       <div id="map-canvas" style="width: 100%; height: 100%"></div>
@@ -69,7 +79,15 @@
     </ul>
     <address><%= trip_ticket.pick_up_location.try(:address_city_and_zip, ', ') %></address>
     <address><%= trip_ticket.drop_off_location.try(:address_city_and_zip, ', ') %></address>
-    <span class="gps-data">GPS Coordinates</span>
+    <div class="gps-data">
+      GPS Coordinates
+      <% if trip_ticket.pick_up_location.try(:position).present? && trip_ticket.drop_off_location.try(:position).present? %>
+      <table>
+        <tr><td>Pick Up</td><td><%= trip_ticket.pick_up_location.try(:latitude) %>, <%= trip_ticket.pick_up_location.try(:longitude) %></td></tr>
+        <tr><td>Drop Off</td><td><%= trip_ticket.drop_off_location.try(:latitude) %>, <%= trip_ticket.drop_off_location.try(:longitude) %></td></tr>
+      </table>
+      <% end %>
+    </div>
     <% unless trip_ticket.trip_purpose_description.blank? %>
       <p>Purpose: <%= trip_ticket.trip_purpose_description %></p>
     <% end %>
@@ -114,39 +132,38 @@
     <div class="details-box active">
       <a class="opener" href="#">Trip Details</a>
       <div class="slide">
-        <% unless trip_ticket.trip_funders.blank? %>
-          <p>Trip Funders: <%= formatted_customer_identifiers trip_ticket.trip_funders %></p>
-        <% end %>
-        <% unless trip_ticket.provider_white_list.blank? %>
-          <p>Trip Whitelist: <%= providers_from_white_black_list trip_ticket.provider_white_list %></p>
-        <% end %>
-        <% unless trip_ticket.provider_black_list.blank? %>
-          <p>Trip Blacklist: <%= providers_from_white_black_list trip_ticket.provider_black_list %></p>
-        <% end %>
+        <dl>
+          <% unless trip_ticket.trip_funders.blank? %>
+            <dt>Funders:</dt>
+            <dd><%= formatted_customer_identifiers trip_ticket.trip_funders %></dd>
+          <% end %>
+          <% unless trip_ticket.provider_white_list.blank? %>
+            <dt>Whitelist:</dt>
+            <dd><%= providers_from_white_black_list trip_ticket.provider_white_list %></dd>
+          <% end %>
+          <% unless trip_ticket.provider_black_list.blank? %>
+            <dt>Blacklist:</dt>
+            <dd><%= providers_from_white_black_list trip_ticket.provider_black_list %></dd>
+          <% end %>
+        </dl>
       </div>
     </div>
-    <div class="form-holder">
+    <div>
       <div class="heading">
         <h2>Activity</h2>
-        <a class="opener" href="#">Comment</a>
       </div>
-      <div class="slide">
-        <%= form_for [trip_ticket, TripTicketComment.new], remote: true, html: { class: 'form-comment' } do |f| %>
-          <fieldset>
-            <%= f.text_area :body, cols: 35, rows: 2 %>
-            <div class="buttons-holder">
-              <a href="#" class="btn-cancel"><span>Cancel</span></a>
-              <input type="submit" value="Submit" />
-            </div>
-          </fieldset>
+      <table class="activity-list">
+        <% trip_ticket.activities_accessible_by(current_ability).each do |activity| %>
+          <%= render 'trip_tickets/ajaxified_dashboard/trip_ticket_activity', :activity => activity %>
         <% end %>
-      </div>
-      <ul class="activity-list">
-        <% trip_ticket.activities.each do |activity| %>
-          <%= render 'unified_trip_ticket_view_activity', :activity => activity %>
-        <% end %>
-      </ul>
+      </table>
     </div>
   </div>
 </div>
-<div id="activities-dialog"></div>
+<div class="trip-ticket-comment-form form-holder" style="display: none">
+  <%= form_for [trip_ticket, TripTicketComment.new], html: { class: 'form-comment' } do |f| %>
+    <fieldset>
+      <%= f.text_area :body, cols: 35, rows: 8 %>
+    </fieldset>
+  <% end %>
+</div>
