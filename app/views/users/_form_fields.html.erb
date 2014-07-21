@@ -7,7 +7,7 @@
       <%= f.label :password %>
       <div>
         The user will be sent an activation link with a generated password
-        <%= hidden_field_tag "user[must_generate_password]", "1" %>
+        <%= f.hidden_field :must_generate_password, :value => "1" %>
       </div>
     </div>
   <% elsif can? :send_reset_password_link, @user and @user != current_user %>

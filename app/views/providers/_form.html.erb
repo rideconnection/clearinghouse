@@ -10,7 +10,7 @@
     <%= render 'locations/address_form', { :f => af, required_fields: true } %>
   <% end %>
   <div class="field">
-    <%= f.label :primary_contact_email %>
+    <%= f.label :primary_contact_email, nil, class: "required" %>
     <%= f.text_field :primary_contact_email %>
   </div>
   <div class="field">
