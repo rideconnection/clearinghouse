@@ -11,7 +11,9 @@ module Clearinghouse
       end
 
       class Location < Grape::Entity
-        expose :id, :address_1, :address_2, :city, :position, :state, :zip, :created_at, :updated_at
+        expose :id, :address_1, :address_2, :city, :position, :state, :zip,
+               :phone_number, :common_name, :jurisdiction,
+               :created_at, :updated_at
       end
 
       class Provider < Grape::Entity
@@ -31,7 +33,7 @@ module Clearinghouse
           :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
           :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
           :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type,
-          :created_at, :updated_at
+          :notes, :created_at, :updated_at
       end
 
       class TripClaim < Grape::Entity
@@ -64,8 +66,10 @@ module Clearinghouse
           :customer_service_animals, :customer_eligibility_factors,
           :num_attendants, :num_guests, :requested_pickup_time,
           :earliest_pick_up_time, :appointment_time, :requested_drop_off_time,
-          :allowed_time_variance, :trip_purpose_description, :trip_funders,
-          :trip_notes, :scheduling_priority
+          :trip_purpose_description, :trip_funders,
+          :trip_notes, :scheduling_priority,
+          :customer_gender, :estimated_distance, :additional_data,
+          :time_window_before, :time_window_after
 
         expose :created_at, :format_with => :precise_timestamp
         expose :updated_at, :format_with => :precise_timestamp

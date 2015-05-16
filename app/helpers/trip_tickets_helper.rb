@@ -2,6 +2,10 @@ module TripTicketsHelper
   def providers_from_white_black_list(provider_ids)
     raw Provider.where(:id => provider_ids).all.collect{|p| link_to p.name, provider_path(p)}.join(', ')
   end
+
+  def formatted_gender(customer_gender)
+    customer_gender.presence || 'Unspecified'
+  end
   
   def customer_age(dob)
     now = Time.zone.now
@@ -31,10 +35,14 @@ module TripTicketsHelper
       raw image_tag('icon02.png', width: 13, height: 13, alt: '')
     end
   end
-  
-  def formatted_allowed_time_variance(allowed_time_variance)
-    if allowed_time_variance > 0
-      " +/- #{allowed_time_variance}"
+
+  def time_window_to_s(time_window)
+    time_window.to_i > 0 ? time_window.to_s : 'any'
+  end
+
+  def formatted_time_window(time_window_before, time_window_after)
+    if time_window_before.to_i > 0 || time_window_after.to_i > 0
+      " + #{time_window_to_s(time_window_after)} / - #{time_window_to_s(time_window_before)} mins"
     end
   end
   
