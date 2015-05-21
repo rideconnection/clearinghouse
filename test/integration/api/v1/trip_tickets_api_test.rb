@@ -10,7 +10,7 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     @trip_ticket2 = FactoryGirl.create(:trip_ticket, customer_first_name: "Arthur", originator: @provider, updated_at: Time.zone.parse("2013-01-01 12:00"))
     @trip_ticket3 = FactoryGirl.create(:trip_ticket, customer_first_name: "Mal", originator: FactoryGirl.create(:provider), updated_at: Time.zone.parse("2013-01-01 23:00"))
   end
-  
+
   describe "GET /api/v1/trip_tickets" do
     include_examples "requires authenticatable params"
 
@@ -91,6 +91,15 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       response.body.must_include %Q{"customer_first_name":"#{@trip_ticket2.customer_first_name}"}
       response.body.wont_include %Q{"customer_first_name":"#{@trip_ticket3.customer_first_name}"}
     end
+
+    it "returns ticket status attribute" do
+      @trip_ticket1.rescind!
+      get "/api/v1/trip_tickets/sync", @minimum_request_params
+      response.status.must_equal 200
+      response.body.must_include %Q("status":"Rescinded")
+      response.body.must_include %Q("rescinded":true)
+    end
+
   end
 
   describe "GET /api/v1/trip_tickets/1" do
@@ -150,6 +159,22 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
       put "/api/v1/trip_tickets/#{@trip_ticket3.id}", ApiParamFactory.authenticatable_params(@provider, {:trip_ticket => {:customer_first_name => "Ariadne"}})
       response.status.must_equal 401
       response.body.wont_include %Q{"customer_first_name":"Ariadne"}
+    end
+
+    it "supports simultaneously updating and rescinding a trip with param status=rescinded" do
+      trip_params[:trip_ticket][:status] = 'rescinded'
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"Ariadne"}
+      response.body.must_include %Q{"rescinded":true}
+    end
+
+    it "supports simultaneously updating and rescinding a trip with param rescinded=true" do
+      trip_params[:trip_ticket][:rescinded] = 'true'
+      put "/api/v1/trip_tickets/#{@trip_ticket1.id}", ApiParamFactory.authenticatable_params(@provider, trip_params)
+      response.status.must_equal 200
+      response.body.must_include %Q{"customer_first_name":"Ariadne"}
+      response.body.must_include %Q{"rescinded":true}
     end
   end
 

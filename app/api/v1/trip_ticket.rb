@@ -60,7 +60,16 @@ module Clearinghouse
           put ':id' do
             trip_ticket = TripTicket.find(params[:id])
             error! "Access Denied", 401 unless current_ability.can?(:update, trip_ticket)
-            if trip_ticket.update_attributes(params[:trip_ticket])
+
+            # special API handling of trip ticket updates
+            # if the trip has param status=rescinded or rescinded=true then we will rescind the trip,
+            # just so the caller doesn't need to make two API calls to both update and rescind a trip
+            trip_params = params[:trip_ticket].dup
+            rescind_params = trip_params.select {|k, v| trip_params.delete(k) || true if %w(status rescinded).include?(k.to_s.downcase) }.with_indifferent_access
+            should_rescind = rescind_params[:status].try(:downcase) == 'rescinded' || rescind_params[:rescinded].try(:downcase) == 'true'
+
+            if trip_ticket.update_attributes(trip_params)
+              trip_ticket.rescind! if should_rescind && trip_ticket.rescindable?
               present trip_ticket, with: Clearinghouse::Entities::V1::TripTicketDetailed
             else
               error!({message: "Could not update trip ticket", errors: trip_ticket.errors}, 422)
