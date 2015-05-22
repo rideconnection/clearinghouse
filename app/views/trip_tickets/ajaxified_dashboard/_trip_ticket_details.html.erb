@@ -66,12 +66,14 @@
       <%#= image_tag 'img01.png', width: 275, height: 201, alt: 'new' %>
     </div>
     <ul class="dates-list">
+
       <% unless trip_ticket.requested_pickup_time.blank? %>
-        <li class="active"><span><%= trip_ticket.requested_pickup_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>PU</strong><%= formatted_allowed_time_variance(trip_ticket.allowed_time_variance) %></span></li>
+        <li class="active"><span><%= trip_ticket.requested_pickup_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>PU</strong><%= formatted_time_window(trip_ticket.time_window_after, trip_ticket.time_window_before) %></span></li>
       <% end %>
       <% unless trip_ticket.requested_drop_off_time.blank? %>
-        <li><span><%= trip_ticket.requested_drop_off_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>DO</strong><%= formatted_allowed_time_variance(trip_ticket.allowed_time_variance) %></span></li>
+        <li><span><%= trip_ticket.requested_drop_off_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>DO</strong><%= formatted_time_window(trip_ticket.time_window_after, trip_ticket.time_window_before) %></span></li>
       <% end %>
+
       <% unless trip_ticket.earliest_pick_up_time.blank? %>
         <li><span><%= trip_ticket.earliest_pick_up_time.strftime "%I:%M %p" %></span><span> <%= trip_ticket.appointment_time.strftime "%b %d" %></span><span class="note"> <strong>Earliest PU</strong></span></li>
       <% end %>
@@ -88,6 +90,9 @@
       </table>
       <% end %>
     </div>
+    <% unless trip_ticket.estimated_distance.blank? %>
+      <p>Estimated Distance: <%= trip_ticket.estimated_distance %> miles</p>
+    <% end %>
     <% unless trip_ticket.trip_purpose_description.blank? %>
       <p>Purpose: <%= trip_ticket.trip_purpose_description %></p>
     <% end %>
@@ -115,7 +120,10 @@
             <dt><%= k %></dt>
             <dd><%= v %></dd>
           <% end %>
-        
+
+          <dt>Gender:</dt>
+          <dd><%= formatted_gender trip_ticket.customer_gender %></dd>
+
           <% unless trip_ticket.customer_race.blank? && trip_ticket.customer_ethnicity.blank? %>
             <dt>Ethnicity:</dt>
             <dd><%= trip_ticket.ethnicity_and_race %></dd>

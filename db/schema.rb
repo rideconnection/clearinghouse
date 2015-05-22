@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140128172852) do
+ActiveRecord::Schema.define(:version => 20150513231411) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -110,9 +110,12 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.string   "city"
     t.string   "state"
     t.string   "zip"
-    t.datetime "created_at",                                          :null => false
-    t.datetime "updated_at",                                          :null => false
-    t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
+    t.datetime "created_at",                                            :null => false
+    t.datetime "updated_at",                                            :null => false
+    t.spatial  "position",     :limit => {:srid=>4326, :type=>"point"}
+    t.string   "phone_number"
+    t.string   "common_name"
+    t.string   "jurisdiction"
   end
 
   create_table "nonces", :force => true do |t|
@@ -218,8 +221,8 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.integer  "operating_hours_id"
     t.text     "rate"
     t.hstore   "eligibility"
-    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
     t.string   "service_area_type"
+    t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
   end
 
   add_index "services", ["provider_id"], :name => "index_services_on_provider_id"
@@ -283,6 +286,7 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.datetime "created_at",                                            :null => false
     t.datetime "updated_at",                                            :null => false
     t.integer  "extra_securement_count"
+    t.text     "notes"
   end
 
   add_index "trip_results", ["trip_ticket_id"], :name => "index_trip_results_on_trip_ticket_id"
@@ -313,7 +317,6 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.integer       "pick_up_location_id"
     t.integer       "drop_off_location_id"
     t.string        "scheduling_priority"
-    t.integer       "allowed_time_variance"
     t.integer       "num_attendants"
     t.integer       "num_guests"
     t.string        "trip_purpose_code"
@@ -343,6 +346,11 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.datetime      "expire_at"
     t.boolean       "expired",                                        :default => false
     t.string        "customer_service_level"
+    t.string        "customer_gender",                 :limit => 1
+    t.integer       "estimated_distance"
+    t.integer       "time_window_before"
+    t.integer       "time_window_after"
+    t.hstore        "additional_data"
   end
 
   add_index "trip_tickets", ["customer_eligibility_factors"], :name => "customer_eligibility_factors"
@@ -361,21 +369,21 @@ ActiveRecord::Schema.define(:version => 20140128172852) do
     t.string       "title"
     t.string       "phone"
     t.integer      "provider_id"
-    t.datetime     "created_at",                                               :null => false
-    t.datetime     "updated_at",                                               :null => false
-    t.string       "encrypted_password",                     :default => "",   :null => false
+    t.datetime     "created_at",                                                :null => false
+    t.datetime     "updated_at",                                                :null => false
+    t.string       "encrypted_password",                      :default => "",   :null => false
     t.string       "reset_password_token"
     t.datetime     "reset_password_sent_at"
-    t.integer      "sign_in_count",                          :default => 0
+    t.integer      "sign_in_count",                           :default => 0
     t.datetime     "current_sign_in_at"
     t.datetime     "last_sign_in_at"
     t.string       "current_sign_in_ip"
     t.string       "last_sign_in_ip"
-    t.boolean      "active",                                 :default => true, :null => false
+    t.boolean      "active",                                  :default => true, :null => false
     t.integer      "role_id"
-    t.string_array "notification_preferences"
+    t.string_array "notification_preferences", :limit => 255
     t.datetime     "password_changed_at"
-    t.integer      "failed_attempts",                        :default => 0
+    t.integer      "failed_attempts",                         :default => 0
     t.datetime     "locked_at"
     t.string       "unique_session_id",        :limit => 20
   end

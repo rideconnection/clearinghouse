@@ -1,10 +1,10 @@
 source "https://rubygems.org"
 
-gem "capistrano"
-gem "capistrano-ext"
+gem "capistrano", require: false
+gem "capistrano-ext", require: false
 gem "pg"
 gem "rails", "~> 3.2"
-gem "rvm-capistrano"
+gem "rvm-capistrano", require: false
 
 # PostgreSQL hstore support
 # Locking this down to 0.6.0 until this is fixed:

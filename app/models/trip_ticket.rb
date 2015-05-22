@@ -6,7 +6,8 @@ class TripTicket < ActiveRecord::Base
   include NotificationRecipients
 
   serialize :customer_identifiers, ActiveRecord::Coders::Hstore
-  
+  serialize :additional_data, ActiveRecord::Coders::Hstore
+
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
   belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :pick_up_location,  :class_name => :Location, :validate => true, :dependent => :destroy
@@ -20,6 +21,8 @@ class TripTicket < ActiveRecord::Base
     "pickup"  => "Pickup",
     "dropoff" => "Drop-off"
   }
+
+  GENDER_CHOICES = %w(M F)
 
   ETHNICITY_CHOICES = [
     'Hispanic origin', 
@@ -49,12 +52,12 @@ class TripTicket < ActiveRecord::Base
 
   CUSTOMER_IDENTIFIER_HSTORE_FIELD_NAMES = CUSTOMER_IDENTIFIER_HSTORE_FIELDS.keys
 
-  attr_accessible :allowed_time_variance, :appointment_time,
+  attr_accessible :appointment_time, :estimated_distance,
     :customer_address_attributes, :customer_address_id,
     :customer_boarding_time, :customer_deboarding_time, :customer_dob,
     :customer_emergency_phone, :customer_ethnicity, :customer_first_name,
     :customer_impairment_description, :customer_information_withheld,
-    :customer_last_name, :customer_middle_name, :customer_notes,
+    :customer_last_name, :customer_middle_name, :customer_gender, :customer_notes,
     :customer_primary_language, :customer_primary_phone, :customer_race,
     :customer_seats_required, :drop_off_location_attributes,
     :drop_off_location_id, :earliest_pick_up_time, :num_attendants,
@@ -64,8 +67,9 @@ class TripTicket < ActiveRecord::Base
     :trip_notes, :trip_purpose_description, :trip_result_attributes,
     :customer_identifiers, :customer_service_level, :customer_eligibility_factors,
     :customer_mobility_factors, :customer_service_animals, :trip_funders,
-    :provider_white_list, :provider_black_list, :expire_at, :expired
-  
+    :provider_white_list, :provider_black_list, :expire_at, :expired,
+    :time_window_before, :time_window_after, :additional_data
+
   accepts_nested_attributes_for :pick_up_location, :drop_off_location, :trip_result
   accepts_nested_attributes_for :customer_address, :reject_if => :all_blank
 
@@ -91,7 +95,9 @@ class TripTicket < ActiveRecord::Base
   validates_presence_of :customer_dob, :customer_first_name, :customer_last_name, 
     :customer_primary_phone, :customer_seats_required, :origin_customer_id, 
     :origin_provider_id
-  
+
+  validates :customer_gender, :inclusion => { :in => GENDER_CHOICES }, :allow_blank => true
+  validates :estimated_distance, :numericality => { :greater_than_or_equal_to => 0 }, :allow_blank => true
   validates :customer_information_withheld, :inclusion => { :in => [true, false] }
   validates :scheduling_priority, :inclusion => { :in => SCHEDULING_PRIORITY.keys }
   validate  :can_be_rescinded, on: :update, if: Proc.new { |trip| trip.rescinded? && trip.rescinded_changed? }
@@ -128,13 +134,15 @@ class TripTicket < ActiveRecord::Base
   
   after_initialize do
     if self.new_record?
-      self.allowed_time_variance    ||= -1
+      self.time_window_before       ||= -1
+      self.time_window_after        ||= -1
       self.customer_boarding_time   ||= 0
       self.customer_deboarding_time ||= 0
       self.customer_seats_required  ||= 1
       self.num_attendants           ||= 0
       self.num_guests               ||= 0
       self.customer_identifiers     ||= {}
+      self.additional_data          ||= {}
     end
   end
   
@@ -144,6 +152,10 @@ class TripTicket < ActiveRecord::Base
     subquery = TripClaim.unscoped.select(:trip_ticket_id).where(claimant_provider_id: provider.id).uniq.to_sql
     where('"trip_tickets"."origin_provider_id" = ? OR "trip_tickets"."id" IN (' << subquery << ')', provider.id)
       .reorder('')
+  end
+
+  def customer_gender=(value)
+    write_attribute(:customer_gender, value.to_s.slice(0, 1).try(:upcase))
   end
 
   def make_result_for_form

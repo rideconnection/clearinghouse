@@ -102,6 +102,18 @@
       <% end %>
     </div>
     <div class="field">
+      <%= f.label :customer_gender, 'Gender' %>
+      <%= "(#{TripTicket::GENDER_CHOICES.join('/')})" %>
+      <% if can? :edit, @trip_ticket %>
+        <%= f.text_field :customer_gender, :placeholder => "Unspecified", :list => "customer_gender_data" %>
+        <datalist id="customer_gender_data">
+          <%= options_for_select(TripTicket::GENDER_CHOICES) %>
+        </datalist>
+      <% else %>
+        <%= @trip_ticket.customer_gender %>
+      <% end %>
+    </div>
+    <div class="field">
       <%= f.label :customer_race, "Race" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.text_field :customer_race, :placeholder => "Other Race", :list => "customer_race_data" %>
@@ -340,6 +352,14 @@
     <legend>Trip Information</legend>
 
     <div class="field">
+      <%= f.label :estimated_distance, 'Estimated Distance' %> (in miles)
+      <% if can? :edit, @trip_ticket %>
+        <%= f.number_field :estimated_distance, :min => 0 %>
+      <% else %>
+        <%= @trip_ticket.estimated_distance %>
+      <% end %>
+    </div>
+    <div class="field">
       <%= f.label :appointment_time, class: "required" %>
       <% if can? :edit, @trip_ticket %>
         <%= f.datetime_select :appointment_time, :ampm => true, :minute_step => 15, :include_blank => true %>
@@ -372,11 +392,19 @@
       <% end %>
     </div>
     <div class="field">
-      <%= f.label :allowed_time_variance %> (in minutes):
+      <%= f.label :time_window_before %> (in minutes):
       <% if can? :edit, @trip_ticket %>
-        <%= f.select :allowed_time_variance, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
+        <%= f.select :time_window_before, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
       <% else %>
-        <%= @trip_ticket.allowed_time_variance %>
+        <%= @trip_ticket.time_window_before %>
+      <% end %>
+    </div>
+    <div class="field">
+      <%= f.label :time_window_after %> (in minutes):
+      <% if can? :edit, @trip_ticket %>
+        <%= f.select :time_window_after, [["Any", -1]] + (1..60).to_a.select{ |i| i % 10 == 0 }, :include_blank => true %>
+      <% else %>
+        <%= @trip_ticket.time_window_after %>
       <% end %>
     </div>
     <div class="field">

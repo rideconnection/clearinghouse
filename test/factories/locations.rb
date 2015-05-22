@@ -6,5 +6,8 @@ FactoryGirl.define do
     city 'Portland'
     state 'OR'
     zip '97210'
+    phone_number '123-456-7890'
+    common_name 'Common Name'
+    jurisdiction 'Jurisdiction'
   end
 end

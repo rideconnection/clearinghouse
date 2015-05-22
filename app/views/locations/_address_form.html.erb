@@ -18,6 +18,18 @@
   <%= f.label :zip, "Postal Code", class: (required_fields ? "required" : "") %>
   <%= f.text_field :zip %>
 </div>
+<div class="field">
+  <%= f.label :phone_number %>
+  <%= f.phone_field :phone_number %>
+</div>
+<div class="field">
+  <%= f.label :common_name %>
+  <%= f.text_field :common_name %>
+</div>
+<div class="field">
+  <%= f.label :jurisdiction %>
+  <%= f.text_field :jurisdiction %>
+</div>
 <% if current_user and current_user.has_any_role?([:site_admin]) %>
 <div class="field">
   <%= f.label :latitude, "Latitude" %>

@@ -17,7 +17,8 @@ class TripTicketTest < ActiveSupport::TestCase
   
   it "initializes new instances with prefilled values" do
     t = TripTicket.new
-    t.allowed_time_variance.must_equal -1
+    t.time_window_before.must_equal -1
+    t.time_window_after.must_equal -1
     t.customer_boarding_time.must_equal 0
     t.customer_deboarding_time.must_equal 0
     t.customer_seats_required.must_equal 1
@@ -83,6 +84,18 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.reload
     # NOTE - Keys and values are coerced to strings
     assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.customer_identifiers)
+  end
+
+  it "has an hstore field for additional_data which returns a hash" do
+    assert_equal({}, @trip_ticket.additional_data)
+    @trip_ticket.additional_data = {
+      :Some => 'Thing',
+      1 => 2
+    }
+    @trip_ticket.save!
+    @trip_ticket.reload
+    # NOTE - Keys and values are coerced to strings
+    assert_equal({'Some' => 'Thing', '1' => '2'}, @trip_ticket.additional_data)
   end
 
   it "should allow a trip to be rescinded" do
