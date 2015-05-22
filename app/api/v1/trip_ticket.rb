@@ -68,12 +68,12 @@ module Clearinghouse
             rescind_params = trip_params.select {|k, v| trip_params.delete(k) || true if %w(status rescinded).include?(k.to_s.downcase) }.with_indifferent_access
             should_rescind = rescind_params[:status].try(:downcase) == 'rescinded' || rescind_params[:rescinded].try(:downcase) == 'true'
 
-            if trip_ticket.update_attributes(trip_params)
-              trip_ticket.rescind! if should_rescind && trip_ticket.rescindable?
-              present trip_ticket, with: Clearinghouse::Entities::V1::TripTicketDetailed
-            else
-              error!({message: "Could not update trip ticket", errors: trip_ticket.errors}, 422)
-            end
+            success = trip_ticket.update_attributes(trip_params) if trip_params.present?
+            error!({message: "Could not update trip ticket", errors: trip_ticket.errors}, 422) unless success
+
+            trip_ticket.rescind! if should_rescind && trip_ticket.rescindable?
+
+            present trip_ticket, with: Clearinghouse::Entities::V1::TripTicketDetailed
           end
 
           desc "Rescind a trip ticket"
