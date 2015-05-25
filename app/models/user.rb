@@ -39,6 +39,11 @@ class User < ActiveRecord::Base
   # Temporary attribute for auto-generated password tokens
   attr_accessor :must_generate_password
 
+  def time_zone
+    # TODO would be good to allow each user to set their time zone
+    'Pacific Time (US & Canada)'
+  end
+
   def partner_provider_ids_for_tickets
     [self.provider_id] + 
       ProviderRelationship.partner_ids_for_provider(self.provider)
