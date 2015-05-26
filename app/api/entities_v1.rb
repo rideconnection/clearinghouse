@@ -53,7 +53,9 @@ module Clearinghouse
       class TripTicket < Grape::Entity
         format_with(:precise_timestamp) {|dt| dt.strftime("%Y-%m-%d %H:%M:%S.%6N") }
 
-        expose :id, :rescinded,
+        # note: status is a virtual API field and cannot be set on actual trips
+
+        expose :id, :status, :rescinded,
           :origin_provider_id, :origin_customer_id, :origin_trip_id,
           :pick_up_location_id, :drop_off_location_id, :customer_address_id,
           :customer_first_name, :customer_last_name, :customer_middle_name,

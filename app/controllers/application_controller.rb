@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  around_filter :user_time_zone, :if => :current_user
   before_filter :apply_application_settings
   before_filter :do_not_track
   before_filter :authenticate_user!
@@ -19,7 +20,11 @@ class ApplicationController < ActionController::Base
   end
   
   private
-  
+
+  def user_time_zone(&block)
+    Time.use_zone(current_user.time_zone, &block)
+  end
+
   def store_location
     # store last url - this is needed for post-login redirect to whatever the
     # user last visited.

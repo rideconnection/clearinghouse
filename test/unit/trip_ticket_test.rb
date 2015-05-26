@@ -123,7 +123,15 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.trip_result.wont_be_nil
     @trip_ticket.trip_result.outcome.must_equal "Cancelled"
   end
-  
+
+  it "does not allow directly updating the status attribute" do
+    ->{ @trip_ticket.update_attributes(status: :rescinded) }.must_raise(ActiveModel::MassAssignmentSecurity::Error)
+  end
+
+  it "does not allow rescinding a trip by updating the rescinded attribute" do
+    ->{ @trip_ticket.update_attributes(rescinded: true) }.must_raise(ActiveModel::MassAssignmentSecurity::Error)
+  end
+
   it "has an originated_or_claimed_by method that returns trips originated or claimed by a provider" do
     originator = @trip_ticket.originator
     claimant = FactoryGirl.create(:provider)
