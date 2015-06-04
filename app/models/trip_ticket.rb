@@ -22,7 +22,7 @@ class TripTicket < ActiveRecord::Base
     "dropoff" => "Drop-off"
   }
 
-  GENDER_CHOICES = %w(M F)
+  GENDER_CHOICES = %w(F M U)
 
   ETHNICITY_CHOICES = [
     'Hispanic origin', 

@@ -49,6 +49,10 @@ class TripClaim < ActiveRecord::Base
   after_create do
     self.approve! if self.can_be_auto_approved?
   end
+
+  def claimant_name
+    claimant.try(:name)
+  end
   
   def status
     super.try(:to_sym)

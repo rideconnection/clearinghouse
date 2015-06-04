@@ -6,9 +6,9 @@ describe "Clearinghouse::API_v1 trip tickets endpoints" do
     @provider = FactoryGirl.create(:provider)
     @minimum_request_params = ApiParamFactory.authenticatable_params(@provider)
 
-    @trip_ticket1 = FactoryGirl.create(:trip_ticket, customer_first_name: "Dom", originator: @provider, updated_at: Time.zone.parse("2013-01-01 00:00"))
-    @trip_ticket2 = FactoryGirl.create(:trip_ticket, customer_first_name: "Arthur", originator: @provider, updated_at: Time.zone.parse("2013-01-01 12:00"))
-    @trip_ticket3 = FactoryGirl.create(:trip_ticket, customer_first_name: "Mal", originator: FactoryGirl.create(:provider), updated_at: Time.zone.parse("2013-01-01 23:00"))
+    @trip_ticket1 = FactoryGirl.create(:trip_ticket, customer_first_name: "Dom", originator: @provider, origin_trip_id: 'origintrip1', updated_at: Time.zone.parse("2013-01-01 00:00"))
+    @trip_ticket2 = FactoryGirl.create(:trip_ticket, customer_first_name: "Arthur", originator: @provider, origin_trip_id: 'origintrip2', updated_at: Time.zone.parse("2013-01-01 12:00"))
+    @trip_ticket3 = FactoryGirl.create(:trip_ticket, customer_first_name: "Mal", originator: FactoryGirl.create(:provider), origin_trip_id: 'origintrip3', updated_at: Time.zone.parse("2013-01-01 23:00"))
   end
 
   describe "GET /api/v1/trip_tickets" do
