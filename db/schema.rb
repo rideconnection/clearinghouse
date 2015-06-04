@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150513231411) do
+ActiveRecord::Schema.define(:version => 20150604164640) do
 
   create_table "SpatialIndex", :id => false, :force => true do |t|
     t.text   "f_table_name"
@@ -116,6 +116,7 @@ ActiveRecord::Schema.define(:version => 20150513231411) do
     t.string   "phone_number"
     t.string   "common_name"
     t.string   "jurisdiction"
+    t.string   "address_type"
   end
 
   create_table "nonces", :force => true do |t|
@@ -313,7 +314,7 @@ ActiveRecord::Schema.define(:version => 20150513231411) do
     t.integer       "customer_deboarding_time"
     t.integer       "customer_seats_required"
     t.text          "customer_notes"
-    t.integer       "origin_trip_id"
+    t.string        "origin_trip_id"
     t.integer       "pick_up_location_id"
     t.integer       "drop_off_location_id"
     t.string        "scheduling_priority"

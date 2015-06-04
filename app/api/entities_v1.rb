@@ -26,6 +26,9 @@ module Clearinghouse
         expose :user_name do |comment, options|
           comment.user.name
         end
+        expose :origin_trip_id do |comment, options|
+          comment.trip_ticket.try(:origin_trip_id)
+        end
       end
 
       class TripResult < Grape::Entity
@@ -34,15 +37,24 @@ module Clearinghouse
           :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
           :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type,
           :notes, :created_at, :updated_at
+        expose :origin_trip_id do |result, options|
+          result.trip_ticket.try(:origin_trip_id)
+        end
       end
 
       class TripClaim < Grape::Entity
         expose :id,
-          :claimant_provider_id, :claimant_customer_id, :claimant_service_id, :claimant_trip_id,
+          :claimant_provider_id, :claimant_name, :claimant_customer_id, :claimant_service_id, :claimant_trip_id,
           :trip_ticket_id, :status, :proposed_pickup_time, :proposed_fare, :notes, :created_at, :updated_at
         # indicates if current provider is the creator of the claim
         expose :is_claimant, unless: { current_provider: nil }  do |claim, options|
           claim.claimant_provider_id == options[:current_provider].id
+        end
+        expose :origin_trip_id do |claim, options|
+          claim.trip_ticket.try(:origin_trip_id)
+        end
+        expose :claimant_name do |claim, options|
+          claim.claimant.try(:name)
         end
       end
 
