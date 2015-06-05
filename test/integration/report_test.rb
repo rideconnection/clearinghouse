@@ -7,7 +7,7 @@ shared_examples 'should support date range filtering' do |date_begin, test_if_fi
   end
 
   test "should filter results by date range" do
-    fill_in('date_begin', with: date_begin.strftime('%Y-%m-%d %I:%M %P'))
+    fill_in('date_begin', with: date_begin.in_time_zone(@user.time_zone).strftime('%Y-%m-%d %I:%M %P'))
     click_button 'Filter Report'
     assert test_if_filtered.call(page)
   end
@@ -25,9 +25,19 @@ class ReportTest < ActionController::IntegrationTest
     @user.save!
     @provider = @user.provider
 
+    Time.zone = @user.time_zone
+
     login_as @user, :scope => :user
     visit '/'
     click_link 'Reports'
+  end
+
+  before do
+    Timecop.freeze
+  end
+
+  after do
+    Timecop.return
   end
 
   test 'user can view a list of available reports' do
