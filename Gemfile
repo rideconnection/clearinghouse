@@ -50,7 +50,7 @@ gem "whenever", "~> 0.8.4", :require => false
 gem "grape", "~> 0.2.0"
 
 group :test, :development, :staging do
-  gem "debugger"
+  #gem "debugger"   # no longer supported, see: https://github.com/cldwalker/debugger#known-issues
   gem "factory_girl_rails"
 end
 
