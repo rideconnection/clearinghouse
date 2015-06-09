@@ -69,13 +69,13 @@ Clearinghouse.application.routes.draw do
 
   resources :reports, :only => [ :index, :show ]
 
-  match 'admin', :controller => :admin, :action => :index
-  match 'job_queue' => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
+  match 'admin', :via => :get, :controller => :admin, :action => :index
+  match 'job_queue' => DelayedJobWeb, :via => :get, :anchor => false, :constraints => lambda { |request|
     request.env['warden'].authenticated? # are we authenticated?
     request.env['warden'].authenticate! # authenticate if not already
     request.env['warden'].user.has_admin_role? # Ensure site_admin role
   }
-  match 'preferences', :controller => :users, :action => :preferences
+  match 'preferences', :via => :get, :controller => :users, :action => :preferences
 
   resource :application_settings, :only => [ :edit, :update ] do
     collection do

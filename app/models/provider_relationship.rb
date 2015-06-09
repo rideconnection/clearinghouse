@@ -19,7 +19,7 @@ class ProviderRelationship < ActiveRecord::Base
 
   validate :must_be_unique_relationship, :on => :create 
   
-  scope :approved, where("approved_at IS NOT NULL")
+  scope :approved, ->{ where "approved_at IS NOT NULL" }
 
   def name
     name_1 = requesting_provider.name

@@ -18,7 +18,7 @@ class Service < ActiveRecord::Base
 
   validates_presence_of :name, :provider
 
-  default_scope order(:name)
+  default_scope ->{ order :name }
 
   def hours_hash
     result = {}

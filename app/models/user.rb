@@ -33,8 +33,8 @@ class User < ActiveRecord::Base
   default_scope order('name ASC')
 
   # All users, sorted by provider
-  scope :all_by_provider, joins("LEFT JOIN providers ON users.provider_id = providers.id").
-    reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC')
+  scope :all_by_provider, ->{ joins("LEFT JOIN providers ON users.provider_id = providers.id").
+    reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC') }
 
   # Temporary attribute for auto-generated password tokens
   attr_accessor :must_generate_password

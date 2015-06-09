@@ -146,7 +146,7 @@ class TripTicket < ActiveRecord::Base
     end
   end
   
-  default_scope order('appointment_time ASC, created_at DESC')
+  default_scope ->{ order 'appointment_time ASC, created_at DESC' }
 
   scope :originated_or_claimed_by, ->(provider) do
     subquery = TripClaim.unscoped.select(:trip_ticket_id).where(claimant_provider_id: provider.id).uniq.to_sql
