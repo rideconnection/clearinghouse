@@ -1,7 +1,10 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
-require 'active_record/connection_adapters/postgis_adapter/railtie'
+#require 'active_record/connection_adapters/postgis_adapter/railtie'
+
+# Load application private config and merge with existing ENV vars. Loaded here so can use values in initializers.
+ENV.update YAML.load_file('config/private.yml') rescue {}
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
