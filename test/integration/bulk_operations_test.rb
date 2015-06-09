@@ -118,8 +118,8 @@ class BulkOperationsTest < ActionController::IntegrationTest
 
     describe "with delayed_job configured" do
       setup do
-        @old_settings = Clearinghouse::Application.config.bulk_operation_options
-        Clearinghouse::Application.config.bulk_operation_options = { use_delayed_job: true }
+        @old_settings = Rails.application.config.bulk_operation_options
+        Rails.application.config.bulk_operation_options = { use_delayed_job: true }
         # stub delayed_job #delay method and count invocations
         class BulkOperationsController
           @@invocation_count = 0
@@ -135,7 +135,7 @@ class BulkOperationsTest < ActionController::IntegrationTest
       end
 
       teardown do
-        Clearinghouse::Application.config.bulk_operation_options = @old_settings
+        Rails.application.config.bulk_operation_options = @old_settings
         class BulkOperationsController
           class << self
             remove_method :invocation_count

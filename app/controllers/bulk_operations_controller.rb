@@ -49,14 +49,14 @@ class BulkOperationsController < ApplicationController
       if @bulk_operation.save
         format.html do
           if @bulk_operation.is_upload?
-            unless Clearinghouse::Application.config.bulk_operation_options[:use_delayed_job]
+            unless Rails.application.config.bulk_operation_options[:use_delayed_job]
               self.class.import(current_user.id, @bulk_operation.id)
             else
               self.class.delay.import(current_user.id, @bulk_operation.id)
             end
             redirect_to bulk_operation_url(@bulk_operation)
           else
-            unless Clearinghouse::Application.config.bulk_operation_options[:use_delayed_job]
+            unless Rails.application.config.bulk_operation_options[:use_delayed_job]
               self.class.export(current_user.id, @bulk_operation.id)
             else
               self.class.delay.export(current_user.id, @bulk_operation.id)

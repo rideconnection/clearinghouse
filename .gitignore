@@ -22,7 +22,6 @@
 *.swp
 
 config/database.yml
-config/private.yml
 erd.pdf
 
 # ignore JetBrains IDE config files
