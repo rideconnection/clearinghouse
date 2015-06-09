@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem "capistrano", require: false
 gem "capistrano-ext", require: false
 gem "pg"
-gem "rails", "~> 3.2"
+gem "rails", "~> 4.2.1"
 gem "rvm-capistrano", require: false
 
 # PostgreSQL hstore support
@@ -16,50 +16,44 @@ gem "activerecord-postgres-array", "~> 0.0.9"
 
 # Geospatial support
 gem "rgeo"
-gem "activerecord-postgis-adapter", "~> 0.6.2"
+gem "activerecord-postgis-adapter", "~> 3.0.0"
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem "sass-rails",   "~> 3.2"
-  gem "coffee-rails", "~> 3.2"
+# note that Rails 4 no longer has an assets group
+gem "sass-rails",   "~> 5.0.3"
+gem "uglifier", "~> 2.7.1"
+gem "coffee-rails", "~> 4.1.0"
 
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem "therubyracer", :require => "v8", :platforms => :ruby
+# See https://github.com/sstephenson/execjs#readme for more supported runtimes
+gem "therubyracer", :require => "v8", :platforms => :ruby
 
-  gem "uglifier", ">= 1.0"
-end
-
-gem "audited", "~> 3.0.0"
-gem "audited-activerecord", "~> 3.0.0"
-gem "cancan", "~> 1.6.9"
-gem "daemons", "~> 1.1.9"
-gem "delayed_job_active_record", "~> 4.0.0"
-gem "delayed_job_web", "~> 1.2.0"
-gem "devise", "~> 2.2.3"
+gem "audited", "~> 4.2.0"
+gem "audited-activerecord", "~> 4.2.0"
+gem "cancan", "~> 1.6.10"
+gem "daemons", "~> 1.2.2"
+gem "delayed_job_active_record", "~> 4.0.3"
+gem "delayed_job_web", "~> 1.2.10"
+gem "devise", "~> 3.1.2"
 gem "devise-async", "~> 0.8.0"
-gem "devise_security_extension", "~> 0.7.2"
-gem "jquery-rails", "~> 2.2.1"
-gem "kaminari", "~> 0.14.1"
-gem "rails-settings-cached", "~> 0.2.4"
-gem "seedbank", "~> 0.2.0"
+gem "devise_security_extension", "~> 0.9.2"
+gem "jquery-rails", "~> 4.0.3"
+gem "kaminari", "~> 0.16.3"
+gem "rails-settings-cached", "~> 0.4.1"
+gem "seedbank", "~> 0.3.0"
 gem "validates_timeliness", "~> 3.0.14"
-gem "whenever", "~> 0.8.4", :require => false
+gem "whenever", "~> 0.9.4", :require => false
 
 # API web service
-gem "grape", "~> 0.2.0"
+gem "grape", "~> 0.11.0"
 
 group :test, :development, :staging do
-  #gem "debugger"   # no longer supported, see: https://github.com/cldwalker/debugger#known-issues
+  # note: debugger gem no longer supported, see: https://github.com/cldwalker/debugger#known-issues
   gem "factory_girl_rails"
 end
 
 group :test, :development do
   gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
   gem "minitest-rails-capybara", git: "git://github.com/blowmage/minitest-rails-capybara.git"
-  gem "spork-rails"
-  gem "spork-minitest", git: "git://github.com/semaperepelitsa/spork-minitest.git"
-  gem "spork-testunit", git: "git://github.com/sporkrb/spork-testunit.git"
+  # note: removed Spork because Rails 4.1+ has Spring built-in
   gem "turn", :require => false
 end
 
