@@ -29,8 +29,8 @@ class CombineCustomerFields < ActiveRecord::Migration
     rename_column :trip_tickets, :customer_mobility_factors, :customer_assistive_devices
     execute "CREATE INDEX customer_assistive_devices ON trip_tickets USING GIN(customer_assistive_devices)"
 
-    add_column :trip_tickets, :guest_or_attendant_service_animals, :string_array
-    add_column :trip_tickets, :guest_or_attendant_assistive_devices, :string_array
+    add_column :trip_tickets, :guest_or_attendant_service_animals, :string, array: true
+    add_column :trip_tickets, :guest_or_attendant_assistive_devices, :string, array: true
     execute "CREATE INDEX guest_or_attendant_service_animals ON trip_tickets USING GIN(guest_or_attendant_service_animals)"
     execute "CREATE INDEX guest_or_attendant_assistive_devices ON trip_tickets USING GIN(guest_or_attendant_assistive_devices)"
   end

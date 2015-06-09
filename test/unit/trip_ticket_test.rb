@@ -187,7 +187,7 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   describe "white/black lists" do
-    it "has an integer_array field for provider_white_list which returns an array" do
+    it "has an integer array field for provider_white_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_white_list
       @trip_ticket.provider_white_list = [
         '2',
@@ -199,7 +199,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_equal [2, 1], @trip_ticket.provider_white_list
     end
   
-    it "has an integer_array field for provider_black_list which returns an array" do
+    it "has an integer array field for provider_black_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_black_list
       @trip_ticket.provider_black_list = [
         '2',

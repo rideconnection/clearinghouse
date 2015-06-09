@@ -51,11 +51,6 @@ GEM
     activerecord-postgis-adapter (3.0.0)
       activerecord (~> 4.2)
       rgeo-activerecord (~> 4.0)
-    activerecord-postgres-array (0.0.10)
-      activerecord
-    activerecord-postgres-hstore (0.6.0)
-      rails
-      rake
     activesupport (4.2.1)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -320,8 +315,6 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-postgis-adapter (~> 3.0.0)
-  activerecord-postgres-array (~> 0.0.9)
-  activerecord-postgres-hstore (= 0.6.0)
   audited (~> 4.2.0)
   audited-activerecord (~> 4.2.0)
   byebug

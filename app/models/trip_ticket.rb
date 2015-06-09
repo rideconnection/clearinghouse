@@ -5,9 +5,6 @@ class TripTicket < ActiveRecord::Base
   include TripTicketIcons
   include NotificationRecipients
 
-  serialize :customer_identifiers, ActiveRecord::Coders::Hstore
-  serialize :additional_data, ActiveRecord::Coders::Hstore
-
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
   belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :pick_up_location,  :class_name => :Location, :validate => true, :dependent => :destroy

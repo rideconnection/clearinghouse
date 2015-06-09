@@ -159,6 +159,6 @@ class UsersController < ApplicationController
   end
 
   def touch_session
-    render :text => 'OK'
+    render :plain => 'OK'
   end
 end

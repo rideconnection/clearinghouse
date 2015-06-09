@@ -6,14 +6,6 @@ gem "pg"
 gem "rails", "~> 4.2.1"
 gem "rvm-capistrano", require: false
 
-# PostgreSQL hstore support
-# Locking this down to 0.6.0 until this is fixed:
-# https://github.com/engageis/activerecord-postgres-hstore/issues/83
-gem "activerecord-postgres-hstore", "0.6.0"
-
-# PostgreSQL array support 
-gem "activerecord-postgres-array", "~> 0.0.9"
-
 # Geospatial support
 gem "rgeo"
 gem "activerecord-postgis-adapter", "~> 3.0.0"

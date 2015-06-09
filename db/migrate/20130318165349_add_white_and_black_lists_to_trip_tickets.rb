@@ -1,7 +1,7 @@
 class AddWhiteAndBlackListsToTripTickets < ActiveRecord::Migration
   def up
-    add_column :trip_tickets, :provider_white_list, :integer_array
-    add_column :trip_tickets, :provider_black_list, :integer_array
+    add_column :trip_tickets, :provider_white_list, ::integer, array: true
+    add_column :trip_tickets, :provider_black_list, ::integer, array: true
     execute "CREATE INDEX provider_white_list ON trip_tickets USING GIN(provider_white_list)"
     execute "CREATE INDEX provider_black_list ON trip_tickets USING GIN(provider_black_list)"
   end

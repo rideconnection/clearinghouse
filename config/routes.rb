@@ -1,6 +1,6 @@
 require 'api'
 
-Clearinghouse.application.routes.draw do
+Rails.application.routes.draw do
 
   mount Clearinghouse::API => "/"
   
