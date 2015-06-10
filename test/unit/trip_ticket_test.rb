@@ -227,7 +227,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
     end
     
-    it "allows only integer values for provider_white_list" do
+    it "allows values for which to_i is greater than zero for provider_white_list" do
       @trip_ticket.provider_white_list = []
       assert @trip_ticket.valid?
   
@@ -235,13 +235,13 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
       
       @trip_ticket.provider_white_list = [:'3']
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
       
       @trip_ticket.provider_white_list = [1.3]
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
     end
-    
-    it "allows only integer values for provider_black_list" do
+
+    it "allows values for which to_i is greater than zero for provider_black_list" do
       @trip_ticket.provider_black_list = []
       assert @trip_ticket.valid?
   
@@ -249,10 +249,10 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
       
       @trip_ticket.provider_black_list = [:'3']
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
       
       @trip_ticket.provider_black_list = [1.3]
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
     end
   end
   

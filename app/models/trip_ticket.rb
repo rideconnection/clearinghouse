@@ -111,12 +111,12 @@ class TripTicket < ActiveRecord::Base
     if trip_ticket.provider_white_list.present? && trip_ticket.provider_black_list.present?
       trip_ticket.errors[:provider_black_list] << "cannot be used with a white list"
     end
-    
-    if trip_ticket.provider_white_list.try(:any?) && !trip_ticket.provider_white_list.inject(true){|bool,element| bool && element.is_integer? }
+
+    if trip_ticket.provider_white_list.try(:any?) && !trip_ticket.provider_white_list.inject(true){|bool,element| bool && element.is_integer? && element > 0 }
       trip_ticket.errors[:provider_white_list] << "must be an array of integers"
     end
     
-    if trip_ticket.provider_black_list.try(:any?) && !trip_ticket.provider_black_list.inject(true){|bool,element| bool && element.is_integer? }
+    if trip_ticket.provider_black_list.try(:any?) && !trip_ticket.provider_black_list.inject(true){|bool,element| bool && element.is_integer? && element > 0 }
       trip_ticket.errors[:provider_black_list] << "must be an array of integers"
     end
     
