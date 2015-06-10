@@ -140,7 +140,7 @@ module ActsAsNotifier
           mailer.delay.send(method, recipients, context)
         else
           Rails.logger.debug "ActsAsNotifier sending message with #{mailer.to_s}.#{method}"
-          mailer.send(method, recipients, context).deliver
+          mailer.send(method, recipients, context).deliver_now
         end
       end
     end

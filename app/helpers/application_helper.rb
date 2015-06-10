@@ -64,7 +64,7 @@ module ApplicationHelper
     relative_url_root = opts.delete(:relative_url_root) || 
       Rails.application.config.relative_url_root ||
       ""
-    trip_ticket_path = relative_url_root + trip_ticket_path(trip_ticket)
+    trip_ticket_path = relative_url_root + trip_ticket_url(trip_ticket, only_path: true)
     trip_tickets_url(opts.merge({:anchor => trip_ticket_path}))
   end
 end
