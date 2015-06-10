@@ -58,7 +58,6 @@ group :test, :development do
   gem "factory_girl_rails"
   gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
   gem "minitest-rails-capybara", git: "git://github.com/blowmage/minitest-rails-capybara.git"
-  gem "turn", :require => false
 
   # note: debugger gem no longer supported, see: https://github.com/cldwalker/debugger#known-issues
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
