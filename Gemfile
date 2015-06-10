@@ -48,6 +48,7 @@ gem "whenever", "~> 0.9.4", :require => false
 
 # API web service
 gem "grape", "~> 0.11.0"
+gem "grape-entity", "~> 0.4.5"
 
 group :test, :development do
   gem "capybara"
