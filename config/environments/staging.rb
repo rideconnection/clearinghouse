@@ -88,4 +88,7 @@ Rails.application.configure do
   config.relative_url_root = '/clearinghouse'
 
   config.bulk_operation_options = { use_delayed_job: false }
+
+  # raise errors for attributes protected from mass-assignment
+  config.active_record.mass_assignment_sanitizer = :strict
 end

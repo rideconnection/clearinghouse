@@ -43,4 +43,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
 
   config.bulk_operation_options = { use_delayed_job: false }
+
+  # raise errors for attributes protected from mass-assignment
+  config.active_record.mass_assignment_sanitizer = :strict
 end
