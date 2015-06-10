@@ -43,8 +43,10 @@ gem "devise_security_extension", "~> 0.9.2"
 gem "kaminari", "~> 0.16.3"
 gem "rails-settings-cached", "~> 0.4.1"
 gem "seedbank", "~> 0.3.0"
-gem "validates_timeliness", "~> 3.0.14"
 gem "whenever", "~> 0.9.4", :require => false
+
+# Rails 4 compatible version of validates_timeliness
+gem "jc-validates_timeliness"
 
 # API web service
 gem "grape", "~> 0.11.0"
