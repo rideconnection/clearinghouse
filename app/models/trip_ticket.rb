@@ -443,7 +443,7 @@ class TripTicket < ActiveRecord::Base
         when :only_rescinded
           where(rescinded: true)
         else
-          scoped
+          self == TripTicket ? all : scoped
       end
     end
 
@@ -517,13 +517,13 @@ class TripTicket < ActiveRecord::Base
     # to be updated as well.
     def filter_by_ticket_status(ticket_statuses, provider)
       ticket_statuses = Array(ticket_statuses).compact.map(&:downcase)
+      scope = self == TripTicket ? self : scoped
       if ticket_statuses.any?
         # This can be a costly filter to apply if the current scope returns
         # lots of records, so let's make debugging future bottlenecks easy.
         # You're welcome, future self.
-        logger.debug "-- Filtering #{scoped.count} records through filter_by_ticket_status"
-
-        where(:id => scoped.all.keep_if{ |ticket|
+        logger.debug "-- Filtering #{scope.count} records through filter_by_ticket_status"
+        where(:id => scope.all.to_a.keep_if{ |ticket|
           ticket_status = ticket.status_for(provider).downcase
 
           # #originator_status may return "{claimant_name} Approved"
@@ -535,7 +535,7 @@ class TripTicket < ActiveRecord::Base
           ticket_statuses.include?(ticket_status)
         }.collect(&:id))
       else
-        scoped
+        scope
       end
     end
     
