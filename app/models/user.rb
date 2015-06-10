@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
 
   before_validation :generate_a_password, :on => :create
 
-  default_scope order('name ASC')
+  default_scope ->{ order 'name ASC' }
 
   # All users, sorted by provider
   scope :all_by_provider, ->{ joins("LEFT JOIN providers ON users.provider_id = providers.id").
