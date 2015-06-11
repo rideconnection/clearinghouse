@@ -290,7 +290,7 @@ class TripTicket < ActiveRecord::Base
   end
 
   def approved_claim
-    trip_claims.where(status: 'approved')
+    trip_claims.where(status: 'approved').first
   end
 
   def claimant
