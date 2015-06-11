@@ -2,7 +2,7 @@
 ENV["RAILS_ENV"] = "test"
 require File.expand_path("../../config/environment", __FILE__)
 require "rails/test_help"
-require "database_cleaner"
+#require "database_cleaner"
 require "minitest/autorun"
 require "minitest/rails"
 require "minitest/rails/capybara"
@@ -27,7 +27,7 @@ end
 # so they can use the http methods get/post/put/delete
 MiniTest::Spec.register_spec_type(/Clearinghouse::API/, ActionDispatch::IntegrationTest)
 
-DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
+#DatabaseCleaner.strategy = :deletion, {:except => %w[spatial_ref_sys]}
 
 # by default, do not send email notifications in test mode
 ActsAsNotifier::Config.disabled = true
