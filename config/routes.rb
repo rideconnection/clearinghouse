@@ -6,9 +6,10 @@ Rails.application.routes.draw do
   
   devise_for :users do
     get '/users/sign_out' => 'devise/sessions#destroy' # allow redirects
-    get 'check_session' => 'users#check_session'
-    get 'touch_session' => 'users#touch_session'
   end
+
+  get 'check_session' => 'users#check_session'
+  get 'touch_session' => 'users#touch_session'
 
   resources :open_capacities
 
