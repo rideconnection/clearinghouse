@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BulkOperationsTest < ActionController::IntegrationTest
+class BulkOperationsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!

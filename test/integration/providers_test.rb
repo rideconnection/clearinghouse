@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ProvidersIntegrationTest < ActionController::IntegrationTest
+class ProvidersIntegrationTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -34,7 +34,7 @@ class ProvidersIntegrationTest < ActionController::IntegrationTest
   end
 
   test "provider_admin can create users, triggering an email" do
-    @user.role = Role.find_or_create_by_name!("site_admin")
+    @user.role = Role.find_or_create_by!(name: "site_admin")
     visit '/'
     click_link "Admin"
   end

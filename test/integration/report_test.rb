@@ -14,7 +14,7 @@ shared_examples 'should support date range filtering' do |date_begin, test_if_fi
 end
 
 
-class ReportTest < ActionController::IntegrationTest
+class ReportTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!

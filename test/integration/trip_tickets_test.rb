@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TripTicketsTest < ActionController::IntegrationTest
+class TripTicketsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -1718,7 +1718,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       @relationship.approve!
       @partner_user = FactoryGirl.create(:user,
                                          :provider => @partner,
-                                         :role => Role.find_or_create_by_name!("provider_admin"),
+                                         :role => Role.find_or_create_by!(name: "provider_admin"),
                                          :notification_preferences => NotificationRecipients::NOTIFICATION_TYPES.stringify_keys.keys)
       @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
       @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job

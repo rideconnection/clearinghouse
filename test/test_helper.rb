@@ -17,7 +17,7 @@ end
 # Integration tests
 require "capybara/rails"
 
-module ActionController
+module ActionDispatch
   class IntegrationTest
     include Capybara::DSL
   end

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class ApplicationSettingsTest < ActionController::IntegrationTest
+class ApplicationSettingsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class AdminUserTest < ActionController::IntegrationTest
+class AdminUserTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
