@@ -171,9 +171,8 @@
       <label>Customer Identifiers</label>
       <% if can? :edit, @trip_ticket %>
         <div class="field-array" style="display:inline-block">
-          <%= f.fields_for :customer_identifiers, @trip_ticket.customer_identifiers do |ci| %>
-            <% # TODO - Refactor this line to use an array constant of fields to ignore. Also, see if this is a bug for Rails or the Hstore gem %>
-            <% @trip_ticket.customer_identifiers.try(:except, *[:builder, :parent_builder, :namespace, "builder", "parent_builder", "namespace"]).try(:each) do |k,v| %>
+          <%= f.fields_for :customer_identifiers do |ci| %>
+            <% @trip_ticket.customer_identifiers.try(:each) do |k,v| %>
               <div class="field hstoreAttribute">
                 <%= text_field_tag k, k, :class => 'hstoreAttributeName', :size => 30 %>
                 <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue', :size => 30 %>
@@ -191,45 +190,45 @@
             <%= raw(customer_identifier_fields) %>
 
             <div><a href="#" id="add_customer_identifier">Add Customer Identifier</a></div>
-          </div>
 
-          <script type='text/javascript'>
-            $(document).ready(function() {
-              $('#customer_identifiers').delegate('.hstoreAttributeName', 'keyup', function(e){
-                $nameEl  = $(this);
-                name     = $.trim($nameEl.val()).toLowerCase();
-                $valueEl = $($nameEl.siblings('.hstoreAttributeValue')[0]);
-                $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + name);
-                $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
-                $valueEl.attr('placeholder', 'value for ' + name);
-              });
+            <script type='text/javascript'>
+              $(document).ready(function() {
+                $('#customer_identifiers').delegate('.hstoreAttributeName', 'keyup', function(e){
+                  $nameEl  = $(this);
+                  name     = $.trim($nameEl.val()).toLowerCase();
+                  $valueEl = $($nameEl.siblings('.hstoreAttributeValue')[0]);
+                  $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + name);
+                  $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
+                  $valueEl.attr('placeholder', 'value for ' + name);
+                });
 
-              $('#customer_identifiers').delegate('.removeHstoreAttribute', 'click', function(event){
-                event.preventDefault();
-                $(this).closest('.hstoreAttribute').remove();
-                blankify_customer_identifiers();
-              });
+                $('#customer_identifiers').delegate('.removeHstoreAttribute', 'click', function(event){
+                  event.preventDefault();
+                  $(this).closest('.hstoreAttribute').remove();
+                  blankify_customer_identifiers();
+                });
 
-              $('#add_customer_identifier').on('click', function(event){
-                event.preventDefault();
-                $(this).parent().before('<%= j raw(customer_identifier_fields) %>');
-                $('#customer_identifiers .hstoreAttributeName:last').focus();
-                blankify_customer_identifiers();
-              });
+                $('#add_customer_identifier').on('click', function(event){
+                  event.preventDefault();
+                  $(this).parent().before('<%= j raw(customer_identifier_fields) %>');
+                  $('#customer_identifiers .hstoreAttributeName:last').focus();
+                  blankify_customer_identifiers();
+                });
 
-              function blankify_customer_identifiers() {
-                $customer_identifiers = $('#customer_identifiers');
-                hstoreAttributeCount = $customer_identifiers.find('.hstoreAttribute').size();
-                if (hstoreAttributeCount == 0) {
-                  $customer_identifiers.append('<input type="hidden" id="trip_ticket_customer_identifiers_blank" name="trip_ticket[customer_identifiers]" value="">');
+                function blankify_customer_identifiers() {
+                  $customer_identifiers = $('#customer_identifiers');
+                  hstoreAttributeCount = $customer_identifiers.find('.hstoreAttribute').size();
+                  if (hstoreAttributeCount == 0) {
+                    $customer_identifiers.append('<input type="hidden" id="trip_ticket_customer_identifiers_blank" name="trip_ticket[customer_identifiers]" value="">');
+                  }
+                  else {
+                    $('#trip_ticket_customer_identifiers_blank').remove();
+                  }
                 }
-                else {
-                  $('#trip_ticket_customer_identifiers_blank').remove();
-                }
-              }
-            });
-          </script>
-        <% end %>
+              });
+            </script>
+          <% end %>
+        </div>
       <% else %>
         <ul>
           <% @trip_ticket.customer_identifiers.try(:each) do |k,v| %>
