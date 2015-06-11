@@ -34,7 +34,7 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 gem "audited", "~> 4.2.0"
 gem "audited-activerecord", "~> 4.2.0"
 gem "daemons", "~> 1.2.2"
-gem "cancan", "~> 1.6.10"
+gem "cancancan", "~> 1.10.1"
 gem "delayed_job_active_record", "~> 4.0.3"
 gem "delayed_job_web", "~> 1.2.10"
 gem "devise", "~> 3.5.1"
