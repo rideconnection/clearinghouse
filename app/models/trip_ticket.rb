@@ -286,7 +286,7 @@ class TripTicket < ActiveRecord::Base
   end
 
   def resolved?
-    (appointment_time.past? && approved?) || trip_result.present?
+    appointment_time.past? && approved? || trip_result.present? && !trip_result.new_record?
   end
 
   def approved_claim
