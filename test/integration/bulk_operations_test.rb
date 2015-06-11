@@ -23,6 +23,9 @@ class BulkOperationsTest < ActionDispatch::IntegrationTest
     @user2.role = Role.find_or_create_by!(name: "scheduler")
     @user2.save!
 
+    # needed for time comparisons since Rails is using the user's time zone to generate views
+    Time.zone = @user.time_zone
+
     login_as @user, :scope => :user
     visit '/'
   end
@@ -164,6 +167,10 @@ class BulkOperationsTest < ActionDispatch::IntegrationTest
       end
 
       it "should update bulk operation status when bulk operation is complete" do
+        puts "### LOOKING FOR TIME: ##################################################"
+        puts "#{@bulk_operation.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
+        puts "########################################################################"
+        puts "#{page.body}"
         assert page.has_content?("Type Download")
         assert page.has_content?("Time #{@bulk_operation.created_at.strftime("%Y-%m-%d %H:%M:%S")}")
         assert page.has_content?("Status Completed")
