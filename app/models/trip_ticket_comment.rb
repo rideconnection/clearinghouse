@@ -18,5 +18,5 @@ class TripTicketComment < ActiveRecord::Base
   
   validates_presence_of :body, :trip_ticket_id, :user_id
   
-  default_scope ->{ order 'created_at ASC' }
+  default_scope ->{ order 'trip_ticket_comments.created_at ASC' }
 end
