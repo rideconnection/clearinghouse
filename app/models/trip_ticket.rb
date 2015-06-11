@@ -13,7 +13,7 @@ class TripTicket < ActiveRecord::Base
   has_many :trip_claims, :dependent => :destroy
   has_many :trip_ticket_comments, :dependent => :destroy
   has_one  :trip_result, :dependent => :destroy
-  
+
   SCHEDULING_PRIORITY = {
     "pickup"  => "Pickup",
     "dropoff" => "Drop-off"
@@ -290,7 +290,11 @@ class TripTicket < ActiveRecord::Base
   end
 
   def approved_claim
-    trip_claims.detect{ |claim| claim.status == :approved}
+    trip_claims.where(status: 'approved')
+  end
+
+  def claimant
+    approved_claim.try(:claimant)
   end
 
   def approved?
