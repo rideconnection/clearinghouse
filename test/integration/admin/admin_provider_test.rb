@@ -7,8 +7,8 @@ class AdminProviderTest < ActionController::IntegrationTest
 
   setup do
     @user = FactoryGirl.create(:user)
-    @user.role = Role.find_or_create_by_name!("site_admin")
-    Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "site_admin")
+    Role.find_or_create_by!(name: "provider_admin")
     login_as(@user, :scope => :user)
   end
 

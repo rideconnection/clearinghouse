@@ -13,14 +13,14 @@ class BulkOperationsTest < ActionController::IntegrationTest
       :password => @password,
       :password_confirmation => @password,
       :provider => @provider)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
 
     @user2 = FactoryGirl.create(:user,
       :password => @password,
       :password_confirmation => @password,
       :provider => @provider)
-    @user2.role = Role.find_or_create_by_name!("scheduler")
+    @user2.role = Role.find_or_create_by!(name: "scheduler")
     @user2.save!
 
     login_as @user, :scope => :user

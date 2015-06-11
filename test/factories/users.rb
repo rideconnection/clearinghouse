@@ -8,6 +8,6 @@ FactoryGirl.define do
     password "Password 1"
     password_confirmation { |u| u.password }
     provider
-    role { Role.find_or_create_by_name("read_only") }
+    role { Role.find_or_create_by(name: "read_only") }
   end
 end

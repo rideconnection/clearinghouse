@@ -7,5 +7,5 @@
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
 [ :site_admin, :provider_admin, :scheduler, :dispatcher, :read_only ].each do |r|
-  Role.find_or_create_by_name(r)
+  Role.find_or_create_by(name: r)
 end

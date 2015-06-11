@@ -13,7 +13,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       :password => @password, 
       :password_confirmation => @password, 
       :provider => @provider)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
 
     login_as @user, :scope => :user

@@ -11,7 +11,7 @@ class UpdateRolesTable < ActiveRecord::Migration
 
   def up
     transaction do
-      read_only = Role.find_or_create_by_name(:read_only)
+      read_only = Role.find_or_create_by(name: :read_only)
     
       Role.find_or_initialize_by(name: :csr).users.try(:each) do |user|
         user.role = read_only
@@ -24,7 +24,7 @@ class UpdateRolesTable < ActiveRecord::Migration
 
   def down
     transaction do
-      csr = Role.find_or_create_by_name(:csr)
+      csr = Role.find_or_create_by(name: :csr)
     
       Role.find_or_initialize_by(name: :read_only).users.try(:each) do |user|
         user.role = csr
