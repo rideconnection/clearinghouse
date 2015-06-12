@@ -16,6 +16,9 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
     @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
 
+    # needed for time comparisons since Rails is using the user's time zone to generate views
+    Time.zone = @user.time_zone
+
     login_as @user, :scope => :user
     visit '/'
   end
