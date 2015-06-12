@@ -113,7 +113,8 @@ class UsersTest < ActionDispatch::IntegrationTest
       fill_in 'Password', :with => "nope"
       click_button 'Sign in'
       current_path.must_equal new_user_session_path
-      assert page.has_content?("Invalid email or password") if i < maximum_attempts
+      assert page.has_content?("Invalid email or password") if i < (maximum_attempts - 2)
+      assert page.has_content?("You have one more attempt before your account is locked") if i == (maximum_attempts - 2)
     end
     
     assert page.has_content?("Your account is locked")
