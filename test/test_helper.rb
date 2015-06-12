@@ -20,6 +20,12 @@ require "capybara/rails"
 module ActionDispatch
   class IntegrationTest
     include Capybara::DSL
+
+    # the way our test suite is set up, we need to manually clear Capybara sessions
+    def teardown
+      Capybara.reset_sessions!
+      Capybara.use_default_driver
+    end
   end
 end
 

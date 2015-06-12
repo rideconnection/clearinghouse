@@ -402,9 +402,6 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
 
       select "No-Show", :from => "trip_result_outcome"
       click_button "Update Trip Result"
-
-      # SHOWS ERROR - TRIP ALREADY TAKEN - CHECKING TO SEE IF WE CAN EDIT TRIP CREATES AN ERROR
-
       assert page.has_content?("Trip result was successfully updated")
       assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
     end
