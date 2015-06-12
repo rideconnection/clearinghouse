@@ -156,7 +156,7 @@ class TripTicket < ActiveRecord::Base
   end
 
   def make_result_for_form
-    can_create_new_result? ? build_trip_result : self.trip_result
+    self.trip_result || can_create_new_result? && build_trip_result || nil
   end
   
   def can_create_or_edit_result?
@@ -164,9 +164,9 @@ class TripTicket < ActiveRecord::Base
   end
 
   def can_create_new_result?
-    test_result = TripResult.new(:outcome => "Completed")
-    test_result.trip_ticket = self
-    test_result.valid?
+    # since the trip result has similar logic in its validations, this is not strictly DRY,
+    # but the method of creating a test result to see if it is valid is too hacked
+    approved? && trip_result.nil?
   end
 
   def customer_full_name
