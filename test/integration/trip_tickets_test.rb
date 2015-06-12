@@ -386,7 +386,7 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  describe "trip results"
+  describe "trip results" do
     test "can be updated repeatedly by authorized users on tickets with approved claims" do
       trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
       trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
