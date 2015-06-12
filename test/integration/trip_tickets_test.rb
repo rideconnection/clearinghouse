@@ -282,7 +282,7 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
       end
     end
   end
-    
+
   describe "customer_identifiers hstore fields" do
     # test "provider admins can add customer identifier attributes to a new trip ticket (using javascript)" do
     #   skip "Having trouble getting user logins to work with selenium - cdb 2013-01-29"
@@ -360,26 +360,6 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
       assert page.has_selector?('.hstoreAttributeValue[value=\'Waste\']')
     end
 
-    test "authorized users can edit trip results on tickets with approved claims repeatedly" do
-      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
-      trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
-      visit trip_ticket_path(trip_ticket) 
-
-      select "Completed", :from => "trip_result_outcome"
-      fill_in "trip_result_driver_id", :with => "Bob Smith"
-      click_button "Update Trip Result"
-
-      assert page.has_content?("Trip result was successfully created")
-      assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
-      assert_equal trip_ticket.reload.trip_result.driver_id, "Bob Smith"
-
-      select "No-Show", :from => "trip_result_outcome"
-      click_button "Update Trip Result"
-
-      assert page.has_content?("Trip result was successfully updated")
-      assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
-    end
-
     test "users who cannot edit an existing trip ticket should see an unordered list of customer identifier attribute pairs" do
       provider_2 = FactoryGirl.create(:provider)
       relationship = ProviderRelationship.create!(
@@ -403,6 +383,30 @@ class TripTicketsTest < ActionDispatch::IntegrationTest
         assert page.has_selector?('li', :text => "charlie: Brown")
         assert page.has_selector?('li', :text => "solid: Gold")
       end
+    end
+  end
+
+  describe "trip results"
+    test "can be updated repeatedly by authorized users on tickets with approved claims" do
+      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
+      trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
+      visit trip_ticket_path(trip_ticket)
+
+      select "Completed", :from => "trip_result_outcome"
+      fill_in "trip_result_driver_id", :with => "Bob Smith"
+      click_button "Update Trip Result"
+
+      assert page.has_content?("Trip result was successfully created")
+      assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
+      assert_equal trip_ticket.reload.trip_result.driver_id, "Bob Smith"
+
+      select "No-Show", :from => "trip_result_outcome"
+      click_button "Update Trip Result"
+
+      # SHOWS ERROR - TRIP ALREADY TAKEN - CHECKING TO SEE IF WE CAN EDIT TRIP CREATES AN ERROR
+
+      assert page.has_content?("Trip result was successfully updated")
+      assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
     end
   end
 
