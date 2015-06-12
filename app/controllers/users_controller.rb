@@ -61,7 +61,7 @@ class UsersController < ApplicationController
     end
     
     if params[:user].has_key?(:role_id)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
+      if Role.provider_roles.include?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, User
       else
         authorize! :set_any_role, User
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     end
     
     if params[:user].has_key?(:role_id)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
+      if Role.provider_roles.include?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, @user
       else
         authorize! :set_any_role, @user
