@@ -91,7 +91,8 @@ class User < ActiveRecord::Base
         Array("0".."9").shuffle.first +
         "!@\#$%^&*".split("").shuffle.first).split("").shuffle.join("")
       self.password = self.password_confirmation = temp_token
-      self.reset_password_token = User.reset_password_token
+      raw_token, hashed_token = Devise.token_generator.generate(User, :reset_password_token)
+      self.reset_password_token = hashed_token
       self.reset_password_sent_at = Time.zone.now
     end
   end
