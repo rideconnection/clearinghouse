@@ -5,6 +5,7 @@ require 'openssl'
 module ApiParamFactory
   # Return the necessary parameters to make an authenticatable API call
   def self.authenticatable_params(provider, additional_params = {})
+
     Rails.logger.debug "additional_params: #{additional_params}"
     
     timestamp = Time.now.utc.xmlschema

@@ -26,21 +26,20 @@ module API_Authentication
       end
 
       def current_provider
-        @current_provider ||= authenticate_current_provider(params[:api_key])
+        @current_provider ||= authenticate_current_provider(params.delete("api_key"))
       end
 
       def enforce_authentication_from_request_params
-        api_key     = request.params.delete("api_key")
-        nonce       = request.params.delete("nonce")
-        timestamp   = request.params.delete("timestamp")
-        hmac_digest = request.params.delete("hmac_digest")
-
         raise_authentication_error("api_key") unless current_provider
-                
+
+        nonce       = params.delete("nonce")
+        timestamp   = params.delete("timestamp")
+        hmac_digest = params.delete("hmac_digest")
+
         unless Rails.env.development?
           raise_authentication_error("nonce")       unless authenticate_nonce(nonce)
           raise_authentication_error("timestamp")   unless authenticate_timestamp(timestamp)
-          raise_authentication_error("hmac_digest") unless authenticate_hmac_digest(hmac_digest, current_provider.private_key, nonce, timestamp, request.params)
+          raise_authentication_error("hmac_digest") unless authenticate_hmac_digest(hmac_digest, current_provider.private_key, nonce, timestamp, params)
         end
       end
 
