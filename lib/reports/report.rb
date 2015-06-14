@@ -161,7 +161,7 @@ module Reports
     def summarize_object_counts_by_category(list, *category_method_and_params)
       result = {}
       list.each do |entry|
-        category = (entry.send(*category_method_and_params) || "").to_s.capitalize
+        category = entry.send(*category_method_and_params).to_s.capitalize
         result[category] ||= 0
         result[category] += 1
       end
