@@ -11,7 +11,7 @@ module Clearinghouse
     format :json
     rescue_from :all do |e|
       # Log it
-      Rails.logger.error "#{e.message}\n\n#{e.backtrace.join("\n")}"
+      Rails.logger.error "#{e} - #{e.message}\n\n#{e.backtrace.join("\n")}"
       
       # TODO - Notify external service of the error
       # Airbrake.notify(e)
