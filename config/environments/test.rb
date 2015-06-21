@@ -45,5 +45,6 @@ Rails.application.configure do
   config.bulk_operation_options = { use_delayed_job: false }
 
   # raise errors for attributes protected from mass-assignment
-  config.active_record.mass_assignment_sanitizer = :strict
+  #config.active_record.mass_assignment_sanitizer = :strict
+  config.action_controller.action_on_unpermitted_parameters = :raise
 end
