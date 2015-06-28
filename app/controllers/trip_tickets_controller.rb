@@ -109,7 +109,7 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets
   # POST /trip_tickets.json
   def create
-    @trip_ticket = TripTicket.new(params[:trip_ticket])
+    @trip_ticket = TripTicket.new(trip_ticket_params)
     @trip_ticket.originator = current_user.provider
     
     respond_to do |format|
@@ -128,7 +128,7 @@ class TripTicketsController < ApplicationController
   # PUT /trip_tickets/1.json
   def update
     respond_to do |format|
-      if @trip_ticket.update_attributes(params[:trip_ticket])
+      if @trip_ticket.update_attributes(trip_ticket_params)
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully updated.' }
         format.json { head :no_content }
       else
@@ -167,7 +167,9 @@ class TripTicketsController < ApplicationController
   def create_multiple_claims
     trip_ticket_ids = Array(params[:trip_claim].try(:keys))
     trip_tickets = TripTicket.accessible_by(current_ability).where(id: trip_ticket_ids).select{|t| t.claimable_by?(current_user)}
-    
+
+    # TODO REFACTOR FOR STRONG PARAMS
+
     trip_claim_errors = false
     @trip_claims = []
     TripClaim.transaction do
@@ -208,28 +210,29 @@ class TripTicketsController < ApplicationController
       :drop_off_location_id, :earliest_pick_up_time, :num_attendants, :num_guests,
       :origin_customer_id, :origin_provider_id, :origin_trip_id, :pick_up_location_id,
       :requested_drop_off_time, :requested_pickup_time, :scheduling_priority, :trip_notes,
-      :trip_purpose_description, :customer_identifiers, :customer_service_level,
-      :expire_at, :expired, :time_window_before, :time_window_after, :additional_data,
+      :trip_purpose_description, :customer_service_level, :expire_at, :expired,
+      :time_window_before, :time_window_after, :additional_data,
       { customer_eligibility_factors: [] },
       { customer_mobility_factors: [] },
       { customer_service_animals: [] },
       { trip_funders: [] },
       { provider_white_list: [] },
       { provider_black_list: [] },
+      { customer_identifiers: params[:trip_ticket][:customer_identifiers].try(:keys) },
       pick_up_location_attributes: [
-        :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
         :phone_number, :common_name, :jurisdiction, :address_type
       ],
       drop_off_location_attributes: [
-        :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
         :phone_number, :common_name, :jurisdiction, :address_type
       ],
       customer_address_attributes: [
-        :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
         :phone_number, :common_name, :jurisdiction, :address_type
       ],
       trip_result_attributes: [
-        :actual_drop_off_time, :actual_pick_up_time, :base_fare,
+        :id, :actual_drop_off_time, :actual_pick_up_time, :base_fare,
         :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
         :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
         :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type, :notes
