@@ -168,13 +168,13 @@ class TripTicketsController < ApplicationController
     trip_ticket_ids = Array(params[:trip_claim].try(:keys))
     trip_tickets = TripTicket.accessible_by(current_ability).where(id: trip_ticket_ids).select{|t| t.claimable_by?(current_user)}
 
-    # TODO REFACTOR FOR STRONG PARAMS
-
     trip_claim_errors = false
     @trip_claims = []
     TripClaim.transaction do
       trip_tickets.each do |tt|
-        trip_claim = tt.trip_claims.new(params[:trip_claim][tt.id.to_s])
+        # note: this is awkward since it is in TripTicketsController and creates TripClaims
+        # this is handled by TripClaimsController exposing a permitted_params method
+        trip_claim = tt.trip_claims.new(params[:trip_claim].require(tt.id.to_s).permit(*TripClaimsController.permitted_params))
         trip_claim.claimant = current_user.provider
         trip_claim.status = :pending
         @trip_claims << trip_claim

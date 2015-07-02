@@ -69,7 +69,7 @@ class TripClaimsController < ApplicationController
   # PUT /trip_claims/1.json
   def update
     respond_to do |format|
-      if @trip_claim.update_attributes(params[:trip_claim])
+      if @trip_claim.update_attributes(trip_claim_params)
         format.html { redirect_to [@trip_ticket, @trip_claim], notice: 'Trip claim was successfully updated.' }
         format.json { head :no_content }
       else
@@ -107,9 +107,19 @@ class TripClaimsController < ApplicationController
       format.json { head :no_content }
     end
   end
-  
+
+  # this helps to whitelist trip claim params in TripTicketsController#create_multiple_claims
+  def self.permitted_params
+    [ :claimant_customer_id, :claimant_provider_id, :claimant_service_id, :claimant_trip_id,
+      :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, :notes ]
+  end
+
   private
-  
+
+  def trip_claim_params
+    params.require(:trip_claim).permit(*permitted_params)
+  end
+
   def new_trip_claim_instance_as_json_for_backbone
     @trip_claim.attributes.merge({
       rendered_partial: render_to_string(partial: "trip_claims/form", formats: [:html]),
