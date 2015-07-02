@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
     :password_expirable, :password_archivable, :lockable, :session_limitable,
     :timeoutable
@@ -7,10 +9,6 @@ class User < ActiveRecord::Base
   belongs_to :role
   has_many :filters
   has_many :bulk_operations
-
-  attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :must_generate_password, :phone, :provider_id, :role_id, 
-    :title, :notification_preferences, :failed_attempts, :locked_at
 
   validate do |user|
     # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical

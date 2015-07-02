@@ -112,7 +112,7 @@ class UsersController < ApplicationController
     end
 
     respond_to do |format|
-      if @user.update_attributes(params[:user])
+      if @user.update_attributes(user_params)
         # Devise logs users out on password change
         sign_in(@user, :bypass => true) if need_relogin
         
@@ -160,5 +160,13 @@ class UsersController < ApplicationController
 
   def touch_session
     render :plain => 'OK'
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:active, :email, :name, :password, :password_confirmation,
+      :must_generate_password, :phone, :provider_id, :role_id, :title, :notification_preferences,
+      :failed_attempts, :locked_at)
   end
 end

@@ -58,7 +58,7 @@ class TripResultsController < ApplicationController
   # PUT /trip_results/1.json
   def update
     respond_to do |format|
-      if @trip_result.update_attributes(params[:trip_result])
+      if @trip_result.update_attributes(trip_result_params)
         format.html { redirect_to @trip_result.trip_ticket, notice: 'Trip result was successfully updated.' }
         format.json { head :no_content }
       else
@@ -79,5 +79,14 @@ class TripResultsController < ApplicationController
       format.html { redirect_to trip_results_url }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def trip_result_params
+    params.require(:trip_result).permit(:actual_drop_off_time, :actual_pick_up_time, :base_fare,
+      :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type, :miles_traveled,
+      :odometer_end, :odometer_start, :outcome, :rate, :rate_type, :trip_claim_id, :trip_ticket_id,
+      :vehicle_id, :vehicle_type, :notes)
   end
 end

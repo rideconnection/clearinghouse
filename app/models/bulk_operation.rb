@@ -1,7 +1,7 @@
 class BulkOperation < ActiveRecord::Base
-  belongs_to :user
+  include ActiveModel::ForbiddenAttributesProtection
 
-  attr_accessible :row_count, :last_exported_timestamp, :is_upload, :file_name, :error_count, :row_errors, :data
+  belongs_to :user
 
   validates_presence_of :user_id
   validates_presence_of :file_name, on: :create, if: Proc.new { |op| op.is_upload? }

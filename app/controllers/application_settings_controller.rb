@@ -10,7 +10,7 @@ class ApplicationSettingsController < ApplicationController
 
   def update
     respond_to do |format|
-      if ApplicationSetting.update_settings params[:application_setting]
+      if ApplicationSetting.update_settings(application_setting_params)
         format.html { redirect_to application_settings_path, notice: 'Application settings were successfully updated.' }
         format.json { head :no_content }
       else
@@ -19,5 +19,11 @@ class ApplicationSettingsController < ApplicationController
         format.json { render json: ApplicationSetting.all, status: :unprocessable_entity }
       end
     end
+  end
+
+  private
+
+  def application_setting_params
+    params.require(:application_setting).permit(:var)
   end
 end

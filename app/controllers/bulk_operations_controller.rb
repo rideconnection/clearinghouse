@@ -42,7 +42,7 @@ class BulkOperationsController < ApplicationController
 
   def create
     uploaded_file = params[:bulk_operation].try(:delete, :uploaded_file)
-    @bulk_operation = current_user.bulk_operations.build(params[:bulk_operation])
+    @bulk_operation = current_user.bulk_operations.build(bulk_operation_params)
     save_upload(uploaded_file) if @bulk_operation.is_upload?
 
     respond_to do |format|
@@ -108,7 +108,12 @@ class BulkOperationsController < ApplicationController
     end
   end
 
-  protected
+  private
+
+  def bulk_operation_params
+    params.require(:bulk_operation).permit(:row_count, :last_exported_timestamp, :is_upload, :file_name,
+      :error_count, :row_errors, :data)
+  end
 
   def save_upload(uploaded_file)
     if uploaded_file.present?

@@ -1,7 +1,9 @@
 class OperatingHours < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   belongs_to :service
 
-  attr_accessible :close_time, :day_of_week, :open_time, :service
+  # attr_accessible :close_time, :day_of_week, :open_time, :service
 
   validates_presence_of :day_of_week, :service
   validate :enforce_hour_sanity

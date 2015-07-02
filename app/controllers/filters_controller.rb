@@ -19,7 +19,7 @@ class FiltersController < ApplicationController
   end
 
   def create
-    @filter = current_user.filters.build(params[:filter])
+    @filter = current_user.filters.build(filter_params)
 
     respond_to do |format|
       if @filter.save
@@ -46,7 +46,7 @@ class FiltersController < ApplicationController
 
   def update
     respond_to do |format|
-      if @filter.update_attributes(params[:filter])
+      if @filter.update_attributes(filter_params)
         format.html do
           if params[:return_to] == 'trip_tickets'
             redirect_to apply_filters_trip_tickets_url(saved_filter: @filter.name), notice: 'Filter was successfully updated.'
@@ -81,5 +81,11 @@ class FiltersController < ApplicationController
       end
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def filter_params
+    params.require(:filter).permit(:name, :data)
   end
 end

@@ -2,6 +2,7 @@ require 'notification_recipients'
 
 class TripTicketComment < ActiveRecord::Base
   include NotificationRecipients
+  include ActiveModel::ForbiddenAttributesProtection
 
   belongs_to :trip_ticket, :touch => true
   belongs_to :user
@@ -14,8 +15,6 @@ class TripTicketComment < ActiveRecord::Base
     end
   end
 
-  attr_accessible :body, :trip_ticket_id, :user_id
-  
   validates_presence_of :body, :trip_ticket_id, :user_id
   
   default_scope ->{ order 'trip_ticket_comments.created_at ASC' }

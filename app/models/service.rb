@@ -1,4 +1,6 @@
 class Service < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   belongs_to :provider
   has_many :open_capacities
   has_many :operating_hours, :class_name => :OperatingHours
@@ -12,9 +14,6 @@ class Service < ActiveRecord::Base
     'both' => 'Pickup and drop-off must both be within service area',
     'either' => 'Either pickup or drop-off must be within service area'
   }
-
-  attr_accessible :eligibility, :funding_id, :name, :operating_hours_id,
-    :rate, :req_min_age, :req_veteran, :service_area, :service_area_type, :provider_id
 
   validates_presence_of :name, :provider
 

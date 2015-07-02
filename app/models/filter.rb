@@ -1,7 +1,7 @@
 class Filter < ActiveRecord::Base
-  belongs_to :user
+  include ActiveModel::ForbiddenAttributesProtection
 
-  attr_accessible :name, :data
+  belongs_to :user
 
   serialize :data
 

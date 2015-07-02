@@ -2,6 +2,7 @@ require 'notification_recipients'
 
 class TripResult < ActiveRecord::Base
   include NotificationRecipients
+  include ActiveModel::ForbiddenAttributesProtection
 
   OUTCOMES = ["Completed", "No-Show", "Cancelled"]
 
@@ -15,11 +16,6 @@ class TripResult < ActiveRecord::Base
       notify ->(opts){ provider_users([trip_ticket.originator, claimant], opts) }, method: :trip_result_created
     end
   end
-
-  attr_accessible :actual_drop_off_time, :actual_pick_up_time, :base_fare,
-    :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
-    :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
-    :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type, :notes
 
   validates :trip_ticket_id,
     :presence => true,

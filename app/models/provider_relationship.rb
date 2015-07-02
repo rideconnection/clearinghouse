@@ -1,5 +1,7 @@
 class ProviderRelationship < ActiveRecord::Base
-  belongs_to :requesting_provider, 
+  include ActiveModel::ForbiddenAttributesProtection
+
+  belongs_to :requesting_provider,
     :foreign_key => "requesting_provider_id",
     :class_name => "Provider"
 
@@ -10,10 +12,6 @@ class ProviderRelationship < ActiveRecord::Base
   validates :requesting_provider_id, :presence => true
 
   validates :cooperating_provider_id, :presence => true
-
-  attr_accessible :approved_at, :automatic_cooperator_approval, 
-    :automatic_requester_approval, :cooperating_provider_id, 
-    :requesting_provider_id, :requesting_provider, :cooperating_provider
 
   validate :must_reference_different_providers
 

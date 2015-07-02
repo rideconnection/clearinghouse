@@ -1,3 +1,4 @@
 class FundingSource < ActiveRecord::Base
-  attr_accessible :name
+  include ActiveModel::ForbiddenAttributesProtection
+  #attr_accessible :name
 end
