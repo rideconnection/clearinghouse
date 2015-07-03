@@ -111,8 +111,12 @@ class BulkOperationsController < ApplicationController
   private
 
   def bulk_operation_params
-    params.require(:bulk_operation).permit(:row_count, :last_exported_timestamp, :is_upload, :file_name,
-      :error_count, :row_errors, :data)
+    if params[:bulk_operation].try(:[], :is_upload)
+      params.require(:bulk_operation).permit(:row_count, :last_exported_timestamp, :is_upload, :file_name,
+        :error_count, :row_errors, :data)
+    else
+      ActionController::Parameters.new.permit!
+    end
   end
 
   def save_upload(uploaded_file)
