@@ -151,7 +151,7 @@ class UsersController < ApplicationController
   def check_session
     last_request_at = session['warden.user.user.session']['last_request_at']
     timeout_time = last_request_at + (Devise.timeout_in || 365.days) # In case the session timeout has been disabled
-    timeout_in = (timeout_time - Time.current).to_i
+    timeout_in = timeout_time - Time.current.to_i
     render :json => {
       'last_request_at' => last_request_at,
       'timeout_in' => timeout_in,
