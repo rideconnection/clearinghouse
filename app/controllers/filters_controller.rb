@@ -86,6 +86,6 @@ class FiltersController < ApplicationController
   private
 
   def filter_params
-    params.require(:filter).permit(:name, :data)
+    params.require(:filter).permit(:name, data: params[:filter][:data].try(:keys))
   end
 end
