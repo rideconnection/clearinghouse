@@ -1,13 +1,13 @@
 require 'test_helper'
 
-class ApplicationSettingsTest < ActionController::IntegrationTest
+class ApplicationSettingsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
 
   setup do
     @admin = FactoryGirl.create(:user)
-    @admin.role = Role.find_or_create_by_name!("site_admin")
+    @admin.role = Role.find_or_create_by!(name: "site_admin")
     @other_user = FactoryGirl.create(:user)
   end
 

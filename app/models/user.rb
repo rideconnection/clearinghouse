@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
     :password_expirable, :password_archivable, :lockable, :session_limitable,
     :timeoutable
@@ -7,10 +9,6 @@ class User < ActiveRecord::Base
   belongs_to :role
   has_many :filters
   has_many :bulk_operations
-
-  attr_accessible :active, :email, :name, :password, :password_confirmation,
-    :must_generate_password, :phone, :provider_id, :role_id, 
-    :title, :notification_preferences, :failed_attempts, :locked_at
 
   validate do |user|
     # minimum 8 characters with at least one of each of the following: lower case alpha, upper case alpha, number, and non-alpha-numerical
@@ -30,11 +28,11 @@ class User < ActiveRecord::Base
 
   before_validation :generate_a_password, :on => :create
 
-  default_scope order('name ASC')
+  default_scope ->{ order 'name ASC' }
 
   # All users, sorted by provider
-  scope :all_by_provider, joins("LEFT JOIN providers ON users.provider_id = providers.id").
-    reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC')
+  scope :all_by_provider, ->{ joins("LEFT JOIN providers ON users.provider_id = providers.id").
+    reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC') }
 
   # Temporary attribute for auto-generated password tokens
   attr_accessor :must_generate_password
@@ -91,7 +89,8 @@ class User < ActiveRecord::Base
         Array("0".."9").shuffle.first +
         "!@\#$%^&*".split("").shuffle.first).split("").shuffle.join("")
       self.password = self.password_confirmation = temp_token
-      self.reset_password_token = User.reset_password_token
+      raw_token, hashed_token = Devise.token_generator.generate(User, :reset_password_token)
+      self.reset_password_token = hashed_token
       self.reset_password_sent_at = Time.zone.now
     end
   end

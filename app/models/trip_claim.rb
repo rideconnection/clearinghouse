@@ -2,6 +2,7 @@ require 'notification_recipients'
 
 class TripClaim < ActiveRecord::Base
   include NotificationRecipients
+  include ActiveModel::ForbiddenAttributesProtection
 
   belongs_to :trip_ticket, :touch => true
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id
@@ -17,10 +18,6 @@ class TripClaim < ActiveRecord::Base
   ]
 
   STATUS = ACTIVE_STATUS + INACTIVE_STATUS
-
-  attr_accessible :claimant_customer_id, :claimant_provider_id, :claimant_service_id, 
-    :claimant_trip_id, :status, :trip_ticket_id, :proposed_pickup_time, :proposed_fare, 
-    :notes
 
   validates_presence_of :claimant_provider_id, :trip_ticket_id, :proposed_pickup_time
     
@@ -44,7 +41,7 @@ class TripClaim < ActiveRecord::Base
     end
   end
 
-  default_scope order('created_at ASC')
+  default_scope ->{ order 'trip_claims.created_at ASC' }
   
   after_create do
     self.approve! if self.can_be_auto_approved?

@@ -2,6 +2,7 @@ require 'notification_recipients'
 
 class TripResult < ActiveRecord::Base
   include NotificationRecipients
+  include ActiveModel::ForbiddenAttributesProtection
 
   OUTCOMES = ["Completed", "No-Show", "Cancelled"]
 
@@ -16,29 +17,18 @@ class TripResult < ActiveRecord::Base
     end
   end
 
-  attr_accessible :actual_drop_off_time, :actual_pick_up_time, :base_fare,
-    :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
-    :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
-    :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type, :notes
-
-  validates :trip_ticket_id, 
+  validates :trip_ticket_id,
     :presence => true,
     :uniqueness => true
 
-  validates :outcome, 
+  validates :outcome,
     :presence => true,
-    :inclusion => { :in => OUTCOMES } 
+    :inclusion => { :in => OUTCOMES }
 
   validate :ensure_trip_ticket_is_approved
 
   def claimant
     trip_ticket.approved_claim.try(:claimant)
-  end
-
-  def can_be_edited_by?(user)
-    originator_id = trip_ticket.origin_provider_id 
-    claimer_id = trip_ticket.approved_claim.try(:claimant_provider_id)
-    [originator_id, claimer_id].include?(user.provider_id)
   end
 
   private

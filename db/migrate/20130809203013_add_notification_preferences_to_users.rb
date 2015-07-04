@@ -1,7 +1,7 @@
 class AddNotificationPreferencesToUsers < ActiveRecord::Migration
 
   def up
-    add_column :users, :notification_preferences, :string_array
+    add_column :users, :notification_preferences, :string, array: true
     execute "CREATE INDEX notification_preferences_index ON users USING GIN(notification_preferences)"
   end
 

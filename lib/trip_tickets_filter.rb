@@ -1,7 +1,7 @@
 module TripTicketsFilter
 
   def trip_tickets_filter(collection, provider)
-    collection ||= TripTicket.scoped
+    collection ||= TripTicket
     init_trip_ticket_trip_time_filter_values
 
     # Apply rescinded filter at the end so we can apply default if not

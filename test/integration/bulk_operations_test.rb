@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class BulkOperationsTest < ActionController::IntegrationTest
+class BulkOperationsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -13,15 +13,18 @@ class BulkOperationsTest < ActionController::IntegrationTest
       :password => @password,
       :password_confirmation => @password,
       :provider => @provider)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
 
     @user2 = FactoryGirl.create(:user,
       :password => @password,
       :password_confirmation => @password,
       :provider => @provider)
-    @user2.role = Role.find_or_create_by_name!("scheduler")
+    @user2.role = Role.find_or_create_by!(name: "scheduler")
     @user2.save!
+
+    # needed for time comparisons since Rails is using the user's time zone to generate views
+    Time.zone = @user.time_zone
 
     login_as @user, :scope => :user
     visit '/'
@@ -118,8 +121,8 @@ class BulkOperationsTest < ActionController::IntegrationTest
 
     describe "with delayed_job configured" do
       setup do
-        @old_settings = Clearinghouse::Application.config.bulk_operation_options
-        Clearinghouse::Application.config.bulk_operation_options = { use_delayed_job: true }
+        @old_settings = Rails.application.config.bulk_operation_options
+        Rails.application.config.bulk_operation_options = { use_delayed_job: true }
         # stub delayed_job #delay method and count invocations
         class BulkOperationsController
           @@invocation_count = 0
@@ -135,7 +138,7 @@ class BulkOperationsTest < ActionController::IntegrationTest
       end
 
       teardown do
-        Clearinghouse::Application.config.bulk_operation_options = @old_settings
+        Rails.application.config.bulk_operation_options = @old_settings
         class BulkOperationsController
           class << self
             remove_method :invocation_count

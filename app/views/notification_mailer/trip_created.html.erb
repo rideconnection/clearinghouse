@@ -1,4 +1,4 @@
-A new Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %> is available:<br><br>
+A new Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ticket_url(@trip_ticket, Rails.application.config.action_mailer.default_url_options) %> is available:<br><br>
 <table class="table table-condensed">
   <caption>Trip Ticket Summary</caption>
   <tbody>
@@ -25,7 +25,7 @@ A new Ride Connection Clearinghouse <%= link_to 'trip ticket', ajaxified_trip_ti
   </tbody>
 </table>
 <br>
-<%= link_to 'Full details', ajaxified_trip_ticket_url(@trip_ticket, Clearinghouse::Application.config.action_mailer.default_url_options) %>
+<%= link_to 'Full details', ajaxified_trip_ticket_url(@trip_ticket, Rails.application.config.action_mailer.default_url_options) %>
 <br><br>
 You have received this email because you enabled email notifications in the <%= link_to 'Ride Connection Clearinghouse application', root_url %>.
 To stop receiving notification emails, please <%= link_to 'update your user preferences', preferences_url %>.

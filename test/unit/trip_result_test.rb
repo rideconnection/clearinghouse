@@ -40,16 +40,17 @@ class TripTicketTest < ActiveSupport::TestCase
     @result.trip_ticket = @ticket
     @result.save!
 
-    user = FactoryGirl.create(:user)
+    # NOTE that per the ability model only certain roles should have access to edit results
+    user = FactoryGirl.create(:user, role: Role.find_or_create_by(name: :provider_admin))
 
     user.provider = @claimant
-    assert @result.can_be_edited_by?(user)
+    assert Ability.new(user).can?(:update, @result)
 
     user.provider = @originator
-    assert @result.can_be_edited_by?(user)
+    assert Ability.new(user).can?(:update, @result)
 
     user.provider = @third_party_provider
-    assert !@result.can_be_edited_by?(user)
+    refute Ability.new(user).can?(:update, @result)
   end
 
   it "should have a claimant method which returns the provider who submitted the result" do

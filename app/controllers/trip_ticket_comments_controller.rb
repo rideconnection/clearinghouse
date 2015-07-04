@@ -56,7 +56,7 @@ class TripTicketCommentsController < ApplicationController
   # PUT /trip_ticket_comments/1.json
   def update
     respond_to do |format|
-      if @trip_ticket_comment.update_attributes(params[:trip_ticket_comment])
+      if @trip_ticket_comment.update_attributes(trip_ticket_comment_params)
         format.html { redirect_to [@trip_ticket, @trip_ticket_comment], notice: 'Trip ticket comment was successfully updated.' }
         format.json { head :no_content }
       else
@@ -75,5 +75,11 @@ class TripTicketCommentsController < ApplicationController
       format.html { redirect_to trip_ticket_trip_ticket_comments_url(@trip_ticket) }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def trip_ticket_comment_params
+    params.require(:trip_ticket_comment).permit(:body, :trip_ticket_id, :user_id)
   end
 end

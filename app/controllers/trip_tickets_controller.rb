@@ -109,7 +109,7 @@ class TripTicketsController < ApplicationController
   # POST /trip_tickets
   # POST /trip_tickets.json
   def create
-    @trip_ticket = TripTicket.new(params[:trip_ticket])
+    @trip_ticket = TripTicket.new(trip_ticket_params)
     @trip_ticket.originator = current_user.provider
     
     respond_to do |format|
@@ -128,7 +128,7 @@ class TripTicketsController < ApplicationController
   # PUT /trip_tickets/1.json
   def update
     respond_to do |format|
-      if @trip_ticket.update_attributes(params[:trip_ticket])
+      if @trip_ticket.update_attributes(trip_ticket_params)
         format.html { redirect_to @trip_ticket, notice: 'Trip ticket was successfully updated.' }
         format.json { head :no_content }
       else
@@ -167,12 +167,14 @@ class TripTicketsController < ApplicationController
   def create_multiple_claims
     trip_ticket_ids = Array(params[:trip_claim].try(:keys))
     trip_tickets = TripTicket.accessible_by(current_ability).where(id: trip_ticket_ids).select{|t| t.claimable_by?(current_user)}
-    
+
     trip_claim_errors = false
     @trip_claims = []
     TripClaim.transaction do
       trip_tickets.each do |tt|
-        trip_claim = tt.trip_claims.new(params[:trip_claim][tt.id.to_s])
+        # note: this is awkward since it is in TripTicketsController and creates TripClaims
+        # this is handled by TripClaimsController exposing a permitted_params method
+        trip_claim = tt.trip_claims.new(params[:trip_claim].require(tt.id.to_s).permit(*TripClaimsController.permitted_params))
         trip_claim.claimant = current_user.provider
         trip_claim.status = :pending
         @trip_claims << trip_claim
@@ -197,7 +199,47 @@ class TripTicketsController < ApplicationController
   end
   
   private
-  
+
+  def trip_ticket_params
+    params.require(:trip_ticket).permit(
+      :appointment_time, :estimated_distance, :customer_address_id, :customer_boarding_time,
+      :customer_deboarding_time, :customer_dob, :customer_emergency_phone, :customer_ethnicity,
+      :customer_first_name, :customer_impairment_description, :customer_information_withheld,
+      :customer_last_name, :customer_middle_name, :customer_gender, :customer_notes,
+      :customer_primary_language, :customer_primary_phone, :customer_race, :customer_seats_required,
+      :drop_off_location_id, :earliest_pick_up_time, :num_attendants, :num_guests,
+      :origin_customer_id, :origin_provider_id, :origin_trip_id, :pick_up_location_id,
+      :requested_drop_off_time, :requested_pickup_time, :scheduling_priority, :trip_notes,
+      :trip_purpose_description, :customer_service_level, :expire_at, :expired,
+      :time_window_before, :time_window_after, :additional_data,
+      { customer_eligibility_factors: [] },
+      { customer_mobility_factors: [] },
+      { customer_service_animals: [] },
+      { trip_funders: [] },
+      { provider_white_list: [] },
+      { provider_black_list: [] },
+      { customer_identifiers: params[:trip_ticket][:customer_identifiers].try(:keys) },
+      pick_up_location_attributes: [
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :phone_number, :common_name, :jurisdiction, :address_type
+      ],
+      drop_off_location_attributes: [
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :phone_number, :common_name, :jurisdiction, :address_type
+      ],
+      customer_address_attributes: [
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :phone_number, :common_name, :jurisdiction, :address_type
+      ],
+      trip_result_attributes: [
+        :id, :actual_drop_off_time, :actual_pick_up_time, :base_fare,
+        :billable_mileage, :driver_id, :extra_securement_count, :fare, :fare_type,
+        :miles_traveled, :odometer_end, :odometer_start, :outcome, :rate,
+        :rate_type, :trip_claim_id, :trip_ticket_id, :vehicle_id, :vehicle_type, :notes
+      ]
+    )
+  end
+
   def setup_locations
     @trip_ticket.build_customer_address  unless @trip_ticket.customer_address
     @trip_ticket.build_drop_off_location unless @trip_ticket.drop_off_location

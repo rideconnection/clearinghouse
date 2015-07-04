@@ -38,7 +38,7 @@ class ServicesController < ApplicationController
       begin
         update_polygon
         Service.transaction do
-          @service.update_attributes params[:service]
+          @service.update_attributes(service_params)
           create_or_update_hours
         end
         format.html { redirect_to provider_path(@service.provider), notice: 'Service was successfully updated.' }
@@ -53,6 +53,11 @@ class ServicesController < ApplicationController
   end
 
   private
+
+  def service_params
+    params.require(:service).permit(:eligibility, :funding_id, :name, :operating_hours_id,
+      :rate, :req_min_age, :req_veteran, :service_area, :service_area_type, :provider_id)
+  end
 
   def create_or_update_hours
     hours = @service.hours_hash

@@ -14,14 +14,14 @@ shared_examples 'should support date range filtering' do |date_begin, test_if_fi
 end
 
 
-class ReportTest < ActionController::IntegrationTest
+class ReportTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
 
   setup do
     @user = FactoryGirl.create(:user)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
     @provider = @user.provider
 

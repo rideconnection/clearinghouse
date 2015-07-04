@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TripTicketsTest < ActionController::IntegrationTest
+class TripTicketsTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -13,8 +13,11 @@ class TripTicketsTest < ActionController::IntegrationTest
       :password => @password, 
       :password_confirmation => @password, 
       :provider => @provider)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
+
+    # needed for time comparisons since Rails is using the user's time zone to generate views
+    Time.zone = @user.time_zone
 
     login_as @user, :scope => :user
     visit '/'
@@ -282,7 +285,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       end
     end
   end
-    
+
   describe "customer_identifiers hstore fields" do
     # test "provider admins can add customer identifier attributes to a new trip ticket (using javascript)" do
     #   skip "Having trouble getting user logins to work with selenium - cdb 2013-01-29"
@@ -360,26 +363,6 @@ class TripTicketsTest < ActionController::IntegrationTest
       assert page.has_selector?('.hstoreAttributeValue[value=\'Waste\']')
     end
 
-    test "authorized users can edit trip results on tickets with approved claims repeatedly" do
-      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
-      trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
-      visit trip_ticket_path(trip_ticket) 
-
-      select "Completed", :from => "trip_result_outcome"
-      fill_in "trip_result_driver_id", :with => "Bob Smith"
-      click_button "Update Trip Result"
-
-      assert page.has_content?("Trip result was successfully created")
-      assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
-      assert_equal trip_ticket.reload.trip_result.driver_id, "Bob Smith"
-
-      select "No-Show", :from => "trip_result_outcome"
-      click_button "Update Trip Result"
-
-      assert page.has_content?("Trip result was successfully updated")
-      assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
-    end
-
     test "users who cannot edit an existing trip ticket should see an unordered list of customer identifier attribute pairs" do
       provider_2 = FactoryGirl.create(:provider)
       relationship = ProviderRelationship.create!(
@@ -403,6 +386,27 @@ class TripTicketsTest < ActionController::IntegrationTest
         assert page.has_selector?('li', :text => "charlie: Brown")
         assert page.has_selector?('li', :text => "solid: Gold")
       end
+    end
+  end
+
+  describe "trip results" do
+    test "can be updated repeatedly by authorized users on tickets with approved claims" do
+      trip_ticket = FactoryGirl.create(:trip_ticket, :originator => @provider)
+      trip_ticket.trip_claims << FactoryGirl.create(:trip_claim, :status => :approved)
+      visit trip_ticket_path(trip_ticket)
+
+      select "Completed", :from => "trip_result_outcome"
+      fill_in "trip_result_driver_id", :with => "Bob Smith"
+      click_button "Update Trip Result"
+
+      assert page.has_content?("Trip result was successfully created")
+      assert_equal trip_ticket.reload.trip_result.outcome, "Completed"
+      assert_equal trip_ticket.reload.trip_result.driver_id, "Bob Smith"
+
+      select "No-Show", :from => "trip_result_outcome"
+      click_button "Update Trip Result"
+      assert page.has_content?("Trip result was successfully updated")
+      assert_equal trip_ticket.reload.trip_result.outcome, "No-Show"
     end
   end
 
@@ -1718,7 +1722,7 @@ class TripTicketsTest < ActionController::IntegrationTest
       @relationship.approve!
       @partner_user = FactoryGirl.create(:user,
                                          :provider => @partner,
-                                         :role => Role.find_or_create_by_name!("provider_admin"),
+                                         :role => Role.find_or_create_by!(name: "provider_admin"),
                                          :notification_preferences => NotificationRecipients::NOTIFICATION_TYPES.stringify_keys.keys)
       @acts_as_notifier_disabled = ActsAsNotifier::Config.disabled
       @acts_as_notifier_use_delayed_job = ActsAsNotifier::Config.use_delayed_job

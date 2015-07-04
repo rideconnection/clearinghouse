@@ -16,13 +16,14 @@ shared_examples "requires authenticatable params" do  |*additional_params|
     send(method, url, all_params)
     response.status.wont_equal 403
     response.body.wont_include "missing parameter:"
+    response.body.wont_match /"error":"\w+ is missing"/
   end
 
   all_params.keys.each do |param|
     it "requires #{param} in params" do
       send(method, url, all_params.except(param))
       response.status.must_equal 403
-      response.body.must_include "missing parameter: #{param}"
+      response.body.must_include %("error":"#{param} is missing")
     end
   end
 end

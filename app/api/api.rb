@@ -11,14 +11,14 @@ module Clearinghouse
     format :json
     rescue_from :all do |e|
       # Log it
-      Rails.logger.error "#{e.message}\n\n#{e.backtrace.join("\n")}"
+      Rails.logger.error "#{e} - #{e.message}\n\n#{e.backtrace.join("\n")}"
       
       # TODO - Notify external service of the error
       # Airbrake.notify(e)
       
       message = { :error => e.message }
       status = 500
-      if e.is_a? Grape::Exceptions::ValidationError
+      if e.is_a? Grape::Exceptions::ValidationErrors
         status = 403
       elsif e.is_a? ActiveRecord::RecordNotFound
         status = 404
@@ -27,20 +27,10 @@ module Clearinghouse
         message = message.merge({ :backtrace => e.backtrace })
       end
       
-      Rack::Response.new(message, status, { 'Content-type' => 'application/json' }).finish
+      Rack::Response.new(message.to_json, status, { 'Content-type' => 'application/json' }).finish
     end
     
-    scope :open_endpoints do
-      mount API_Info
-    end
-    
-    # In Grape, includes apply only to the namespace, scope, or version that
-    # immediately follows the include. Putting it here, above a scope, with
-    # all protected mount points inside of it, ensures that it will apply to
-    # all of those mount points.
-    include API_Authentication
-    scope :protected_endpoints do
-      mount API_v1
-    end
+    mount API_Info
+    mount API_v1
   end
 end

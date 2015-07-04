@@ -1,8 +1,8 @@
 class EligibilityRule < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   belongs_to :eligibility_requirement
   has_one :service, :through => :eligibility_requirement
-
-  attr_accessible :eligibility_requirement_id, :trip_field, :comparison_type, :comparison_value
 
   COMPARISON_TYPES = {
     'contain'       => 'must contain',

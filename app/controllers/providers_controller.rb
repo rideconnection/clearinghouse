@@ -50,7 +50,7 @@ class ProvidersController < ApplicationController
   def update
     @provider = Provider.find(params[:id])
     respond_to do |format|
-      if @provider.update_attributes(params[:provider])
+      if @provider.update_attributes(provider_params)
         format.html { redirect_to providers_path, notice: 'Provider was successfully updated.' }
         format.json { render json: @provider }
       else
@@ -90,11 +90,25 @@ class ProvidersController < ApplicationController
     end
   end
 
-  protected
+  private
+
+  def provider_params
+    params.require(:provider).permit(:active, :address, :name, :primary_contact_email,
+      :trip_ticket_expiration_days_before, :trip_ticket_expiration_time_of_day,
+      address_attributes: [
+        :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
+        :phone_number, :common_name, :jurisdiction, :address_type
+      ],
+      users_attributes: [
+        :id, :active, :email, :name, :password, :password_confirmation,
+        :must_generate_password, :phone, :provider_id, :role_id,
+        :title, :notification_preferences, :failed_attempts, :locked_at
+      ])
+  end
 
   def create_provider_admin_user_for_forms
     if @provider.new_record?
-      user_params = params[:provider].try(:[], :users_attributes).try(:[], '0') || {}
+      user_params = provider_params.try(:[], :users_attributes).try(:[], '0') || {}
       user_params[:role_id] = Role.where(name: 'provider_admin').pluck(:id).first
       @user = @provider.users.build(user_params)
     end

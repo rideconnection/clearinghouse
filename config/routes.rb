@@ -1,14 +1,15 @@
 require 'api'
 
-Clearinghouse::Application.routes.draw do
+Rails.application.routes.draw do
 
   mount Clearinghouse::API => "/"
   
   devise_for :users do
     get '/users/sign_out' => 'devise/sessions#destroy' # allow redirects
-    get 'check_session' => 'users#check_session'
-    get 'touch_session' => 'users#touch_session'
   end
+
+  get 'check_session' => 'users#check_session'
+  get 'touch_session' => 'users#touch_session'
 
   resources :open_capacities
 
@@ -69,13 +70,13 @@ Clearinghouse::Application.routes.draw do
 
   resources :reports, :only => [ :index, :show ]
 
-  match 'admin', :controller => :admin, :action => :index
-  match 'job_queue' => DelayedJobWeb, :anchor => false, :constraints => lambda { |request|
+  match 'admin', :via => :get, :controller => :admin, :action => :index
+  match 'job_queue' => DelayedJobWeb, :via => :get, :anchor => false, :constraints => lambda { |request|
     request.env['warden'].authenticated? # are we authenticated?
     request.env['warden'].authenticate! # authenticate if not already
     request.env['warden'].user.has_admin_role? # Ensure site_admin role
   }
-  match 'preferences', :controller => :users, :action => :preferences
+  match 'preferences', :via => :get, :controller => :users, :action => :preferences
 
   resource :application_settings, :only => [ :edit, :update ] do
     collection do

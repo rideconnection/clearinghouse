@@ -124,14 +124,6 @@ class TripTicketTest < ActiveSupport::TestCase
     @trip_ticket.trip_result.outcome.must_equal "Cancelled"
   end
 
-  it "does not allow directly updating the status attribute" do
-    ->{ @trip_ticket.update_attributes(status: :rescinded) }.must_raise(ActiveModel::MassAssignmentSecurity::Error)
-  end
-
-  it "does not allow rescinding a trip by updating the rescinded attribute" do
-    ->{ @trip_ticket.update_attributes(rescinded: true) }.must_raise(ActiveModel::MassAssignmentSecurity::Error)
-  end
-
   it "has an originated_or_claimed_by method that returns trips originated or claimed by a provider" do
     originator = @trip_ticket.originator
     claimant = FactoryGirl.create(:provider)
@@ -187,7 +179,7 @@ class TripTicketTest < ActiveSupport::TestCase
   end
   
   describe "white/black lists" do
-    it "has an integer_array field for provider_white_list which returns an array" do
+    it "has an integer array field for provider_white_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_white_list
       @trip_ticket.provider_white_list = [
         '2',
@@ -199,7 +191,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert_equal [2, 1], @trip_ticket.provider_white_list
     end
   
-    it "has an integer_array field for provider_black_list which returns an array" do
+    it "has an integer array field for provider_black_list which returns an array" do
       assert_equal nil, @trip_ticket.provider_black_list
       @trip_ticket.provider_black_list = [
         '2',
@@ -227,7 +219,7 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
     end
     
-    it "allows only integer values for provider_white_list" do
+    it "allows values for which to_i is greater than zero for provider_white_list" do
       @trip_ticket.provider_white_list = []
       assert @trip_ticket.valid?
   
@@ -235,13 +227,13 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
       
       @trip_ticket.provider_white_list = [:'3']
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
       
       @trip_ticket.provider_white_list = [1.3]
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
     end
-    
-    it "allows only integer values for provider_black_list" do
+
+    it "allows values for which to_i is greater than zero for provider_black_list" do
       @trip_ticket.provider_black_list = []
       assert @trip_ticket.valid?
   
@@ -249,10 +241,10 @@ class TripTicketTest < ActiveSupport::TestCase
       assert !@trip_ticket.valid?
       
       @trip_ticket.provider_black_list = [:'3']
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
       
       @trip_ticket.provider_black_list = [1.3]
-      assert !@trip_ticket.valid?
+      assert @trip_ticket.valid?
     end
   end
   

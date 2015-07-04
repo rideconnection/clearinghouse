@@ -1,15 +1,12 @@
 class Provider < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   has_many :services
   has_many :nonces
   has_many :users, inverse_of: :provider
   belongs_to :address, :class_name => :Location, :validate => true, :dependent => :destroy
   has_many :trip_tickets, :foreign_key => :origin_provider_id
   has_many :trip_claims, :foreign_key => :claimant_provider_id
-
-  # :address_attributes is needed to support mass-assignment of nested attrs
-  attr_accessible :active, :address, :address_attributes, :name, 
-    :primary_contact_email, :users_attributes, 
-    :trip_ticket_expiration_days_before, :trip_ticket_expiration_time_of_day
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :users

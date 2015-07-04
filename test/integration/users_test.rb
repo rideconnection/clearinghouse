@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class UsersTest < ActionController::IntegrationTest
+class UsersTest < ActionDispatch::IntegrationTest
 
   include Warden::Test::Helpers
   Warden.test_mode!
@@ -13,7 +13,7 @@ class UsersTest < ActionController::IntegrationTest
       :password => @password, 
       :password_confirmation => @password, 
       :provider => @provider)
-    @user.role = Role.find_or_create_by_name!("provider_admin")
+    @user.role = Role.find_or_create_by!(name: "provider_admin")
     @user.save!
   end
   
@@ -113,7 +113,8 @@ class UsersTest < ActionController::IntegrationTest
       fill_in 'Password', :with => "nope"
       click_button 'Sign in'
       current_path.must_equal new_user_session_path
-      assert page.has_content?("Invalid email or password") if i < maximum_attempts
+      assert page.has_content?("Invalid email or password") if i < (maximum_attempts - 2)
+      assert page.has_content?("You have one more attempt before your account is locked") if i == (maximum_attempts - 2)
     end
     
     assert page.has_content?("Your account is locked")

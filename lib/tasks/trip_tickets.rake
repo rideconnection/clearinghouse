@@ -48,8 +48,7 @@ namespace :clearinghouse do
       desc 'Recalculate the appointment_time and expire_at attributes to occur in the future based on the offset of the original attribute from the created_at timestamp. (Caution: Will also update the created_at date!) Specify an ID to reset a single ticket. Ex: `rake clearinghouse:trip_tickets:development:unexpire[123]`'
       task :rebase_appointment_and_expiration_dates, [:id] => [:environment] do |t, args|
         args.with_defaults(:id => nil)
-        tickets = TripTicket.scoped
-        tickets = tickets.where(id: args.id) if args.id.to_i > 0
+        tickets = args.id.to_i > 0 ? TripTicket.where(id: args.id) : TripTicket
         TripTicket.transaction do
           tickets.find_each do |tt|
             puts "Preparing to rebase ticket ##{tt.id}"

@@ -12,8 +12,6 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     @user2 = FactoryGirl.create(:user, provider: @provider2)
     @user3 = FactoryGirl.create(:user, provider: @provider3)
 
-    @minimum_request_params = ApiParamFactory.authenticatable_params(@provider1)
-
     @trip_ticket1 = FactoryGirl.create(:trip_ticket, originator: @provider1)
     @trip_ticket2 = FactoryGirl.create(:trip_ticket, originator: @provider2)
     @trip_ticket3 = FactoryGirl.create(:trip_ticket, originator: @provider3)
@@ -28,13 +26,13 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by the provider" do
       it "returns all trip comments belonging to the trip ticket" do
-        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", api_params(@provider1, trip_ticket_id: @trip_ticket1.id)
         response.status.must_equal 200
         response.body.must_include %Q{"body":"#{@trip_comment1.body}"}
       end
 
       it "does not return trip comments belonging to other trip tickets" do
-        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments", api_params(@provider1, trip_ticket_id: @trip_ticket1.id)
         response.status.must_equal 200
         response.body.wont_include %Q{"body":"#{@trip_comment2.body}"}
       end
@@ -42,7 +40,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by a related provider" do
       it "returns all trip comments belonging to the trip ticket" do
-        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments", api_params(@provider1, trip_ticket_id: @trip_ticket2.id)
         response.status.must_equal 200
         response.body.must_include %Q{"body":"#{@trip_comment2.body}"}
       end
@@ -50,7 +48,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by an unrelated provider" do
       it "returns a 401 access denied error" do
-        get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments", api_params(@provider1, trip_ticket_id: @trip_ticket3.id)
         response.status.must_equal 401
         response.body.wont_include %Q{"body":"#{@trip_comment3.body}"}
       end
@@ -62,7 +60,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by the provider" do
       it "returns the specified trip comment" do
-        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments/#{@trip_comment1.id}", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments/#{@trip_comment1.id}", api_params(@provider1, trip_ticket_id: @trip_ticket1.id, id: @trip_comment1.id)
         response.status.must_equal 200
         response.body.must_include %Q{"body":"#{@trip_comment1.body}"}
       end
@@ -70,7 +68,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by a related provider" do
       it "returns the specified trip comment" do
-        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments/#{@trip_comment2.id}", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments/#{@trip_comment2.id}", api_params(@provider1, trip_ticket_id: @trip_ticket2.id, id: @trip_comment2.id)
         response.status.must_equal 200
         response.body.must_include %Q{"body":"#{@trip_comment2.body}"}
       end
@@ -78,7 +76,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip ticket was originated by an unrelated provider" do
       it "returns a 401 access denied error" do
-        get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments/#{@trip_comment3.id}", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments/#{@trip_comment3.id}", api_params(@provider1, trip_ticket_id: @trip_ticket3.id, id: @trip_comment3.id)
         response.status.must_equal 401
         response.body.wont_include %Q{"body":"#{@trip_comment3.body}"}
       end
@@ -86,7 +84,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     context "when trip comment does not belong to specified trip ticket" do
       it "returns a 404 not found error" do
-        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_comment1.id}", @minimum_request_params
+        get "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_claims/#{@trip_comment1.id}", api_params(@provider1, trip_ticket_id: @trip_ticket2.id, id: @trip_comment1.id)
         response.status.must_equal 404
         response.body.wont_include %Q{"body":"#{@trip_comment1.body}"}
       end
@@ -104,7 +102,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     context "when trip ticket was originated by the provider" do
       it "creates a trip comment" do
         post "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments",
-             ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
+             api_params(@provider1, trip_ticket_id: @trip_ticket1.id, trip_ticket_comment: comment_params)
         response.status.must_equal 201
         response.body.must_include %Q{"body":"new comment"}
       end
@@ -113,7 +111,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     context "when trip ticket was originated by a related provider" do
       it "creates a trip comment" do
         post "/api/v1/trip_tickets/#{@trip_ticket2.id}/trip_ticket_comments",
-             ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
+             api_params(@provider1, trip_ticket_id: @trip_ticket2.id, trip_ticket_comment: comment_params)
         response.status.must_equal 201
         response.body.must_include %Q{"body":"new comment"}
       end
@@ -122,7 +120,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
     context "when trip ticket was originated by an unrelated provider" do
       it "returns a 401 access denied error" do
         post "/api/v1/trip_tickets/#{@trip_ticket3.id}/trip_ticket_comments",
-             ApiParamFactory.authenticatable_params(@provider1, {trip_ticket_comment: comment_params})
+             api_params(@provider1, trip_ticket_id: @trip_ticket3.id, trip_ticket_comment: comment_params)
         response.status.must_equal 401
         response.body.wont_include %Q{"body":"new comment"}
       end
@@ -134,7 +132,7 @@ describe "Clearinghouse::API_v1 trip ticket comments endpoints" do
 
     it "does not allow the API to update trip comments" do
       put "/api/v1/trip_tickets/#{@trip_ticket1.id}/trip_ticket_comments/#{@trip_comment1.id}",
-          ApiParamFactory.authenticatable_params(@provider1, {:trip_ticket_comment => {:body => "updated comment"}})
+          api_params(@provider1, trip_ticket_id: @trip_ticket1.id, id: @trip_comment1.id, trip_ticket_comment: {body: "updated comment"})
       response.status.must_equal 401
     end
   end

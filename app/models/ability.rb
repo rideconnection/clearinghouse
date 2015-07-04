@@ -36,8 +36,10 @@ class Ability
       # Dispatchers and above can edit/cancel tickets belonging to their own provider
       can [:update, :rescind], TripTicket, :origin_provider_id => user.provider_id
 
-      can [:create, :update], TripResult do |result| 
-        result.can_be_edited_by?(user)
+      can [:create, :update], TripResult do |result|
+        originator_id = result.trip_ticket.try(:origin_provider_id)
+        claimant_id = result.trip_ticket.try(:approved_claim).try(:claimant_provider_id)
+        user.provider_id && [originator_id, claimant_id].include?(user.provider_id)
       end
     end
     

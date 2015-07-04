@@ -1,7 +1,9 @@
-class Nonce < ActiveRecord::Base  
+class Nonce < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   belongs_to :provider
   
-  attr_accessible :nonce, :provider_id
+  # attr_accessible :nonce, :provider_id
   
   # TODO - Add more validations - length, format, etc.
   validates :nonce, uniqueness: { scope: :provider_id }

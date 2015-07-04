@@ -1,7 +1,10 @@
 module Clearinghouse
   class API_v1 < Grape::API
-    helpers APIHelpers
+    helpers API_Authentication
     version 'v1', :using => :path, :vendor => 'Clearinghouse' do
+      params do
+        use :authentication_params
+      end
 
       namespace :trip_tickets do
         desc "Get list of trips accessible to the requesting provider"

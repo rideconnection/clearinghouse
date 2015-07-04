@@ -1,7 +1,10 @@
 module Clearinghouse
   class API_v1 < Grape::API
-    helpers APIHelpers
+    helpers API_Authentication
     version 'v1', :using => :path, :vendor => 'Clearinghouse' do
+      params do
+        use :authentication_params
+      end
 
       namespace :users do
         desc "Get a list of users belonging to this provider"

@@ -54,3 +54,11 @@ class ActiveSupport::TestCase
     msg.subject.must_equal subject
   end
 end
+
+module ActionDispatch
+  class IntegrationTest
+    def api_params(provider, additional_params = {})
+      ApiParamFactory.authenticatable_params(provider, additional_params)
+    end
+  end
+end

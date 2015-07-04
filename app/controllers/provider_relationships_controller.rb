@@ -54,7 +54,7 @@ class ProviderRelationshipsController < ApplicationController
   # PUT /provider_relationships/1.json
   def update
     respond_to do |format|
-      if @provider_relationship.update_attributes(params[:provider_relationship])
+      if @provider_relationship.update_attributes(provider_relationship_params)
         format.html do 
           redirect_to provider_for_request, 
             notice: 'Provider relationship was successfully updated.'
@@ -82,8 +82,7 @@ class ProviderRelationshipsController < ApplicationController
   end
 
   def activate
-    @provider_relationship = ProviderRelationship.find(
-      params[:provider_relationship_id])
+    @provider_relationship = ProviderRelationship.find(params[:provider_relationship_id])
     @provider_relationship.approve!
     respond_to do |format|
       format.html do 
@@ -95,6 +94,12 @@ class ProviderRelationshipsController < ApplicationController
   end
 
   private
+
+  def provider_relationship_params
+    params.require(:provider_relationship).permit(:approved_at, :automatic_cooperator_approval,
+      :automatic_requester_approval, :cooperating_provider_id, :requesting_provider_id,
+      :requesting_provider, :cooperating_provider)
+  end
 
   def provider_for_request
     if can? :update, @provider_relationship.requesting_provider

@@ -61,7 +61,7 @@ class UsersController < ApplicationController
     end
     
     if params[:user].has_key?(:role_id)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
+      if Role.provider_roles.include?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, User
       else
         authorize! :set_any_role, User
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     end
     
     if params[:user].has_key?(:role_id)
-      if Role.provider_roles.exists?(Role.find(params[:user][:role_id]))
+      if Role.provider_roles.include?(Role.find(params[:user][:role_id]))
         authorize! :set_provider_role, @user
       else
         authorize! :set_any_role, @user
@@ -112,7 +112,7 @@ class UsersController < ApplicationController
     end
 
     respond_to do |format|
-      if @user.update_attributes(params[:user])
+      if @user.update_attributes(user_params)
         # Devise logs users out on password change
         sign_in(@user, :bypass => true) if need_relogin
         
@@ -151,7 +151,7 @@ class UsersController < ApplicationController
   def check_session
     last_request_at = session['warden.user.user.session']['last_request_at']
     timeout_time = last_request_at + (Devise.timeout_in || 365.days) # In case the session timeout has been disabled
-    timeout_in = (timeout_time - Time.current).to_i
+    timeout_in = timeout_time - Time.current.to_i
     render :json => {
       'last_request_at' => last_request_at,
       'timeout_in' => timeout_in,
@@ -159,6 +159,14 @@ class UsersController < ApplicationController
   end
 
   def touch_session
-    render :text => 'OK'
+    render :plain => 'OK'
+  end
+
+  private
+
+  def user_params
+    params.require(:user).permit(:active, :email, :name, :password, :password_confirmation,
+      :must_generate_password, :phone, :provider_id, :role_id, :title, :failed_attempts, :locked_at,
+      notification_preferences: [])
   end
 end

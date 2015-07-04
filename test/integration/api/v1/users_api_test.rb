@@ -4,8 +4,6 @@ require 'api_param_factory'
 describe "Clearinghouse::API_v1 users endpoints" do
   before do
     @provider = FactoryGirl.create(:provider)
-    @minimum_request_params = ApiParamFactory.authenticatable_params(@provider)
-
     @user1 = FactoryGirl.create(:user, name: "Phil", active: true, provider: @provider)
     @user2 = FactoryGirl.create(:user, name: "Bill", provider: @provider)
     @user3 = FactoryGirl.create(:user, name: "Mark", provider: FactoryGirl.create(:provider))
@@ -15,7 +13,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     include_examples "requires authenticatable params"
 
     it "should return all provider users as JSON" do
-      get "/api/v1/users", @minimum_request_params
+      get "/api/v1/users", api_params(@provider)
       response.status.must_equal 200
       response.body.must_include %Q{"name":"#{@user1.name}"}
       response.body.must_include %Q{"name":"#{@user2.name}"}
@@ -27,13 +25,13 @@ describe "Clearinghouse::API_v1 users endpoints" do
     include_examples "requires authenticatable params"
 
     it "should return the specified provider user as JSON" do
-      get "/api/v1/users/#{@user1.id}", ApiParamFactory.authenticatable_params(@provider)
+      get "/api/v1/users/#{@user1.id}", api_params(@provider, id: @user1.id)
       response.status.must_equal 200
       response.body.must_include %Q{"name":"#{@user1.name}"}
     end
 
     it "should not allow me to access a user belonging to another provider" do
-      get "/api/v1/users/#{@user3.id}", ApiParamFactory.authenticatable_params(@provider)
+      get "/api/v1/users/#{@user3.id}", api_params(@provider, id: @user3.id)
       response.status.must_equal 404
       response.body.wont_include %Q{"name":"#{@user3.name}"}
     end
@@ -43,7 +41,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     include_examples "requires authenticatable params"
 
     it "should update the specified provider user and return the user as JSON" do
-      put "/api/v1/users/#{@user1.id}", ApiParamFactory.authenticatable_params(@provider, {:user => {:name => "Mary"}})
+      put "/api/v1/users/#{@user1.id}", api_params(@provider, id: @user1.id, user: {name: "Mary"})
       response.status.must_equal 200
       response.body.must_include %Q{"name":"Mary"}
       @user1.reload
@@ -51,7 +49,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     end
 
     it "should not allow me to access a user belonging to another provider" do
-      put "/api/v1/users/#{@user3.id}", ApiParamFactory.authenticatable_params(@provider, {:user => {:name => "Mary"}})
+      put "/api/v1/users/#{@user3.id}", api_params(@provider, id: @user3.id, user: {name: "Mary"})
       response.status.must_equal 404
       response.body.wont_include %Q{"name":"Mary"}
     end
@@ -65,7 +63,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     include_examples "requires authenticatable params"
 
     it "should activate the specified provider user and return the user as JSON" do
-      put "/api/v1/users/#{@user1.id}/activate", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/users/#{@user1.id}/activate", api_params(@provider, id: @user1.id)
       response.status.must_equal 200
       response.body.must_include %Q{"active":true}
       @user1.reload
@@ -73,7 +71,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     end
 
     it "should not allow me to access a user belonging to another provider" do
-      put "/api/v1/users/#{@user3.id}/activate", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/users/#{@user3.id}/activate", api_params(@provider, id: @user3.id)
       response.status.must_equal 404
       response.body.wont_include %Q{"active":true"}
     end
@@ -87,7 +85,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     include_examples "requires authenticatable params"
 
     it "should deactivate the specified provider user and return the user as JSON" do
-      put "/api/v1/users/#{@user1.id}/deactivate", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/users/#{@user1.id}/deactivate", api_params(@provider, id: @user1.id)
       response.status.must_equal 200
       response.body.must_include %Q{"active":false}
       @user1.reload
@@ -95,7 +93,7 @@ describe "Clearinghouse::API_v1 users endpoints" do
     end
 
     it "should not allow me to access a user belonging to another provider" do
-      put "/api/v1/users/#{@user3.id}/deactivate", ApiParamFactory.authenticatable_params(@provider)
+      put "/api/v1/users/#{@user3.id}/deactivate", api_params(@provider, id: @user3.id)
       response.status.must_equal 404
       response.body.wont_include %Q{"active":false"}
     end

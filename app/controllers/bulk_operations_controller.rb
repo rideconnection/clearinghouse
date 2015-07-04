@@ -42,21 +42,21 @@ class BulkOperationsController < ApplicationController
 
   def create
     uploaded_file = params[:bulk_operation].try(:delete, :uploaded_file)
-    @bulk_operation = current_user.bulk_operations.build(params[:bulk_operation])
+    @bulk_operation = current_user.bulk_operations.build(bulk_operation_params)
     save_upload(uploaded_file) if @bulk_operation.is_upload?
 
     respond_to do |format|
       if @bulk_operation.save
         format.html do
           if @bulk_operation.is_upload?
-            unless Clearinghouse::Application.config.bulk_operation_options[:use_delayed_job]
+            unless Rails.application.config.bulk_operation_options[:use_delayed_job]
               self.class.import(current_user.id, @bulk_operation.id)
             else
               self.class.delay.import(current_user.id, @bulk_operation.id)
             end
             redirect_to bulk_operation_url(@bulk_operation)
           else
-            unless Clearinghouse::Application.config.bulk_operation_options[:use_delayed_job]
+            unless Rails.application.config.bulk_operation_options[:use_delayed_job]
               self.class.export(current_user.id, @bulk_operation.id)
             else
               self.class.delay.export(current_user.id, @bulk_operation.id)
@@ -108,7 +108,16 @@ class BulkOperationsController < ApplicationController
     end
   end
 
-  protected
+  private
+
+  def bulk_operation_params
+    if params[:bulk_operation].try(:[], :is_upload)
+      params.require(:bulk_operation).permit(:row_count, :last_exported_timestamp, :is_upload, :file_name,
+        :error_count, :row_errors, :data)
+    else
+      ActionController::Parameters.new.permit!
+    end
+  end
 
   def save_upload(uploaded_file)
     if uploaded_file.present?

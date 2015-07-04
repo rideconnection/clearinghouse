@@ -1,12 +1,14 @@
 class OperatingHours < ActiveRecord::Base
+  include ActiveModel::ForbiddenAttributesProtection
+
   belongs_to :service
 
-  attr_accessible :close_time, :day_of_week, :open_time, :service
+  # attr_accessible :close_time, :day_of_week, :open_time, :service
 
   validates_presence_of :day_of_week, :service
   validate :enforce_hour_sanity
 
-  default_scope order(:day_of_week)
+  default_scope ->{ order :day_of_week }
 
   START_OF_DAY = '05:00:00'
   END_OF_DAY = '03:00:00'

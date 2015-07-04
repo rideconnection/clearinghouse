@@ -5,6 +5,7 @@ require 'openssl'
 module ApiParamFactory
   # Return the necessary parameters to make an authenticatable API call
   def self.authenticatable_params(provider, additional_params = {})
+
     Rails.logger.debug "additional_params: #{additional_params}"
     
     timestamp = Time.now.utc.xmlschema
@@ -13,7 +14,7 @@ module ApiParamFactory
       api_key:     provider.api_key,
       nonce:       nonce,
       timestamp:   timestamp,
-      hmac_digest: hmac_digest(provider.private_key, nonce, timestamp, hash_stringify(additional_params))
+      hmac_digest: hmac_digest(provider.private_key, nonce, timestamp, additional_params)
     }
     Rails.logger.debug "required_params: #{required_params}"
 
@@ -26,7 +27,7 @@ module ApiParamFactory
   # Create an HMAC digest
   def self.hmac_digest(private_key, nonce, timestamp, request_params)
     Rails.logger.debug "Digesting request_params: #{request_params.to_json}"
-    digest = OpenSSL::HMAC.hexdigest('sha1', private_key, [nonce, timestamp, request_params.to_json].join(':'))
+    digest = OpenSSL::HMAC.hexdigest('sha1', private_key, [nonce, timestamp, hash_stringify(request_params).to_json].join(':'))
     Rails.logger.debug "hmac_digest: #{digest}"
     digest
   end

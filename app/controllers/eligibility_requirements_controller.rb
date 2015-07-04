@@ -46,7 +46,7 @@ class EligibilityRequirementsController < ApplicationController
   def update
     @form_path = @eligibility_requirement
     respond_to do |format|
-      if @eligibility_requirement.update_attributes(params[:eligibility_requirement])
+      if @eligibility_requirement.update_attributes(eligibility_requirement_params)
         format.html { redirect_to edit_eligibility_requirement_url(@eligibility_requirement), notice: 'Eligibility Requirements Group was successfully updated.' }
         format.json { head :no_content }
       else
@@ -62,5 +62,13 @@ class EligibilityRequirementsController < ApplicationController
       format.html { redirect_to provider_path(@eligibility_requirement.service.provider) + "#service-#{ @eligibility_requirement.service.id }-eligibility-requirements" }
       format.json { head :no_content }
     end
+  end
+
+  private
+
+  def eligibility_requirement_params
+    params.require(:eligibility_requirement).permit(:boolean_type, eligibility_rule_attributes: [
+      :id, :eligibility_requirement_id, :trip_field, :comparison_type, :comparison_value
+    ])
   end
 end
