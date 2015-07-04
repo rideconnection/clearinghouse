@@ -24,6 +24,6 @@ class ApplicationSettingsController < ApplicationController
   private
 
   def application_setting_params
-    params.require(:application_setting).permit(:var)
+    params.require(:application_setting).permit!
   end
 end
