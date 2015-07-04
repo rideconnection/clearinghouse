@@ -28,6 +28,12 @@ namespace :deploy do
   end
 end
 
+task :link_secrets_yml do
+  puts "    Link secrets.yml file"
+  run "rm #{latest_release}/config/secrets.yml"
+  run  "ln -nfs #{deploy_to}/shared/config/secrets.yml #{latest_release}/config/secrets.yml"
+end
+
 task :copy_database_yml do
   puts "    Copy database.yml file"
   run  "cp #{latest_release}/config/database.yml.example #{latest_release}/config/database.yml"
