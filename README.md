@@ -18,16 +18,18 @@ fuzzy match or key/value storage extensions, so we don't use it in development.
 Setting up the development environment:
 
 0. Prerequsites:
-   - RVM
-   - PostgreSQL and system packages, e.g.:
-         apt-get install postgresql postgresql-contrib-9.1 \
-                         postgresql-9.1-postgis postgresql-server-dev-9.1i \
+   - On OS X, prerequisites can be installed with Homebrew (http://brew.sh).
+   - RVM (Ruby Version Manager)
+   - PostgreSQL (up to 9.4 tested) and system packages, e.g.:
+         apt-get install postgresql-9.4 postgresql-contrib-9.4 \
+                         postgresql-9.4-postgis postgresql-server-dev-9.4 \
                          build-essential
 
 1. Install your Ruby environment:
-   - Trust the local .rvmrc file when you enter this repository directory.
    - rvm pkg install zlib
-   - rvm install ruby-1.9.3-p286
+   - rvm install ruby-2.2.2
+   - Clone project from GitHub.
+   - cd into directory, rvm automatically switches to correct Ruby and gemset.
    - gem install bundler
    - bundle install
  
@@ -52,8 +54,8 @@ And run the following commands:
     
     -- Install PostGIS (your file paths may vary)
     -- For Brew installations, use the path /usr/local/share/postgis/
-    \i /usr/share/postgresql/9.1/contrib/postgis-1.5/postgis.sql
-    \i /usr/share/postgresql/9.1/contrib/postgis-1.5/spatial_ref_sys.sql
+    \i /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
+    \i /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
     GRANT ALL ON geometry_columns TO PUBLIC;
     GRANT ALL ON geography_columns TO PUBLIC;
     GRANT ALL ON spatial_ref_sys TO PUBLIC;
@@ -100,45 +102,12 @@ Testing
 
 All tests are implemented with minitest.  Run them all with:
 
-    bundle exec rake minitest:all
+    bundle exec rake test
 
 To run an individual minitest test:
 
     cd <project root directory>
-    ruby -Itest path/to/test_file.rb
-
-Speeding up your tests
-----------------------
-
-The spork gem has also been included and preconfigured in order to help speed up
-the execution of tests. If you are only going to be running the test suite once
-or need to setup a CI server, you won't want to use spork. But if you will be
-running tests frequently, while developing a new feature or refactoring, etc., 
-then preloading your test environment into spork will save you a few seconds 
-or minutes per test execution.
-
-It's easiest to just run the spork server in the background window of a terminal:
-
-    bundle exec spork minitest&
-
-You can then run the test suites through Spork with typical rake test commands
-(defined in lib/tasks):
-
-    bundle exec rake test:all          (run all tests)
-    bundle exec rake test:functionals  (run tests found in test/functional)
-    bundle exec rake test:integration  (run tests found in test/integration)
-    bundle exec rake test:units        (run tests found in test/unit)
-
-Or by manually invoking testdrb which is provided by the spork-minitest gem:
-
-    find test -name "*_test.rb" -type f | xargs bundle exec testdrb
-    find test/functional -name "*_test.rb" -type f | xargs bundle exec testdrb
-    find test/integration -name "*_test.rb" -type f | xargs bundle exec testdrb
-    find test/unit -name "*_test.rb" -type f | xargs bundle exec testdrb
-
-To run an individual test using Spork:
-
-    testdrb path/to/test_file.rb
+    ruby -Ilib -Itest path/to/test_file.rb
 
 Deployment
 ==========
@@ -152,7 +121,13 @@ public key on the staging/production servers so you can run commands as the
 
 To set this up, talk to another developer to get your public key on the 
 machines. If you need to do system administration on the servers, you'll need 
-your own user accout set up as well.
+your own user account set up as well.
+
+On the server, copy secrets.yml from the project to: /home/deployer/rails/clearinghouse/shared/config
+
+Edit secrets.yml and add random keys for secret_key_base and devise_secret_key
+in the production section ("rake secret" can be used to generate random keys).
+It may be necessary to install Ruby 2.2.2 and bundler on the server.
 
 Once you have SSH access as deployer, you can deploy:
 
