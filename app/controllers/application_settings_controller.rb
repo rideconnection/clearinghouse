@@ -24,6 +24,10 @@ class ApplicationSettingsController < ApplicationController
   private
 
   def application_setting_params
+    timeout_param = params[:application_setting].try(:[], 'devise.timeout_in')
+    if timeout_param && (timeout_param.is_a?(Fixnum) || timeout_param.is_a?(Integer))
+      params[:application_setting]['devise.timeout_in'] = timeout_param.minutes
+    end
     params.require(:application_setting).permit!
   end
 end
