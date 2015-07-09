@@ -108,7 +108,7 @@ class ProvidersController < ApplicationController
 
   def create_provider_admin_user_for_forms
     if @provider.new_record?
-      user_params = provider_params.try(:[], :users_attributes).try(:[], '0') || {}
+      user_params = params[:provider].try(:[], :users_attributes).try(:[], '0') || {}
       user_params[:role_id] = Role.where(name: 'provider_admin').pluck(:id).first
       @user = @provider.users.build(user_params)
     end
