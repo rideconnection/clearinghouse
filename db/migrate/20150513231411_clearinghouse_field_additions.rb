@@ -9,10 +9,7 @@ class ClearinghouseFieldAdditions < ActiveRecord::Migration
     # Replace allowed_time_variance with time window before and time window after fields
     add_column :trip_tickets, :time_window_before, :integer
     add_column :trip_tickets, :time_window_after, :integer
-    TripTicket.update_all(
-      'time_window_before = allowed_time_variance, time_window_after = allowed_time_variance',
-      'allowed_time_variance IS NOT NULL'
-    )
+    TripTicket.where('allowed_time_variance IS NOT NULL').update_all('time_window_before = allowed_time_variance, time_window_after = allowed_time_variance')
     remove_column :trip_tickets, :allowed_time_variance
 
     # Free-form literal input record for API access only.
@@ -35,10 +32,7 @@ class ClearinghouseFieldAdditions < ActiveRecord::Migration
     remove_column :trip_tickets, :customer_gender
     remove_column :trip_tickets, :estimated_distance
     add_column :trip_tickets, :allowed_time_variance, :integer
-    TripTicket.update_all(
-      'allowed_time_variance = LEAST(COALESCE(time_window_before, 0), COALESCE(time_window_after, 0))',
-      'time_window_before IS NOT NULL OR time_window_after IS NOT NULL'
-    )
+    TripTicket.where('time_window_before IS NOT NULL OR time_window_after IS NOT NULL').update_all('allowed_time_variance = LEAST(COALESCE(time_window_before, 0), COALESCE(time_window_after, 0))')
     remove_column :trip_tickets, :time_window_before
     remove_column :trip_tickets, :time_window_after
     remove_column :trip_tickets, :additional_data
