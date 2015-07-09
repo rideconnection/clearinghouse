@@ -117,7 +117,7 @@ class TripClaimsController < ApplicationController
   private
 
   def trip_claim_params
-    params.require(:trip_claim).permit(*permitted_params)
+    params.require(:trip_claim).permit(*TripClaimsController.permitted_params)
   end
 
   def new_trip_claim_instance_as_json_for_backbone

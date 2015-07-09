@@ -16,6 +16,8 @@ ActiveRecord::Schema.define(version: 20150610153648) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "fuzzystrmatch"
+  enable_extension "postgis"
+  enable_extension "postgis_topology"
   enable_extension "hstore"
 
   create_table "SpatialIndex", id: false, force: :cascade do |t|
@@ -120,10 +122,10 @@ ActiveRecord::Schema.define(version: 20150610153648) do
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
     t.geometry "position",     limit: {:srid=>4326, :type=>"point"}
-    t.string   "phone_number", limit: 255
-    t.string   "common_name",  limit: 255
-    t.string   "jurisdiction", limit: 255
-    t.string   "address_type", limit: 255
+    t.string   "phone_number"
+    t.string   "common_name"
+    t.string   "jurisdiction"
+    t.string   "address_type"
   end
 
   create_table "nonces", force: :cascade do |t|
@@ -321,7 +323,7 @@ ActiveRecord::Schema.define(version: 20150610153648) do
     t.integer  "customer_deboarding_time"
     t.integer  "customer_seats_required"
     t.text     "customer_notes"
-    t.string   "origin_trip_id",                  limit: 255
+    t.string   "origin_trip_id"
     t.integer  "pick_up_location_id"
     t.integer  "drop_off_location_id"
     t.string   "scheduling_priority",             limit: 255
