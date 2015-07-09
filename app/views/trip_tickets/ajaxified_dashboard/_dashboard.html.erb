@@ -82,6 +82,7 @@
 
           // Make some functions public
           dashboard.clickify = this.clickify;
+          dashboard.errorDialog = this.errorDialog;
           dashboard.displayErrors = this.displayErrors;
           dashboard.display404Message = this.display404Message;
           dashboard.display500Message = this.display500Message;
@@ -256,6 +257,24 @@
           });
         },
 
+        errorDialog: function(container, title) {
+          container.dialog({
+            title: title,
+            width: 625,
+            modal: true,
+            draggable: false,
+            resizable: false,
+            buttons: {
+              OK: function() {
+                $(this).dialog('close');
+              },
+              },
+            close: function() {
+              $(this).dialog('destroy');
+            },
+          });
+        },
+
         // TODO - convert this to a Backbone view
         display404Message: function(ticket_id, previously_selected) {
           ticket_id = ticket_id || 0;
@@ -277,9 +296,11 @@
 
         // TODO - convert this to a Backbone view
         display500Message: function() {
-          dashboard.resetViews($('#an_error_occurred'));
-          $('#main .tickets-list li.check').removeClass('check');
-          dashboard.current_trip_ticket = null;
+          var error_container = $('<div class="error_explanation">');
+          error_container.html(
+            '<p style="text-align: center"><strong>Please refresh the page and try this operation again.</strong></p>'
+          );
+          dashboard.errorDialog(error_container, "An error occurred while processing your request");
         },
 
         // TODO - convert this to a Backbone view
@@ -296,22 +317,7 @@
               });
             });
           }
-          
-          error_container.dialog({
-            title: "The following errors occurred",
-            width: 625,
-            modal: true,
-            draggable: false,
-            resizable: false,
-            buttons: {
-              OK: function() {
-                $(this).dialog('close');
-              },
-            },
-            close: function() {
-              $(this).dialog('destroy');
-            },
-          });
+          dashboard.errorDialog(error_container, "The following errors occurred");
         },
 
         // TODO - move this to be a direct descendant of `dashboard`
@@ -323,10 +329,8 @@
             // display404Message expects a ticket_id argument
             var ticket_id = parseInt(jqXHR.originalRequestOptions.url.replace(dashboard.root_url + '/', ''));
             this.display404Message(ticket_id);
-          } else if (jqXHR.status == 500) {
-            this.display500Message();
           } else {
-            console.debug('Failed to handle an unexpected error code!', jqXHR.status);
+            this.display500Message();
           }
         },
 
@@ -379,7 +383,6 @@
           $('.content-frame').hide();
           $('#selected_resource_removed').hide();
           $('#requested_resource_not_found').hide();
-          $('#an_error_occurred').hide();
           $('#select_multiple_instructions').hide();
           $('#background_polling_paused').hide();
           $show.show();
@@ -1146,14 +1149,6 @@
   <div class="tickets-holder"><div class="scrollable-area"><ul class="tickets-list"></ul></div></div>
   <div class="content-holder"><div class="scrollable-area">
     <div class="content-frame"></div>
-    <div id="an_error_occurred" style="display: none" class="padded">
-      <p style="text-align: center; font-weight: bold">
-        <br><br>
-        An error occurred while processing your request.
-        <br><br>
-        You can try to select another ticket, <%= link_to "clear the filters", clear_filters_trip_tickets_path, class: "no-clickify clear-trip_ticket-filters", style: "text-decoration: underline" %> or <%= link_to "reload the page", "javascript:window.location.reload()" %>.
-      </p>
-    </div>
     <div id="selected_resource_removed" style="display: none" class="padded">
       <p style="text-align: center; font-weight: bold">
         <br><br>
