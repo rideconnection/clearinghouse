@@ -35,8 +35,10 @@
           <td>
             <% if user.active? && can?(:deactivate, user) %>
               <%= link_to 'Deactivate', deactivate_user_path(user), :method=>:post %>
-            <% elsif can?(:activate, user) %>
+            <% elsif !user.active? && can?(:activate, user) %>
               <%= link_to 'Activate', deactivate_user_path(user), :method=>:post %>
+            <% else %>
+              <%= user.active? ? 'Active' : 'Inactive' %>
             <% end %>
           </td>
         </tr>
