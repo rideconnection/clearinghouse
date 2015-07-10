@@ -334,9 +334,9 @@ class TripTicket < ActiveRecord::Base
     (
       [audits.first] +
       audits.where(action: 'update') +
-      customer_address.audits.where(action: 'update') +
-      pick_up_location.audits.where(action: 'update') +
-      drop_off_location.audits.where(action: 'update')
+      (customer_address.try(:audits).try(:where, action: 'update') || []) +
+      (pick_up_location.try(:audits).try(:where, action: 'update') || []) +
+      (drop_off_location.try(:audits).try(:where, action: 'update') || [])
     ).compact.sort_by(&:created_at).reverse # Descending order
   end
 

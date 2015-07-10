@@ -1,4 +1,4 @@
-$("#modal-dialog").html('<%= escape_javascript(render("shared/audit_trail", :audits => @trip_ticket.audits_with_associated, :no_header => true)) %>');
+$("#modal-dialog").html('<%= escape_javascript(render("shared/audit_trail", audits: @trip_ticket.audits_with_associated, no_header: true)) %>');
 $("#modal-dialog").dialog({
   title: "Change History",
   width: 1062,

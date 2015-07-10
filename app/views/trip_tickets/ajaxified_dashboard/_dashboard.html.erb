@@ -640,7 +640,7 @@
           'click a.activity-edit'    : 'edit',
           'click a.claim-rescind'    : 'rescindClaim',
           'click a.claim-approve'    : 'approveClaim',
-          'click .activity-list a'   : 'showActivity',
+          'click .activity-list a:not(.claim-rescind, .claim-approve)' : 'showActivity',
         },
 
         initialize: function () {
