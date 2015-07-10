@@ -9,6 +9,7 @@ class AdminProviderTest < ActionDispatch::IntegrationTest
     @user = FactoryGirl.create(:user)
     @user.role = Role.find_or_create_by!(name: "site_admin")
     Role.find_or_create_by!(name: "provider_admin")
+    @provider = FactoryGirl.create(:provider, active: true)
     login_as(@user, :scope => :user)
   end
 
@@ -37,4 +38,20 @@ class AdminProviderTest < ActionDispatch::IntegrationTest
     assert_equal mail.to.first, "test@example.net" 
     assert mail.body.include?("Please set up a password")
   end
+
+  test "admin can deactivate an active provider" do
+    visit "/providers"
+    find("a[href='#{deactivate_provider_path(@provider)}']").click
+    assert page.has_content?('Provider was successfully updated.')
+    refute @provider.reload.active?
+  end
+  
+  test "admin can activate an inactive provider" do
+    @provider.update_attribute :active, false
+
+    visit "/providers"
+    find("a[href='#{activate_provider_path(@provider)}']").click
+    assert page.has_content?('Provider was successfully updated.')
+    assert @provider.reload.active?
+  end  
 end
