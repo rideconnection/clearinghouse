@@ -107,7 +107,7 @@ All tests are implemented with minitest.  Run them all with:
 To run an individual minitest test:
 
     cd <project root directory>
-    ruby -Ilib -Itest path/to/test_file.rb
+    bundle exec rake test path/to/test_file.rb
 
 Deployment
 ==========

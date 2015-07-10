@@ -67,8 +67,8 @@ class EligibilityRequirementsController < ApplicationController
   private
 
   def eligibility_requirement_params
-    params.require(:eligibility_requirement).permit(:boolean_type, eligibility_rule_attributes: [
-      :id, :eligibility_requirement_id, :trip_field, :comparison_type, :comparison_value
+    params.require(:eligibility_requirement).permit(:boolean_type, eligibility_rules_attributes: [
+      :id, :eligibility_requirement_id, :trip_field, :comparison_type, :comparison_value, :_destroy
     ])
   end
 end
