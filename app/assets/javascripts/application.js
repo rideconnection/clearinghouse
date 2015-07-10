@@ -62,12 +62,7 @@ var SessionTimer = function(user_options) {
     $.ajax({
       timeout: 5000,
       url: ClearingHouse.urls['check_session'],
-      headers: {
-        // Do not update last_request_at when checking session timeout, which
-        // would defeat the purpose of this script.
-        'devise.skip_trackable': 1
-      },
-      error: function() {
+      error: function(jqXHR, textStatus, errorThrown) {
         // Not sure if there's anything useful to do here.
       },
       success: function(data) {
@@ -80,7 +75,7 @@ var SessionTimer = function(user_options) {
     $.ajax({
       timeout: 5000,
       url: ClearingHouse.urls['touch_session'],
-      error: function() {
+      error: function(jqXHR, textStatus, errorThrown) {
         // Not sure if there's anything useful to do here.
       },
       success: onSuccess

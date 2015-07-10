@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   load_and_authorize_resource except: [:check_session, :touch_session]
-  before_filter :admins_only, :only => :index
+  before_filter :admins_only, only: :index
+  prepend_before_filter :do_not_track, only: :check_session
 
   # GET /users
   # GET /users.json
@@ -150,8 +151,10 @@ class UsersController < ApplicationController
 
   def check_session
     last_request_at = session['warden.user.user.session']['last_request_at']
-    timeout_time = last_request_at + (Devise.timeout_in || 365.days) # In case the session timeout has been disabled
-    timeout_in = timeout_time - Time.current.to_i
+    session_length = (Devise.timeout_in || 365.days).to_i # In case the session timeout has been disabled
+    timeout_time = last_request_at + session_length
+    server_time = Time.current.to_i
+    timeout_in = timeout_time - server_time
     render :json => {
       'last_request_at' => last_request_at,
       'timeout_in' => timeout_in,
@@ -168,5 +171,9 @@ class UsersController < ApplicationController
     params.require(:user).permit(:active, :email, :name, :password, :password_confirmation,
       :must_generate_password, :phone, :provider_id, :role_id, :title, :failed_attempts, :locked_at,
       notification_preferences: [])
+  end
+
+  def do_not_track
+    request.env['devise.skip_trackable'] = true
   end
 end

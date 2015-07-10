@@ -5,7 +5,6 @@ class ApplicationController < ActionController::Base
 
   around_filter :user_time_zone, :if => :current_user
   before_filter :apply_application_settings
-  before_filter :do_not_track
   before_filter :authenticate_user!
   after_filter :store_location
   
@@ -25,7 +24,9 @@ class ApplicationController < ActionController::Base
   private
 
   def user_time_zone(&block)
-    Time.use_zone(current_user.time_zone, &block)
+    # The route for /users/sign_out can throw an error here while trying to
+    # load a user with id='sign_out', so allow it to fail gracefully.
+    Time.use_zone(current_user.try(:time_zone) || Time.zone, &block)
   end
 
   def store_location
@@ -89,14 +90,6 @@ class ApplicationController < ActionController::Base
       render(hash)
     ensure
       @template_format = original_format
-    end
-  end
-
-  def do_not_track
-    # Devise is supposed to recognize this header, I thought. Unfortunately,
-    # I'm having to check it manually.
-    if request.headers['devise.skip_trackable']
-      request.env['devise.skip_trackable'] = true
     end
   end
 end
