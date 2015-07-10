@@ -111,4 +111,26 @@ class AdminUserTest < ActionDispatch::IntegrationTest
     assert_equal 0, @other_user.failed_attempts
     assert_nil @other_user.locked_at
   end
+  
+  test "admin can deactivate an active user account" do
+    visit "/users"
+    find("a[href='#{deactivate_user_path(@other_user)}']").click
+    assert page.has_content?('User was successfully updated.')
+    refute @other_user.reload.active?
+  end
+  
+  test "admin can activate an inactive user account" do
+    @other_user.update_attribute :active, false
+
+    visit "/users"
+    find("a[href='#{activate_user_path(@other_user)}']").click
+    assert page.has_content?('User was successfully updated.')
+    assert @other_user.reload.active?
+  end
+  
+  test "admin cannot deactivate their own account" do
+    visit "/users"
+    refute_selector "a[href='#{deactivate_user_path(@user)}']"
+    assert page.has_content? "Active"
+  end
 end
