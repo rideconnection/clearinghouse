@@ -92,6 +92,8 @@ class User < ActiveRecord::Base
       raw_token, hashed_token = Devise.token_generator.generate(User, :reset_password_token)
       self.reset_password_token = hashed_token
       self.reset_password_sent_at = Time.zone.now
+      self.must_generate_password = false
     end
+    true
   end
 end

@@ -71,7 +71,11 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        NewUserMailer.delay.welcome(@user, nil, @user.need_to_generate_password?)
+        if Rails.env.development? || Rails.env.test?
+          NewUserMailer.welcome(@user, nil, @user.need_to_generate_password?).deliver_now
+        else
+          NewUserMailer.delay.welcome(@user, nil, @user.need_to_generate_password?)
+        end
         destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
