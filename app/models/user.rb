@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
 
   devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
     :password_expirable, :password_archivable, :lockable, :session_limitable,
-    :timeoutable
+    :timeoutable, :confirmable
 
   belongs_to :provider, inverse_of: :users
   belongs_to :role
@@ -26,16 +26,11 @@ class User < ActiveRecord::Base
   
   validates_presence_of :provider, :role
 
-  before_validation :generate_a_password, :on => :create
-
   default_scope ->{ order 'name ASC' }
 
   # All users, sorted by provider
-  scope :all_by_provider, ->{ joins("LEFT JOIN providers ON users.provider_id = providers.id").
+  scope :all_by_provider, -> { joins("LEFT JOIN providers ON users.provider_id = providers.id").
     reorder('users.provider_id IS NULL DESC, providers.name ASC, users.name ASC') }
-
-  # Temporary attribute for auto-generated password tokens
-  attr_accessor :must_generate_password
 
   def time_zone
     # TODO would be good to allow each user to set their time zone
@@ -67,10 +62,6 @@ class User < ActiveRecord::Base
     "Sorry, this account has been deactivated."
   end
 
-  def need_to_generate_password?
-    !!must_generate_password
-  end
-  
   def display_name
     if name.blank?
       email
@@ -79,21 +70,32 @@ class User < ActiveRecord::Base
     end
   end
   
-  private
+  # Set the password without knowing the current password used in our
+  # confirmation controller
+  def attempt_set_password(params)
+    p = {}
+    p[:password] = params[:password]
+    p[:password_confirmation] = params[:password_confirmation]
+    update_attributes(p)
+  end
 
-  def generate_a_password
-    if need_to_generate_password?
-      temp_token = (Devise.friendly_token.first(16) +
-        Array("a".."z").shuffle.first +
-        Array("A".."Z").shuffle.first +
-        Array("0".."9").shuffle.first +
-        "!@\#$%^&*".split("").shuffle.first).split("").shuffle.join("")
-      self.password = self.password_confirmation = temp_token
-      raw_token, hashed_token = Devise.token_generator.generate(User, :reset_password_token)
-      self.reset_password_token = hashed_token
-      self.reset_password_sent_at = Time.zone.now
-      self.must_generate_password = false
+  # Return whether a password has been set
+  def has_no_password?
+    self.encrypted_password.blank?
+  end
+
+  # Provide access to protected method pending_any_confirmation
+  def only_if_unconfirmed
+    pending_any_confirmation { yield }
+  end
+  
+  # Override default password_required? method 
+  def password_required?
+    # Password is required if it is being set, but not for new records
+    if !persisted? 
+      false
+    else
+      !password.nil? || !password_confirmation.nil?
     end
-    true
   end
 end

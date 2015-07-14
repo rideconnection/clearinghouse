@@ -4,6 +4,9 @@ Rails.application.routes.draw do
 
   mount Clearinghouse::API => "/"
 
+  as :user do
+    patch '/user/confirmation' => 'confirmations#update', :via => :patch, :as => :update_user_confirmation
+  end
   devise_for :users, :controllers => { :confirmations => "confirmations" }
 
   get 'check_session' => 'users#check_session'
@@ -69,7 +72,7 @@ Rails.application.routes.draw do
   resources :reports, :only => [ :index, :show ]
 
   match 'admin', :via => :get, :controller => :admin, :action => :index
-  match 'job_queue' => DelayedJobWeb, :via => :get, :anchor => false, :constraints => lambda { |request|
+  match 'job_queue' => DelayedJobWeb, :anchor => false, via: [:get, :post], :constraints => lambda { |request|
     request.env['warden'].authenticated? # are we authenticated?
     request.env['warden'].authenticate! # authenticate if not already
     request.env['warden'].user.has_admin_role? # Ensure site_admin role
@@ -83,6 +86,6 @@ Rails.application.routes.draw do
   end
 
   get "pages/credits"
-
+  
   root :to => 'trip_tickets#index'
 end

@@ -23,12 +23,12 @@
   </div>
 
   <% if @provider.new_record? && @user.present? %>
-  <fieldset id="provider_admin_user">
-    <legend>Administrative User</legend>
-    <%= f.fields_for :users, @user do |user_fields| %>
-      <%= render 'users/form_fields', { :f => user_fields } %>
-    <% end %>
-  </fieldset>
+    <fieldset id="provider_admin_user">
+      <legend>Administrative User</legend>
+      <%= f.fields_for :users, @user do |user_fields| %>
+        <%= render 'users/form_fields', { :f => user_fields } %>
+      <% end %>
+    </fieldset>
   <% end %>
 
   <div class="buttons-holder">

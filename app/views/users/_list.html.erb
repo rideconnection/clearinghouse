@@ -31,7 +31,7 @@
           <td><%= user.title %></td>
           <td><%= link_to user.email, "mailto:#{user.email}" %></td>
           <td><%= user.phone %></td>
-          <td><% if can? :edit, user %><%= link_to 'Edit User', edit_user_path(user) %><% end %></td>
+          <td><% if can? :edit, user %><%= link_to (user == current_user ? 'Edit Profile' : 'Edit User'), edit_user_path(user) %><% end %></td>
           <td>
             <% if user.active? && can?(:deactivate, user) %>
               <%= link_to 'Deactivate', deactivate_user_path(user), :method=>:post %>

@@ -36,7 +36,6 @@ class ProvidersController < ApplicationController
     @provider.active = true
     respond_to do |format|
       if @provider.save
-        NewUserMailer.delay.welcome(@provider.users.first, nil, true)
         format.html { redirect_to providers_path, notice: 'Provider was successfully created.' }
         format.json { render json: @provider, status: :created, location: @provider }
       else
@@ -100,9 +99,8 @@ class ProvidersController < ApplicationController
         :phone_number, :common_name, :jurisdiction, :address_type
       ],
       users_attributes: [
-        :id, :active, :email, :name, :password, :password_confirmation,
-        :must_generate_password, :phone, :provider_id, :role_id,
-        :title, :notification_preferences, :failed_attempts, :locked_at
+        :id, :active, :email, :name, :password, :password_confirmation, :phone, :provider_id, 
+        :role_id, :title, :notification_preferences, :failed_attempts, :locked_at
       ])
   end
 

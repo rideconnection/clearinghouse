@@ -71,11 +71,6 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
-        if Rails.env.development? || Rails.env.test?
-          NewUserMailer.welcome(@user, nil, @user.need_to_generate_password?).deliver_now
-        else
-          NewUserMailer.delay.welcome(@user, nil, @user.need_to_generate_password?)
-        end
         destination = current_user.has_admin_role? ? users_path : provider_path(@user.provider)
         format.html { redirect_to destination, notice: 'User was successfully created.' }
         format.json { render json: @user, status: :created, location: @user }
@@ -121,7 +116,7 @@ class UsersController < ApplicationController
         # Devise logs users out on password change
         sign_in(@user, :bypass => true) if need_relogin
         
-        @user.send_reset_password_instructions if params[:send_reset_password_link]
+        @user.send_reset_password_instructions if params[:send_reset_password_instructions]
         
         format.html { redirect_to :back, notice: 'User was successfully updated.' }
         format.json { head :no_content }
@@ -173,7 +168,7 @@ class UsersController < ApplicationController
 
   def user_params
     params.require(:user).permit(:active, :email, :name, :password, :password_confirmation,
-      :must_generate_password, :phone, :provider_id, :role_id, :title, :failed_attempts, :locked_at,
+      :phone, :provider_id, :role_id, :title, :failed_attempts, :locked_at,
       notification_preferences: [])
   end
 

@@ -6,20 +6,10 @@
     <div class="field">
       <%= f.label :password %>
       <div>
-        The user will be sent an activation link with a generated password
-        <%= f.hidden_field :must_generate_password, :value => "1" %>
+        The user will set their own email when they confirm their account
       </div>
     </div>
-  <% elsif can? :send_reset_password_link, @user and @user != current_user %>
-    <div class="field">
-      <%= f.label :password %>
-      <div>
-        <%= label_tag("send_reset_password_link") do %>
-          <%= check_box_tag "send_reset_password_link" %> Send a link to reset their password
-        <% end %>
-      </div>
-    </div>
-  <% else %>
+  <% elsif @user == current_user %>
     <div class="field">
       <%= f.label :password, "New password" %>
       <%= f.password_field :password %>
@@ -27,6 +17,15 @@
     <div class="field">
       <%= f.label :password_confirmation, "Confirm new password" %>
       <%= f.password_field :password_confirmation %>
+    </div>
+  <% elsif can? :send_reset_password_instructions, @user %>
+    <div class="field">
+      <%= f.label :password %>
+      <div>
+        <%= label_tag("send_reset_password_instructions") do %>
+          <%= check_box_tag "send_reset_password_instructions" %> Send a link to reset their password
+        <% end %>
+      </div>
     </div>
   <% end %>
   <div class="field">
