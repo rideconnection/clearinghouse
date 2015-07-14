@@ -24,9 +24,7 @@ class ApplicationController < ActionController::Base
   private
 
   def user_time_zone(&block)
-    # The route for /users/sign_out can throw an error here while trying to
-    # load a user with id='sign_out', so allow it to fail gracefully.
-    Time.use_zone(try(:current_user).try(:time_zone) || Time.zone, &block)
+    Time.use_zone(current_user.try(:time_zone) || Time.zone, &block)
   end
 
   def store_location
