@@ -1,21 +1,21 @@
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
-  # Added for Devise 3.1+:
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` on Rails 4+ applications as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  config.secret_key = Rails.application.secrets.devise_secret_key
+  # config.secret_key = '2200d9a7137776d71526e43921d0b1cc30205ee03df1a0e2bf0ae666d689ed5392be9e6a0884026c209334e725003e2c8ac2dc892b67ea1a3474f233a38dfd7b'
 
   # ==> Mailer Configuration
   # Configure the e-mail address which will be shown in Devise::Mailer,
-  # note that it will be overwritten if you use your own mailer class with default "from" parameter.
-  config.mailer_sender = "Clearinghouse Notifications <noreply@rideconnection.org>"
+  # note that it will be overwritten if you use your own mailer class
+  # with default "from" parameter.
+  config.mailer_sender = 'Clearinghouse Notifications <noreply@rideconnection.org>'
 
   # Configure the class responsible to send e-mails.
-  # config.mailer = "Devise::Mailer"
+  # config.mailer = 'Devise::Mailer'
 
   # ==> ORM configuration
   # Load and configure the ORM. Supports :active_record (default) and
@@ -31,7 +31,7 @@ Devise.setup do |config|
   # session. If you need permissions, you should implement that in a before filter.
   # You can also supply a hash where the value is a boolean determining whether
   # or not authentication should be aborted when the value is not present.
-  # config.authentication_keys = [ :email ]
+  # config.authentication_keys = [:email]
 
   # Configure parameters from the request object used for authentication. Each entry
   # given should be a request method and it will automatically be passed to the
@@ -43,12 +43,12 @@ Devise.setup do |config|
   # Configure which authentication keys should be case-insensitive.
   # These keys will be downcased upon creating or modifying a user and when used
   # to authenticate or find a user. Default is :email.
-  config.case_insensitive_keys = [ :email ]
+  config.case_insensitive_keys = [:email]
 
   # Configure which authentication keys should have whitespace stripped.
   # These keys will have whitespace before and after removed upon creating or
   # modifying a user and when used to authenticate or find a user. Default is :email.
-  config.strip_whitespace_keys = [ :email ]
+  config.strip_whitespace_keys = [:email]
 
   # Tell if authentication through request.params is enabled. True by default.
   # It can be set to an array that will enable params authentication only for the
@@ -99,7 +99,7 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 10
 
   # Setup a pepper to generate the encrypted password.
-  # config.pepper = "6243356ccf26a562e105cd15a4f3b741f3e95ffcdffa5b19672c0213bbdb66f12c07b1a2995845c8993d7528edac4703a43fe8f77cb9bb470293861d389a4624"
+  # config.pepper = '6243356ccf26a562e105cd15a4f3b741f3e95ffcdffa5b19672c0213bbdb66f12c07b1a2995845c8993d7528edac4703a43fe8f77cb9bb470293861d389a4624'
 
   # ==> Configuration for :confirmable
   # A period that the user is allowed to access the website even without
@@ -124,7 +124,7 @@ Devise.setup do |config|
   config.reconfirmable = true
 
   # Defines which key will be used when confirming an account
-  # config.confirmation_keys = [ :email ]
+  # config.confirmation_keys = [:email]
 
   # ==> Configuration for :rememberable
   # The time the user will be remembered without asking for credentials again.
@@ -141,7 +141,7 @@ Devise.setup do |config|
   # config.rememberable_options = {}
 
   # ==> Configuration for :validatable
-  # Range for password length. Default is 8..72
+  # Range for password length.
   config.password_length = 0..999 # Let the User model validate the password
 
   # Email regex used to validate email formats. It simply asserts that
@@ -164,7 +164,7 @@ Devise.setup do |config|
   config.lock_strategy = :failed_attempts
 
   # Defines which key will be used when locking and unlocking an account
-  config.unlock_keys = [ :email ]
+  config.unlock_keys = [:email]
 
   # Defines which strategy will be used to unlock an account.
   # :email = Sends an unlock link to the user email
@@ -186,7 +186,7 @@ Devise.setup do |config|
   # ==> Configuration for :recoverable
   #
   # Defines which key will be used when recovering the password for an account
-  # config.reset_password_keys = [ :email ]
+  # config.reset_password_keys = [:email]
 
   # Time interval you can reset your password with a reset password key.
   # Don't put a too small interval or your users won't have the time to
@@ -265,42 +265,42 @@ Devise.setup do |config|
 
   # ==> Security Extension
   # Configure security extension for devise
-
+  
   # Should the password expire (e.g 3.months)
   config.expire_password_after = ApplicationSetting.defaults['devise.expire_password_after']
-
+  
   # Need 1 char of A-Z, a-z and 0-9
   # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
-
+  
   # How many passwords to keep in archive
   # Note: Changing the password 4 times results in the old_passwords table containing passwords
   # 1, 2, 3, and 4. With a password_archiving_count of 4, changing it a 5th time results in
   # password 5 being added and password 1 being dropped, and thus able to be used again after
   # 5 changes.
   config.password_archiving_count = ApplicationSetting.defaults['devise.password_archiving_count']
-
+  
   # Deny old password (true, false, count)
   config.deny_old_passwords = true
-
+  
   # enable email validation for :secure_validatable. (true, false, validation_options)
   # dependency: need an email validator like rails_email_validator
   # config.email_validation = true
-
+  
   # captcha integration for recover form
   # config.captcha_for_recover = true
-
+  
   # captcha integration for sign up form
   # config.captcha_for_sign_up = true
-
+  
   # captcha integration for sign in form
   # config.captcha_for_sign_in = true
-
+  
   # captcha integration for unlock form
   # config.captcha_for_unlock = true
-
+  
   # captcha integration for confirmation form
   # config.captcha_for_confirmation = true
-
+  
   # Time period for account expiry from last_activity_at
   # config.expire_after = 90.days
 end
