@@ -6,6 +6,5 @@ FactoryGirl.define do
     name "My Provider"
     address { FactoryGirl.create(:location) }
     primary_contact_email "some@nights.fun"
-    active true
   end
 end

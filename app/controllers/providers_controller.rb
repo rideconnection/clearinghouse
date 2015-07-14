@@ -33,7 +33,6 @@ class ProvidersController < ApplicationController
   end
 
   def create
-    @provider.active = true
     respond_to do |format|
       if @provider.save
         format.html { redirect_to providers_path, notice: 'Provider was successfully created.' }
@@ -59,16 +58,6 @@ class ProvidersController < ApplicationController
     end
   end
 
-  def activate
-    params[:provider] = { :active => true }
-    update
-  end
-
-  def deactivate
-    params[:provider] = { :active => false }
-    update
-  end
-
   def keys; end
 
   def reset_keys
@@ -92,7 +81,7 @@ class ProvidersController < ApplicationController
   private
 
   def provider_params
-    params.require(:provider).permit(:active, :address, :name, :primary_contact_email,
+    params.require(:provider).permit(:address, :name, :primary_contact_email,
       :trip_ticket_expiration_days_before, :trip_ticket_expiration_time_of_day,
       address_attributes: [
         :id, :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150714194219) do
+ActiveRecord::Schema.define(version: 20150714222727) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -196,7 +196,6 @@ ActiveRecord::Schema.define(version: 20150714194219) do
     t.datetime "updated_at",                                     null: false
     t.string   "api_key",                            limit: 255
     t.string   "private_key",                        limit: 255
-    t.boolean  "active"
     t.string   "primary_contact_email",              limit: 255
     t.integer  "trip_ticket_expiration_days_before"
     t.time     "trip_ticket_expiration_time_of_day"

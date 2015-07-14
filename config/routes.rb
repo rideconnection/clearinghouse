@@ -20,8 +20,6 @@ Rails.application.routes.draw do
 
   resources :providers do
     member do
-      post 'activate'
-      post 'deactivate'
       get  'keys'
       post 'reset_keys'
     end

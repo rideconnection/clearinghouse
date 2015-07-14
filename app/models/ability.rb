@@ -15,13 +15,10 @@ class Ability
     user ||= User.new # guest user
     
     if user.has_admin_role?
-      
       can :manage, [User, Provider]
-      
     end
 
     if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :dispatcher, :api]
-      
       # Per Feb 12, 2013 minutes: 
       #   Site Admin must be associated with a provider and can only act on
       #   tickets/claims/open capacity on behalf of his provider. If a site
@@ -44,7 +41,6 @@ class Ability
     end
     
     if user.has_any_role? [:site_admin, :provider_admin, :scheduler, :api]
-      
       # Per Feb 12, 2013 minutes: 
       #   Site Admin must be associated with a provider and can only act on
       #   tickets/claims/open capacity on behalf of his provider. If a site
@@ -86,18 +82,14 @@ class Ability
       # bulk operations should only be created and read, not updated or destroyed
       can [:create, :read], BulkOperation, :user_id => user.id
       can :download, BulkOperation, :user_id => user.id, :is_upload => false
-
     end
 
     if user.has_any_role? [:api]
-
       # per Clearinghouse User Ability Matrix doc, API has same abilities as Scheduler with these specific exceptions
       cannot :rescind, ServiceRequest
-
     end
 
     if user.has_any_role? [:site_admin, :provider_admin]
-      
       # Per ticket #1225:
       #   Per the approved matrix site admins can:
       #     * set up partnerships

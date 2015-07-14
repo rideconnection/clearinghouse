@@ -11,7 +11,6 @@
         <th>Name</th>
         <th>Contact</th>
         <th></th>
-        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -21,15 +20,6 @@
           <td><%= link_to provider.name, provider_path(provider) %></td>
           <td><%= mail_to (provider.primary_contact_email) %></td>
           <td><% if can? :edit, provider %><%= link_to 'Edit', edit_provider_path(provider) %><% end %></td>
-          <td>
-            <% if provider.active? && can?(:deactivate, provider) %>
-              <%= link_to 'Deactivate', deactivate_provider_path(provider), :method=>:post %>
-            <% elsif !provider.active? && can?(:activate, provider) %>
-              <%= link_to 'Activate', activate_provider_path(provider), :method=>:post %>
-            <% else %>
-              <%= provider.active? ? 'Active' : 'Inactive' %>
-            <% end %>
-          </td>
         </tr>
       <% end %>
     </tbody>
