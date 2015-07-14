@@ -7,5 +7,5 @@ class ServiceRequest < ActiveRecord::Base
 
   # attr_accessible :notes, :open_capacity_id, :status, :trip_ticket_id, :user_id
 
-  audited
+  audited allow_mass_assignment: true
 end

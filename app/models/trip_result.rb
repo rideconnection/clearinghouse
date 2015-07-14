@@ -6,7 +6,7 @@ class TripResult < ActiveRecord::Base
 
   OUTCOMES = ["Completed", "No-Show", "Cancelled"]
 
-  audited
+  audited allow_mass_assignment: true
 
   belongs_to :trip_ticket, :touch => true
   has_one :trip_claim

@@ -7,7 +7,7 @@ class TripTicketComment < ActiveRecord::Base
   belongs_to :trip_ticket, :touch => true
   belongs_to :user
   
-  audited
+  audited allow_mass_assignment: true
 
   acts_as_notifier do
     after_create do

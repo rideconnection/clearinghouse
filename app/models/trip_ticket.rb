@@ -53,7 +53,7 @@ class TripTicket < ActiveRecord::Base
   accepts_nested_attributes_for :pick_up_location, :drop_off_location, :trip_result
   accepts_nested_attributes_for :customer_address, :reject_if => :all_blank
 
-  audited
+  audited allow_mass_assignment: true
 
   acts_as_notifier do
     after_create do

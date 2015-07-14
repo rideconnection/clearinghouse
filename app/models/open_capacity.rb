@@ -7,5 +7,5 @@ class OpenCapacity < ActiveRecord::Base
   has_many :service_requests
   has_many :waypoints
 
-  audited
+  audited allow_mass_assignment: true
 end

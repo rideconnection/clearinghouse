@@ -5,8 +5,8 @@ class Location < ActiveRecord::Base
   #                 :phone_number, :common_name, :jurisdiction, :address_type
 
   validates_presence_of :address_1, :city, :state, :zip
-  
-  audited
+
+  audited allow_mass_assignment: true
 
   attr_writer :latitude, :longitude
 

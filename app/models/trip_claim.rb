@@ -27,7 +27,7 @@ class TripClaim < ActiveRecord::Base
 
   validate :trip_ticket_is_not_rescinded, :on => :create
 
-  audited
+  audited allow_mass_assignment: true
 
   acts_as_notifier do
     after_create do
