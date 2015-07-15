@@ -36,6 +36,6 @@ class AdminProviderTest < ActionDispatch::IntegrationTest
 
     assert page.has_content?("Provider was successfully created.")
     assert_equal mail.to.first, "test@example.net" 
-    assert mail.body.include?("Please set up a password")
+    assert mail.body.include?("Confirm my account")
   end
 end

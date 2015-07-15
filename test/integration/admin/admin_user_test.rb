@@ -18,7 +18,7 @@ class AdminUserTest < ActionDispatch::IntegrationTest
     Provider.destroy_all
   end
 
-  test "admin can create a new user with a random password" do
+  test "admin can create a new user without setting a password" do
     visit "/"
     click_link "Admin"
     click_link "Users"
@@ -34,12 +34,12 @@ class AdminUserTest < ActionDispatch::IntegrationTest
 
     assert page.has_content?("User was successfully created.")
     assert_equal mail.to.first, "test@example.net" 
-    assert mail.body.include?("You have been assigned the password")
+    assert mail.body.include?("Confirm my account")
   end
 
   test "admin can edit another user and have a password reset email sent" do  
     visit "/users/#{@other_user.id}/edit"
-    check "send_reset_password_link"
+    check "send_reset_password_instructions"
     click_button "Update User"
 
     mail = ActionMailer::Base.deliveries.last

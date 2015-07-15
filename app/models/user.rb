@@ -53,7 +53,7 @@ class User < ActiveRecord::Base
   end
 
   def active_for_authentication?
-    !!active
+    active?
   end
 
   def inactive_message
@@ -90,7 +90,7 @@ class User < ActiveRecord::Base
   # Override default password_required? method 
   def password_required?
     # Password is required if it is being set, but not for new records
-    if !persisted? 
+    if !persisted?
       false
     else
       !password.nil? || !password_confirmation.nil?
