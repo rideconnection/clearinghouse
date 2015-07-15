@@ -1,6 +1,5 @@
 class Filter < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :user
 
   serialize :data

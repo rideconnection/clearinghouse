@@ -1,9 +1,5 @@
 class Role < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
   has_many :users
-
-  # attr_accessible :name
 
   # The set of roles that are meaningful inside a provider
   scope :provider_roles, ->{ where "name != 'site_admin'" }

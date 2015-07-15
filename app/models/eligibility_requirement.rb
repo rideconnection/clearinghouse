@@ -1,6 +1,5 @@
 class EligibilityRequirement < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :service
   has_many :eligibility_rules, :dependent => :destroy
 

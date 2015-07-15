@@ -1,6 +1,5 @@
 class OpenCapacity < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :arrival_location,   :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :departure_location, :class_name => :Location, :validate => true, :dependent => :destroy
   belongs_to :service

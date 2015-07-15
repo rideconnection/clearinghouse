@@ -1,6 +1,5 @@
 class Provider < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   has_many :services
   has_many :nonces
   has_many :users, inverse_of: :provider

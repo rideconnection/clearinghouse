@@ -2,7 +2,6 @@ require 'notification_recipients'
 
 class TripClaim < ActiveRecord::Base
   include NotificationRecipients
-  include ActiveModel::ForbiddenAttributesProtection
 
   belongs_to :trip_ticket, :touch => true
   belongs_to :claimant, :class_name => :Provider, :foreign_key => :claimant_provider_id

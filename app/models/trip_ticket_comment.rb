@@ -2,8 +2,7 @@ require 'notification_recipients'
 
 class TripTicketComment < ActiveRecord::Base
   include NotificationRecipients
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :trip_ticket, :touch => true
   belongs_to :user
   

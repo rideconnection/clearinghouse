@@ -1,6 +1,5 @@
 class BulkOperation < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :user
 
   validates_presence_of :user_id

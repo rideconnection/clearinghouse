@@ -1,6 +1,5 @@
 class Service < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :provider
   has_many :open_capacities
   has_many :operating_hours, :class_name => :OperatingHours

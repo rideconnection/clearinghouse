@@ -2,8 +2,7 @@ require 'notification_recipients'
 
 class TripResult < ActiveRecord::Base
   include NotificationRecipients
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   OUTCOMES = ["Completed", "No-Show", "Cancelled"]
 
   audited allow_mass_assignment: true

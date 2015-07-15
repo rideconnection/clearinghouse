@@ -1,6 +1,5 @@
 class EligibilityRule < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :eligibility_requirement
   has_one :service, :through => :eligibility_requirement
 

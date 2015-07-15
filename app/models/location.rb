@@ -1,9 +1,4 @@
 class Location < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
-  # attr_accessible :address_1, :address_2, :city, :position, :state, :zip, :latitude, :longitude,
-  #                 :phone_number, :common_name, :jurisdiction, :address_type
-
   validates_presence_of :address_1, :city, :state, :zip
 
   audited allow_mass_assignment: true

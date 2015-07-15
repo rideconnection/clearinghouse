@@ -4,7 +4,6 @@ require 'notification_recipients'
 class TripTicket < ActiveRecord::Base
   include TripTicketIcons
   include NotificationRecipients
-  include ActiveModel::ForbiddenAttributesProtection
 
   belongs_to :originator, :foreign_key => :origin_provider_id, :class_name => :Provider, :validate => true
   belongs_to :customer_address,  :class_name => :Location, :validate => true, :dependent => :destroy

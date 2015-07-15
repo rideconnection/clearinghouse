@@ -1,6 +1,5 @@
 class ProviderRelationship < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   belongs_to :requesting_provider,
     :foreign_key => "requesting_provider_id",
     :class_name => "Provider"

@@ -3,8 +3,7 @@
 # them all using `ApplicationSetting.delete_all`, but you'll
 # also want to `rake tmp:clear` to get rid of the cached values
 class ApplicationSetting < RailsSettings::CachedSettings
-  include ActiveModel::ForbiddenAttributesProtection
-
+  
   def self.update_settings(params)
     transaction do
       self['devise.maximum_attempts']         = params['devise.maximum_attempts'].to_i           if params.has_key? "devise.maximum_attempts"

@@ -1,6 +1,4 @@
 class User < ActiveRecord::Base
-  include ActiveModel::ForbiddenAttributesProtection
-
   devise :async, :database_authenticatable, :recoverable, :trackable, :validatable,
     :password_expirable, :password_archivable, :lockable, :session_limitable,
     :timeoutable, :confirmable
