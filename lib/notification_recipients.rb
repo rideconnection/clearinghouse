@@ -60,6 +60,6 @@ module NotificationRecipients
 
   def notification_enabled_filter(users, notifier_options)
     type = notifier_options[:method].to_sym
-    users.where("(users.confirmed_at IS NOT NULL && users.notification_preferences @> ?)", "{\"#{type}\"}")
+    users.where("(users.confirmed_at IS NOT NULL AND users.notification_preferences @> ?)", "{\"#{type}\"}")
   end
 end
