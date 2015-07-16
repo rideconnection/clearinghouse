@@ -1,5 +1,0 @@
-# ln -fs `bundle show delayed_job_web`/lib/delayed_job_web/application/public #{current_path}/public/widget-queue
-
-
-# puts "    Link in DelayedJobWeb assets folder"
-# run "cd #{latest_release}; ln -nFs `bundle show delayed_job_web`/lib/delayed_job_web/application/public #{latest_release}/public/job_queue"

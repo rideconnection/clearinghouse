@@ -18,8 +18,6 @@ set :rvm_roles, [:app, :web]
 set :conditionally_migrate, false
 
 # Whenever options
-set :whenever_command, "bundle exec whenever"
-set :whenever_environment, ->{ fetch(:stage) }
 set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
 set :whenever_roles, [:db, :app]
 
@@ -53,6 +51,6 @@ set :keep_releases, 20
 namespace :deploy do
   after :publishing, :restart
   namespace :assets do
-    # before :precompile, :link_djw_assets_folder
+    before :precompile, :link_djw_assets
   end
 end
