@@ -1,5 +1,6 @@
 class FiltersController < ApplicationController
   load_and_authorize_resource
+  skip_load_resource only: [:create]
 
   def index
   end
@@ -86,6 +87,10 @@ class FiltersController < ApplicationController
   private
 
   def filter_params
-    params.require(:filter).permit(:name, data: params[:filter][:data].try(:keys))
+    # H/T to http://stackoverflow.com/a/24752108/83743 for this workaround
+    filter_data = params[:filter].delete(:data)
+    params.require(:filter).permit(:name).tap do |whitelisted|
+      whitelisted[:data] = filter_data
+    end
   end
 end
