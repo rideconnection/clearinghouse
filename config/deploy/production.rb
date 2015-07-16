@@ -1,3 +1,5 @@
+# TODO upgrade to capistrano v3 syntax!! (See staging file)
+
 set :branch, "production"
 set :deploy_to, "/srv/clearinghouse"
 set :rails_env, "production"

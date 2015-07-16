@@ -1,13 +1,13 @@
-require "rvm/capistrano"
-
-set :branch, "master"
-set :rvm_ruby_string, 'ruby-2.2.2@clearinghouse'
-set :rails_env, "staging"
-set :deploy_to, "/home/deployer/rails/clearinghouse"
+set :branch, 'master'
+set :rvm_ruby_version, 'ruby-2.2.2@clearinghouse'
+set :passenger_rvm_ruby_version, 'ruby-2.2.2@global'
+set :deploy_to, '/home/deployer/rails/clearinghouse'
 set :default_env, { "RAILS_RELATIVE_URL_ROOT" => "/clearinghouse" }
 
-role :web, "184.154.158.74"
-role :app, "184.154.158.74"
-role :db,  "184.154.158.74", :primary => true # This is where Rails migrations will run
+# capistrano-rails directives
+set :rails_env, 'staging'
+set :assets_roles, [:web, :app]
+set :migration_role, [:db]
+set :conditionally_migrate, true
 
-before "deploy:assets:precompile", :link_secrets_yml
+server 'ridestage.panopticdev.com', roles: [:app, :web, :db], user: 'deployer'

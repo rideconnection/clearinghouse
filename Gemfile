@@ -1,10 +1,7 @@
 source "https://rubygems.org"
 
-gem "capistrano", require: false
-gem "capistrano-ext", require: false
 gem "pg"
 gem "rails", "~> 4.2.1"
-gem "rvm-capistrano", require: false
 
 # Geospatial support
 gem "rgeo"
@@ -52,7 +49,24 @@ gem "grape-entity", "~> 0.4.5"
 # per https://github.com/intridea/grape#rails
 gem "hashie-forbidden_attributes"
 
+group :development do
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+
+  gem "rails-erd"
+  gem "thin"
+
+  # Use Capistrano for deployment
+  gem 'capistrano', '~> 3.4'
+  gem 'capistrano-rvm', '~> 0.1', require: false
+  gem 'capistrano-rails', '~> 1.1', require: false
+  gem 'capistrano-secrets-yml', '~> 1.0', require: false
+end
+
 group :test, :development do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug'
+
   gem "capybara"
   gem "database_cleaner"
   gem "launchy"
@@ -61,25 +75,6 @@ group :test, :development do
   gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
   gem "minitest-rails-capybara", git: "git://github.com/blowmage/minitest-rails-capybara.git"
 
-  # note: debugger gem no longer supported, see: https://github.com/cldwalker/debugger#known-issues
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug'
-
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 2.0'
-
-  # note: removed Spork because Rails 4.1+ has Spring built-in
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
 end
-
-group :development do
-  gem "rails-erd"
-  gem "thin"
-end
-
-# To use ActiveModel has_secure_password
-# gem "bcrypt-ruby", "~> 3.0"
-
-# Use unicorn as the app server
-# gem "unicorn"
