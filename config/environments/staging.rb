@@ -67,7 +67,6 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {
     :host => 'ridestage.panopticdev.com/clearinghouse',
   }
-  config.action_mailer.asset_host = 'https://ridestage.panopticdev.com/clearinghouse'
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
@@ -84,8 +83,6 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
-
-  config.relative_url_root = '/clearinghouse'
 
   config.bulk_operation_options = { use_delayed_job: false }
 
