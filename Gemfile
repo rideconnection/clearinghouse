@@ -4,8 +4,8 @@ gem "pg"
 gem "rails", "~> 4.2.1"
 
 # Geospatial support
-gem "rgeo"
 gem "activerecord-postgis-adapter", "~> 3.0.0"
+gem "rgeo"
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'

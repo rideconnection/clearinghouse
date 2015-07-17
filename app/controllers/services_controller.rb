@@ -133,16 +133,17 @@ class ServicesController < ApplicationController
   end
 
   def update_polygon
+    factory = RGeo::Geos.factory(srid: 4326)
     points = []
     if !params[:service_area].nil?
       params[:service_area].each_pair do |key, value|
-        points << "#{value[:lng]} #{value[:lat]}"
+        points << factory.point(value[:lng].to_f, value[:lat].to_f)
       end
     end
-    wkt = nil
     if points.any?
-      wkt = "POLYGON ((#{points.join(", ")}))"
+      @service.service_area = factory.polygon(factory.linear_ring(points))
+    else
+      @service.service_area = nil
     end
-    @service.service_area = wkt
   end
 end
