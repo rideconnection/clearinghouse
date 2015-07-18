@@ -70,7 +70,9 @@ class AdminUserTest < ActionDispatch::IntegrationTest
     fill_in 'user[email]', :with => 'user.changed@clearinghouse.org'
     click_button 'Update User'
     assert page.has_content?('User was successfully updated.')
-    assert find_field('user[email]').value == 'user.changed@clearinghouse.org'
+    # we require re-confirmation of email changes with Devise Confirmable
+    #assert find_field('user[email]').value == 'user.changed@clearinghouse.org'
+    @user.reload.unconfirmed_email.must_equal('user.changed@clearinghouse.org')
   end
 
   test "user can change name" do
@@ -111,8 +113,9 @@ class AdminUserTest < ActionDispatch::IntegrationTest
     assert_equal 0, @other_user.failed_attempts
     assert_nil @other_user.locked_at
   end
-  
+
   test "admin can deactivate an active user account" do
+    @other_user.update_attributes confirmed_at: 1.days.ago
     visit "/users"
     find("a[href='#{deactivate_user_path(@other_user)}']").click
     assert page.has_content?('User was successfully updated.')
@@ -120,15 +123,15 @@ class AdminUserTest < ActionDispatch::IntegrationTest
   end
   
   test "admin can activate an inactive user account" do
-    @other_user.update_attribute :active, false
-
+    @other_user.update_attributes active: false, confirmed_at: 1.days.ago
     visit "/users"
     find("a[href='#{activate_user_path(@other_user)}']").click
     assert page.has_content?('User was successfully updated.')
     assert @other_user.reload.active?
   end
-  
+
   test "admin cannot deactivate their own account" do
+    @user.update_attributes confirmed_at: 1.days.ago
     visit "/users"
     refute_selector "a[href='#{deactivate_user_path(@user)}']"
     assert page.has_content? "Active"
