@@ -115,7 +115,6 @@ class AdminUserTest < ActionDispatch::IntegrationTest
   end
 
   test "admin can deactivate an active user account" do
-    @other_user.update_attributes confirmed_at: 1.days.ago
     visit "/users"
     find("a[href='#{deactivate_user_path(@other_user)}']").click
     assert page.has_content?('User was successfully updated.')
@@ -123,7 +122,7 @@ class AdminUserTest < ActionDispatch::IntegrationTest
   end
   
   test "admin can activate an inactive user account" do
-    @other_user.update_attributes active: false, confirmed_at: 1.days.ago
+    @other_user.update_attribute :active, false
     visit "/users"
     find("a[href='#{activate_user_path(@other_user)}']").click
     assert page.has_content?('User was successfully updated.')
@@ -131,7 +130,6 @@ class AdminUserTest < ActionDispatch::IntegrationTest
   end
 
   test "admin cannot deactivate their own account" do
-    @user.update_attributes confirmed_at: 1.days.ago
     visit "/users"
     refute_selector "a[href='#{deactivate_user_path(@user)}']"
     assert page.has_content? "Active"

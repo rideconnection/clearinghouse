@@ -10,5 +10,6 @@ FactoryGirl.define do
     provider
     role { Role.find_or_create_by(name: "read_only") }
     active true
+    confirmed_at 1.days.ago
   end
 end
