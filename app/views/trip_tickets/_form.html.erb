@@ -175,7 +175,7 @@
             <% @trip_ticket.customer_identifiers.try(:each) do |k,v| %>
               <div class="field hstoreAttribute">
                 <%= text_field_tag k, k, :class => 'hstoreAttributeName', :size => 30 %>
-                <%= ci.text_field k, :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue', :size => 30 %>
+                <%= ci.text_field k.gsub(/[^A-Za-z0-9]/, '_'), :value => v, :placeholder => "value for #{k}", :class => 'hstoreAttributeValue', :size => 30 %>
                 <a href="#" class='removeHstoreAttribute'>X</a>
               </div>
             <% end %>
@@ -194,12 +194,19 @@
             <script type='text/javascript'>
               $(document).ready(function() {
                 $('#customer_identifiers').delegate('.hstoreAttributeName', 'keyup', function(e){
-                  $nameEl  = $(this);
-                  name     = $.trim($nameEl.val()).toLowerCase();
-                  $valueEl = $($nameEl.siblings('.hstoreAttributeValue')[0]);
-                  $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + name);
-                  $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
-                  $valueEl.attr('placeholder', 'value for ' + name);
+                  var $nameEl   = $(this);
+                  var name      = $.trim($nameEl.val()).toLowerCase();
+                  var paramName = name.replace(/[^A-Za-z0-9]/g, '_');
+                  var $valueEl  = $($nameEl.siblings('.hstoreAttributeValue')[0]);
+                  if (name && name.length > 0) {
+                    $valueEl.attr('id',          'trip_ticket_customer_identifiers_' + paramName);
+                    $valueEl.attr('name',        'trip_ticket[customer_identifiers][' + name + ']');
+                    $valueEl.attr('placeholder', 'value for ' + name);
+                  } else {
+                    $valueEl.attr('id',          '');
+                    $valueEl.attr('name',        '');
+                    $valueEl.attr('placeholder', 'value');
+                  }
                 });
 
                 $('#customer_identifiers').delegate('.removeHstoreAttribute', 'click', function(event){
