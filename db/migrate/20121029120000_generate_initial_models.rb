@@ -41,7 +41,7 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.string   "zip"
       t.datetime "created_at",                                          :null => false
       t.datetime "updated_at",                                          :null => false
-      t.spatial  "position",   :limit => {:srid=>4326, :type=>"point"}
+      t.st_point "position", :srid=>4326
     end
 
     create_table "open_capacities" do |t|
@@ -95,7 +95,7 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.datetime "created_at",                                                    :null => false
       t.datetime "updated_at",                                                    :null => false
       t.integer  "operating_hours_id"
-      t.spatial  "service_area",       :limit => {:srid=>4326, :type=>"polygon"}
+      t.st_polygon "service_area", :srid=>4326
     end
 
     create_table "spatialite_history", :primary_key => "event_id" do |t|
