@@ -1,4 +1,4 @@
-class GenerateInitalModels < ActiveRecord::Migration
+class GenerateInitialModels < ActiveRecord::Migration
   def change
     create_table "SpatialIndex", :id => false do |t|
       t.text   "f_table_name"

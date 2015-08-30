@@ -1,4 +1,4 @@
-set :branch, 'master'
+set :branch, 'staging'
 set :rvm_ruby_version, 'ruby-2.2.2@clearinghouse'
 set :passenger_rvm_ruby_version, 'ruby-2.2.2@passenger'
 set :deploy_to, '/home/deploy/rails/clearinghouse'
