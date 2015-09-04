@@ -39,8 +39,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.string   "city"
       t.string   "state"
       t.string   "zip"
-      t.datetime "created_at",                                          :null => false
-      t.datetime "updated_at",                                          :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
       t.st_point "position", :srid=>4326
     end
 
@@ -54,8 +54,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.integer  "departure_location_id"
       t.datetime "arrival_time"
       t.integer  "arrival_location_id"
-      t.datetime "created_at",             :null => false
-      t.datetime "updated_at",             :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "operating_hours" do |t|
@@ -63,8 +63,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.integer  "day_of_week"
       t.time     "open_time"
       t.time     "close_time"
-      t.datetime "created_at",  :null => false
-      t.datetime "updated_at",  :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "providers" do |t|
@@ -81,8 +81,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.integer  "status"
       t.integer  "user_id"
       t.text     "notes"
-      t.datetime "created_at",       :null => false
-      t.datetime "updated_at",       :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "services" do |t|
@@ -92,8 +92,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.boolean  "req_veteran"
       t.integer  "funding_source_id"
       t.string   "rate"
-      t.datetime "created_at",                                                    :null => false
-      t.datetime "updated_at",                                                    :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
       t.integer  "operating_hours_id"
       t.st_polygon "service_area", :srid=>4326
     end
@@ -108,13 +108,13 @@ class GenerateInitialModels < ActiveRecord::Migration
     end
 
     create_table "trip_claims" do |t|
+      t.integer  "claimant_provider_id"
       t.integer  "origin_provider_id"
       t.integer  "claimant_service_id"
       t.integer  "trip_ticket_id"
-      t.integer  "fare"
       t.integer  "status"
-      t.datetime "created_at",           :null => false
-      t.datetime "updated_at",           :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "trip_results" do |t|
@@ -135,15 +135,16 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.float    "odometer_start"
       t.float    "odometer_end"
       t.float    "billable_mileage"
-      t.integer  "num_extra_securements"
-      t.datetime "created_at",             :null => false
-      t.datetime "updated_at",             :null => false
+      t.string   "extra_securements_used"
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "trip_tickets" do |t|
       t.integer  "origin_provider_id"
       t.integer  "origin_customer_id"
       t.integer  "claimant_customer_id"
+      t.integer  "claimant_provider_id"
       t.integer  "approved_claim_id"
       t.boolean  "customer_information_withheld"
       t.date     "customer_dob"
@@ -169,8 +170,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.string   "trip_purpose_code"
       t.string   "trip_purpose_description"
       t.text     "trip_notes"
-      t.datetime "created_at",                      :null => false
-      t.datetime "updated_at",                      :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "users" do |t|
@@ -179,8 +180,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.string   "title"
       t.string   "phone"
       t.integer  "provider_id"
-      t.datetime "created_at",  :null => false
-      t.datetime "updated_at",  :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
 
     create_table "waypoints" do |t|
@@ -188,8 +189,8 @@ class GenerateInitialModels < ActiveRecord::Migration
       t.integer  "sequence_id"
       t.datetime "arrival_time"
       t.integer  "location_id"
-      t.datetime "created_at",       :null => false
-      t.datetime "updated_at",       :null => false
+      t.datetime "created_at", :null => false
+      t.datetime "updated_at", :null => false
     end
   end
 end

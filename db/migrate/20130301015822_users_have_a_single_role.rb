@@ -1,10 +1,5 @@
 class UsersHaveASingleRole < ActiveRecord::Migration
 
-  class User < ActiveRecord::Base
-    has_and_belongs_to_many :roles
-    attr_accessible :role_id
-  end
-
   def up
     transaction do
       add_column :users, :role_id, :integer

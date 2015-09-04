@@ -1,14 +1,5 @@
 class UpdateRolesTable < ActiveRecord::Migration
 
-  class User < ActiveRecord::Base
-    belongs_to :role, :class_name => 'UpdateRolesTable::Role'
-    attr_accessible :role
-  end
-
-  class Role < ActiveRecord::Base
-    has_many :users, :class_name => 'UpdateRolesTable::User'
-  end
-
   def up
     transaction do
       read_only = Role.find_or_create_by(name: :read_only)
