@@ -15,6 +15,14 @@ class Location < ActiveRecord::Base
     @longitude || position.try(:x)
   end
 
+  def position=(val)
+    if val.is_a?(String)
+      super RGeo::Geos.factory(srid: 4326).parse_wkt(val)
+    else
+      super val
+    end
+  end
+
   def address_and_city(separator = "\n")
     [address_1, address_2, city].reject(&:blank?).map(&:strip).join(separator)
   end
@@ -31,7 +39,7 @@ class Location < ActiveRecord::Base
 
   def normalize_coordinates
     if @latitude.present? && @longitude.present?
-      self.position = "POINT (#{@longitude} #{@latitude})"
+      self.position = RGeo::Geos.factory(srid: 4326).point(@longitude.to_f, @latitude.to_f)
     end
   end
 end
