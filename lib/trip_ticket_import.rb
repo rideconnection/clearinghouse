@@ -1,4 +1,5 @@
 require 'csv'
+#require 'active_model/forbidden_attributes_protection'
 
 class TripTicketImport
   attr_accessor :originator, :row_count, :errors
@@ -46,7 +47,7 @@ class TripTicketImport
           raise RowError, "trip ticket could not be created, error unknown" if trip.nil?
           raise RowError, trip.errors.full_messages.join(', ') unless trip.errors.empty?
 
-        rescue RowError, ActiveModel::MassAssignmentSecurity::Error => e
+        rescue RowError, ActiveModel::ForbiddenAttributesError, ActionController::ParameterMissing => e
           msg = e.message.length > 200 ? (e.message.slice(0, 200) + '...') : e.message
           self.errors << "Row #{row_count + 1}: #{msg}"
 
