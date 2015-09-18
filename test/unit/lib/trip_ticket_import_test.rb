@@ -9,7 +9,7 @@ class TripTicketImportTest < ActiveSupport::TestCase
     @csv_new_attrs = ',,customer123,trip123,Joe,Testington,,02/05/2013,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,123-456-7890,5 Barker St,,Boston,,MA,02134,123-456-7890,123 Main St Apt A,,Andover,,MA,01810,123-456-7890,F,15'
     @csv_new = @csv_header + "\n" + @csv_new_attrs
 
-    @csv_invalid_attrs = ',,,,,,02/05/2013,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,123-456-7890,5 Barker St,,Boston,,MA,02134,123-456-7890,123 Main St Apt A,,Andover,,MA,01810,123-456-7890,F,15'
+    @csv_invalid_attrs = ',,,,,,,02/05/2013,(123) 456-7890,,,,,FALSE,,0,0,1,,,,,,0,0,2000-01-01T00:00:00Z,,2013-08-31T17:00:00-07:00,2000-01-01T00:00:00Z,-1,-1,,,,pickup,123 Main St Apt B,,Chelmsford,,MA,01110,123-456-7890,5 Barker St,,Boston,,MA,02134,123-456-7890,123 Main St Apt A,,Andover,,MA,01810,123-456-7890,F,15'
     @csv_invalid = @csv_header + "\n" + @csv_invalid_attrs
 
     @existing_trip = FactoryGirl.create(:trip_ticket)
