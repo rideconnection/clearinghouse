@@ -1,10 +1,12 @@
-# TODO upgrade to capistrano v3 syntax!! (See staging file)
+set :branch, 'production'
+set :rvm_ruby_version, 'ruby-2.2.3@clearinghouse'
+set :passenger_rvm_ruby_version, 'ruby-2.2.3@passenger'
+set :deploy_to, '/home/deploy/rails/clearinghouse'
 
-set :branch, "production"
-set :deploy_to, "/srv/clearinghouse"
-set :rails_env, "production"
-role :web, "ch.rideconnection.org"
-role :app, "ch.rideconnection.org"
-role :db,  "ch.rideconnection.org", :primary => true # This is where Rails migrations will run
+# capistrano-rails directives
+set :rails_env, 'production'
+set :assets_roles, [:web, :app]
+set :migration_role, [:db]
+set :conditionally_migrate, true
 
-before "deploy:assets:precompile", :link_secrets_yml
+server 'ch.rideconnection.org', roles: [:app, :web, :db], user: 'deploy'

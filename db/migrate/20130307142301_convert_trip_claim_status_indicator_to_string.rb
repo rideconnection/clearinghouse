@@ -14,8 +14,6 @@ class ConvertTripClaimStatusIndicatorToString < ActiveRecord::Migration
       -1 => :declined,
       -2 => :rescinded
     }
-    
-    attr_accessible :status, :new_status
   end
   
   def up

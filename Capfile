@@ -9,6 +9,7 @@ require 'capistrano/rvm'
 require 'capistrano/bundler'
 require 'capistrano/rails'
 require 'capistrano/secrets_yml'
+require 'capistrano/rails/collection'
 require 'whenever/capistrano'
 
 # Load custom tasks from `lib/capistrano/tasks' if you have any defined

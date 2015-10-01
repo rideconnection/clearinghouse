@@ -4,8 +4,11 @@ class AddRateToTripClaim < ActiveRecord::Migration
       t.text :rate
     end
     # Was previously a string, but text seems more appropriate
-    change_table :services do |t|
-      t.text :rate
+    reversible do |dir|
+      change_table :services do |t|
+        dir.up   { t.change :rate, :text   }
+        dir.down { t.change :rate, :string }
+      end
     end
   end
 end

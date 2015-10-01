@@ -65,7 +65,7 @@ Rails.application.configure do
   # config.assets.precompile += %w( dashboard.js notification_mailer.css )
 
   config.action_mailer.default_url_options = {
-    :host => 'ridestage.panopticdev.com/clearinghouse',
+    :host => 'ch-staging.rideconnection.org',
   }
 
   # Disable delivery errors, bad email addresses will be ignored

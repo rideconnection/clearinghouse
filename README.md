@@ -52,10 +52,11 @@ And run the following commands:
     -- This is ok.
     CREATE LANGUAGE plpgsql;
     
-    -- Install PostGIS (your file paths may vary)
-    -- For Brew installations, use the path /usr/local/share/postgis/
-    \i /usr/share/postgresql/9.4/contrib/postgis-2.1/postgis.sql
-    \i /usr/share/postgresql/9.4/contrib/postgis-2.1/spatial_ref_sys.sql
+    -- Install PostGIS
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;
+
+    -- Add these rights if you run into permissions problems with the spatial tables
     GRANT ALL ON geometry_columns TO PUBLIC;
     GRANT ALL ON geography_columns TO PUBLIC;
     GRANT ALL ON spatial_ref_sys TO PUBLIC;
