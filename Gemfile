@@ -74,6 +74,7 @@ group :test, :development do
   gem "factory_girl_rails"
   gem "minitest-rails", git: "git://github.com/blowmage/minitest-rails.git"
   gem "minitest-rails-capybara", git: "git://github.com/blowmage/minitest-rails-capybara.git"
+  gem "capistrano-rails-collection"
 
   # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'web-console', '~> 2.0'
